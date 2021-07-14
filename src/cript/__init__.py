@@ -14,6 +14,7 @@ __short_version__ = __version__.rpartition(".")[0]
 from .base import *
 from .user import *
 from .group import *
+from .publication import *
 from .collection import *
 from .data import *
 from .experiment import *

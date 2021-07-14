@@ -1,21 +1,13 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 from typing import Union
 from bson.objectid import ObjectId
 from json import dumps
 
 from src.cript import __version__
-from src.cript.utils.serializable import Serializable
+from .utils.serializable import Serializable
 
 
-class BaseAttributeError(Exception):
-    pass
-
-
-class BaseModelError(Exception):
-    pass
-
-
-class BaseModel(Serializable, object):
+class BaseModel(Serializable, ABC):
     """Base (abstract) class to represent a data model.
     Parameters
     ----------
@@ -31,6 +23,19 @@ class BaseModel(Serializable, object):
         _class: str = None,
         notes: str = None
     ):
+        """
+
+        :param name: The name of the user.
+
+        :param _class: class of node.
+        :param notes: Any miscellaneous notes related to the user.
+
+        :param uid: The unique ID of the material.
+        :param model_version: Version of CRIPT data model.
+        :param version_control: Link to version control node.
+        :param last_modified_date: Last date the node was modified.
+        :param created_date: Date it was created.
+        """
 
         self._name = None
         self.name = name
