@@ -22,8 +22,11 @@ class criptdb:
 
     def save(self, obj: type[cript.user]):
         doc = obj.as_dict()
+
+        doc["_id"] = doc.pop("uid")  # need to happen recursively
+
         coll = self.db[obj.class_]
-        coll.insert_one(doc)
+        coll.insert_one(doc).inserted_id
         if self.op_print:
             print(f"'{obj.name}' was saved to the database.")
 

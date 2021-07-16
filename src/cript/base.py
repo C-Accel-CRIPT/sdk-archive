@@ -1,7 +1,9 @@
-from abc import abstractmethod, ABC
-from typing import Union
-from bson.objectid import ObjectId
+from abc import ABC
 from json import dumps
+from datetime import datetime
+from typing import Union
+
+from pint.unit import Unit
 
 from src.cript import __version__
 from .utils.serializable import Serializable
@@ -48,11 +50,20 @@ class BaseModel(Serializable, ABC):
         self._uid = None
         self._model_version = __version__
         self._version_control = None
-        self._last_modified_date = None
-        self._created_date = None
+        self._last_modified_date = None #datetime.utcnow()
+        self._created_date = None #datetime.utcnow()
+        self.__dict = None
+        self.__dict_no_none = None
 
     def __repr__(self):
-        return dumps(self._to_dict(self), indent=2, sort_keys=True)
+        self.__dict = self.as_dict()
+        self.__dict_no_none = self.dict_remove_none(self.__dict)
+        return dumps(self.__dict, indent=2, sort_keys=True)
+
+    def __str__(self):
+        self.__dict = self.as_dict()
+        self.__dict_no_none = self.dict_remove_none(self.__dict)
+        return dumps(self.__dict_no_none, indent=2, sort_keys=True)
 
     @property
     def name(self):
@@ -103,36 +114,20 @@ class BaseModel(Serializable, ABC):
         return self._created_date
 
 
-
-
-class BaseAttribute:
-    """Base class to represent an attribute.
-    Parameters
-    ----------
-    key: str, required
-        The attribute type.
-    value: float, required
-        The numerical value of the attribute.
-    units: str, required
-        The units of value.
-    uncertainty: float, optional
-        The uncertainty in the quantity value.
-    method: str, optional
-        The method with which the attribute was determined.
-    notes: str, optional
-        Any miscellaneous text notes related to the attribute.
-    """
-
+class Cond(Serializable):
     def __init__(
-        self,
-        key: str = None,
-        value: float = None,
-        units: str = None,
-        uncertainty: float = None,
-        method: str = None,
-        notes: str = None,
+            self,
+            key: str = None,
+            value: Union[float, str, int] = None,
+            unit: Unit = None,
+            uncer: Union[float, str] = None,
+            data_uid=None,
     ):
-        super().__init__(notes=notes)
+        """
+
+        :param key: time, temp, pres, solvent, standard, relative, atmosphere
+        :param unit:
+        """
 
         self._key = None
         self.key = key
@@ -140,32 +135,17 @@ class BaseAttribute:
         self._value = None
         self.value = value
 
-        self._units = None
-        self.units = units
+        self._unit = None
+        self.unit = unit
 
-        self._uncertainty = None
-        self.uncertainty = uncertainty
+        self._uncer = None
+        self.uncer = uncer
 
-        self._method = None
-        self.method = method
-
-    def __repr__(self):
-        """Text friendly representation of the attribute."""
-        typ = self.__class__.__name__
-        if self.uncertainty:
-            return f"{typ} <{self.value} +/- {self.uncertainty} (Units: {self.units})>"
-        else:
-            return f"{typ} <{self.value} (Units: {self.units})>"
-
-    @property
-    @abstractmethod
-    def supported_keys(self):
-        """List of attribute keys with built-in units/range-validation support."""
-        raise NotImplementedError
+        self._data_uid = None
+        self.data_uid = data_uid
 
     @property
     def key(self):
-        """Attribute key."""
         return self._key
 
     @key.setter
@@ -174,7 +154,6 @@ class BaseAttribute:
 
     @property
     def value(self):
-        """Attribute value."""
         return self._value
 
     @value.setter
@@ -182,28 +161,153 @@ class BaseAttribute:
         self._value = value
 
     @property
-    def units(self):
-        """Units of attribute value."""
-        return self._units
+    def unit(self):
+        return self._unit
 
-    @units.setter
-    def units(self, units):
-        self._units = units
+    @unit.setter
+    def unit(self, unit):
+        self._unit = unit
 
     @property
-    def uncertainty(self):
-        """Uncertainty in attribute value."""
-        return self._uncertainty
+    def uncer(self):
+        return self._uncer
 
-    @uncertainty.setter
-    def uncertainty(self, uncertainty):
-        self._uncertainty = uncertainty
+    @uncer.setter
+    def uncer(self, uncer):
+        self._uncer = uncer
+
+    @property
+    def data_uid(self):
+        return self._data_uid
+
+    @data_uid.setter
+    def data_uid(self, data_uid):
+        self._data_uid = data_uid
+
+
+class Prop(Serializable):
+    def __init__(
+            self,
+            key: str,
+            value: Union[float, str],
+            unit: Unit = None,
+            uncer: Union[float, str] = None,
+            method: str = None,
+            mat_id: int = None,
+            component: str = None,
+            data_uid: str = None,
+            conditions: list[Cond] = None
+    ):
+        """
+
+        :param mat_id:
+        :param key:
+        :param value:
+        :param uncer:
+        :param unit:
+        :param component:
+        :param method:
+        :param data_uid:
+        :param conditions:
+        """
+
+        self._mat_id = None
+        self.mat_id = mat_id
+
+        self._key = None
+        self.key = key
+
+        self._value = None
+        self.value = value
+
+        self._uncer = None
+        self.uncer = uncer
+
+        self._unit = None
+        self.unit = unit
+
+        self._component = None
+        self.component = component
+
+        self._method = None
+        self.method = method
+
+        self._data_uid = None
+        self.data_uid = data_uid
+
+        self._conditions = None
+        self.conditions = conditions
+
+    @property
+    def mat_id(self):
+        return self._mat_id
+
+    @mat_id.setter
+    def mat_id(self, mat_id):
+        self._mat_id = mat_id
+
+    @property
+    def key(self):
+        return self._key
+
+    @key.setter
+    def key(self, key):
+        self._key = key
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
+
+    @property
+    def uncer(self):
+        return self._uncer
+
+    @uncer.setter
+    def uncer(self, uncer):
+        self._uncer = uncer
+
+    @property
+    def unit(self):
+        return self._unit
+
+    @unit.setter
+    def unit(self, unit):
+        self._unit = unit
+
+    @property
+    def component(self):
+        return self._component
+
+    @component.setter
+    def component(self, component):
+        self._component = component
 
     @property
     def method(self):
-        """Method of determination of attribute value."""
         return self._method
 
     @method.setter
     def method(self, method):
         self._method = method
+
+    @property
+    def data_uid(self):
+        return self._data_uid
+
+    @data_uid.setter
+    def data_uid(self, data_uid):
+        self._data_uid = data_uid
+
+    @property
+    def conditions(self):
+        return self._conditions
+
+    @conditions.setter
+    def conditions(self, conditions):
+        self._conditions = conditions
+
+
