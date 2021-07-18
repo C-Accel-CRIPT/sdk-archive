@@ -7,6 +7,7 @@ from pint.unit import Unit
 
 from src.cript import __version__
 from .utils.serializable import Serializable
+from .validation_tools import *
 
 
 class BaseModel(Serializable, ABC):
@@ -71,6 +72,7 @@ class BaseModel(Serializable, ABC):
         return self._name
 
     @name.setter
+    @type_check_property
     def name(self, name):
         self._name = name
 
@@ -157,6 +159,7 @@ class Cond(Serializable):
         return self._value
 
     @value.setter
+    @type_check_property
     def value(self, value):
         self._value = value
 

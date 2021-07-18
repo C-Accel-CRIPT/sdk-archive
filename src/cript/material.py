@@ -6,6 +6,7 @@ Material Node
 from .base import BaseModel, Cond, Prop
 from .keywords.material import *
 from .utils.serializable import Serializable
+from .validation_tools import *
 
 
 class Identifiers(Serializable):
@@ -226,6 +227,7 @@ class Material(BaseModel):
         return self._properties
 
     @properties.setter
+    @type_check_property
     def properties(self, properties):
         self._properties = properties
 
@@ -234,6 +236,7 @@ class Material(BaseModel):
         return self._keywords
 
     @keywords.setter
+    @type_check_property
     def keywords(self, keywords):
         self._keywords = keywords
 
