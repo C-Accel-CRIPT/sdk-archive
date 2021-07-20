@@ -7,13 +7,11 @@ setup(
     name='cript',
     version='0.0.1',
     url='',
-    license='MIT License',
     author='Dylan Walsh',
     author_email='dylanwal@mit.edu',
     description='CRIPT (A Community Resource for Innovation in Polymer Technology)',
     classifiers=[
                   "Programming Language :: Python :: 3",
-                  "License :: OSI Approved :: MIT License",
                   "Operating System :: OS Independent",
               ],
     package_dir={"": "src"},

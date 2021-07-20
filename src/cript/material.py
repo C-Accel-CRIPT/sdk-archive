@@ -227,7 +227,7 @@ class Material(BaseModel):
         return self._properties
 
     @properties.setter
-    @type_check_property
+    #@type_check_property
     def properties(self, properties):
         self._properties = properties
 
@@ -236,7 +236,7 @@ class Material(BaseModel):
         return self._keywords
 
     @keywords.setter
-    @type_check_property
+    #@type_check_property
     def keywords(self, keywords):
         self._keywords = keywords
 

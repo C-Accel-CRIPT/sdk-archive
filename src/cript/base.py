@@ -72,7 +72,7 @@ class BaseModel(Serializable, ABC):
         return self._name
 
     @name.setter
-    @type_check_property
+    #@type_check_property
     def name(self, name):
         self._name = name
 
@@ -159,7 +159,7 @@ class Cond(Serializable):
         return self._value
 
     @value.setter
-    @type_check_property
+    #@type_check_property
     def value(self, value):
         self._value = value
 

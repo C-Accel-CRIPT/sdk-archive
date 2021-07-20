@@ -57,6 +57,7 @@ prop = [cript.Prop(mat_id=0, key="phase", value="liquid"),
 node.properties = prop
 
 print(node)
+print("%" * 25)
 print(repr(node))
 
 # save
