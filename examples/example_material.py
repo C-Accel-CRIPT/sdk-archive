@@ -14,7 +14,7 @@ database = "test"
 
 iden = [cript.Identifiers(
     preferred_name="styrene",
-    names=["styrene", "vinylbenzene", "phenylethylene", "ethenylbenzene"],
+    names=["vinylbenzene", "phenylethylene", "ethenylbenzene"],
     chem_formula="C8H8",
     smiles="C=Cc1ccccc1",
     cas="100-42-5",
@@ -24,7 +24,6 @@ iden = [cript.Identifiers(
 
 # Generate node
 node = cript.Material(
-    name="Dylan's Notebook",
     identifier=iden,
     keywords=["styrene"],
     storage=[
@@ -58,7 +57,7 @@ node.properties = prop
 
 print(node)
 print("%" * 25)
-print(repr(node))
+#print(repr(node))
 
 # save
 #db.save(node)

@@ -6,7 +6,7 @@ Material Node
 from .base import BaseModel, Cond, Prop
 from .keywords.material import *
 from .utils.serializable import Serializable
-from .validation_tools import *
+from cript.validation_tools import *
 
 
 class Identifiers(Serializable):
@@ -79,6 +79,7 @@ class Identifiers(Serializable):
         return self._preferred_name
 
     @preferred_name.setter
+    @type_check_property
     def preferred_name(self, preferred_name):
         self._preferred_name = preferred_name
 
@@ -87,6 +88,7 @@ class Identifiers(Serializable):
         return self._names
 
     @names.setter
+    @type_check_property
     def names(self, names):
         self._names = names
 
@@ -95,6 +97,7 @@ class Identifiers(Serializable):
         return self._cas
 
     @cas.setter
+    @type_check_property
     def cas(self, cas):
         self._cas = cas
 
@@ -103,6 +106,7 @@ class Identifiers(Serializable):
         return self._bigsmiles
 
     @bigsmiles.setter
+    @type_check_property
     def bigsmiles(self, bigsmiles):
         self._bigsmiles = bigsmiles
 
@@ -111,6 +115,7 @@ class Identifiers(Serializable):
         return self._smiles
 
     @smiles.setter
+    @type_check_property
     def smiles(self, smiles):
         self._smiles = smiles
 
@@ -119,6 +124,7 @@ class Identifiers(Serializable):
         return self._chem_formula
 
     @chem_formula.setter
+    @type_check_property
     def chem_formula(self, chem_formula):
         self._chem_formula = chem_formula
 
@@ -127,6 +133,7 @@ class Identifiers(Serializable):
         return self._chem_repeat
 
     @chem_repeat.setter
+    @type_check_property
     def chem_repeat(self, chem_repeat):
         self._chem_repeat = chem_repeat
 
@@ -135,6 +142,7 @@ class Identifiers(Serializable):
         return self._pubchem_cid
 
     @pubchem_cid.setter
+    @type_check_property
     def pubchem_cid(self, pubchem_cid):
         self._pubchem_cid = pubchem_cid
 
@@ -143,6 +151,7 @@ class Identifiers(Serializable):
         return self._inchi
 
     @inchi.setter
+    @type_check_property
     def inchi(self, inchi):
         self._inchi = inchi
 
@@ -151,6 +160,7 @@ class Identifiers(Serializable):
         return self._inchi_key
 
     @inchi_key.setter
+    @type_check_property
     def inchi_key(self, inchi_key):
         self._inchi_key = inchi_key
 
@@ -161,8 +171,8 @@ class Material(BaseModel):
 
     def __init__(
             self,
-            name: str,
             identifier: list[Identifiers],
+            name: str = None,
             properties: list[Prop] = None,
             keywords: list[str] = None,
             source: str = None,
@@ -190,6 +200,8 @@ class Material(BaseModel):
         :param last_modified_date: Last date the node was modified.
         :param created_date: Date it was created.
         """
+        if name is None:
+            name = identifier[0].preferred_name
 
         super().__init__(name=name, _class=self._class, notes=notes)
 
@@ -219,6 +231,7 @@ class Material(BaseModel):
         return self._identifier
 
     @identifier.setter
+    @type_check_property
     def identifier(self, identifier):
         self._identifier = identifier
 
@@ -227,7 +240,7 @@ class Material(BaseModel):
         return self._properties
 
     @properties.setter
-    #@type_check_property
+    @type_check_property
     def properties(self, properties):
         self._properties = properties
 
@@ -236,7 +249,7 @@ class Material(BaseModel):
         return self._keywords
 
     @keywords.setter
-    #@type_check_property
+    @type_check_property
     def keywords(self, keywords):
         self._keywords = keywords
 
@@ -245,6 +258,7 @@ class Material(BaseModel):
         return self._source
 
     @source.setter
+    @type_check_property
     def source(self, source):
         self._source = source
 
@@ -253,6 +267,7 @@ class Material(BaseModel):
         return self._lot_number
 
     @lot_number.setter
+    @type_check_property
     def lot_number(self, lot_number):
         self._lot_number = lot_number
 
@@ -261,6 +276,7 @@ class Material(BaseModel):
         return self._storage
 
     @storage.setter
+    @type_check_property
     def storage(self, storage):
         self._storage = storage
 
@@ -269,5 +285,6 @@ class Material(BaseModel):
         return self._hazard
 
     @hazard.setter
+    @type_check_property
     def hazard(self, hazard):
         self._hazard = hazard

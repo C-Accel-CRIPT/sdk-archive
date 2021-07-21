@@ -1,12 +1,13 @@
 from abc import ABC
 from json import dumps
-from datetime import datetime
 from typing import Union
+from datetime import datetime
 
 from pint.unit import Unit
 
 from src.cript import __version__
 from .utils.serializable import Serializable
+from .utils.database_core import Database_core
 from .validation_tools import *
 
 
@@ -51,20 +52,16 @@ class BaseModel(Serializable, ABC):
         self._uid = None
         self._model_version = __version__
         self._version_control = None
-        self._last_modified_date = None #datetime.utcnow()
-        self._created_date = None #datetime.utcnow()
-        self.__dict = None
-        self.__dict_no_none = None
+        self._last_modified_date = None
+        self._created_date = None
+
+        self._database_core = Database_core
 
     def __repr__(self):
-        self.__dict = self.as_dict()
-        self.__dict_no_none = self.dict_remove_none(self.__dict)
-        return dumps(self.__dict, indent=2, sort_keys=True)
+        return dumps(self.as_dict(), indent=2, sort_keys=True)
 
     def __str__(self):
-        self.__dict = self.as_dict()
-        self.__dict_no_none = self.dict_remove_none(self.__dict)
-        return dumps(self.__dict_no_none, indent=2, sort_keys=True)
+        return dumps(self.dict_remove_none(self.as_dict()), indent=2, sort_keys=True)
 
     @property
     def name(self):
@@ -72,7 +69,7 @@ class BaseModel(Serializable, ABC):
         return self._name
 
     @name.setter
-    #@type_check_property
+    @type_check_property
     def name(self, name):
         self._name = name
 
@@ -82,6 +79,7 @@ class BaseModel(Serializable, ABC):
         return self._notes
 
     @notes.setter
+    @type_check_property
     def notes(self, notes):
         self._notes = notes
 
@@ -151,6 +149,7 @@ class Cond(Serializable):
         return self._key
 
     @key.setter
+    @type_check_property
     def key(self, key):
         self._key = key
 
@@ -159,7 +158,7 @@ class Cond(Serializable):
         return self._value
 
     @value.setter
-    #@type_check_property
+    @type_check_property
     def value(self, value):
         self._value = value
 
@@ -168,6 +167,7 @@ class Cond(Serializable):
         return self._unit
 
     @unit.setter
+    @type_check_property
     def unit(self, unit):
         self._unit = unit
 
@@ -176,6 +176,7 @@ class Cond(Serializable):
         return self._uncer
 
     @uncer.setter
+    @type_check_property
     def uncer(self, uncer):
         self._uncer = uncer
 
@@ -184,6 +185,7 @@ class Cond(Serializable):
         return self._data_uid
 
     @data_uid.setter
+    @type_check_property
     def data_uid(self, data_uid):
         self._data_uid = data_uid
 
@@ -192,9 +194,9 @@ class Prop(Serializable):
     def __init__(
             self,
             key: str,
-            value: Union[float, str],
+            value: Union[float, int, str],
             unit: Unit = None,
-            uncer: Union[float, str] = None,
+            uncer: Union[float, int, str] = None,
             method: str = None,
             mat_id: int = None,
             component: str = None,
@@ -246,6 +248,7 @@ class Prop(Serializable):
         return self._mat_id
 
     @mat_id.setter
+    @type_check_property
     def mat_id(self, mat_id):
         self._mat_id = mat_id
 
@@ -254,6 +257,7 @@ class Prop(Serializable):
         return self._key
 
     @key.setter
+    @type_check_property
     def key(self, key):
         self._key = key
 
@@ -262,6 +266,7 @@ class Prop(Serializable):
         return self._value
 
     @value.setter
+    @type_check_property
     def value(self, value):
         self._value = value
 
@@ -270,6 +275,7 @@ class Prop(Serializable):
         return self._uncer
 
     @uncer.setter
+    @type_check_property
     def uncer(self, uncer):
         self._uncer = uncer
 
@@ -278,6 +284,7 @@ class Prop(Serializable):
         return self._unit
 
     @unit.setter
+    @type_check_property
     def unit(self, unit):
         self._unit = unit
 
@@ -286,6 +293,7 @@ class Prop(Serializable):
         return self._component
 
     @component.setter
+    @type_check_property
     def component(self, component):
         self._component = component
 
@@ -294,6 +302,7 @@ class Prop(Serializable):
         return self._method
 
     @method.setter
+    @type_check_property
     def method(self, method):
         self._method = method
 
@@ -302,6 +311,7 @@ class Prop(Serializable):
         return self._data_uid
 
     @data_uid.setter
+    @type_check_property
     def data_uid(self, data_uid):
         self._data_uid = data_uid
 
@@ -310,6 +320,7 @@ class Prop(Serializable):
         return self._conditions
 
     @conditions.setter
+    @type_check_property
     def conditions(self, conditions):
         self._conditions = conditions
 

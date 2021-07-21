@@ -7,9 +7,8 @@ class criptdb:
 
     def __init__(self, username: str, password: str, project: str, database: str, op_print = True):
         if self.instances > 0:
-            raise UserError("Connection to CRIPT database already exists.")
+            raise Exception("Connection to CRIPT database already exists.")
         self.instances += 1
-
 
         self.client = MongoClient(
             f"mongodb+srv://{username}:{password}@cluster0.ekf91.mongodb.net/{project}?retryWrites=true&w=majority")
@@ -20,7 +19,7 @@ class criptdb:
         if self.op_print:
             print(f"Connection to database '{database}' successful.")
 
-    def save(self, obj: type[cript.user]):
+    def save(self, obj):
         doc = obj.as_dict()
 
         doc["_id"] = doc.pop("uid")  # need to happen recursively

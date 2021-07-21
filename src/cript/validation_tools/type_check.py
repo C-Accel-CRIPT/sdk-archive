@@ -1,14 +1,28 @@
-from typing import get_type_hints
+from typing import get_type_hints, _UnionGenericAlias
+from types import GenericAlias
 from functools import wraps
 import builtins
 import warnings
-from sys import modules
 from inspect import getmembers, isclass
 
-import cript   # in use, just not recognized by pycharm
+import pint
+import cript
 
 builtin_types = {getattr(builtins, d).__name__: getattr(builtins, d) for d in dir(builtins) if isinstance(getattr(builtins, d), type) and "Error" not in getattr(builtins, d).__name__ and "Warning" not in getattr(builtins, d).__name__}
-cript_types = {pair[0]: pair[1] for pair in getmembers(cript, isclass)}
+pint_types = {pair[0]: pair[1] for pair in getmembers(pint, isclass)}
+cript_types = {}
+
+
+def custom_formatwarning(msg, *args, **kwargs):
+    return "Warning: " + str(msg) + '\n'
+
+
+warnings.formatwarning = custom_formatwarning
+
+
+def get_cript_types():
+    global cript_types
+    cript_types = {pair[0]: pair[1] for pair in getmembers(cript, isclass)}
 
 
 def type_check_property(func):
@@ -19,53 +33,71 @@ def type_check_property(func):
     """
     @wraps(func)
     def _wrapper(*args, **kwargs):
-        # get variable type
-        arg_type = get_type_hints(args[0].__init__)[func.__name__]
+        if cript_types == {}:
+            get_cript_types()
 
-        # converter to builtin types, if needed
-        if arg_type in builtin_types.values():
-            pass
-        else:
-            # generic types need parsing
-            arg_type = parse_generic_type(str(arg_type))
+        try:
+            # get variable type
+            arg_type_op = get_type_hints(args[0].__init__)[func.__name__]
 
-        # get arg type tree
-            if args[1] is None:
-                arg_type_op= type(None)
+            # converter to builtin types, if needed
+            if arg_type_op in builtin_types.values():
+                pass
+            elif type(arg_type_op) is _UnionGenericAlias:
+                # unions and optionals
+                arg_type_op = parse_generic_type(str(arg_type_op))
+            elif type(arg_type_op) is GenericAlias:
+                arg_type_op = parse_generic_alias_type(str(arg_type_op))
             else:
-                arg_type_op = get_arg_types(args[1])
+                raise KeyError
 
-        # do check
-        check = do_type_check(arg_type_op, arg_type)
-        if check is TypeError:
-            raise TypeError(f"Expected {arg_type_op} but got {arg_type} for property: {func.__name__}.")
+            # get arg type tree
+            if args[1] is None:
+                arg_type = {None: ""}
+            else:
+                arg_type = get_arg_types(args[1])
+
+            # do check
+            check = do_type_check(arg_type, arg_type_op)
+            if check is TypeError:
+                raise TypeError(f"Expected {arg_type_op} but got {arg_type} for property: {func.__name__}.")
+
+        except KeyError:
+            warnings.warn(f"No type hint provided for {func.__name__}, so type check not possible.")
 
         # if pass type check, run function
         return func(*args, **kwargs)
     return _wrapper
 
 
-def do_type_check(var_type, arg_type: dict):
+def do_type_check(arg_type: dict, arg_type_op):
+    """
+    Does actual type check
+    :param arg_type:
+    :param arg_type_op:
+    :return:
+    """
+
     # get the level arg types
-    current_type = list(arg_type.keys())
+    current_types = list(arg_type.keys())
 
     # get the level type options
-    if type(var_type) == dict:
+    if type(arg_type_op) == dict:
         current_options = []
         next_options = []
-        for i in var_type.values():
+        for i in arg_type_op.values():
             if type(i) == list:
-                current_options.append([list])
+                current_options.append(list)
                 next_options.append(i)
             else:
                 current_options.append(i)
-    elif type(var_type) == list:
+    elif type(arg_type_op) == list:
         current_options = [list]
     else:
-        current_options = [var_type]
+        current_options = [arg_type_op]
 
     # do check between the two, throw error or move to next level ; stop if all values == ""
-    if current_type in current_options:
+    if all(item in current_options for item in current_types):
 
         # find next arg type dict for next level
         for v in arg_type.values():
@@ -74,14 +106,13 @@ def do_type_check(var_type, arg_type: dict):
 
                 state = TypeError
                 for option in next_options:
-                    back = do_type_check(option[1], next_type)
+                    back = do_type_check(next_type, option[1])
                     if back is None:
                         return None
             else:
                 return None
 
     return TypeError
-
 
 
 def get_arg_types(arg) -> dict:
@@ -100,10 +131,12 @@ def get_arg_types(arg) -> dict:
 
     type_out = type(arg)
 
-    if type_out in [int, float, str, bool, bytes] or type_out in cript_types.values():
+    if type_out in builtin_types.values() or\
+            type_out in pint_types.values() or\
+            type_out in cript_types.values():
         return {type_out: ""}
 
-    if type_out == list or type_out[0] == tuple:
+    if type_out == list or type_out == tuple:
         list_type = {}
         for i in arg:
             if type(i) not in list_type.keys():
@@ -138,8 +171,13 @@ def parse_generic_type(text_in: str):
     text_in = text_in[7:]  # strips the first "typeing."
     if text_in[0] == "O":
         type_out = parse_generic_type_optional(text_in)
+
+        # Add None as option
+        type_out = {1: type_out, 2: None}
+
     elif text_in[0] == "U":
         type_out = parse_generic_type_union(text_in)
+
     else:
         warnings.warn(f"Type check not valid. {text_in}")
         return None
@@ -149,7 +187,7 @@ def parse_generic_type(text_in: str):
 
 def parse_generic_type_union(text_in: str) -> dict:
     """
-    Given a string like: Union[float, str, int, NoneType] return list of types
+    Given a string like: Union[float, str, int, NoneType] return dict of types
     :param text_in:
     :return:
     """
@@ -185,17 +223,8 @@ def parse_generic_type_union(text_in: str) -> dict:
 
     type_out = {}
     for i, text in enumerate(types_list):
-        if text in builtin_types.keys():
-            type_out[i] = builtin_types[text]
-        elif text == "NoneType":
-            type_out[i] = None
-        elif text.startswith("typing."):
-            type_out[i] = parse_generic_type(text)
-        elif text.startswith("cript."):
-            exec(f"type_out[{i}] = " + text)
-        else:
-            warnings.warn(f"Type check not valid2. {text}")
-            return None
+        type_out[i] = text_to_type(text)
+
     return type_out
 
 
@@ -206,6 +235,10 @@ def parse_generic_type_optional(text_in: str) -> list:
     :return:
     """
     text_in = text_in[9:-1]  # strips "Optional[" and "]"
+
+    if "[" not in text_in:
+        return text_to_type(text_in)
+
     types_list = []
     word = ""
     for letter in text_in:
@@ -218,36 +251,52 @@ def parse_generic_type_optional(text_in: str) -> list:
 
     type_out = []
     for text in types_list:
-        if text in builtin_types.keys():
-            type_out.append(builtin_types[text])
-        elif text == "NoneType":
-            type_out.append(None)
-        elif text.startswith("typing."):
-            type_out.append(parse_generic_type(text))
-        elif text.startswith("cript."):
-            exec("type_out.append(" + text + ")")
-        else:
-            warnings.warn(f"Type check not valid2. {text}")
-            return None
+        type_out.append(text_to_type(text))
+
     return type_out
 
 
-if __name__ == '__main__':
-    test_text = "typing.Union[" \
-                "float," \
-                " str," \
-                " int," \
-                " NoneType," \
-                " typing.Optional[list[str]]," \
-                " typing.Optional[list[cript.base.Prop]]," \
-                " cript.base.Prop," \
-                " typing.Optional[list[typing.Union[str, int]]]" \
-                "]"
-    print(parse_generic_type(test_text))
+def parse_generic_alias_type(text_in: str):
 
-    c = parse_generic_type("typing.Optional[list[typing.Union[int, typing.Optional[list[typing.Union[str, cript.base.Prop]]]]]")
-    test_variable = [1, 2, ["hi", "fish", cript.base.Prop(key="bp", value=100)]]
-    b = get_arg_types(test_variable)
-    print(b)
+    types_list = []
+    word = ""
+    bracket_counter = 0  # it counts up when it sees [ and should count down to zero when it closes them all
+    nesting = False  # used if another typing class found.
+    for letter in text_in:
+        if letter == "[":
+            bracket_counter += 1
+            types_list.append(word)
+            word = ""
+        elif letter == "]":
+            if word != "":
+                types_list.append(word)
+            bracket_counter -= 1
+        else:
+            word = word + letter
 
-    print(do_type_check(c, b))
+    type_out = {}
+    for i, text in enumerate(types_list):
+        type_out[i] = text_to_type(text)
+
+    return type_out
+
+
+def text_to_type(text: str):
+    """
+    Convert string to type
+    :param text:
+    :return:
+    """
+    if text in builtin_types.keys():
+        return builtin_types[text]
+    elif text == "NoneType":
+        return None
+    elif text.startswith("typing."):
+        return parse_generic_type(text)
+    elif text.startswith("cript.") and text.split(".")[-1] in cript_types.keys():
+        return cript_types[text.split(".")[-1]]
+    elif text.startswith("pint.") and text.split(".")[-1] in pint_types.keys():
+        return pint_types[text.split(".")[-1]]
+    else:
+        warnings.warn(f"Type check not valid. {text}")
+        return None
