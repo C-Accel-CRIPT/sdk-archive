@@ -4,14 +4,15 @@ from typing import Union
 from datetime import datetime
 
 from pint.unit import Unit
+from bson import ObjectId
 
-from src.cript import __version__
+from . import __version__
 from .utils.serializable import Serializable
-from .utils.database_core import Database_core
+from .utils.database_core import DatabaseCore
 from .validation_tools import *
 
 
-class BaseModel(Serializable, ABC):
+class BaseModel(Serializable, DatabaseCore, ABC):
     """Base (abstract) class to represent a data model.
     Parameters
     ----------
@@ -25,7 +26,13 @@ class BaseModel(Serializable, ABC):
         self,
         name: str,
         _class: str = None,
-        notes: str = None
+        notes: str = None,
+
+        uid: ObjectId = None,
+        model_version: str = None,
+        version_control=None,
+        last_modified_date: datetime = None,
+        created_date: datetime = None
     ):
         """
 
@@ -50,12 +57,14 @@ class BaseModel(Serializable, ABC):
         self._class_ = _class
 
         self._uid = None
-        self._model_version = __version__
+        if model_version is None:
+            self._model_version = __version__
+        else:
+            self._model_version = model_version
         self._version_control = None
         self._last_modified_date = None
         self._created_date = None
 
-        self._database_core = Database_core
 
     def __repr__(self):
         return dumps(self.as_dict(), indent=2, sort_keys=True)
@@ -87,6 +96,11 @@ class BaseModel(Serializable, ABC):
     def uid(self):
         """Unique ID of the node."""
         return self._uid
+
+    @uid.setter
+    @type_check_property
+    def uid(self, uid):
+        self._uid = uid
 
     @property
     def class_(self):

@@ -9,7 +9,7 @@ username = "DW_cript"
 password = "YXMaoE1"
 project = "cript_testing"
 database = "test"
-#db = criptdb(username, password, project, database)
+db = criptdb(username, password, project, database)
 
 
 iden = [cript.Identifiers(
@@ -55,9 +55,11 @@ prop = [cript.Prop(mat_id=0, key="phase", value="liquid"),
 
 node.properties = prop
 
-print(node)
-print("%" * 25)
+#print(node)
+#print("%" * 25)
 #print(repr(node))
 
 # save
-#db.save(node)
+db.save(node)
+
+print(node)

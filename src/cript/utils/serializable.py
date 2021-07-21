@@ -1,5 +1,6 @@
 import abc
 from pint import Unit
+from bson import ObjectId
 
 
 class Serializable(abc.ABC):
@@ -25,6 +26,8 @@ class Serializable(abc.ABC):
             return [Serializable._to_dict(i) for i in obj]
         elif hasattr(obj, "as_dict"):
             return obj.as_dict()
+        elif isinstance(obj, ObjectId):
+            return str(obj)
         else:
             return obj
 

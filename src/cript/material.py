@@ -6,7 +6,7 @@ Material Node
 from .base import BaseModel, Cond, Prop
 from .keywords.material import *
 from .utils.serializable import Serializable
-from cript.validation_tools import *
+from .validation_tools import *
 
 
 class Identifiers(Serializable):

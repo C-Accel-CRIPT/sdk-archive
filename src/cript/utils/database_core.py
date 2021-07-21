@@ -1,10 +1,9 @@
 
+from datetime import datetime
 
 
-class Database_core:
-    def __init__(self):
-        pass
+class DatabaseCore:
 
-    def set_time(self):
-        pass
-        a["data"] = datetime.utcnow()
+    @staticmethod
+    def time_stamp(name: str):
+        return {name: datetime.utcnow()}
