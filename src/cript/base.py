@@ -8,11 +8,10 @@ from bson import ObjectId
 
 from . import __version__
 from .utils.serializable import Serializable
-from .utils.database_core import DatabaseCore
 from .validation_tools import *
 
 
-class BaseModel(Serializable, DatabaseCore, ABC):
+class BaseModel(Serializable, ABC):
     """Base (abstract) class to represent a data model.
     Parameters
     ----------

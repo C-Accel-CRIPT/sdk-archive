@@ -1,14 +1,13 @@
 from pint.unit import Unit
 
 import cript
-from criptdb import criptdb
 
 # Connect to database
 username = "DW_cript"
 password = "YXMaoE1"
 project = "cript_testing"
 database = "test"
-# db = criptdb(username, password, project, database)
+# db = cript.CriptDB(username, password, project, database)
 
 
 ingredients = [

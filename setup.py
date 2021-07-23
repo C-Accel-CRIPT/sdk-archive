@@ -15,7 +15,7 @@ setup(
                   "Operating System :: OS Independent",
               ],
     package_dir={"": "src"},
-    py_modules=["cript", "criptdb"],
+    py_modules=["cript"],
     packages=find_packages(where="src"),
     install_requires=[
         "pymongo[srv]>=3.11",

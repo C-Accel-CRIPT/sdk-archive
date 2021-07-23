@@ -10,7 +10,6 @@ import cript
 
 builtin_types = {getattr(builtins, d).__name__: getattr(builtins, d) for d in dir(builtins) if isinstance(getattr(builtins, d), type) and "Error" not in getattr(builtins, d).__name__ and "Warning" not in getattr(builtins, d).__name__}
 pint_types = {pair[0]: pair[1] for pair in getmembers(pint, isclass)}
-cript_types = {}
 
 
 def custom_formatwarning(msg, *args, **kwargs):
@@ -18,11 +17,6 @@ def custom_formatwarning(msg, *args, **kwargs):
 
 
 warnings.formatwarning = custom_formatwarning
-
-
-def get_cript_types():
-    global cript_types
-    cript_types = {pair[0]: pair[1] for pair in getmembers(cript, isclass)}
 
 
 def type_check_property(func):
@@ -33,9 +27,6 @@ def type_check_property(func):
     """
     @wraps(func)
     def _wrapper(*args, **kwargs):
-        if cript_types == {}:
-            get_cript_types()
-
         try:
             # get variable type
             arg_type_op = get_type_hints(args[0].__init__)[func.__name__]
@@ -133,7 +124,7 @@ def get_arg_types(arg) -> dict:
 
     if type_out in builtin_types.values() or\
             type_out in pint_types.values() or\
-            type_out in cript_types.values():
+            type_out in cript.cript_types.values():
         return {type_out: ""}
 
     if type_out == list or type_out == tuple:
@@ -293,8 +284,8 @@ def text_to_type(text: str):
         return None
     elif text.startswith("typing."):
         return parse_generic_type(text)
-    elif text.startswith("cript.") and text.split(".")[-1] in cript_types.keys():
-        return cript_types[text.split(".")[-1]]
+    elif text.startswith("cript.") and text.split(".")[-1] in cript.cript_types.keys():
+        return cript.cript_types[text.split(".")[-1]]
     elif text.startswith("pint.") and text.split(".")[-1] in pint_types.keys():
         return pint_types[text.split(".")[-1]]
     else:

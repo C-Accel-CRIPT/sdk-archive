@@ -20,7 +20,12 @@ from .inventory import *
 from .material import *
 from .process import *
 from .simulation import *
+from .database import *
 
+
+from inspect import getmembers, isclass
+from sys import modules
+cript_types = {pair[0]: pair[1] for pair in getmembers(modules[__name__], isclass) if "cript." in str(pair[1])}
 
 
 
