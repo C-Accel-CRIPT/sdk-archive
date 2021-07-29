@@ -45,15 +45,15 @@ class CriptDB:
                 f"mongodb+srv://{db_username}:{db_password}@cluster0.ekf91.mongodb.net/{db_project}?retryWrites=true&w=majority")
             self.client.server_info()  # test database connection
         except errors.ServerSelectionTimeoutError as err:
-            print("Connection to database failed.\n\n")
-            raise Exception(err)
+            msg = "Connection to database failed.\n\n"
+            raise cript.CRIPTError(msg)
 
         self.op_print = op_print
         if self.op_print:
             print(f"Connection to database '{db_database}' successful.")
 
         self.db = self.client[db_database]
-        self.collections = self.db.list_collection_names()
+        self.db_collections = self.db.list_collection_names()
 
         self._user = None
         self.user = user
@@ -79,16 +79,25 @@ class CriptDB:
             # if user provides email address find their id for them.
             self._user = self._user_find_by_email(user)
         else:
-            if len(user) == 24:  # uids are 24 charters long
+            if self._id_type_check(user):  # uids are 24 charters long
                 if self._user_exists(user):  # check database to make sure user exists
                     self._user = user
                 else:
-                    raise Exception(f"user({user}) not found.")
-            else:
-                raise Exception(f"User uids are 24 letters or numbers long. The provided uid is {len(user)}.")
+                    msg = f"user({user}) not found."
+                    raise cript.CRIPTError(msg)
 
     @login_check
     def save(self, obj):
+        """
+        Saves item to database
+
+        Example:
+        save('user node')
+        save('group node')
+
+        :param obj: The object to be saved.
+        :return:
+        """
         # create document from python object
         doc = self._create_doc(obj)
 
@@ -104,10 +113,6 @@ class CriptDB:
 
         return obj.uid
 
-    @login_check
-    def update(self):
-        pass
-
     def _create_doc(self, obj):
         # convert to dictionary
         doc = obj.as_dict()
@@ -116,8 +121,9 @@ class CriptDB:
         if doc["uid"] is None:
             doc.pop("uid")
         else:
-            raise Exception("uid should not have an id already. If you are trying to update an existing doc, "
-                            "don't use 'save', use 'update'.")
+            msg = "uid should not have an id already. If you are trying to update an existing doc, "\
+                            "don't use 'save', use 'update'."
+            raise cript.CRIPTError(msg)
 
         # add time stamps
         doc = self._set_time_stamps(doc)
@@ -144,7 +150,9 @@ class CriptDB:
         coll = self.db["user"]
         doc = coll.find_one({"email": email})
         if doc is None:
-            raise Exception(f"{email} not found in database.")
+            msg = f"{email} not found in database."
+            raise cript.CRIPTError(msg)
+
         return str(doc["_id"])
 
     def _user_exists(self, uid: str) -> bool:
@@ -160,22 +168,72 @@ class CriptDB:
         else:
             return False
 
-    def view_all(self, obj):
+    @staticmethod
+    def _id_type_check(uid: str) -> bool:
+        if type(uid) != str:
+            msg = f"uids should be type 'str'. The provided uid is {type(uid)}."
+            raise cript.CRIPTError(msg)
+        if len(uid) != 24:
+            msg = f"uids are 24 letters or numbers long. The provided uid is {len(uid)} long."
+            raise cript.CRIPTError(msg)
+
+        return True
+
+    @login_check
+    def view(self, obj, sort_by: str = None, num_results: int = 50):
         """
-        View all items in a mongodb collection.
-        :param obj:
+        View  items in a mongodb collection.
+
+        Examples:
+        view(cript.Group)                           shows all groups
+        view(cript.Collection)                      shows all collections from all groups you are apart of
+        view(cript.Experiment)                      shows all experiments from all groups and collections
+        view('uid')                                 shows just that object (can be group, collection, etc.)
+
+        :param obj: The node type you want or uid of node you want
+        :param sort_by:
+        :param num_results:
         :return:
         """
-        # make sure provided obj is a valid choice
-        if obj not in self.collections:
-            raise Exception(f"Invalid name provided. Valid names: {self.collections}")
+        if obj in cript.cript_types.values():
+            result = self._search(obj)
+            self._print_table(result)
+            return result
 
-        # Preform search
-        coll = self.db[obj]
-        result = list(coll.find({}))
+        elif self._id_type_check(obj):   #################### This search should be improved, for loop bad idea _> probably change from random to user defined _id with class embedded
+            for coll in self.db_collections:
+                coll = self.db[coll]
+                result = coll.find_one({"_id": ObjectId(obj)})
+                if result is not None:
+                    break
+            print(result)
+            return result
 
-        # Print to screen as nice table.
-        row_format = "{:<6}" + "{:<30}" * 2
+        else:
+            msg = "Invalid input."
+            raise cript.CRIPTError(msg)
+
+    def _search(self, obj, sort_by: str = None, num_results: int = 50):
+        """
+        Preform search of db_collection
+
+        """
+        coll = self.db[obj._class]
+        if sort_by is None:
+            result = list(coll.find({}, limit=num_results))
+        else:
+            result = list(coll.find({}, limit=num_results, sort=[(sort_by, -1)]))
+
+        return result
+
+    @staticmethod
+    def _print_table(result: list[dict]):
+        """
+        Print to screen as nice table from
+        :param result:
+        :return:
+        """
+        row_format = "{:<8}" + "{:<30}" * 2
         print("")
         print(row_format.format("number", "name", "uid"))
         print("-" * 60)
@@ -183,20 +241,14 @@ class CriptDB:
             print(row_format.format(str(i), doc["name"][:25], str(doc["_id"])))
         print("")
 
-        return result
+    @login_check
+    def load(self, obj):
+        pass
 
-    # def list_documents_in_collection(
-    #     database: Database = None, collection_name: str = None
-    # ) -> List[dict]:
-    #     """List all documents in a database collection."""
-    #     return [c for c in database[collection_name].find({})]
-    #
-    # def get_document_by_id(
-    #     database: Database = None, collection_name: str = None, uid: Union[str, ObjectId] = None
-    # ) -> dict:
-    #     """Get a document from a database collection using its uid."""
-    #     uid = ObjectId(uid)
-    #     return database[collection_name].find_one({"_id": uid})
+    @login_check
+    def delete(self, obj):
+        pass
 
-
-# doc["_id"] = doc.pop("uid")  # need to happen recursively
+    @login_check
+    def update(self, obj):
+        pass

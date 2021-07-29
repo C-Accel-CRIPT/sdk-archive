@@ -9,9 +9,9 @@ def login_check(func):
     """
     @wraps(func)
     def _login_check(*args, **kwargs):
-        # if user first time, allow user create
+        # if creating a user, allow!
         if args[0].user is None:
-            if args[1].class_ != "User":
+            if args[1].class_ != "user":
                 raise Exception("Login before trying to save. To login type: cript.CriptDB.user = 'your user id' ")
 
             value = func(*args, **kwargs)

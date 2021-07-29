@@ -5,13 +5,12 @@ username = "DW_cript"
 password = "YXMaoE1"
 project = "cript_testing"
 database = "test"
-db = cript.CriptDB(username, password, project, database)
+user = "60f87e2d7f47c4a26b8c5bab"
+db = cript.CriptDB(username, password, project, database, user)
 
 # Generate node
 node = cript.Group(
-    name="CRIPT Development Team",
-    email="cript@mit.edu",
-    website="https://cript.mit.edu/"
+    name="tutorial",
 )
 
 print(node)

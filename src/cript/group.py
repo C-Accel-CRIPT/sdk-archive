@@ -16,6 +16,10 @@ class Group(BaseModel):
             name: str,
             email: str = None,
             website: str = None,
+            owner: str = None,
+            collection: str = None,
+            parent_group: str = None,
+            publication: str = None,
             notes: str = None
     ):
         """
@@ -42,6 +46,9 @@ class Group(BaseModel):
         self._website = None
         self.website = website
 
+        self._owner = None
+        self.owner = owner
+
         # collection
         # parent group
         # publication
@@ -61,3 +68,11 @@ class Group(BaseModel):
     @website.setter
     def website(self, website):
         self._website = website
+
+    @property
+    def owner(self):
+        return self._owner
+
+    @owner.setter
+    def owner(self, owner):
+        self._owner = owner

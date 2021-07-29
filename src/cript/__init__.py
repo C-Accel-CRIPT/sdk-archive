@@ -28,7 +28,6 @@ from sys import modules
 cript_types = {pair[0]: pair[1] for pair in getmembers(modules[__name__], isclass) if "cript." in str(pair[1])}
 
 
-
 from pint import UnitRegistry
 u = UnitRegistry()
 

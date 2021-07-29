@@ -2,8 +2,7 @@
 User Node
 
 """
-
-from bson.objectid import ObjectId
+import cript.group
 
 from .base import BaseModel
 
@@ -21,6 +20,7 @@ class User(BaseModel):
             orcid: str = None,
             organization: str = None,
             position: str = None,
+            c_groups: list = None,
             notes: str = None
     ):
         """
@@ -35,6 +35,8 @@ class User(BaseModel):
         :param organization: The organization the user belongs to.
         :param position: The position/title of the user in their organization.
         :param notes: Any miscellaneous notes related to the user.
+
+        :param c_groups: CRIPT groups you belong to
 
         :param _class: class of node.
         :param uid: The unique ID of the material.
@@ -67,91 +69,75 @@ class User(BaseModel):
         self._position = None
         self.position = position
 
-        # group owns
-        # in groups
+        self._c_groups = None
+        self.c_groups = c_groups
+
         # publication
 
+    @property
+    def c_groups(self):
+        return self._c_groups
 
-@property
-def groups(self):
-    """List of groups the user belongs to."""
-    return self._groups
+    @c_groups.setter
+    def c_groups(self, c_groups):
+        for group in c_groups:
+            if not isinstance(group, cript.group.Group):
+                msg = f"Group {group} not of type `Group`."
+                raise UserError(msg)
+            self._groups.append(group)
 
+    @property
+    def email(self):
+        return self._email
 
-@groups.setter
-def groups(self, groups):
-    for group in groups:
-        if not isinstance(group, Group):
-            msg = f"Group {group} not of type `data_model.group.Group`"
-            raise UserError(msg)
-        self._groups.append(group)
+    @email.setter
+    def email(self, email):
+        self._email = email
 
+    @property
+    def phone(self):
+        return self._phone
 
-@property
-def email(self):
-    return self._email
+    @phone.setter
+    def phone(self, phone):
+        self._phone = phone
 
+    @property
+    def website(self):
+        return self._website
 
-@email.setter
-def email(self, email):
-    self._email = email
+    @website.setter
+    def website(self, website):
+        self._website = website
 
+    @property
+    def twitter(self):
+        return self._twitter
 
-@property
-def phone(self):
-    return self._phone
+    @twitter.setter
+    def twitter(self, twitter):
+        self._twitter = twitter
 
+    @property
+    def orcid(self):
+        return self._orcid
 
-@phone.setter
-def phone(self, phone):
-    self._phone = phone
+    @orcid.setter
+    def orcid(self, orcid):
+        self._orcid = orcid
 
+    @property
+    def organization(self):
+        return self._organization
 
-@property
-def website(self):
-    return self._website
+    @organization.setter
+    def organization(self, organization):
+        self._organization = organization
 
+    @property
+    def position(self):
+        return self._position
 
-@website.setter
-def website(self, website):
-    self._website = website
-
-
-@property
-def twitter(self):
-    return self._twitter
-
-
-@twitter.setter
-def twitter(self, twitter):
-    self._twitter = twitter
-
-
-@property
-def orcid(self):
-    return self._orcid
-
-
-@orcid.setter
-def orcid(self, orcid):
-    self._orcid = orcid
-
-
-@property
-def organization(self):
-    return self._organization
-
-
-@organization.setter
-def organization(self, organization):
-    self._organization = organization
-
-
-@property
-def position(self):
-    return self._position
-
-
-@position.setter
-def position(self, position):
-    self._position = position
+    @position.setter
+    def position(self, position):
+        self._position = position

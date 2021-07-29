@@ -13,7 +13,7 @@ class Collection(BaseModel):
     def __init__(
         self,
         name: str,
-        notes: str = None,
+        notes: str = None
     ):
         """
 

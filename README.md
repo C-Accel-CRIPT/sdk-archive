@@ -8,3 +8,17 @@ To rebuild cript and refresh:
 (https://packaging.python.org/tutorials/packaging-projects/)
 1) py -m build
 2) pip  install -e .
+
+
+
+<u>To do list:</u>
+* Overall:
+    * security
+        * Groups: owner has to approve new user
+    * view_all -> better sort (alphabetical, date created, number of members, owner)
+
+* User:
+    *
+    
+* Group
+    * 

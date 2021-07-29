@@ -4,7 +4,6 @@ from typing import Union
 from datetime import datetime
 
 from pint.unit import Unit
-from bson import ObjectId
 
 from . import __version__
 from .utils.serializable import Serializable
@@ -27,7 +26,7 @@ class BaseModel(Serializable, ABC):
         _class: str = None,
         notes: str = None,
 
-        uid: ObjectId = None,
+        uid: str = None,
         model_version: str = None,
         version_control=None,
         last_modified_date: datetime = None,
@@ -63,7 +62,6 @@ class BaseModel(Serializable, ABC):
         self._version_control = None
         self._last_modified_date = None
         self._created_date = None
-
 
     def __repr__(self):
         return dumps(self.as_dict(), indent=2, sort_keys=True)
@@ -338,3 +336,7 @@ class Prop(Serializable):
         self._conditions = conditions
 
 
+class CRIPTError(Exception):
+
+    def __init__(self, message):
+        self.message = message
