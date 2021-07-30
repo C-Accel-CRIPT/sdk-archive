@@ -10,7 +10,7 @@ import cript.material
 
 class Inventory(BaseModel):
 
-    _class = "inventory"
+    _class = "Inventory"
 
     def __init__(
         self,

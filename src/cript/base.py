@@ -2,12 +2,13 @@ from abc import ABC
 from json import dumps
 from typing import Union
 from datetime import datetime
+import warnings
 
 from pint.unit import Unit
 
 from . import __version__
 from .utils.serializable import Serializable
-from .validation_tools import *
+from .utils.type_check import *
 
 
 class BaseModel(Serializable, ABC):
@@ -33,12 +34,10 @@ class BaseModel(Serializable, ABC):
         created_date: datetime = None
     ):
         """
-
         :param name: The name of the user.
 
-        :param _class: class of node.
         :param notes: Any miscellaneous notes related to the user.
-
+        :param _class: class of node.
         :param uid: The unique ID of the material.
         :param model_version: Version of CRIPT data model.
         :param version_control: Link to version control node.
@@ -123,6 +122,41 @@ class BaseModel(Serializable, ABC):
     def created_date(self):
         """Date the node was created."""
         return self._created_date
+
+    def _set_CRIPT_prop(self, objs, prop: str):
+        """
+        This can set CRIPT properties
+        :param objs: List of CRIPT objects or List of Lists of strings to add to prop
+        :param prop: The property to be set
+        :return:
+        """
+        _class = prop[2:]  # strip "c_"
+        _type = cript.cript_types[_class]
+
+        if objs is None:
+            exec(f"self._{prop} = None")
+        else:
+            exec(f"current_uids = [g[0] for g in self.{prop}]")
+            for obj in objs:
+                if type(obj) is list:
+                    obj_info = obj
+                elif isinstance(obj, _class):
+                    if obj.uid is None:
+                        msg = f"{_class} {obj} needs to be saved before adding it to the user node."
+                        warnings.warn(msg, CRIPTWarning)
+                        continue
+                    obj_info = [obj.uid, obj.name]
+                else:
+                    msg = f"{_class} {obj} not of type {_type}. Skipped."
+                    warnings.warn(msg, CRIPTWarning)
+                    continue
+
+                if obj_info[0] in current_uids:
+                    msg = f"{_class} {obj} already in node."
+                    warnings.warn(msg, CRIPTWarning)
+                    continue
+
+                exec(f"self._{prop}.append(obj_info)")
 
 
 class Cond(Serializable):
@@ -340,3 +374,16 @@ class CRIPTError(Exception):
 
     def __init__(self, message):
         self.message = message
+
+
+class CRIPTWarning(Warning):
+
+    def __init__(self, message):
+        self.message = message
+
+
+def load(ddict: dict):
+    ddict["uid"] = ddict.pop("_id")
+    class_ = ddict.pop("class_")
+    obj = cript.cript_types[class_](**ddict)
+    return obj

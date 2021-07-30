@@ -126,7 +126,7 @@ class Ingredient(Serializable):
 
 class Process(BaseModel):
     op_keywords = keywords_Process
-    _class = "process"
+    _class = "Process"
 
     def __init__(
             self,

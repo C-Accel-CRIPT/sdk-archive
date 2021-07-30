@@ -8,7 +8,7 @@ from .base import BaseModel
 
 class Experiment(BaseModel):
 
-    _class = "experiment"
+    _class = "Experiment"
 
     def __init__(
         self,

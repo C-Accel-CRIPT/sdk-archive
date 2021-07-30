@@ -7,36 +7,8 @@ from .base import BaseModel
 
 
 class Publication(BaseModel):
-    """
 
-    Parameters
-    ----------
-    ** required **
-    title: str
-
-
-    ** optional **
-    authors: list[str]
-        List of authors [Last name, First name middle intial or name].
-    journal: str
-    publisher: str
-    year: int
-    volume: int
-    issue: int
-    pages: str
-    doi: str
-
-    issn: str
-
-    arxiv_id: str
-
-    PMID: str
-
-    website: str
-    notes: str
-    """
-
-    _class = "publication"
+    _class = "Publication"
 
     def __init__(
             self,

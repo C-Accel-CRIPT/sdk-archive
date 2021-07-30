@@ -4,23 +4,24 @@ Collection Node
 """
 
 from .base import BaseModel
-
+from .utils.type_check import *
 
 class Collection(BaseModel):
 
-    _class = "collection"
+    _class = "Collection"
 
     def __init__(
         self,
         name: str,
+        c_collections=None,
         notes: str = None
     ):
         """
-
         :param name: The name of the collection.
 
-        :param notes: Any miscellaneous notes related to the user.
+        :param c_collections:
 
+        :param notes: Any miscellaneous notes related to the user.
         :param _class: class of node.
         :param uid: The unique ID of the material.
         :param model_version: Version of CRIPT data model.

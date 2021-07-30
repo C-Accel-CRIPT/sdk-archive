@@ -2,13 +2,17 @@
 User Node
 
 """
-import cript.group
 
-from .base import BaseModel
+import warnings
+import re
+
+import cript.group
+from .base import BaseModel, CRIPTWarning
+from .utils.type_check import *
 
 
 class User(BaseModel):
-    _class = "user"
+    _class = "User"
 
     def __init__(
             self,
@@ -20,7 +24,7 @@ class User(BaseModel):
             orcid: str = None,
             organization: str = None,
             position: str = None,
-            c_groups: list = None,
+            c_group: list = None,
             notes: str = None
     ):
         """
@@ -34,10 +38,10 @@ class User(BaseModel):
         :param orcid: The ORCID (https://orcid.org/) iD of the user.
         :param organization: The organization the user belongs to.
         :param position: The position/title of the user in their organization.
+
+        :param c_group: CRIPT group you belong to
+
         :param notes: Any miscellaneous notes related to the user.
-
-        :param c_groups: CRIPT groups you belong to
-
         :param _class: class of node.
         :param uid: The unique ID of the material.
         :param model_version: Version of CRIPT data model.
@@ -69,36 +73,58 @@ class User(BaseModel):
         self._position = None
         self.position = position
 
-        self._c_groups = None
-        self.c_groups = c_groups
+        self._c_group = None
+        self.c_group = c_group
 
         # publication
 
     @property
-    def c_groups(self):
-        return self._c_groups
+    def c_group(self):
+        return self._c_group
 
-    @c_groups.setter
-    def c_groups(self, c_groups):
-        for group in c_groups:
-            if not isinstance(group, cript.group.Group):
-                msg = f"Group {group} not of type `Group`."
-                raise UserError(msg)
-            self._groups.append(group)
+    @c_group.setter
+    def c_group(self, c_group):
+        if c_group is None:
+            self._c_group = None
+        else:
+            current_group_uids = [g[0] for g in self.c_group]
+            for group in c_group:
+                if type(group) is list:
+                    self._c_group.append(group)
+                if not isinstance(group, cript.group.Group):
+                    msg = f"Group {group} not of type `Group` and not added to user node."
+                    warnings.warn(msg, CRIPTWarning)
+                    continue
+                if group.uid is None:
+                    msg = f"Group {group} needs to be saved before adding it to the user node."
+                    warnings.warn(msg, CRIPTWarning)
+                    continue
+                if group.uid in current_group_uids:
+                    msg = f"Group {group} already added to user node."
+                    warnings.warn(msg, CRIPTWarning)
+                    continue
+
+                self._c_group.append([group.uid, group.name])
 
     @property
     def email(self):
         return self._email
 
     @email.setter
+    @type_check_property
     def email(self, email):
-        self._email = email
+        if self._email_format_check(email):
+            self._email = email
+        else:
+            msg = f"Email {email} not of correct format. (text@text.text)"
+            warnings.warn(msg, CRIPTWarning)
 
     @property
     def phone(self):
         return self._phone
 
     @phone.setter
+    @type_check_property
     def phone(self, phone):
         self._phone = phone
 
@@ -107,6 +133,7 @@ class User(BaseModel):
         return self._website
 
     @website.setter
+    @type_check_property
     def website(self, website):
         self._website = website
 
@@ -115,6 +142,7 @@ class User(BaseModel):
         return self._twitter
 
     @twitter.setter
+    @type_check_property
     def twitter(self, twitter):
         self._twitter = twitter
 
@@ -123,6 +151,7 @@ class User(BaseModel):
         return self._orcid
 
     @orcid.setter
+    @type_check_property
     def orcid(self, orcid):
         self._orcid = orcid
 
@@ -131,6 +160,7 @@ class User(BaseModel):
         return self._organization
 
     @organization.setter
+    @type_check_property
     def organization(self, organization):
         self._organization = organization
 
@@ -139,5 +169,17 @@ class User(BaseModel):
         return self._position
 
     @position.setter
+    @type_check_property
     def position(self, position):
         self._position = position
+
+    @staticmethod
+    def _email_format_check(email: str) -> bool:
+        """
+        Check email is text@text.text
+        """
+        regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        if re.match(regex, email):
+            return True
+        else:
+            return False

@@ -3,11 +3,12 @@ Database Connection
 
 """
 from datetime import datetime
+from typing import Union
 
 from pymongo import MongoClient, errors
 from bson import ObjectId
 
-from .validation_tools import *
+from .utils.type_check import *
 from .utils.database_tools import *
 
 
@@ -182,12 +183,23 @@ class CriptDB:
     @login_check
     def view(self, obj, sort_by: str = None, num_results: int = 50):
         """
-        View  items in a mongodb collection.
+        View/search based on node.
 
         Examples:
+            shows all in database
         view(cript.Group)                           shows all groups
+        view(cript.Material)                        shows all materials
+        view(cript.Publication)                     shows all publications
+
+            shows all in your groups
         view(cript.Collection)                      shows all collections from all groups you are apart of
+        view(cript.Inventory)                       shows all inventories from all groups you are apart of
         view(cript.Experiment)                      shows all experiments from all groups and collections
+        view(cript.Process)                         shows all processes from all groups and collections
+        view(cript.Simulation)                      shows all simulation from all groups and collections
+        view(cript.Data)                            shows all data from all groups and collections
+
+            shows one file
         view('uid')                                 shows just that object (can be group, collection, etc.)
 
         :param obj: The node type you want or uid of node you want
@@ -215,16 +227,40 @@ class CriptDB:
 
     def _search(self, obj, sort_by: str = None, num_results: int = 50):
         """
-        Preform search of db_collection
 
+        """
+        if obj in [cript.Group, cript.Publication, cript.Material]:
+            result = self._search_full_collection(obj, sort_by, num_results)
+        elif obj in [cript.Collection, cript.Inventory, cript.Experiment, cript.Process, cript.Simulation, cript.Data]:
+            result = self._search_with_groups(obj, sort_by, num_results)
+        else:
+            mes = f"{obj} is not a valid object for viewing."
+            raise cript.CRIPTError(mes)
+
+        return result
+
+    def _search_full_collection(self, obj, sort_by: str = None, num_results: int = 50):
+        """
+        Search the full collection
         """
         coll = self.db[obj._class]
         if sort_by is None:
             result = list(coll.find({}, limit=num_results))
         else:
             result = list(coll.find({}, limit=num_results, sort=[(sort_by, -1)]))
-
         return result
+
+    def _search_with_groups(self, obj, sort_by: str = None, num_results: int = 50):
+        """
+        Get groups user is apart of and search those.
+        """
+        coll = self.db[obj._class]
+        if sort_by is None:
+            result = list(coll.find({}, limit=num_results))
+        else:
+            result = list(coll.find({}, limit=num_results, sort=[(sort_by, -1)]))
+        return result
+
 
     @staticmethod
     def _print_table(result: list[dict]):
@@ -237,12 +273,33 @@ class CriptDB:
         print("")
         print(row_format.format("number", "name", "uid"))
         print("-" * 60)
-        for i, doc in enumerate(result):
-            print(row_format.format(str(i), doc["name"][:25], str(doc["_id"])))
-        print("")
+        if result:
+            for i, doc in enumerate(result):
+                print(row_format.format(str(i), doc["name"][:25], str(doc["_id"])))
+            print("")
+        else:
+            print("No results.")
 
     @login_check
-    def load(self, obj):
+    def search(self, quary: Union[str, dict], node=None):
+        """
+        View/search based on a key or value in a node.
+
+        Example:
+        .search("styrene", cript.Material)                      searches for the word styrene anywhere in all material nodes
+        .search({"preferred_name": "styrene"}, cript.Material)  search for the styrene in only preferred_name in Material node
+        .search(
+            {"preferred_name": "styrene", "mw": ">1000"},
+            cript.Material)
+
+        :param quary:
+        :param node:
+        :return:
+        """
+        pass
+
+    @login_check
+    def load(self, uid):
         pass
 
     @login_check

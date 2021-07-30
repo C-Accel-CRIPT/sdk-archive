@@ -35,7 +35,7 @@ class File(Serializable):
 
 class Data(BaseModel):
     op_keywords = []
-    _class = "data"
+    _class = "Data"
 
     def __init__(
             self,

@@ -6,7 +6,7 @@ Material Node
 from .base import BaseModel, Cond, Prop
 from .keywords.material import *
 from .utils.serializable import Serializable
-from .validation_tools import *
+from .utils.type_check import *
 
 
 class Identifiers(Serializable):
@@ -24,9 +24,7 @@ class Identifiers(Serializable):
             inchi_key: str = None
     ):
         """
-
         :param preferred_name: preferred name
-
         :param names: additional names, abbreviations, short hands for the material
         :param cas: CAS number
         :param bigsmiles: bigSMILES Line Notation
@@ -167,7 +165,7 @@ class Identifiers(Serializable):
 
 class Material(BaseModel):
     op_keywords = [k for k in keywords_material_p.keys()] + [k for k in keywords_material.keys()]
-    _class = "material"
+    _class = "Material"
 
     def __init__(
             self,
@@ -182,17 +180,17 @@ class Material(BaseModel):
             notes: str = None
     ):
         """
-
         :param name: The name of the user.
         :param identifier:
+
         :param properties:
         :param keywords:
         :param source:
         :param lot_number:
         :param storage:
         :param hazard:
-        :param notes: Any miscellaneous notes related to the user.
 
+        :param notes: Any miscellaneous notes related to the user.
         :param _class: class of node.
         :param uid: The unique ID of the material.
         :param model_version: Version of CRIPT data model.
