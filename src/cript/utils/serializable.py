@@ -1,6 +1,7 @@
 import abc
 from pint import Unit
 from bson import ObjectId
+from datetime import datetime
 
 
 class Serializable(abc.ABC):
@@ -26,8 +27,8 @@ class Serializable(abc.ABC):
             return [Serializable._to_dict(i) for i in obj]
         elif hasattr(obj, "as_dict"):
             return obj.as_dict()
-        elif isinstance(obj, ObjectId):
-            return str(obj)
+        # elif isinstance(obj, ObjectId):
+        #     return str(obj)
         else:
             return obj
 
@@ -52,7 +53,24 @@ class Serializable(abc.ABC):
 
         return _dict
 
-    @classmethod
-    def from_dict(cls, ddict: dict):
-        """Construct an object from the input dictionary."""
-        return cls(**ddict)
+    @staticmethod
+    def dict_datetime_to_str(ddict: dict) -> dict:
+        """Converts any datetime objects to strings"""
+
+        attr = dict()
+        for k, v in ddict.items():
+            value = Serializable._loop_through(v)
+            attr[k] = value
+
+        return attr
+
+    @staticmethod
+    def _loop_through(obj):
+        if isinstance(obj, list):
+            return [Serializable._loop_through(i) for i in obj]
+        elif isinstance(obj, dict):
+            return Serializable.dict_datetime_to_str(obj)
+        elif type(obj) is datetime:
+            return str(obj)
+        else:
+            return obj

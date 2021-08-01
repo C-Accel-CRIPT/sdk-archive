@@ -2,11 +2,12 @@
 Group Node
 
 """
-
+import re
 import warnings
 
 from .base import BaseModel, CRIPTWarning
 from .utils.type_check import *
+
 
 class Group(BaseModel):
     _class = "Group"
@@ -16,10 +17,11 @@ class Group(BaseModel):
             name: str,
             email: str = None,
             website: str = None,
-            c_owner=None,
-            c_collection=None,
-            c_group=None,
-            notes: str = None
+            c_owner: list = None,
+            c_collection: list = None,
+            c_group: list = None,
+            notes: str = None,
+            **kwargs
     ):
         """
         :param name: The name of the group.
@@ -40,7 +42,7 @@ class Group(BaseModel):
         :param created_date: Date it was created.
         """
 
-        super().__init__(name=name, _class=self._class, notes=notes)
+        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
         self._email = None
         self.email = email
@@ -66,7 +68,13 @@ class Group(BaseModel):
     @email.setter
     @type_check_property
     def email(self, email):
-        self._email = email
+        if email is None:
+            self._email = email
+        elif self._email_format_check(email):
+            self._email = email
+        else:
+            msg = f"Email {email} not of correct format. (format: text@text.text)"
+            warnings.warn(msg, CRIPTWarning)
 
     @property
     def website(self):
@@ -101,3 +109,14 @@ class Group(BaseModel):
     @c_collection.setter
     def c_collection(self, c_collection):
         self._set_CRIPT_prop(c_collection, "c_collection")
+
+    @staticmethod
+    def _email_format_check(email: str) -> bool:
+        """
+        Check email is text@text.text
+        """
+        regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+        if re.match(regex, email):
+            return True
+        else:
+            return False

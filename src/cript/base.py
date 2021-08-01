@@ -1,4 +1,5 @@
 from abc import ABC
+from bson import ObjectId
 from json import dumps
 from typing import Union
 from datetime import datetime
@@ -12,22 +13,13 @@ from .utils.type_check import *
 
 
 class BaseModel(Serializable, ABC):
-    """Base (abstract) class to represent a data model.
-    Parameters
-    ----------
-    name: str, required
-        User specific name of the node.
-    notes: str, optional
-        A free form space to add non-property information.
-    """
-
     def __init__(
         self,
         name: str,
         _class: str = None,
         notes: str = None,
 
-        uid: str = None,
+        uid: Union[str, ObjectId] = None,
         model_version: str = None,
         version_control=None,
         last_modified_date: datetime = None,
@@ -51,26 +43,32 @@ class BaseModel(Serializable, ABC):
         self._notes = None
         self.notes = notes
 
-        self._class_ = _class
+        self._class_ = None
+        self.class_ = _class
 
         self._uid = None
+        self.uid = uid
+
         if model_version is None:
             self._model_version = __version__
         else:
             self._model_version = model_version
-        self._version_control = None
+        self._version_control = version_control
+
         self._last_modified_date = None
+        self.last_modified_date = last_modified_date
+
         self._created_date = None
+        self.created_date = created_date
 
     def __repr__(self):
-        return dumps(self.as_dict(), indent=2, sort_keys=True)
+        return dumps(self.dict_datetime_to_str(self.as_dict()), indent=2, sort_keys=True)
 
     def __str__(self):
-        return dumps(self.dict_remove_none(self.as_dict()), indent=2, sort_keys=True)
+        return dumps(self.dict_datetime_to_str(self.dict_remove_none(self.as_dict())), indent=2, sort_keys=True)
 
     @property
     def name(self):
-        """User specific name of the node."""
         return self._name
 
     @name.setter
@@ -80,7 +78,6 @@ class BaseModel(Serializable, ABC):
 
     @property
     def notes(self):
-        """ A free form space to add non-property information."""
         return self._notes
 
     @notes.setter
@@ -90,38 +87,51 @@ class BaseModel(Serializable, ABC):
 
     @property
     def uid(self):
-        """Unique ID of the node."""
         return self._uid
 
     @uid.setter
-    @type_check_property
     def uid(self, uid):
+        if type(uid) is ObjectId:
+            uid = str(uid)
         self._uid = uid
 
     @property
     def class_(self):
-        """Version of the data model."""
         return self._class_
+
+    @class_.setter
+    def class_(self, class_):
+        self._class_ = class_
 
     @property
     def model_version(self):
-        """Version of the data model."""
         return self._model_version
 
     @property
     def version_control(self):
-        """Version control reference of the data model."""
         return self._version_control
 
     @property
     def last_modified_date(self):
-        """Date the node was last modified."""
         return self._last_modified_date
+
+    @last_modified_date.setter
+    def last_modified_date(self, last_modified_date):
+        self._last_modified_date = last_modified_date
 
     @property
     def created_date(self):
-        """Date the node was created."""
         return self._created_date
+
+    @created_date.setter
+    def created_date(self, created_date):
+        self._created_date = created_date
+
+    def _create_reference(self) -> dict:
+        """
+        Gives dictionary for reference
+        """
+        return {"uid": self.uid, "name": self.name}
 
     def _set_CRIPT_prop(self, objs, prop: str):
         """
@@ -131,31 +141,53 @@ class BaseModel(Serializable, ABC):
         :return:
         """
         _class = prop[2:]  # strip "c_"
-        _type = cript.cript_types[_class]
+        _type = cript.cript_types[_class.capitalize()]
 
         if objs is None:
             exec(f"self._{prop} = None")
         else:
-            exec(f"current_uids = [g[0] for g in self.{prop}]")
+            current_uids = []
+            exec(f"if self.{prop} is not None:\n\tcurrent_uids=[g[0] for g in self.{prop}]")
+
+            # if list not given, make it a list
+            if isinstance(objs, _type) or isinstance(objs, str):
+                objs = [objs]
+
+            # loop through list
             for obj in objs:
-                if type(obj) is list:
+                if isinstance(obj, dict):  # happens when loading an object
                     obj_info = obj
-                elif isinstance(obj, _class):
+                elif isinstance(obj, str):  # user may give just id as string -> just store string, will be expanded on database upload
+                    if id_type_check(obj):
+                        obj_info = obj
+
+                        if obj_info in current_uids:
+                            msg = f"{_class} {obj} already in node."
+                            warnings.warn(msg, CRIPTWarning)
+                            continue
+
+                elif isinstance(obj, _type):  # user may give a CRIPT node -> then extract dictionary
                     if obj.uid is None:
-                        msg = f"{_class} {obj} needs to be saved before adding it to the user node."
+                        msg = f"{_class} '{obj.name}' needs to be saved before adding it to the node."
                         warnings.warn(msg, CRIPTWarning)
                         continue
-                    obj_info = [obj.uid, obj.name]
+
+                    obj_info = obj._create_reference()   # Generates reference
+
+                    if obj_info["uid"] in current_uids:
+                        msg = f"{_class} {obj} already in node."
+                        warnings.warn(msg, CRIPTWarning)
+                        continue
+
                 else:
                     msg = f"{_class} {obj} not of type {_type}. Skipped."
                     warnings.warn(msg, CRIPTWarning)
                     continue
 
-                if obj_info[0] in current_uids:
-                    msg = f"{_class} {obj} already in node."
-                    warnings.warn(msg, CRIPTWarning)
-                    continue
+                print(current_uids)
 
+
+                exec(f"if self._{prop} is None:\n\tself._{prop} = []")
                 exec(f"self._{prop}.append(obj_info)")
 
 

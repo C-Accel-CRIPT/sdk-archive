@@ -80,67 +80,12 @@ class CriptDB:
             # if user provides email address find their id for them.
             self._user = self._user_find_by_email(user)
         else:
-            if self._id_type_check(user):  # uids are 24 charters long
+            if id_type_check(user):
                 if self._user_exists(user):  # check database to make sure user exists
                     self._user = user
                 else:
-                    msg = f"user({user}) not found."
+                    msg = f"user('{user}') not found."
                     raise cript.CRIPTError(msg)
-
-    @login_check
-    def save(self, obj):
-        """
-        Saves item to database
-
-        Example:
-        save('user node')
-        save('group node')
-
-        :param obj: The object to be saved.
-        :return:
-        """
-        # create document from python object
-        doc = self._create_doc(obj)
-
-        # select collection based on class type
-        coll = self.db[obj.class_]
-
-        # save document and put generated uid back into object
-        obj.uid = coll.insert_one(doc).inserted_id
-
-        # output to user
-        if self.op_print:
-            print(f"'{obj.name}' was saved to the database.")
-
-        return obj.uid
-
-    def _create_doc(self, obj):
-        # convert to dictionary
-        doc = obj.as_dict()
-
-        # remove empty id
-        if doc["uid"] is None:
-            doc.pop("uid")
-        else:
-            msg = "uid should not have an id already. If you are trying to update an existing doc, "\
-                            "don't use 'save', use 'update'."
-            raise cript.CRIPTError(msg)
-
-        # add time stamps
-        doc = self._set_time_stamps(doc)
-
-        # remove any unused attributes
-        doc = obj.dict_remove_none(doc)
-        return doc
-
-    @staticmethod
-    def _set_time_stamps(doc):
-        now = datetime.utcnow()
-        if "created_date" in doc.keys() and doc["created_date"] is None:
-            doc["created_date"] = now
-        if "last_modified_date" in doc.keys():
-            doc["last_modified_date"] = now
-        return doc
 
     def _user_find_by_email(self, email: str) -> str:
         """
@@ -148,7 +93,7 @@ class CriptDB:
         :param email:
         :return: id as string
         """
-        coll = self.db["user"]
+        coll = self.db["User"]
         doc = coll.find_one({"email": email})
         if doc is None:
             msg = f"{email} not found in database."
@@ -162,23 +107,136 @@ class CriptDB:
         :param uid:
         :return:
         """
-        coll = self.db["user"]
+        coll = self.db["User"]
         doc = coll.find_one({"_id": ObjectId(uid)})
         if doc is not None:
             return True
         else:
             return False
 
+
+    @login_check
+    def save(self, obj):
+        """
+        Saves item to database
+
+        Example:
+        save('user node')
+        save('group node')
+
+        :param obj: The object to be saved.
+        :return:
+        """
+        # checks
+        self._save_checks(obj)
+
+        # create document from python object
+        doc = self._create_doc(obj)
+
+        # select collection based on class type
+        coll = self.db[obj.class_]
+
+        # save document and put generated uid back into object
+        obj.uid = str(coll.insert_one(doc).inserted_id)
+
+        # output to user
+        if self.op_print:
+            print(f"'{obj.name}' was saved to the database.")
+
+        return obj.uid
+
+    def _create_doc(self, obj):
+        """
+        Converts a CRIPT node into document for upload to mongoDB
+        """
+        # add time stamps
+        self._set_time_stamps(obj)
+
+        # convert to dictionary
+        doc = obj.as_dict()
+
+        # remove empty id
+        doc.pop("uid")
+
+        # check for incomplete object references
+        doc = self._doc_reference_check(doc)
+
+        # remove any unused attributes
+        doc = obj.dict_remove_none(doc)
+        return doc
+
     @staticmethod
-    def _id_type_check(uid: str) -> bool:
-        if type(uid) != str:
-            msg = f"uids should be type 'str'. The provided uid is {type(uid)}."
-            raise cript.CRIPTError(msg)
-        if len(uid) != 24:
-            msg = f"uids are 24 letters or numbers long. The provided uid is {len(uid)} long."
+    def _set_time_stamps(obj):
+        """
+        Adds time stamps to CRIPT node.
+        """
+        now = datetime.utcnow()
+        if obj.created_date is None:
+            obj.created_date = now
+
+        obj.last_modified_date = now
+
+    def _doc_reference_check(self, doc: dict) -> dict:
+        """
+        a reference my not have both uid and name, so this will find the document and add it.
+        """
+        ref_keys = [k for k in doc.keys() if k[:2] == "c_"]
+
+        for key in ref_keys:
+            value = doc[key]
+            if value is None:
+                continue
+            elif isinstance(value, list):
+                new_value = []
+                for item in value:
+                    if isinstance(item, dict):
+                        new_value.append(item)
+                    elif isinstance(item, str):  # if string look up and get the extra details
+                        coll_name = key[2:].capitalize()
+                        coll = self.db[coll_name]
+                        result = coll.find_one({"_id": ObjectId(item)})
+                        if result:
+                            node = cript.load(result)
+                            new_value.append(node._create_reference())
+                        else:
+                            msg = f"'{item}' in '{key}' not found in database."
+                            raise CRIPTError(msg)
+                    else:
+                        msg = f"'{item}' in '{key}' is an invalid object type."
+                        raise CRIPTError(msg)
+
+                doc[key] = new_value
+
+        return doc
+
+    def _save_checks(self, obj):
+        """
+        This function checks the database for conflicts.
+        """
+        coll = self.db[obj.class_]
+
+        if obj.uid is not None:
+            msg = "uid should not have an id already. If you are trying to update an existing doc, "\
+                            "don't use 'save', use 'update'."
             raise cript.CRIPTError(msg)
 
-        return True
+        if obj.class_ == "User":
+            # must have unique email address
+            if coll.find_one({"email": obj.email}) is not None:
+                msg = f"{obj.email} is already registered in the database."
+                raise CRIPTError(msg)
+
+        elif obj.class_ == "Group":
+            pass
+
+        elif obj.class_ == "Collection":
+            pass
+
+        elif obj.class_ == "Experiment":
+            pass
+
+        elif obj.class_ == "Material":
+            pass
 
     @login_check
     def view(self, obj, sort_by: str = None, num_results: int = 50):
@@ -212,12 +270,18 @@ class CriptDB:
             self._print_table(result)
             return result
 
-        elif self._id_type_check(obj):   #################### This search should be improved, for loop bad idea _> probably change from random to user defined _id with class embedded
+        elif id_type_check(obj):   #################### This search should be improved, for loop bad idea _> probably change from random to user defined _id with class embedded
+            result = None
             for coll in self.db_collections:
                 coll = self.db[coll]
                 result = coll.find_one({"_id": ObjectId(obj)})
                 if result is not None:
                     break
+
+            if result is None:
+                mes = f"{obj} not found."
+                raise cript.CRIPTError(mes)
+
             print(result)
             return result
 
@@ -261,7 +325,6 @@ class CriptDB:
             result = list(coll.find({}, limit=num_results, sort=[(sort_by, -1)]))
         return result
 
-
     @staticmethod
     def _print_table(result: list[dict]):
         """
@@ -281,6 +344,14 @@ class CriptDB:
             print("No results.")
 
     @login_check
+    def update(self, obj):
+        pass
+
+    @login_check
+    def delete(self, obj):
+        pass
+
+    @login_check
     def search(self, quary: Union[str, dict], node=None):
         """
         View/search based on a key or value in a node.
@@ -296,16 +367,4 @@ class CriptDB:
         :param node:
         :return:
         """
-        pass
-
-    @login_check
-    def load(self, uid):
-        pass
-
-    @login_check
-    def delete(self, obj):
-        pass
-
-    @login_check
-    def update(self, obj):
         pass

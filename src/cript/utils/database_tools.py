@@ -1,5 +1,7 @@
 from functools import wraps
 
+from cript.base import CRIPTError
+
 
 def login_check(func):
     """
@@ -11,8 +13,8 @@ def login_check(func):
     def _login_check(*args, **kwargs):
         # if creating a user, allow!
         if args[0].user is None:
-            if args[1].class_ != "user":
-                raise Exception("Login before trying to save. To login type: cript.CriptDB.user = 'your user id' ")
+            if args[1].class_ != "User":
+                raise CRIPTError("Login before trying to save. To login type: cript.CriptDB.user = 'your user id' ")
 
             value = func(*args, **kwargs)
 

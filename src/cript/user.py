@@ -6,7 +6,6 @@ User Node
 import warnings
 import re
 
-import cript.group
 from .base import BaseModel, CRIPTWarning
 from .utils.type_check import *
 
@@ -25,7 +24,8 @@ class User(BaseModel):
             organization: str = None,
             position: str = None,
             c_group: list = None,
-            notes: str = None
+            notes: str = None,
+            **kwargs
     ):
         """
 
@@ -50,7 +50,7 @@ class User(BaseModel):
         :param created_date: Date it was created.
         """
 
-        super().__init__(name=name, _class=self._class, notes=notes)
+        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
         self._email = None
         self.email = email
@@ -84,27 +84,7 @@ class User(BaseModel):
 
     @c_group.setter
     def c_group(self, c_group):
-        if c_group is None:
-            self._c_group = None
-        else:
-            current_group_uids = [g[0] for g in self.c_group]
-            for group in c_group:
-                if type(group) is list:
-                    self._c_group.append(group)
-                if not isinstance(group, cript.group.Group):
-                    msg = f"Group {group} not of type `Group` and not added to user node."
-                    warnings.warn(msg, CRIPTWarning)
-                    continue
-                if group.uid is None:
-                    msg = f"Group {group} needs to be saved before adding it to the user node."
-                    warnings.warn(msg, CRIPTWarning)
-                    continue
-                if group.uid in current_group_uids:
-                    msg = f"Group {group} already added to user node."
-                    warnings.warn(msg, CRIPTWarning)
-                    continue
-
-                self._c_group.append([group.uid, group.name])
+        self._set_CRIPT_prop(c_group, "c_group")
 
     @property
     def email(self):
@@ -113,10 +93,12 @@ class User(BaseModel):
     @email.setter
     @type_check_property
     def email(self, email):
-        if self._email_format_check(email):
+        if email is None:
+            self._email = email
+        elif self._email_format_check(email):
             self._email = email
         else:
-            msg = f"Email {email} not of correct format. (text@text.text)"
+            msg = f"Email {email} not of correct format. (format: text@text.text)"
             warnings.warn(msg, CRIPTWarning)
 
     @property
@@ -126,7 +108,13 @@ class User(BaseModel):
     @phone.setter
     @type_check_property
     def phone(self, phone):
-        self._phone = phone
+        if phone is None:
+            self._phone = phone
+        elif self._phone_format_check(phone):
+            self._phone = phone
+        else:
+            msg = f"Phone number {phone} not of correct format. (format: numbers and dash only)"
+            warnings.warn(msg, CRIPTWarning)
 
     @property
     def website(self):
@@ -153,7 +141,16 @@ class User(BaseModel):
     @orcid.setter
     @type_check_property
     def orcid(self, orcid):
-        self._orcid = orcid
+        if orcid is None:
+            self._orcid = orcid
+        elif self._orcid_format_check(orcid):
+            self._orcid = orcid
+        elif self._orcid_format_check2(orcid):
+            orcid = orcid[0:4] + "-" + orcid[4:8] + "-" + orcid[8:12] + "-" + orcid[12:]
+            self._orcid = orcid
+        else:
+            msg = f"{orcid} invalid format, and not added to user node. (format: ####-####-####-####)"
+            raise CRIPTWarning(msg)
 
     @property
     def organization(self):
@@ -180,6 +177,39 @@ class User(BaseModel):
         """
         regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
         if re.match(regex, email):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def _phone_format_check(phone: str) -> bool:
+        """
+        Check phone format
+        """
+        regex = r'[0-9|-]{10}'
+        if re.match(regex, phone):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def _orcid_format_check(orcid: str) -> bool:
+        """
+        Check orcid format   ####-####-####-####
+        """
+        regex = r'[0-9]{4}[-]{1}[0-9]{4}[-]{1}[0-9]{4}[-]{1}[0-9]{4}'
+        if re.match(regex, orcid):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def _orcid_format_check2(orcid: str) -> bool:
+        """
+        Check orcid format  (no dashes)  ################
+        """
+        regex = r'[0-9]{16}'
+        if re.match(regex, orcid):
             return True
         else:
             return False

@@ -291,3 +291,14 @@ def text_to_type(text: str):
     else:
         warnings.warn(f"Type check not valid. {text}")
         return None
+
+
+def id_type_check(uid: str) -> bool:
+    if type(uid) != str:
+        msg = f"uids should be type 'str'. The provided uid is {type(uid)}."
+        raise cript.CRIPTError(msg)
+    if len(uid) != 24:
+        msg = f"uids are 24 letters or numbers long. The provided uid is {len(uid)} long."
+        raise cript.CRIPTError(msg)
+
+    return True

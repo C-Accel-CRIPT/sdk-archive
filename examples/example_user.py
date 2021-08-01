@@ -9,10 +9,10 @@ db = cript.CriptDB(username, password, project, database)
 
 # Generate node
 node = cript.User(
-    name="Dylan W",
-    email="dylan@cript.edu",
+    name="Dylan",
+    email="Dylan6@cript.edu",
     orcid="0000-0000-0000-0001",
-    organization="Mass. Institute of Technology",
+    organization="MIT",
     position="Research Assistant"
 )
 
