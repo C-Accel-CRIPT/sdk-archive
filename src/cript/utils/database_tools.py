@@ -13,7 +13,12 @@ def login_check(func):
     def _login_check(*args, **kwargs):
         # if creating a user, allow!
         if args[0].user is None:
-            if args[1].class_ != "User":
+            try:
+                if args[1].class_ == "User":
+                    pass
+                else:
+                    raise AttributeError
+            except AttributeError:
                 raise CRIPTError("Login before trying to save. To login type: cript.CriptDB.user = 'your user id' ")
 
             value = func(*args, **kwargs)

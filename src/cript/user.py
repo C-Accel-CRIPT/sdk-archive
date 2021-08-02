@@ -24,6 +24,7 @@ class User(BaseModel):
             organization: str = None,
             position: str = None,
             c_group: list = None,
+            c_publication: list = None,
             notes: str = None,
             **kwargs
     ):
@@ -76,7 +77,8 @@ class User(BaseModel):
         self._c_group = None
         self.c_group = c_group
 
-        # publication
+        self._c_publication = None
+        self.c_publication = c_publication
 
     @property
     def c_group(self):
@@ -85,6 +87,14 @@ class User(BaseModel):
     @c_group.setter
     def c_group(self, c_group):
         self._set_CRIPT_prop(c_group, "c_group")
+
+    @property
+    def c_publication(self):
+        return self._c_publication
+
+    @c_publication.setter
+    def c_publication(self, c_publication):
+        self._set_CRIPT_prop(c_publication, "c_publication")
 
     @property
     def email(self):

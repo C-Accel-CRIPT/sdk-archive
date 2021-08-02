@@ -15,8 +15,9 @@ class Inventory(BaseModel):
     def __init__(
         self,
         name: str,
-        materials: Union[list[cript.material.Material], list[list[str, str]]] = None,
-        notes: str = None
+        c_material: list = None,
+        notes: str = None,
+        **kwargs
     ):
         """
 
@@ -31,20 +32,15 @@ class Inventory(BaseModel):
         :param last_modified_date: Last date the node was modified.
         :param created_date: Date it was created.
         """
-        super().__init__(name=name, _class=self._class, notes=notes)
+        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
-        self._materials = None
-        self.materials = materials
+        self._c_material = None
+        self.c_material = c_material
 
     @property
-    def materials(self):
-        return self._materials
+    def c_material(self):
+        return self._c_material
 
-    @materials.setter
-    def materials(self, materials):
-        self._materials = materials
-
-    def add(self, material):
-        if self.materials is None:
-            mat_list = self.materials
-            self.materials = mat_list.append()
+    @c_material.setter
+    def c_material(self, c_material):
+        self._set_CRIPT_prop(c_material, "c_material")

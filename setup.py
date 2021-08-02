@@ -20,6 +20,7 @@ setup(
     install_requires=[
         "pymongo[srv]>=3.11",
         "pint>=0.17",
-        "bson>=0.5"
+        "bson>=0.5",
+        "jsonpatch>=1.32"
     ]
 )

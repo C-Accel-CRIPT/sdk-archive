@@ -127,11 +127,25 @@ class BaseModel(Serializable, ABC):
     def created_date(self, created_date):
         self._created_date = created_date
 
-    def _create_reference(self) -> dict:
+    def _reference(self) -> dict:
         """
-        Gives dictionary for reference
+        From a filled out node, create reference dictionary.
+        :return:
         """
-        return {"uid": self.uid, "name": self.name}
+        ddict = self.as_dict()
+        return self._create_reference(ddict)
+
+    @staticmethod
+    def _create_reference(ddict) -> dict:
+        """
+        Gives reference dictionary from dictionary.
+        """
+        keys = ["uid", "name"]
+        out = {}
+        for key in keys:
+            out[key] = ddict[key]
+
+        return out
 
     def _set_CRIPT_prop(self, objs, prop: str):
         """
@@ -144,19 +158,26 @@ class BaseModel(Serializable, ABC):
         _type = cript.cript_types[_class.capitalize()]
 
         if objs is None:
-            exec(f"self._{prop} = None")
+            setattr(self, f"_{prop}", None)
         else:
             current_uids = []
-            exec(f"if self.{prop} is not None:\n\tcurrent_uids=[g[0] for g in self.{prop}]")
+            if isinstance(getattr(self, prop), list):
+                current_uids = [g["uid"] for g in getattr(self, prop)]
 
             # if list not given, make it a list
-            if isinstance(objs, _type) or isinstance(objs, str):
+            if isinstance(objs, _type) or isinstance(objs, str) or isinstance(objs, dict):
                 objs = [objs]
 
             # loop through list
             for obj in objs:
-                if isinstance(obj, dict):  # happens when loading an object
-                    obj_info = obj
+                if isinstance(obj, dict):  # happens when loading node, or passing node from cript.view().
+                    obj_info = _type._create_reference(obj)
+
+                    if obj_info["uid"] in current_uids:
+                        msg = f"{_class} {obj} already in node."
+                        warnings.warn(msg, CRIPTWarning)
+                        continue
+
                 elif isinstance(obj, str):  # user may give just id as string -> just store string, will be expanded on database upload
                     if id_type_check(obj):
                         obj_info = obj
@@ -172,7 +193,7 @@ class BaseModel(Serializable, ABC):
                         warnings.warn(msg, CRIPTWarning)
                         continue
 
-                    obj_info = obj._create_reference()   # Generates reference
+                    obj_info = obj._reference()   # Generates reference
 
                     if obj_info["uid"] in current_uids:
                         msg = f"{_class} {obj} already in node."
@@ -184,10 +205,9 @@ class BaseModel(Serializable, ABC):
                     warnings.warn(msg, CRIPTWarning)
                     continue
 
-                print(current_uids)
+                if getattr(self, f"_{prop}") is None:
+                    setattr(self, f"_{prop}", [])
 
-
-                exec(f"if self._{prop} is None:\n\tself._{prop} = []")
                 exec(f"self._{prop}.append(obj_info)")
 
 
@@ -415,7 +435,7 @@ class CRIPTWarning(Warning):
 
 
 def load(ddict: dict):
-    ddict["uid"] = ddict.pop("_id")
+    ddict["uid"] = str(ddict.pop("_id"))
     class_ = ddict.pop("class_")
     obj = cript.cript_types[class_](**ddict)
     return obj

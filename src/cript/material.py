@@ -177,7 +177,8 @@ class Material(BaseModel):
             lot_number: str = None,
             storage: list[Cond] = None,
             hazard: list[str] = None,
-            notes: str = None
+            notes: str = None,
+            **kwargs
     ):
         """
         :param name: The name of the user.
@@ -201,7 +202,7 @@ class Material(BaseModel):
         if name is None:
             name = identifier[0].preferred_name
 
-        super().__init__(name=name, _class=self._class, notes=notes)
+        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
         self._identifier = None
         self.identifier = identifier

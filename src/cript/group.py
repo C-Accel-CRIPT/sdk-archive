@@ -20,6 +20,7 @@ class Group(BaseModel):
             c_owner: list = None,
             c_collection: list = None,
             c_group: list = None,
+            c_publication: list = None,
             notes: str = None,
             **kwargs
     ):
@@ -59,7 +60,8 @@ class Group(BaseModel):
         self._c_group = None
         self.c_group = c_group
 
-        # publication
+        self._c_publication = None
+        self.c_publication = c_publication
 
     @property
     def email(self):
@@ -109,6 +111,14 @@ class Group(BaseModel):
     @c_collection.setter
     def c_collection(self, c_collection):
         self._set_CRIPT_prop(c_collection, "c_collection")
+
+    @property
+    def c_publication(self):
+        return self._c_publication
+
+    @c_publication.setter
+    def c_publication(self, c_publication):
+        self._set_CRIPT_prop(c_publication, "c_publication")
 
     @staticmethod
     def _email_format_check(email: str) -> bool:

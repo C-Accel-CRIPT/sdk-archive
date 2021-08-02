@@ -136,7 +136,8 @@ class Process(BaseModel):
             conditions: list[Cond],
             properties: list[Prop] = None,
             keywords: list[str] = None,
-            notes: str = None
+            notes: str = None,
+            **kwargs
     ):
         """
 
@@ -155,7 +156,7 @@ class Process(BaseModel):
         :param last_modified_date: Last date the node was modified.
         :param created_date: Date it was created.
         """
-        super().__init__(name=name, _class=self._class, notes=notes)
+        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
         self._ingredients = None
         self.ingredients = ingredients

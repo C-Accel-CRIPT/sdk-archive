@@ -7,6 +7,7 @@ from typing import Union
 
 from pymongo import MongoClient, errors
 from bson import ObjectId
+from jsonpatch import JsonPatch
 
 from .utils.type_check import *
 from .utils.database_tools import *
@@ -156,7 +157,7 @@ class CriptDB:
         doc = obj.as_dict()
 
         # remove empty id
-        doc.pop("uid")
+        doc["_id"] = doc.pop("uid")
 
         # check for incomplete object references
         doc = self._doc_reference_check(doc)
@@ -345,7 +346,57 @@ class CriptDB:
 
     @login_check
     def update(self, obj):
-        pass
+        # get current document
+        coll = self.db[obj.class_]
+        old_doc = coll.find_one({"_id": ObjectId(obj.uid)})
+        if old_doc is None:
+            mes = f"Previous document not found in database. ('{obj.name}', '{obj.uid}')"
+            raise cript.CRIPTError(mes)
+
+        # create new doc
+        new_doc = self._create_doc(obj)
+
+        # get differences
+        patch = self._create_json_patch(old_doc, new_doc)
+
+        # Do update
+        self._update_from_patch(obj, patch, new_doc)
+
+    @staticmethod
+    def _create_json_patch(doc_old, doc_new):
+        """
+        Creates patch from old and new document
+        :param doc_old:
+        :param doc_new:
+        :return:
+        """
+        # cleaning up non-JSON dump-able objects
+        doc_old["_id"] = str(doc_old["_id"])
+
+        remove_keys = ["created_date", "last_modified_date"]
+        for key in remove_keys:
+            doc_old.pop(key)
+            doc_new.pop(key)
+
+        return JsonPatch.from_diff(src=doc_old, dst=doc_new)
+
+    def _update_from_patch(self, obj, patch, doc_new):
+        """
+
+        """
+        coll = self.db[obj.class_]
+        changes = {}
+        for p in patch:
+            key = p["path"].split("/")[1]
+            if key not in changes.keys():
+                changes[key] = doc_new[key]
+
+        result = coll.update_one({"_id": ObjectId(obj.uid)}, {"$set": changes})
+        if not result.acknowledged:
+            msg = f"Error in updating {obj.name}."
+            raise CRIPTError(msg)
+        else:
+            print(f"Update of '{obj.name}' successful!")
 
     @login_check
     def delete(self, obj):
