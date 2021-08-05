@@ -43,4 +43,4 @@ class Inventory(BaseModel):
 
     @c_material.setter
     def c_material(self, c_material):
-        self._set_CRIPT_prop(c_material, "c_material")
+        self._setter_CRIPT_prop(c_material, "c_material")

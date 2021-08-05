@@ -15,10 +15,16 @@ To rebuild cript and refresh:
 * Overall:
     * security
         * Groups: owner has to approve new user
-    * view_all -> better sort (alphabetical, date created, number of members, owner)
+    * `db.view()` allow advance searching and sort (alphabetical, date created, number of members, owner)
+    * deleting
 
 * User:
     *
     
 * Group
     * 
+    
+
+tutorials:
+* advanced searching
+* publications

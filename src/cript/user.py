@@ -86,7 +86,7 @@ class User(BaseModel):
 
     @c_group.setter
     def c_group(self, c_group):
-        self._set_CRIPT_prop(c_group, "c_group")
+        self._setter_CRIPT_prop(c_group, "c_group")
 
     @property
     def c_publication(self):
@@ -94,7 +94,7 @@ class User(BaseModel):
 
     @c_publication.setter
     def c_publication(self, c_publication):
-        self._set_CRIPT_prop(c_publication, "c_publication")
+        self._setter_CRIPT_prop(c_publication, "c_publication")
 
     @property
     def email(self):

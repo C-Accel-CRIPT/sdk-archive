@@ -41,7 +41,7 @@ class Experiment(BaseModel):
 
     @c_material.setter
     def c_material(self, c_material):
-        self._set_CRIPT_prop(c_material, "c_material")
+        self._setter_CRIPT_prop(c_material, "c_material")
 
     @property
     def c_process(self):
@@ -49,7 +49,7 @@ class Experiment(BaseModel):
 
     @c_process.setter
     def c_process(self, c_process):
-        self._set_CRIPT_prop(c_process, "c_process")
+        self._setter_CRIPT_prop(c_process, "c_process")
 
     @property
     def c_data(self):
@@ -57,4 +57,4 @@ class Experiment(BaseModel):
 
     @c_data.setter
     def c_data(self, c_data):
-        self._set_CRIPT_prop(c_data, "c_data")
+        self._setter_CRIPT_prop(c_data, "c_data")

@@ -92,7 +92,6 @@ class Group(BaseModel):
         return self._c_owner
 
     @c_owner.setter
-    @type_check_property
     def c_owner(self, c_owner):
         self._c_owner = c_owner
 
@@ -102,7 +101,7 @@ class Group(BaseModel):
 
     @c_group.setter
     def c_group(self, c_group):
-        self._set_CRIPT_prop(c_group, "c_group")
+        self._setter_CRIPT_prop(c_group, "c_group")
 
     @property
     def c_collection(self):
@@ -110,7 +109,7 @@ class Group(BaseModel):
 
     @c_collection.setter
     def c_collection(self, c_collection):
-        self._set_CRIPT_prop(c_collection, "c_collection")
+        self._setter_CRIPT_prop(c_collection, "c_collection")
 
     @property
     def c_publication(self):
@@ -118,7 +117,7 @@ class Group(BaseModel):
 
     @c_publication.setter
     def c_publication(self, c_publication):
-        self._set_CRIPT_prop(c_publication, "c_publication")
+        self._setter_CRIPT_prop(c_publication, "c_publication")
 
     @staticmethod
     def _email_format_check(email: str) -> bool:

@@ -2,6 +2,7 @@
 Database Connection
 
 """
+import sys
 from datetime import datetime
 from typing import Union
 
@@ -84,6 +85,8 @@ class CriptDB:
             if id_type_check(user):
                 if self._user_exists(user):  # check database to make sure user exists
                     self._user = user
+                    if self.op_print:
+                        print(f"Login as '{user}' was successful.")
                 else:
                     msg = f"user('{user}') not found."
                     raise cript.CRIPTError(msg)
@@ -115,7 +118,6 @@ class CriptDB:
         else:
             return False
 
-
     @login_check
     def save(self, obj):
         """
@@ -128,8 +130,8 @@ class CriptDB:
         :param obj: The object to be saved.
         :return:
         """
-        # checks
-        self._save_checks(obj)
+        # pre - checks
+        self._pre_save_checks(obj)
 
         # create document from python object
         doc = self._create_doc(obj)
@@ -139,6 +141,9 @@ class CriptDB:
 
         # save document and put generated uid back into object
         obj.uid = str(coll.insert_one(doc).inserted_id)
+
+        # post - checks
+        self._post_save_checks(obj)
 
         # output to user
         if self.op_print:
@@ -153,14 +158,14 @@ class CriptDB:
         # add time stamps
         self._set_time_stamps(obj)
 
+        # check for incomplete object references
+        doc = self._obj_reference_check(obj)
+
         # convert to dictionary
         doc = obj.as_dict()
 
         # remove empty id
         doc["_id"] = doc.pop("uid")
-
-        # check for incomplete object references
-        doc = self._doc_reference_check(doc)
 
         # remove any unused attributes
         doc = obj.dict_remove_none(doc)
@@ -176,6 +181,37 @@ class CriptDB:
             obj.created_date = now
 
         obj.last_modified_date = now
+
+    def _obj_reference_check(self, obj):
+        """
+        a reference my not have both uid and name, so this will find the document and add it.
+        """
+        ref_keys = [k.strip("_") for k in vars(obj) if k[:3] == "_c_"]
+
+        for key in ref_keys:
+            value = getattr(obj, key)
+            if value is None:
+                continue
+            elif isinstance(value, list):
+                new_value = []
+                for item in value:
+                    if isinstance(item, dict):
+                        new_value.append(item)
+                    elif isinstance(item, str):  # if string look up and get the extra details
+                        coll = self.db[key[2:].capitalize()]
+                        result = coll.find_one({"_id": ObjectId(item)})
+                        if result:
+                            node = cript.load(result)
+                            new_value.append(node._reference())
+                        else:
+                            msg = f"'{item}' in '{key}' not found in database."
+                            raise CRIPTError(msg)
+                    else:
+                        msg = f"'{item}' in '{key}' is an invalid object type."
+                        raise CRIPTError(msg)
+
+                setattr(obj, key, "_clear")
+                setattr(obj, key, new_value)
 
     def _doc_reference_check(self, doc: dict) -> dict:
         """
@@ -198,7 +234,7 @@ class CriptDB:
                         result = coll.find_one({"_id": ObjectId(item)})
                         if result:
                             node = cript.load(result)
-                            new_value.append(node._create_reference())
+                            new_value.append(node._reference())
                         else:
                             msg = f"'{item}' in '{key}' not found in database."
                             raise CRIPTError(msg)
@@ -210,7 +246,7 @@ class CriptDB:
 
         return doc
 
-    def _save_checks(self, obj):
+    def _pre_save_checks(self, obj):
         """
         This function checks the database for conflicts.
         """
@@ -228,7 +264,43 @@ class CriptDB:
                 raise CRIPTError(msg)
 
         elif obj.class_ == "Group":
+            obj.c_owner = self.user
+
+        elif obj.class_ == "Collection":
             pass
+
+        elif obj.class_ == "Experiment":
+            pass
+
+        elif obj.class_ == "Material":
+            pass
+
+    def _post_save_checks(self, obj):
+        """
+        This function checks the database for conflicts.
+        """
+        if obj.class_ == "User":
+            pass
+
+        elif obj.class_ == "Group":
+            # adding new group to current user logged in
+            try:  # Try to find a user node in the Python stack/globals
+                for i in range(100):
+                    frames = sys._getframe(i)
+                    globals_ = frames.f_globals
+                    user_node = [globals_[k] for k, v in globals_.items() if isinstance(v, cript.User) and k[0] != "_"]
+                    if user_node:
+                        user_node = user_node[0]
+                        user_node.c_group = obj.uid
+                        break
+
+            except AttributeError:  # if no User node found, just load it in and update it
+                coll = self.db["User"]
+                doc = coll.find_one({"_id": ObjectId(self.user)})
+                user_node = cript.load(doc)
+                user_node.c_group = obj.uid
+
+            self.update(user_node)
 
         elif obj.class_ == "Collection":
             pass
@@ -240,7 +312,7 @@ class CriptDB:
             pass
 
     @login_check
-    def view(self, obj, sort_by: str = None, num_results: int = 50):
+    def view(self, obj, query: dict = None, num_results: int = 50):
         """
         View/search based on node.
 
@@ -262,12 +334,12 @@ class CriptDB:
         view('uid')                                 shows just that object (can be group, collection, etc.)
 
         :param obj: The node type you want or uid of node you want
-        :param sort_by:
+        :param query:
         :param num_results:
         :return:
         """
         if obj in cript.cript_types.values():
-            result = self._search(obj)
+            result = self._search(obj, query)
             self._print_table(result)
             return result
 
@@ -290,40 +362,62 @@ class CriptDB:
             msg = "Invalid input."
             raise cript.CRIPTError(msg)
 
-    def _search(self, obj, sort_by: str = None, num_results: int = 50):
+    def _search(self, obj, query: dict = None, num_results: int = 50):
         """
 
         """
         if obj in [cript.Group, cript.Publication, cript.Material]:
-            result = self._search_full_collection(obj, sort_by, num_results)
+            result = self._search_full_collection(obj, query, num_results)
         elif obj in [cript.Collection, cript.Inventory, cript.Experiment, cript.Process, cript.Simulation, cript.Data]:
-            result = self._search_with_groups(obj, sort_by, num_results)
+            result = self._search_with_groups(obj, query, num_results)
         else:
             mes = f"{obj} is not a valid object for viewing."
             raise cript.CRIPTError(mes)
 
         return result
 
-    def _search_full_collection(self, obj, sort_by: str = None, num_results: int = 50):
+    def _search_full_collection(self, obj, query: dict = None, num_results: int = 50):
         """
         Search the full collection
         """
         coll = self.db[obj._class]
-        if sort_by is None:
+        if query is None:
+            # search whole collection
             result = list(coll.find({}, limit=num_results))
+        elif len(query.keys()) == 1 and "sort" in query.keys():
+            # search whole
+            result = list(coll.find({}, limit=num_results, sort=[(query["sort"], -1)]))
+        elif len(query.keys()) == 3 and all(key in query.keys() for key in ["field", "type", "value"]):
+            if query["type"] in ["$regex", "$gt", "$gte", "$in", "$lt", "$lte"]:  #https://docs.mongodb.com/manual/reference/operator/query/
+                result = list(coll.find({query["field"]: {query["type"]: query["value"]}}, limit=num_results))
+            elif query["type"] == "$exact":
+                result = list(coll.find({query["field"]: query["value"]}, limit=num_results))
+            else:
+                mes = f"{query['type']} is not a valid query type."
+                raise cript.CRIPTError(mes)
+        elif len(query.keys()) == 4 and all(key in query.keys() for key in ["field", "type", "value", "sort"]):
+            if query["type"] in ["$regex", "$gt", "$gte", "$in", "$lt", "$lte"]:  #https://docs.mongodb.com/manual/reference/operator/query/
+                result = list(coll.find({query["field"]: {query["type"]: query["value"]}}, limit=num_results, sort=[(query["sort"], -1)]))
+            elif query["type"] == "$exact":
+                result = list(coll.find({query["field"]: query["value"]}, limit=num_results, sort=[(query["sort"], -1)]))
+            else:
+                mes = f"{query['type']} is not a valid query type."
+                raise cript.CRIPTError(mes)
         else:
-            result = list(coll.find({}, limit=num_results, sort=[(sort_by, -1)]))
+            mes = f"Not a valid query."
+            raise cript.CRIPTError(mes)
+
         return result
 
-    def _search_with_groups(self, obj, sort_by: str = None, num_results: int = 50):
+    def _search_with_groups(self, obj, query: dict = None, num_results: int = 50):
         """
         Get groups user is apart of and search those.
         """
         coll = self.db[obj._class]
-        if sort_by is None:
-            result = list(coll.find({}, limit=num_results))
+        if "sort" in query.keys():
+            result = list(coll.find({}, limit=num_results, sort=[(query["sort"], -1)]))
         else:
-            result = list(coll.find({}, limit=num_results, sort=[(sort_by, -1)]))
+            result = list(coll.find({}, limit=num_results))
         return result
 
     @staticmethod
@@ -403,7 +497,7 @@ class CriptDB:
         pass
 
     @login_check
-    def search(self, quary: Union[str, dict], node=None):
+    def search(self, query: Union[str, dict], node=None):
         """
         View/search based on a key or value in a node.
 
@@ -414,7 +508,7 @@ class CriptDB:
             {"preferred_name": "styrene", "mw": ">1000"},
             cript.Material)
 
-        :param quary:
+        :param query:
         :param node:
         :return:
         """

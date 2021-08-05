@@ -147,7 +147,7 @@ class BaseModel(Serializable, ABC):
 
         return out
 
-    def _set_CRIPT_prop(self, objs, prop: str):
+    def _setter_CRIPT_prop(self, objs, prop: str):
         """
         This can set CRIPT properties
         :param objs: List of CRIPT objects or List of Lists of strings to add to prop
@@ -159,10 +159,15 @@ class BaseModel(Serializable, ABC):
 
         if objs is None:
             setattr(self, f"_{prop}", None)
+        elif isinstance(objs, str) and objs == "_clear":
+            setattr(self, f"_{prop}", None)
         else:
+            # get uid already in node
             current_uids = []
             if isinstance(getattr(self, prop), list):
-                current_uids = [g["uid"] for g in getattr(self, prop)]
+                for g in getattr(self, prop):
+                    if isinstance(g, dict):
+                        current_uids.append(g["uid"])
 
             # if list not given, make it a list
             if isinstance(objs, _type) or isinstance(objs, str) or isinstance(objs, dict):
@@ -171,10 +176,12 @@ class BaseModel(Serializable, ABC):
             # loop through list
             for obj in objs:
                 if isinstance(obj, dict):  # happens when loading node, or passing node from cript.view().
+                    if "_id" in obj.keys():   # happens when passing node from cript.view()
+                        obj["uid"] = str(obj.pop("_id"))
                     obj_info = _type._create_reference(obj)
 
                     if obj_info["uid"] in current_uids:
-                        msg = f"{_class} {obj} already in node."
+                        msg = f"{_class} {obj['uid']} already in node."
                         warnings.warn(msg, CRIPTWarning)
                         continue
 

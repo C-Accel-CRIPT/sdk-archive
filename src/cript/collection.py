@@ -47,7 +47,7 @@ class Collection(BaseModel):
 
     @c_collection.setter
     def c_collection(self, c_collection):
-        self._set_CRIPT_prop(c_collection, "c_collection")
+        self._setter_CRIPT_prop(c_collection, "c_collection")
 
     @property
     def c_experiment(self):
@@ -55,4 +55,4 @@ class Collection(BaseModel):
 
     @c_experiment.setter
     def c_experiment(self, c_experiment):
-        self._set_CRIPT_prop(c_experiment, "c_experiment")
+        self._setter_CRIPT_prop(c_experiment, "c_experiment")
