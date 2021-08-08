@@ -1,14 +1,14 @@
-import cript
+import cript as C
 
 # Connect to database
 username = "DW_cript"
 password = "YXMaoE1"
 project = "cript_testing"
 database = "test"
-db = cript.CriptDB(username, password, project, database)
+db = C.CriptDB(username, password, project, database)
 
 # Generate node
-node = cript.User(
+node = C.User(
     name="Dylan",
     email="Dylan34@cript.edu",
     orcid="0000-0000-0000-0001",
@@ -23,7 +23,7 @@ db.save(node)
 print(node)
 
 # Generate node
-node2 = cript.Group(
+node2 = C.Group(
     name="tutorial2",
     website="www.test.com"
 )

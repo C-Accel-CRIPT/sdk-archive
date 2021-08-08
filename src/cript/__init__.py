@@ -25,10 +25,14 @@ from .database import *
 
 from inspect import getmembers, isclass
 from sys import modules
+
 cript_types = {pair[0]: pair[1] for pair in getmembers(modules[__name__], isclass) if "cript." in str(pair[1])}
 
 
+# Units
 from pint import UnitRegistry
 u = UnitRegistry()
+class Unit(u.Unit):
+    pass
 
 # from . import u, q

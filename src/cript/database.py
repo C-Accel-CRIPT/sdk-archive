@@ -9,9 +9,12 @@ from typing import Union
 from pymongo import MongoClient, errors
 from bson import ObjectId
 from jsonpatch import JsonPatch
+from typing import Union
 
 from .utils.type_check import *
 from .utils.database_tools import *
+from .base import load
+import cript as C
 
 
 class CriptDB:
@@ -22,7 +25,7 @@ class CriptDB:
                  db_password: str,
                  db_project: str,
                  db_database: str,
-                 user: str = None,
+                 user: Union[str, C.User] = None,
                  op_print: bool = True):
         """
         This class handles all communication with MongoDB.
@@ -30,13 +33,13 @@ class CriptDB:
         :param db_password: mongoDB password
         :param db_project: mongoDB project
         :param db_database: name of database on mongoDB
-        :param user: provide email or uid for user you want to login with
+        :param user: user node
         :param op_print: True to get printouts from database commands
         """
 
-        if self.instances > 0:
-            raise Exception("Connection to CRIPT database already exists.")
-        self.instances += 1
+        if CriptDB.instances > 0:
+            raise Exception("Connection to CRIPT database already exists. Can't start a second one.")
+        CriptDB.instances += 1
 
         self.db_username = db_username
         self.db_password = db_password
@@ -49,7 +52,7 @@ class CriptDB:
             self.client.server_info()  # test database connection
         except errors.ServerSelectionTimeoutError as err:
             msg = "Connection to database failed.\n\n"
-            raise cript.CRIPTError(msg)
+            raise CRIPTError(msg)
 
         self.op_print = op_print
         if self.op_print:
@@ -76,22 +79,29 @@ class CriptDB:
     @user.setter
     @type_check_property
     def user(self, user):
+        """
+        Takes str(email or uid) and will find User node, or you can provide user node
+        :param user: email, or uid or User node
+        :return:
+        """
         if user is None:
             self._user = user
-        elif "@" in user:
-            # if user provides email address find their id for them.
+            if self.op_print:
+                print(f"Not yet login.")
+        elif isinstance(user, str) and "@" in user:
             self._user = self._user_find_by_email(user)
+        elif isinstance(user, str) and id_type_check(user):
+            self._user = self._user_find_by_id(user)
+        elif isinstance(user, C.cript_types) and user["uid"] is not None:
+            self._user = user
         else:
-            if id_type_check(user):
-                if self._user_exists(user):  # check database to make sure user exists
-                    self._user = user
-                    if self.op_print:
-                        print(f"Login as '{user}' was successful.")
-                else:
-                    msg = f"user('{user}') not found."
-                    raise cript.CRIPTError(msg)
+            msg = f"User login failed due to invalid object ({user}) passed to user. (accepted values: email or uid or user node 'after being saved')\n\n"
+            raise CRIPTError(msg)
 
-    def _user_find_by_email(self, email: str) -> str:
+        if self.op_print:
+            print(f"Login as '{user}' was successful.")
+
+    def _user_find_by_email(self, email: str) -> C.User:
         """
         Find User by email address
         :param email:
@@ -103,9 +113,9 @@ class CriptDB:
             msg = f"{email} not found in database."
             raise cript.CRIPTError(msg)
 
-        return str(doc["_id"])
+        return load(doc)
 
-    def _user_exists(self, uid: str) -> bool:
+    def _user_find_by_id(self, uid: str) -> C.User:
         """
         Given the uid check if user exists
         :param uid:
@@ -113,26 +123,55 @@ class CriptDB:
         """
         coll = self.db["User"]
         doc = coll.find_one({"_id": ObjectId(uid)})
-        if doc is not None:
-            return True
-        else:
-            return False
+        if doc is None:
+            msg = f"{uid} not found in database."
+            raise cript.CRIPTError(msg)
+
+        return load(doc)
 
     @login_check
-    def save(self, obj):
+    def save(self, obj, parent_obj=None):
         """
         Saves item to database
 
         Example:
-        save('user node')
-        save('group node')
+            Solo saves (user, group)
+        save('user node')   automatically logs you in
+        save('group node')  automatically add user as owner, and adds the group to user node
+        save('publication')
+        save('material')
+
+            pair saves (collection, experiment, inventory, material, process, data)
+        save('collection node', 'group node')
+        save('collection node','publication node')
+        save('experiment node', 'collection node')
+        save('inventory node', 'group node')
+        save('material', 'inventory')
+        save('material', ['inventory node', 'inventory node', 'experiment node'])
+        save('process', 'experiment node')
+        save('data', ['experiment node', 'process node'])
+
 
         :param obj: The object to be saved.
+        :param parent_obj: The object you want it to be added to.
         :return:
         """
         # pre - checks
-        self._pre_save_checks(obj)
+        self._pre_save_checks(obj, parent_obj)
 
+        # save to database
+        self._do_save(obj)
+
+        # post - checks
+        self._post_save_checks(obj, parent_obj)
+
+        # output to user
+        if self.op_print:
+            print(f"'{obj.name}' was saved to the database.")
+
+        return obj.uid
+
+    def _do_save(self, obj):
         # create document from python object
         doc = self._create_doc(obj)
 
@@ -142,15 +181,6 @@ class CriptDB:
         # save document and put generated uid back into object
         obj.uid = str(coll.insert_one(doc).inserted_id)
 
-        # post - checks
-        self._post_save_checks(obj)
-
-        # output to user
-        if self.op_print:
-            print(f"'{obj.name}' was saved to the database.")
-
-        return obj.uid
-
     def _create_doc(self, obj):
         """
         Converts a CRIPT node into document for upload to mongoDB
@@ -159,7 +189,7 @@ class CriptDB:
         self._set_time_stamps(obj)
 
         # check for incomplete object references
-        doc = self._obj_reference_check(obj)
+        self._obj_reference_check(obj)
 
         # convert to dictionary
         doc = obj.as_dict()
@@ -246,36 +276,80 @@ class CriptDB:
 
         return doc
 
-    def _pre_save_checks(self, obj):
+    def _pre_save_checks(self, obj, parent_obj):
         """
         This function checks the database for conflicts.
         """
-        coll = self.db[obj.class_]
+        # General checks
+        if not isinstance(obj, tuple(cript.cript_types.values())):
+            msg = f"{obj} is not a valid CRIPT node."
+            raise cript.CRIPTError(msg)
+
+        if isinstance(parent_obj, tuple(cript.cript_types.values())) or parent_obj is None:
+            pass
+        else:
+            msg = f"{obj} is not a valid CRIPT node."
+            raise cript.CRIPTError(msg)
 
         if obj.uid is not None:
             msg = "uid should not have an id already. If you are trying to update an existing doc, "\
                             "don't use 'save', use 'update'."
             raise cript.CRIPTError(msg)
 
+        if parent_obj is not None:
+            if parent_obj.uid is None:
+                msg = f"{parent_obj.name} needs to be saved first."
+                raise cript.CRIPTError(msg)
+
+        # Class specific checks.
         if obj.class_ == "User":
+            coll = self.db[obj.class_]
             # must have unique email address
             if coll.find_one({"email": obj.email}) is not None:
                 msg = f"{obj.email} is already registered in the database."
                 raise CRIPTError(msg)
 
         elif obj.class_ == "Group":
-            obj.c_owner = self.user
+            obj.c_owner = self.user._reference()
 
         elif obj.class_ == "Collection":
-            pass
+            parent_obj_types = ["Group", "Publication"]
+            self._parent_obj_check(obj, parent_obj, parent_obj_types)
 
         elif obj.class_ == "Experiment":
-            pass
+            parent_obj_types = ["Collection"]
+            self._parent_obj_check(obj, parent_obj, parent_obj_types)
 
         elif obj.class_ == "Material":
             pass
 
-    def _post_save_checks(self, obj):
+        elif obj.class_ == "Process":
+            parent_obj_types = ["Experiment"]
+            self._parent_obj_check(obj, parent_obj, parent_obj_types)
+
+        elif obj.class_ == "Data":
+            pass
+
+        elif obj.class_ == "Inventory":
+            pass
+
+        elif obj.class_ == "Publication":
+            pass
+
+        else:
+            msg = f"{obj.class_} cannot be saved by itself."
+            raise CRIPTError(msg)
+
+    @staticmethod
+    def _parent_obj_check(obj, parent_obj, parent_obj_types):
+        if parent_obj.class_ in parent_obj_types:
+            pass
+        else:
+            msg = f"Saving a {obj.class_} requires a parent_obj to be {parent_obj_types}."
+            raise CRIPTError(msg)
+
+
+    def _post_save_checks(self, obj, parent_obj):
         """
         This function checks the database for conflicts.
         """
@@ -303,10 +377,13 @@ class CriptDB:
             self.update(user_node)
 
         elif obj.class_ == "Collection":
-            pass
+            attr = "c_" + obj.class_.lower()
+            setattr(parent_obj, attr, obj)
+            self.update(parent_obj)
 
         elif obj.class_ == "Experiment":
-            pass
+            attr = "c_" + obj.class_.lower()
+            setattr(parent_obj, attr, obj)
 
         elif obj.class_ == "Material":
             pass
@@ -318,17 +395,14 @@ class CriptDB:
 
         Examples:
             shows all in database
-        view(cript.Group)                           shows all groups
-        view(cript.Material)                        shows all materials
-        view(cript.Publication)                     shows all publications
+        view(C.Group, "all")                    shows all groups in database
+        view(C.Material, "all")                 shows all materials in database
 
             shows all in your groups
-        view(cript.Collection)                      shows all collections from all groups you are apart of
-        view(cript.Inventory)                       shows all inventories from all groups you are apart of
-        view(cript.Experiment)                      shows all experiments from all groups and collections
-        view(cript.Process)                         shows all processes from all groups and collections
-        view(cript.Simulation)                      shows all simulation from all groups and collections
-        view(cript.Data)                            shows all data from all groups and collections
+        view(C.Collection)                      shows all collections from all groups you are apart of
+        view(C.Inventory)                       shows all inventories from all groups you are apart of
+        view(C.Experiment)                      shows all experiments from all groups and collections
+        view(C.Data)                            shows all data from all groups and collections
 
             shows one file
         view('uid')                                 shows just that object (can be group, collection, etc.)
@@ -496,20 +570,3 @@ class CriptDB:
     def delete(self, obj):
         pass
 
-    @login_check
-    def search(self, query: Union[str, dict], node=None):
-        """
-        View/search based on a key or value in a node.
-
-        Example:
-        .search("styrene", cript.Material)                      searches for the word styrene anywhere in all material nodes
-        .search({"preferred_name": "styrene"}, cript.Material)  search for the styrene in only preferred_name in Material node
-        .search(
-            {"preferred_name": "styrene", "mw": ">1000"},
-            cript.Material)
-
-        :param query:
-        :param node:
-        :return:
-        """
-        pass
