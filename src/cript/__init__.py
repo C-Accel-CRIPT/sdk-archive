@@ -27,7 +27,7 @@ from inspect import getmembers, isclass
 from sys import modules
 
 cript_types = {pair[0]: pair[1] for pair in getmembers(modules[__name__], isclass) if "cript." in str(pair[1])}
-
+cript_types_tuple = tuple(cript_types.values())
 
 # Units
 from pint import UnitRegistry

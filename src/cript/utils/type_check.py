@@ -293,7 +293,7 @@ def text_to_type(text: str):
         return None
 
 
-def id_type_check(uid: str) -> bool:
+def id_type_check(uid: str):
     if type(uid) != str:
         msg = f"uids should be type 'str'. The provided uid is {type(uid)}."
         raise cript.CRIPTError(msg)
@@ -302,3 +302,10 @@ def id_type_check(uid: str) -> bool:
         raise cript.CRIPTError(msg)
 
     return True
+
+
+def id_type_check_bool(uid: str) -> bool:
+    try:
+        return id_type_check(uid)
+    except cript.CRIPTError:
+        return False

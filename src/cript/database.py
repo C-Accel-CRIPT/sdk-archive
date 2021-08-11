@@ -9,7 +9,6 @@ from typing import Union
 from pymongo import MongoClient, errors
 from bson import ObjectId
 from jsonpatch import JsonPatch
-from typing import Union
 
 from .utils.type_check import *
 from .utils.database_tools import *
@@ -19,6 +18,7 @@ import cript as C
 
 class CriptDB:
     instances = 0
+    user_update = 0
 
     def __init__(self,
                  db_username: str,
@@ -48,9 +48,10 @@ class CriptDB:
 
         try:
             self.client = MongoClient(
-                f"mongodb+srv://{db_username}:{db_password}@cluster0.ekf91.mongodb.net/{db_project}?retryWrites=true&w=majority")
+                f"mongodb+srv://{db_username}:{db_password}@cluster0.ekf91.mongodb.net"
+                f"/{db_project}?retryWrites=true&w=majority")
             self.client.server_info()  # test database connection
-        except errors.ServerSelectionTimeoutError as err:
+        except errors.ServerSelectionTimeoutError:
             msg = "Connection to database failed.\n\n"
             raise CRIPTError(msg)
 
@@ -87,19 +88,25 @@ class CriptDB:
         if user is None:
             self._user = user
             if self.op_print:
-                print(f"Not yet login.")
+                print(f"Not yet logged in.")
+            return
+
         elif isinstance(user, str) and "@" in user:
             self._user = self._user_find_by_email(user)
         elif isinstance(user, str) and id_type_check(user):
             self._user = self._user_find_by_id(user)
-        elif isinstance(user, C.cript_types) and user["uid"] is not None:
+        elif isinstance(user, C.cript_types["User"]) and user.uid is not None:
             self._user = user
+            CriptDB.user_update += 1
+            if CriptDB.user_update > 1:
+                return
         else:
-            msg = f"User login failed due to invalid object ({user}) passed to user. (accepted values: email or uid or user node 'after being saved')\n\n"
+            msg = f"User login failed due to invalid object ({user}) passed to user. " \
+                  f"(accepted values: email or uid or user node 'after being saved')\n\n"
             raise CRIPTError(msg)
 
         if self.op_print:
-            print(f"Login as '{user}' was successful.")
+            print(f"Login as '{self.user.name}' was successful.")
 
     def _user_find_by_email(self, email: str) -> C.User:
         """
@@ -153,21 +160,23 @@ class CriptDB:
 
 
         :param obj: The object to be saved.
-        :param parent_obj: The object you want it to be added to.
+        :param parent_obj: The object you want it to be added to, or dict of that node.
         :return:
         """
         # pre - checks
+        if isinstance(parent_obj, dict):
+            parent_obj = C.load(parent_obj)
         self._pre_save_checks(obj, parent_obj)
 
         # save to database
         self._do_save(obj)
 
-        # post - checks
-        self._post_save_checks(obj, parent_obj)
-
         # output to user
         if self.op_print:
-            print(f"'{obj.name}' was saved to the database.")
+            print(f"Save of '{obj.name}' was successful.")
+
+        # post - checks
+        self._post_save_checks(obj, parent_obj)
 
         return obj.uid
 
@@ -281,11 +290,11 @@ class CriptDB:
         This function checks the database for conflicts.
         """
         # General checks
-        if not isinstance(obj, tuple(cript.cript_types.values())):
+        if not isinstance(obj, C.cript_types_tuple):
             msg = f"{obj} is not a valid CRIPT node."
             raise cript.CRIPTError(msg)
 
-        if isinstance(parent_obj, tuple(cript.cript_types.values())) or parent_obj is None:
+        if isinstance(parent_obj, C.cript_types_tuple) or parent_obj is None:
             pass
         else:
             msg = f"{obj} is not a valid CRIPT node."
@@ -342,12 +351,15 @@ class CriptDB:
 
     @staticmethod
     def _parent_obj_check(obj, parent_obj, parent_obj_types):
-        if parent_obj.class_ in parent_obj_types:
+        if parent_obj is None:
             pass
+        if parent_obj.class_ in parent_obj_types:
+            return
         else:
-            msg = f"Saving a {obj.class_} requires a parent_obj to be {parent_obj_types}."
-            raise CRIPTError(msg)
+            pass
 
+        msg = f"Saving a {obj.class_} requires a parent_obj to be {parent_obj_types}."
+        raise CRIPTError(msg)
 
     def _post_save_checks(self, obj, parent_obj):
         """
@@ -384,6 +396,7 @@ class CriptDB:
         elif obj.class_ == "Experiment":
             attr = "c_" + obj.class_.lower()
             setattr(parent_obj, attr, obj)
+            self.update(parent_obj)
 
         elif obj.class_ == "Material":
             pass
@@ -394,11 +407,7 @@ class CriptDB:
         View/search based on node.
 
         Examples:
-            shows all in database
-        view(C.Group, "all")                    shows all groups in database
-        view(C.Material, "all")                 shows all materials in database
-
-            shows all in your groups
+            shows all in *your* groups
         view(C.Collection)                      shows all collections from all groups you are apart of
         view(C.Inventory)                       shows all inventories from all groups you are apart of
         view(C.Experiment)                      shows all experiments from all groups and collections
@@ -407,17 +416,24 @@ class CriptDB:
             shows one file
         view('uid')                                 shows just that object (can be group, collection, etc.)
 
+            shows all in database
+        view(C.Group, {"scope": "all"})                    shows all groups in database
+        view(C.Material, {"scope": "all"})                 shows all materials in database
+
+
+
         :param obj: The node type you want or uid of node you want
         :param query:
         :param num_results:
         :return:
         """
-        if obj in cript.cript_types.values():
-            result = self._search(obj, query)
-            self._print_table(result)
-            return result
+        # if obj is cript node
+        if obj in C.cript_types_tuple:
+            result, key = self._search(obj, query)
+            self._print_table(result, key)
 
-        elif id_type_check(obj):   #################### This search should be improved, for loop bad idea _> probably change from random to user defined _id with class embedded
+        # if obj is uid
+        elif id_type_check_bool(obj):   #################### This search should be improved, for loop bad idea _> probably change from random to user defined _id with class embedded
             result = None
             for coll in self.db_collections:
                 coll = self.db[coll]
@@ -428,40 +444,48 @@ class CriptDB:
             if result is None:
                 mes = f"{obj} not found."
                 raise cript.CRIPTError(mes)
-
-            print(result)
-            return result
+            else:
+                print(result)
 
         else:
             msg = "Invalid input."
             raise cript.CRIPTError(msg)
 
+        return result
+
     def _search(self, obj, query: dict = None, num_results: int = 50):
         """
 
         """
-        if obj in [cript.Group, cript.Publication, cript.Material]:
-            result = self._search_full_collection(obj, query, num_results)
-        elif obj in [cript.Collection, cript.Inventory, cript.Experiment, cript.Process, cript.Simulation, cript.Data]:
-            result = self._search_with_groups(obj, query, num_results)
-        else:
-            mes = f"{obj} is not a valid object for viewing."
-            raise cript.CRIPTError(mes)
+        key = None
+        if isinstance(query, dict):
+            if "scope" in query and query["scope"] == "all":
+                # search whole database
+                result = self._search_full_collection(obj, query, num_results)
+            else:
+                # search your nodes
+                pass
 
-        return result
+        elif query is None:
+            result, key = self._search_local(obj, num_results)
+        else:
+            mes = f"{query} is not a valid object for viewing."
+            raise C.CRIPTError(mes)
+
+        return result, key
 
     def _search_full_collection(self, obj, query: dict = None, num_results: int = 50):
         """
         Search the full collection
         """
         coll = self.db[obj._class]
-        if query is None:
+        if len(query.keys()) == 1:
             # search whole collection
             result = list(coll.find({}, limit=num_results))
-        elif len(query.keys()) == 1 and "sort" in query.keys():
+        elif len(query.keys()) == 2 and "sort" in query.keys():
             # search whole
             result = list(coll.find({}, limit=num_results, sort=[(query["sort"], -1)]))
-        elif len(query.keys()) == 3 and all(key in query.keys() for key in ["field", "type", "value"]):
+        elif len(query.keys()) == 4 and all(key in query.keys() for key in ["field", "type", "value"]):
             if query["type"] in ["$regex", "$gt", "$gte", "$in", "$lt", "$lte"]:  #https://docs.mongodb.com/manual/reference/operator/query/
                 result = list(coll.find({query["field"]: {query["type"]: query["value"]}}, limit=num_results))
             elif query["type"] == "$exact":
@@ -469,7 +493,7 @@ class CriptDB:
             else:
                 mes = f"{query['type']} is not a valid query type."
                 raise cript.CRIPTError(mes)
-        elif len(query.keys()) == 4 and all(key in query.keys() for key in ["field", "type", "value", "sort"]):
+        elif len(query.keys()) == 5 and all(key in query.keys() for key in ["field", "type", "value", "sort"]):
             if query["type"] in ["$regex", "$gt", "$gte", "$in", "$lt", "$lte"]:  #https://docs.mongodb.com/manual/reference/operator/query/
                 result = list(coll.find({query["field"]: {query["type"]: query["value"]}}, limit=num_results, sort=[(query["sort"], -1)]))
             elif query["type"] == "$exact":
@@ -483,43 +507,87 @@ class CriptDB:
 
         return result
 
-    def _search_with_groups(self, obj, query: dict = None, num_results: int = 50):
+    def _search_local(self, obj, num_results: int = 50):
         """
-        Get groups user is apart of and search those.
+        Get everything the user is associated with.
         """
-        coll = self.db[obj._class]
-        if "sort" in query.keys():
-            result = list(coll.find({}, limit=num_results, sort=[(query["sort"], -1)]))
-        else:
-            result = list(coll.find({}, limit=num_results))
-        return result
+        result = []
+        key = []
+
+        if obj is C.cript_types["User"]:
+            result = self.user
+            key = None
+        elif obj is C.cript_types["Group"]:
+            for group in self.user.c_group:
+                group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
+                if group_dict is not None:
+                    result.append(group_dict)
+            key = None
+        elif obj is C.cript_types["Collection"]:
+            for group in self.user.c_group:
+                group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
+                if group_dict is not None:
+                    if "c_collection" in group_dict.keys():
+                        for collection in group_dict["c_collection"]:
+                            coll_dict = self.db["Collection"].find_one({"_id": ObjectId(collection["uid"])})
+                            if coll_dict is not None:
+                                result.append(coll_dict)
+                                key.append(f".{group['name']}")
+        elif obj is C.cript_types["Experiment"]:
+            for group in self.user.c_group:
+                group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
+                if group_dict is not None:
+                    if "c_collection" in group_dict.keys():
+                        for collection in group_dict["c_collection"]:
+                            coll_dict = self.db["Collection"].find_one({"_id": ObjectId(collection["uid"])})
+                            if coll_dict is not None:
+                                if "c_experiment" in coll_dict.keys():
+                                    for expt in coll_dict["c_experiment"]:
+                                        expt_dict = self.db["Experiment"].find_one({"_id": ObjectId(expt["uid"])})
+                                        if expt_dict is not None:
+                                            result.append(expt_dict)
+                                            key.append(f".{group['name']}.{collection['name']}")
+
+        return result, key
 
     @staticmethod
-    def _print_table(result: list[dict]):
+    def _print_table(result: list[dict], key: list[str]):
         """
         Print to screen as nice table from
         :param result:
         :return:
         """
-        row_format = "{:<8}" + "{:<30}" * 2
-        print("")
-        print(row_format.format("number", "name", "uid"))
-        print("-" * 60)
-        if result:
-            for i, doc in enumerate(result):
-                print(row_format.format(str(i), doc["name"][:25], str(doc["_id"])))
+        if key is None:
+            row_format = "{:<8}" + "{:<30}" * 2
             print("")
+            print(row_format.format("number", "name", "uid"))
+            print("-" * 60)
+            if result:
+                for i, doc in enumerate(result):
+                    print(row_format.format(str(i), doc["name"][:25], str(doc["_id"])))
+                print("")
+            else:
+                print("No results.")
         else:
-            print("No results.")
+            row_format = "{:<8}" + "{:<30}" * 3
+            print("")
+            print(row_format.format("number", "key", "name", "uid"))
+            print("-" * 60)
+            if result:
+                for i, (doc, k) in enumerate(zip(result, key)):
+                    print(row_format.format(str(i), k, doc["name"][:25], str(doc["_id"])))
+                print("")
+            else:
+                print("No results.")
 
     @login_check
     def update(self, obj):
-        # get current document
-        coll = self.db[obj.class_]
-        old_doc = coll.find_one({"_id": ObjectId(obj.uid)})
-        if old_doc is None:
-            mes = f"Previous document not found in database. ('{obj.name}', '{obj.uid}')"
-            raise cript.CRIPTError(mes)
+
+        # pre - checks
+        self._pre_update_checks(obj)
+
+        # get current doc from database
+        old_doc = self._get_doc_from_obj(obj)
 
         # create new doc
         new_doc = self._create_doc(obj)
@@ -529,6 +597,18 @@ class CriptDB:
 
         # Do update
         self._update_from_patch(obj, patch, new_doc)
+
+        # post - checks
+        self._post_update_checks(obj)
+
+    def _get_doc_from_obj(self, obj) -> dict:
+        """Get document from database given a node"""
+        coll = self.db[obj.class_]
+        doc = coll.find_one({"_id": ObjectId(obj.uid)})
+        if doc is None:
+            mes = f"Previous document not found in database. ('{obj.name}', '{obj.uid}')"
+            raise cript.CRIPTError(mes)
+        return doc
 
     @staticmethod
     def _create_json_patch(doc_old, doc_new):
@@ -565,6 +645,15 @@ class CriptDB:
             raise CRIPTError(msg)
         else:
             print(f"Update of '{obj.name}' successful!")
+
+    def _pre_update_checks(self, obj):
+        pass
+
+    def _post_update_checks(self, obj):
+
+        if obj.class_ == "User":
+            if obj is not self.user:
+                self.user = obj
 
     @login_check
     def delete(self, obj):
