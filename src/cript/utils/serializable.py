@@ -1,10 +1,17 @@
-import abc
-from pint import Unit
-from bson import ObjectId
+from abc import ABC
 from datetime import datetime
 
+from .. import cript_types, Unit
 
-class Serializable(abc.ABC):
+
+def load(ddict: dict):
+    ddict["uid"] = str(ddict.pop("_id"))
+    class_ = ddict.pop("class_")
+    obj = cript_types[class_](**ddict)
+    return obj
+
+
+class Serializable(ABC):
     """Base abstract class for a serializable object."""
 
     def as_dict(self):
@@ -27,14 +34,12 @@ class Serializable(abc.ABC):
             return [Serializable._to_dict(i) for i in obj]
         elif hasattr(obj, "as_dict"):
             return obj.as_dict()
-        # elif isinstance(obj, ObjectId):
-        #     return str(obj)
         else:
             return obj
 
     @staticmethod
     def dict_remove_none(ddict: dict) -> dict:
-        """Remove key, value pair form dictionary if value is None."""
+        """Remove 'key, value' pair form dictionary if value is None."""
         _dict = {}
         for k, v in ddict.items():
             if v is None:
@@ -56,7 +61,6 @@ class Serializable(abc.ABC):
     @staticmethod
     def dict_datetime_to_str(ddict: dict) -> dict:
         """Converts any datetime objects to strings"""
-
         attr = dict()
         for k, v in ddict.items():
             value = Serializable._loop_through(v)

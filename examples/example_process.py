@@ -21,13 +21,13 @@ ingredients = [
 # Generate node
 node = cript.Process(
     name="Anionic of Styrene",
-    ingredients=ingredients,
+    ingr=ingredients,
     procedure="In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
               "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
               "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
               "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
               "precipitation in methanol 3 times and dried under vacuum.",
-    conditions=[
+    cond=[
         cript.Cond("temp", 25, Unit("degC")),
         cript.Cond("time", 60, Unit("min"))
     ],

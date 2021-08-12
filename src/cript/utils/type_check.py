@@ -1,5 +1,4 @@
-from typing import get_type_hints, _UnionGenericAlias
-from typing import Union, get_origin
+from typing import get_type_hints, get_origin, _UnionGenericAlias
 from types import GenericAlias
 from functools import wraps
 import builtins
@@ -7,6 +6,8 @@ import warnings
 from inspect import getmembers, isclass
 
 import pint
+
+from .. import Union
 import cript
 
 builtin_types = {getattr(builtins, d).__name__: getattr(builtins, d) for d in dir(builtins) if isinstance(getattr(builtins, d), type) and "Error" not in getattr(builtins, d).__name__ and "Warning" not in getattr(builtins, d).__name__}
@@ -28,8 +29,7 @@ def type_check(type_options: Union[tuple, type]):
         @wraps(func)
         def _wrapper(*args, **kwargs):
             try:
-                arg = args[1]
-                _do_check(arg, type_options, func)
+                _do_check(*args, type_options, func)
             except Exception:
                 pass
 
@@ -38,7 +38,9 @@ def type_check(type_options: Union[tuple, type]):
     return _type_check_decorator
 
 
-def _do_check(arg, type_options, func):
+def _do_check(args, type_options, func):
+
+    arg =args[1]
 
     # arg pre- processing
     if isinstance(arg, (list, tuple, dict)):
@@ -52,6 +54,18 @@ def _do_check(arg, type_options, func):
         arg_generic = False
 
     # type_options pre-processing
+    if type_options == "self" or type_options == "list[self]":
+        type_options = type(args[0])
+    elif "self" in type_options:
+        new_type_op = []
+        for t in type_options:
+            if t == "self":
+                new_type_op.append(type(args[0]))
+            elif t == "list[self]":
+                new_type_op.append(list[type(args[0])])
+            else:
+                new_type_op.append(t)
+
     # make input to tuple if not
     if isinstance(type_options, type):
         type_options = (type_options,)

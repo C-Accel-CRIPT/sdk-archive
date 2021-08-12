@@ -1,6 +1,6 @@
 from functools import wraps
 
-from cript.base import CRIPTError
+from .. import CRIPTError
 
 
 def login_check(func):

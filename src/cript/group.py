@@ -2,11 +2,11 @@
 Group Node
 
 """
-import re
-import warnings
 
-from .base import BaseModel, CRIPTWarning
-from .utils.type_check import *
+import re
+
+from . import BaseModel, CRIPTError
+from .utils.type_check import type_check_property
 
 
 class Group(BaseModel):
@@ -21,6 +21,7 @@ class Group(BaseModel):
             c_collection: list = None,
             c_group: list = None,
             c_publication: list = None,
+            c_inventory=None,
             notes: str = None,
             **kwargs
     ):
@@ -63,6 +64,9 @@ class Group(BaseModel):
         self._c_publication = None
         self.c_publication = c_publication
 
+        self._c_inventory = None
+        self.c_inventory = c_inventory
+
     @property
     def email(self):
         return self._email
@@ -76,7 +80,7 @@ class Group(BaseModel):
             self._email = email
         else:
             msg = f"Email {email} not of correct format. (format: text@text.text)"
-            warnings.warn(msg, CRIPTWarning)
+            raise CRIPTError(msg)
 
     @property
     def website(self):
@@ -118,6 +122,14 @@ class Group(BaseModel):
     @c_publication.setter
     def c_publication(self, c_publication):
         self._setter_CRIPT_prop(c_publication, "c_publication")
+
+    @property
+    def c_inventory(self):
+        return self._c_inventory
+
+    @c_inventory.setter
+    def c_inventory(self, c_inventory):
+        self._setter_CRIPT_prop(c_inventory, "c_inventory")
 
     @staticmethod
     def _email_format_check(email: str) -> bool:

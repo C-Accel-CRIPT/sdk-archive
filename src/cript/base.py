@@ -1,13 +1,22 @@
-from abc import ABC
-from bson import ObjectId
-from json import dumps
-from typing import Union
-from datetime import datetime
-import warnings
+"""
+base:
 
-from . import __version__, Unit
+Contains BaseModel that all core CRIPT nodes inherits from.
+Contains CRIPTError and CRIPTWarning
+
+"""
+
+from abc import ABC
+from typing import Union
+from json import dumps
+from datetime import datetime
+
+from bson import ObjectId
+
+from . import __version__
 from .utils.serializable import Serializable
-from .utils.type_check import *
+from .utils.type_check import type_check_property, type_check, id_type_check
+import cript as C
 
 
 class BaseModel(Serializable, ABC):
@@ -24,7 +33,7 @@ class BaseModel(Serializable, ABC):
         created_date: datetime = None
     ):
         """
-        :param name: The name of the user.
+        :param name: Descriptive name
 
         :param notes: Any miscellaneous notes related to the user.
         :param _class: class of node.
@@ -91,6 +100,10 @@ class BaseModel(Serializable, ABC):
     def uid(self, uid):
         if type(uid) is ObjectId:
             uid = str(uid)
+        else:
+            if not id_type_check(uid):
+                mes = f"{uid} is invalid uid."
+                raise CRIPTError(mes)
         self._uid = uid
 
     @property
@@ -137,6 +150,7 @@ class BaseModel(Serializable, ABC):
     def _create_reference(ddict) -> dict:
         """
         Gives reference dictionary from dictionary.
+        * This method may be overwritten in inheritance.
         """
         keys = ["uid", "name"]
         out = {}
@@ -148,12 +162,12 @@ class BaseModel(Serializable, ABC):
     def _setter_CRIPT_prop(self, objs, prop: str):
         """
         This can set CRIPT properties
-        :param objs: List of CRIPT objects or List of Lists of strings to add to prop
+        :param objs: List of CRIPT objects or Lists of strings to add to prop
         :param prop: The property to be set
         :return:
         """
         _class = prop[2:]  # strip "c_"
-        _type = cript.cript_types[_class.capitalize()]
+        _type = C.cript_types[_class.capitalize()]
 
         if objs is None:
             setattr(self, f"_{prop}", None)
@@ -180,7 +194,7 @@ class BaseModel(Serializable, ABC):
 
                     if obj_info["uid"] in current_uids:
                         msg = f"{_class} {obj['uid']} already in node."
-                        warnings.warn(msg, CRIPTWarning)
+                        CRIPTWarning(msg)
                         continue
 
                 elif isinstance(obj, str):  # user may give just id as string -> just store string, will be expanded on database upload
@@ -189,242 +203,31 @@ class BaseModel(Serializable, ABC):
 
                         if obj_info in current_uids:
                             msg = f"{_class} {obj} already in node."
-                            warnings.warn(msg, CRIPTWarning)
+                            CRIPTWarning(msg)
                             continue
 
                 elif isinstance(obj, _type):  # user may give a CRIPT node -> then extract dictionary
                     if obj.uid is None:
                         msg = f"{_class} '{obj.name}' needs to be saved before adding it to the node."
-                        warnings.warn(msg, CRIPTWarning)
+                        CRIPTWarning(msg)
                         continue
 
                     obj_info = obj._reference()   # Generates reference
 
                     if obj_info["uid"] in current_uids:
                         msg = f"{_class} {obj} already in node."
-                        warnings.warn(msg, CRIPTWarning)
+                        CRIPTWarning(msg)
                         continue
 
                 else:
                     msg = f"{_class} {obj} not of type {_type}. Skipped."
-                    warnings.warn(msg, CRIPTWarning)
+                    CRIPTWarning(msg)
                     continue
 
                 if getattr(self, f"_{prop}") is None:
                     setattr(self, f"_{prop}", [])
 
                 exec(f"self._{prop}.append(obj_info)")
-
-
-class Cond(Serializable):
-    def __init__(
-            self,
-            key: str = None,
-            value: Union[float, str, int] = None,
-            unit: Unit = None,
-            uncer: Union[float, str] = None,
-            data_uid=None,
-    ):
-        """
-
-        :param key: time, temp, pres, solvent, standard, relative, atmosphere
-        :param unit:
-        """
-
-        self._key = None
-        self.key = key
-
-        self._value = None
-        self.value = value
-
-        self._unit = None
-        self.unit = unit
-
-        self._uncer = None
-        self.uncer = uncer
-
-        self._data_uid = None
-        self.data_uid = data_uid
-
-    @property
-    def key(self):
-        return self._key
-
-    @key.setter
-    @type_check_property
-    def key(self, key):
-        self._key = key
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    @type_check_property
-    def value(self, value):
-        self._value = value
-
-    @property
-    def unit(self):
-        return self._unit
-
-    @unit.setter
-    @type_check_property
-    def unit(self, unit):
-        self._unit = unit
-
-    @property
-    def uncer(self):
-        return self._uncer
-
-    @uncer.setter
-    @type_check_property
-    def uncer(self, uncer):
-        self._uncer = uncer
-
-    @property
-    def data_uid(self):
-        return self._data_uid
-
-    @data_uid.setter
-    @type_check_property
-    def data_uid(self, data_uid):
-        self._data_uid = data_uid
-
-
-class Prop(Serializable):
-    def __init__(
-            self,
-            key: str,
-            value: Union[float, int, str],
-            unit: Unit = None,
-            uncer: Union[float, int, str] = None,
-            method: str = None,
-            mat_id: int = 0,
-            component: str = None,
-            data_uid: str = None,
-            conditions: Union[list[Cond], Cond] = None
-    ):
-        """
-
-        :param mat_id: mat_id=0 is for bulk (default)
-        :param key:
-        :param value:
-        :param uncer:
-        :param unit:
-        :param component:
-        :param method:
-        :param data_uid:
-        :param conditions:
-        """
-
-        self._mat_id = None
-        self.mat_id = mat_id
-
-        self._key = None
-        self.key = key
-
-        self._value = None
-        self.value = value
-
-        self._uncer = None
-        self.uncer = uncer
-
-        self._unit = None
-        self.unit = unit
-
-        self._component = None
-        self.component = component
-
-        self._method = None
-        self.method = method
-
-        self._data_uid = None
-        self.data_uid = data_uid
-
-        self._conditions = None
-        self.conditions = conditions
-
-    @property
-    def mat_id(self):
-        return self._mat_id
-
-    @mat_id.setter
-    @type_check_property
-    def mat_id(self, mat_id):
-        self._mat_id = mat_id
-
-    @property
-    def key(self):
-        return self._key
-
-    @key.setter
-    @type_check_property
-    def key(self, key):
-        self._key = key
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    @type_check_property
-    def value(self, value):
-        self._value = value
-
-    @property
-    def uncer(self):
-        return self._uncer
-
-    @uncer.setter
-    @type_check_property
-    def uncer(self, uncer):
-        self._uncer = uncer
-
-    @property
-    def unit(self):
-        return self._unit
-
-    @unit.setter
-    @type_check_property
-    def unit(self, unit):
-        self._unit = unit
-
-    @property
-    def component(self):
-        return self._component
-
-    @component.setter
-    @type_check_property
-    def component(self, component):
-        self._component = component
-
-    @property
-    def method(self):
-        return self._method
-
-    @method.setter
-    @type_check_property
-    def method(self, method):
-        self._method = method
-
-    @property
-    def data_uid(self):
-        return self._data_uid
-
-    @data_uid.setter
-    @type_check_property
-    def data_uid(self, data_uid):
-        self._data_uid = data_uid
-
-    @property
-    def conditions(self):
-        return self._conditions
-
-    @conditions.setter
-    @type_check((list[Cond], Cond, None))
-    def conditions(self, conditions):
-        self._conditions = conditions
 
 
 class CRIPTError(Exception):
@@ -437,10 +240,3 @@ class CRIPTWarning(Warning):
 
     def __init__(self, message):
         self.message = message
-
-
-def load(ddict: dict):
-    ddict["uid"] = str(ddict.pop("_id"))
-    class_ = ddict.pop("class_")
-    obj = cript.cript_types[class_](**ddict)
-    return obj

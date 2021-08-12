@@ -2,21 +2,19 @@
 Material Node
 
 """
+
 from typing import Union
-from json import dumps
 
-from . import load, CRIPTError
-from .base import BaseModel, Cond, Prop
-from .keywords.material import *
+from . import load, CRIPTError, BaseModel, Cond, Prop
 from .utils.serializable import Serializable
-from .utils.type_check import *
-
+from .utils.type_check import type_check_property, type_check, id_type_check
+from .keys.material import *
 
 class Iden(Serializable):
     def __init__(
             self,
             c_material=None,
-            preferred_name: str = None,
+            name: str = None,
             names: list[str] = None,
             cas: str = None,
             bigsmiles: str = None,
@@ -28,7 +26,7 @@ class Iden(Serializable):
             inchi_key: str = None
     ):
         """
-        :param preferred_name: preferred name
+        :param name: preferred name
         :param names: additional names, abbreviations, short hands for the material
         :param cas: CAS number
         :param bigsmiles: bigSMILES Line Notation
@@ -43,8 +41,8 @@ class Iden(Serializable):
         :param main_uid:
         """
 
-        self._preferred_name = None
-        self.preferred_name = preferred_name
+        self._name = None
+        self.name = name
 
         self._names = None
         self.names = names
@@ -83,13 +81,13 @@ class Iden(Serializable):
         return dumps(self.dict_datetime_to_str(self.dict_remove_none(self.as_dict())), indent=2, sort_keys=True)
 
     @property
-    def preferred_name(self):
-        return self._preferred_name
+    def name(self):
+        return self._name
 
-    @preferred_name.setter
+    @name.setter
     @type_check_property
-    def preferred_name(self, preferred_name):
-        self._preferred_name = preferred_name
+    def name(self, name):
+        self._name = name
 
     @property
     def names(self):
@@ -188,9 +186,10 @@ class Material(BaseModel):
 
     def __init__(
             self,
-            identifier, # : Union[list[Iden], Iden, list[Material], Material]
+            iden: "Union[list[Iden], Iden, list[Material], Material]",
             name: str = None,
-            properties: list[Prop] = None,
+            prop: list[Prop] = None,
+            c_process=None,
             keywords: list[str] = None,
             source: str = None,
             lot_number: str = None,
@@ -200,10 +199,10 @@ class Material(BaseModel):
             **kwargs
     ):
         """
-        :param identifier:
+        :param iden:
 
         :param name: The name of the user. (automatic populated from identifier if not given)
-        :param properties:
+        :param prop: properties
         :param keywords:
         :param source:
         :param lot_number:
@@ -219,11 +218,14 @@ class Material(BaseModel):
         :param created_date: Date it was created.
         """
 
-        self._identifier = None
-        self.identifier = identifier
+        self._iden = None
+        self.iden = iden
 
-        self._properties = None
-        self.properties = properties
+        self._prop = None
+        self.prop = prop
+
+        self._c_process = None
+        self.c_process = c_process
 
         self._keywords = None
         self.keywords = keywords
@@ -241,32 +243,32 @@ class Material(BaseModel):
         self.hazard = hazard
 
         if name is None:
-            name = identifier[0].preferred_name
+            name = self._name_from_identifier()
 
         super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
     @property
-    def identifier(self):
-        return self._identifier
+    def iden(self):
+        return self._iden
 
-    @identifier.setter
-    #@type_check((list[Iden], Iden, list[], Material, dict))
-    def identifier(self, identifier):
+    @iden.setter
+    @type_check((list[Iden], Iden, dict, "self", "list[self]"))
+    def iden(self, obj):
         ddict = dict()
 
-        if isinstance(identifier, dict):
-            obj = load(identifier)
+        if isinstance(obj, dict):
+            obj = load(obj)
 
-        if isinstance(identifier, Iden):
-            ddict["1"] = identifier.as_dict()
-        elif isinstance(identifier, Material):
-            ddict["1"] = identifier._reference
-        elif isinstance(identifier, list):
-            for i, iden in enumerate(identifier):
+        if isinstance(obj, Iden):
+            ddict["1"] = obj.as_dict()
+        elif isinstance(obj, Material):
+            ddict["1"] = obj._reference
+        elif isinstance(obj, list):
+            for i, iden in enumerate(obj):
                 if isinstance(iden, Iden):
                     ddict[f"{i+1}"] = iden.as_dict()
                 elif isinstance(iden, Material):
-                    ddict[f"{i+1}"] = iden._reference
+                    ddict[f"{i+1}"] = iden._reference()
                 else:
                     mes = "Invalid Identifier provided."
                     raise CRIPTError(mes)
@@ -274,16 +276,16 @@ class Material(BaseModel):
             mes = "Invalid Identifier provided."
             raise CRIPTError(mes)
 
-        self._identifier = identifier
+        self._iden = ddict
 
     @property
-    def properties(self):
-        return self._properties
+    def prop(self):
+        return self._prop
 
-    @properties.setter
+    @prop.setter
     @type_check_property
-    def properties(self, properties):
-        self._properties = properties
+    def prop(self, prop):
+        self._prop = prop
 
     @property
     def keywords(self):
@@ -293,6 +295,14 @@ class Material(BaseModel):
     @type_check_property
     def keywords(self, keywords):
         self._keywords = keywords
+
+    @property
+    def c_process(self):
+        return self._c_process
+
+    @c_process.setter
+    def c_process(self, c_process):
+        self._setter_CRIPT_prop(c_process, "c_process")
 
     @property
     def source(self):
@@ -329,3 +339,18 @@ class Material(BaseModel):
     @type_check_property
     def hazard(self, hazard):
         self._hazard = hazard
+
+    def _name_from_identifier(self):
+        """
+        Will generate a name from identifiers.
+        :return:
+        """
+        keys = self.iden.keys()
+        if len(keys) == 1:
+            name = self.iden["1"]["name"]
+        else:
+            name = ""
+            for key in keys:
+                name = name + "." + self.iden[key]["name"]
+
+        return name

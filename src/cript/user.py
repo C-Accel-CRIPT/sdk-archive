@@ -3,11 +3,10 @@ User Node
 
 """
 
-import warnings
 import re
 
-from .base import BaseModel, CRIPTWarning
-from .utils.type_check import *
+from . import BaseModel, CRIPTError
+from .utils.type_check import type_check_property
 
 
 class User(BaseModel):
@@ -109,7 +108,7 @@ class User(BaseModel):
             self._email = email
         else:
             msg = f"Email {email} not of correct format. (format: text@text.text)"
-            warnings.warn(msg, CRIPTWarning)
+            raise CRIPTError(msg)
 
     @property
     def phone(self):
@@ -124,7 +123,7 @@ class User(BaseModel):
             self._phone = phone
         else:
             msg = f"Phone number {phone} not of correct format. (format: numbers and dash only)"
-            warnings.warn(msg, CRIPTWarning)
+            raise CRIPTError(msg)
 
     @property
     def website(self):
@@ -160,7 +159,7 @@ class User(BaseModel):
             self._orcid = orcid
         else:
             msg = f"{orcid} invalid format, and not added to user node. (format: ####-####-####-####)"
-            raise CRIPTWarning(msg)
+            raise CRIPTError(msg)
 
     @property
     def organization(self):

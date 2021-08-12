@@ -2,14 +2,11 @@
 Process Node
 
 """
-from typing import Union
 
-from . import Unit
-
-from .base import BaseModel, Cond, Prop
-from .keywords.process import *
+from . import BaseModel, Cond, Prop, Unit
 from .utils.serializable import Serializable
-
+from .utils.type_check import type_check_property, type_check, id_type_check
+from .keys.process import *
 
 class Qty(Serializable):
     def __init__(
@@ -71,7 +68,7 @@ class Qty(Serializable):
         self._mat_id = mat_id
 
 
-class Ingredient(Serializable):
+class Ingr(Serializable):
     keywords = keywords_Ingredients
 
     def __init__(
@@ -131,10 +128,10 @@ class Process(BaseModel):
     def __init__(
             self,
             name: str,
-            ingredients: list[Ingredient],
+            ingr: list[Ingr],
             procedure: str,
-            conditions: list[Cond],
-            properties: list[Prop] = None,
+            cond: list[Cond],
+            prop: list[Prop] = None,
             keywords: list[str] = None,
             notes: str = None,
             **kwargs
@@ -142,10 +139,10 @@ class Process(BaseModel):
         """
 
         :param name: The name of the user.
-        :param ingredients:
+        :param ingr:
         :param procedure:
-        :param conditions:
-        :param properties:
+        :param cond:
+        :param prop:
         :param keywords:
         :param notes: Any miscellaneous notes related to the user.
 
@@ -158,28 +155,28 @@ class Process(BaseModel):
         """
         super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
-        self._ingredients = None
-        self.ingredients = ingredients
+        self._ingr = None
+        self.ingr = ingr
 
         self._procedure = None
         self.procedure = procedure
 
-        self._properties = None
-        self.properties = properties
+        self._prop = None
+        self.prop = prop
 
         self._keywords = None
         self.keywords = keywords
 
-        self._conditions = None
-        self.conditions = conditions
+        self._cond = None
+        self.cond = cond
 
     @property
-    def ingredients(self):
-        return self._ingredients
+    def ingr(self):
+        return self._ingr
 
-    @ingredients.setter
-    def ingredients(self, ingredients):
-        self._ingredients = ingredients
+    @ingr.setter
+    def ingr(self, ingr):
+        self._ingr = ingr
 
     @property
     def procedure(self):
@@ -190,12 +187,12 @@ class Process(BaseModel):
         self._procedure = procedure
 
     @property
-    def properties(self):
-        return self._properties
+    def prop(self):
+        return self._prop
 
-    @properties.setter
-    def properties(self, properties):
-        self._properties = properties
+    @prop.setter
+    def prop(self, prop):
+        self._prop = prop
 
     @property
     def keywords(self):
@@ -206,9 +203,9 @@ class Process(BaseModel):
         self._keywords = keywords
 
     @property
-    def conditions(self):
-        return self._conditions
+    def cond(self):
+        return self._cond
 
-    @conditions.setter
-    def conditions(self, conditions):
-        self._conditions = conditions
+    @cond.setter
+    def cond(self, cond):
+        self._cond = cond

@@ -4,7 +4,7 @@ Database Connection
 """
 import sys
 from datetime import datetime
-from typing import Union
+# from typing import Union
 
 from pymongo import MongoClient, errors
 from bson import ObjectId
@@ -296,8 +296,15 @@ class CriptDB:
 
         if isinstance(parent_obj, C.cript_types_tuple) or parent_obj is None:
             pass
+        elif isinstance(parent_obj, list):
+            for i in parent_obj:
+                if isinstance(i, C.cript_types_tuple):
+                    pass
+                else:
+                    msg = f"{i} is not a valid CRIPT node for {obj.name}."
+                    raise cript.CRIPTError(msg)
         else:
-            msg = f"{obj} is not a valid CRIPT node."
+            msg = f"{parent_obj} is not a valid CRIPT node."
             raise cript.CRIPTError(msg)
 
         if obj.uid is not None:
@@ -306,9 +313,15 @@ class CriptDB:
             raise cript.CRIPTError(msg)
 
         if parent_obj is not None:
-            if parent_obj.uid is None:
-                msg = f"{parent_obj.name} needs to be saved first."
-                raise cript.CRIPTError(msg)
+            if isinstance(parent_obj, list):
+                for i in parent_obj:
+                    if i.uid is None:
+                        msg = f"{i.name} needs to be saved first."
+                        raise cript.CRIPTError(msg)
+            else:
+                if parent_obj.uid is None:
+                    msg = f"{parent_obj.name} needs to be saved first."
+                    raise cript.CRIPTError(msg)
 
         # Class specific checks.
         if obj.class_ == "User":
@@ -330,7 +343,8 @@ class CriptDB:
             self._parent_obj_check(obj, parent_obj, parent_obj_types)
 
         elif obj.class_ == "Material":
-            pass
+            parent_obj_types = ["Experiment", "Inventory", None]
+            self._parent_obj_check(obj, parent_obj, parent_obj_types)
 
         elif obj.class_ == "Process":
             parent_obj_types = ["Experiment"]
@@ -352,8 +366,19 @@ class CriptDB:
     @staticmethod
     def _parent_obj_check(obj, parent_obj, parent_obj_types):
         if parent_obj is None:
-            pass
-        if parent_obj.class_ in parent_obj_types:
+            if None in parent_obj_types:
+                return
+            else:
+                pass
+
+        if isinstance(parent_obj, list):
+            for i in parent_obj:
+                if i.class_ not in parent_obj_types:
+                    break
+            else:
+                return
+
+        if hasattr(parent_obj, "class_") and parent_obj.class_ in parent_obj_types:
             return
         else:
             pass
@@ -374,7 +399,7 @@ class CriptDB:
                 for i in range(100):
                     frames = sys._getframe(i)
                     globals_ = frames.f_globals
-                    user_node = [globals_[k] for k, v in globals_.items() if isinstance(v, cript.User) and k[0] != "_"]
+                    user_node = [globals_[k] for k, v in globals_.items() if isinstance(v, C.User) and k[0] != "_"]
                     if user_node:
                         user_node = user_node[0]
                         user_node.c_group = obj.uid
@@ -383,23 +408,42 @@ class CriptDB:
             except AttributeError:  # if no User node found, just load it in and update it
                 coll = self.db["User"]
                 doc = coll.find_one({"_id": ObjectId(self.user)})
-                user_node = cript.load(doc)
+                user_node = load(doc)
                 user_node.c_group = obj.uid
 
             self.update(user_node)
 
         elif obj.class_ == "Collection":
             attr = "c_" + obj.class_.lower()
-            setattr(parent_obj, attr, obj)
-            self.update(parent_obj)
+            if isinstance(parent_obj, list):
+                for i in parent_obj:
+                    setattr(i, attr, obj)
+                    self.update(i)
+            else:
+                setattr(parent_obj, attr, obj)
+                self.update(parent_obj)
 
         elif obj.class_ == "Experiment":
             attr = "c_" + obj.class_.lower()
-            setattr(parent_obj, attr, obj)
-            self.update(parent_obj)
+            if isinstance(parent_obj, list):
+                for i in parent_obj:
+                    setattr(i, attr, obj)
+                    self.update(i)
+            else:
+                setattr(parent_obj, attr, obj)
+                self.update(parent_obj)
 
         elif obj.class_ == "Material":
-            pass
+            attr = "c_" + obj.class_.lower()
+            if isinstance(parent_obj, list):
+                for i in parent_obj:
+                    setattr(i, attr, obj)
+                    self.update(i)
+            elif parent_obj is None:
+                pass
+            else:
+                setattr(parent_obj, attr, obj)
+                self.update(parent_obj)
 
     @login_check
     def view(self, obj, query: dict = None, num_results: int = 50):
@@ -429,11 +473,11 @@ class CriptDB:
         """
         # if obj is cript node
         if obj in C.cript_types_tuple:
-            result, key = self._search(obj, query)
+            result, key = self._search(obj, query, num_results)
             self._print_table(result, key)
 
         # if obj is uid
-        elif id_type_check_bool(obj):   #################### This search should be improved, for loop bad idea _> probably change from random to user defined _id with class embedded
+        elif id_type_check_bool(obj):   ### This search should be improved, for loop bad idea _> probably change from random to user defined _id with class embedded
             result = None
             for coll in self.db_collections:
                 coll = self.db[coll]
@@ -463,8 +507,9 @@ class CriptDB:
                 # search whole database
                 result = self._search_full_collection(obj, query, num_results)
             else:
-                # search your nodes
-                pass
+                # search your nodes with query
+                print("your query not currently supported.")
+                result = None
 
         elif query is None:
             result, key = self._search_local(obj, num_results)
@@ -482,32 +527,16 @@ class CriptDB:
         if len(query.keys()) == 1:
             # search whole collection
             result = list(coll.find({}, limit=num_results))
-        elif len(query.keys()) == 2 and "sort" in query.keys():
-            # search whole
-            result = list(coll.find({}, limit=num_results, sort=[(query["sort"], -1)]))
-        elif len(query.keys()) == 4 and all(key in query.keys() for key in ["field", "type", "value"]):
-            if query["type"] in ["$regex", "$gt", "$gte", "$in", "$lt", "$lte"]:  #https://docs.mongodb.com/manual/reference/operator/query/
-                result = list(coll.find({query["field"]: {query["type"]: query["value"]}}, limit=num_results))
-            elif query["type"] == "$exact":
-                result = list(coll.find({query["field"]: query["value"]}, limit=num_results))
-            else:
-                mes = f"{query['type']} is not a valid query type."
-                raise cript.CRIPTError(mes)
-        elif len(query.keys()) == 5 and all(key in query.keys() for key in ["field", "type", "value", "sort"]):
-            if query["type"] in ["$regex", "$gt", "$gte", "$in", "$lt", "$lte"]:  #https://docs.mongodb.com/manual/reference/operator/query/
-                result = list(coll.find({query["field"]: {query["type"]: query["value"]}}, limit=num_results, sort=[(query["sort"], -1)]))
-            elif query["type"] == "$exact":
-                result = list(coll.find({query["field"]: query["value"]}, limit=num_results, sort=[(query["sort"], -1)]))
-            else:
-                mes = f"{query['type']} is not a valid query type."
-                raise cript.CRIPTError(mes)
         else:
-            mes = f"Not a valid query."
-            raise cript.CRIPTError(mes)
+            try:
+                result = list(coll.find(query["key"], limit=num_results))
+            except Exception:
+                mes = f"Not a valid query."
+                raise cript.CRIPTError(mes)
 
         return result
 
-    def _search_local(self, obj, num_results: int = 50):
+    def _search_local(self, obj, num_results: int = 50):   ### Could be refactored.
         """
         Get everything the user is associated with.
         """
@@ -547,6 +576,104 @@ class CriptDB:
                                         if expt_dict is not None:
                                             result.append(expt_dict)
                                             key.append(f".{group['name']}.{collection['name']}")
+        elif obj is C.cript_types["Inventory"]:
+            for group in self.user.c_group:
+                group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
+                if group_dict is not None:
+
+                    if "c_inventory" in group_dict.keys():
+                        for inventory in group_dict["c_inventory"]:
+                            inventory_dict = self.db["Inventory"].find_one({"_id": ObjectId(inventory["uid"])})
+                            if inventory_dict is not None:
+                                result.append(inventory_dict)
+                                key.append(f".{group['name']}")
+
+                    if "c_collection" in group_dict.keys():
+                        for collection in group_dict["c_collection"]:
+                            coll_dict = self.db["Collection"].find_one({"_id": ObjectId(collection["uid"])})
+                            if coll_dict is not None:
+                                if "c_inventory" in coll_dict.keys():
+                                    for inventory in coll_dict["c_inventory"]:
+                                        inventory_dict = self.db["Inventory"].find_one({"_id": ObjectId(inventory["uid"])})
+                                        if inventory_dict is not None:
+                                            result.append(inventory_dict)
+                                            key.append(f".{group['name']}.{collection['name']}")
+
+        elif obj is C.cript_types["Material"]:
+            for group in self.user.c_group:
+                group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
+                if group_dict is not None:
+
+                    if "c_inventory" in group_dict.keys():
+                        for inventory in group_dict["c_inventory"]:
+                            inventory_dict = self.db["Inventory"].find_one({"_id": ObjectId(inventory["uid"])})
+                            if inventory_dict is not None:
+                                for mat in inventory_dict["c_material"]:
+                                    mat_dict = self.db["Material"].find_one({"_id": ObjectId(mat["uid"])})
+                                    if mat_dict is not None:
+                                        result.append(mat_dict)
+                                        key.append(f".{group['name']}.{inventory['name']}")
+
+                    if "c_collection" in group_dict.keys():
+                        for collection in group_dict["c_collection"]:
+                            coll_dict = self.db["Collection"].find_one({"_id": ObjectId(collection["uid"])})
+                            if coll_dict is not None:
+
+                                if "c_inventory" in coll_dict.keys():
+                                    for inventory in coll_dict["c_inventory"]:
+                                        inventory_dict = self.db["Inventory"].find_one({"_id": ObjectId(inventory["uid"])})
+                                        if inventory_dict is not None:
+                                            for mat in inventory_dict["c_material"]:
+                                                mat_dict = self.db["Material"].find_one({"_id": ObjectId(mat["uid"])})
+                                                if mat_dict is not None:
+                                                    result.append(mat_dict)
+                                                    key.append(f".{group['name']}.{inventory['name']}")
+
+                                if "c_experiment" in coll_dict.keys():
+                                    for expt in coll_dict["c_experiment"]:
+                                        expt_dict = self.db["Experiment"].find_one({"_id": ObjectId(expt["uid"])})
+                                        if expt_dict is not None:
+                                            for mat in expt_dict["c_material"]:
+                                                mat_dict = self.db["Material"].find_one({"_id": ObjectId(mat["uid"])})
+                                                if mat_dict is not None:
+                                                    result.append(mat_dict)
+                                                    key.append(f".{group['name']}.{expt['name']}")
+
+        elif obj is C.cript_types["Process"]:
+            for group in self.user.c_group:
+                group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
+                if group_dict is not None:
+                    if "c_collection" in group_dict.keys():
+                        for collection in group_dict["c_collection"]:
+                            coll_dict = self.db["Collection"].find_one({"_id": ObjectId(collection["uid"])})
+                            if coll_dict is not None:
+                                if "c_experiment" in coll_dict.keys():
+                                    for expt in coll_dict["c_experiment"]:
+                                        expt_dict = self.db["Experiment"].find_one({"_id": ObjectId(expt["uid"])})
+                                        if expt_dict is not None:
+                                            for proc in expt_dict["c_process"]:
+                                                proc_dict = self.db["Process"].find_one({"_id": ObjectId(proc["uid"])})
+                                                if proc_dict is not None:
+                                                    result.append(proc_dict)
+                                                    key.append(f".{group['name']}.{expt['name']}")
+
+        elif obj is C.cript_types["Data"]:
+            for group in self.user.c_group:
+                group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
+                if group_dict is not None:
+                    if "c_collection" in group_dict.keys():
+                        for collection in group_dict["c_collection"]:
+                            coll_dict = self.db["Collection"].find_one({"_id": ObjectId(collection["uid"])})
+                            if coll_dict is not None:
+                                if "c_experiment" in coll_dict.keys():
+                                    for expt in coll_dict["c_experiment"]:
+                                        expt_dict = self.db["Experiment"].find_one({"_id": ObjectId(expt["uid"])})
+                                        if expt_dict is not None:
+                                            for data in expt_dict["c_data"]:
+                                                data_dict = self.db["Data"].find_one({"_id": ObjectId(data["uid"])})
+                                                if data_dict is not None:
+                                                    result.append(data_dict)
+                                                    key.append(f".{group['name']}.{expt['name']}")
 
         return result, key
 
@@ -658,4 +785,3 @@ class CriptDB:
     @login_check
     def delete(self, obj):
         pass
-

@@ -3,10 +3,11 @@ Data node
 
 """
 
-from .base import BaseModel, Cond, Prop
-from .keywords.material import *
-from .utils.serializable import Serializable
 from pathlib import Path
+
+from . import BaseModel, Cond, Prop
+from .utils.serializable import Serializable
+from .keys.data import *
 
 class File(Serializable):
     def __init__(
@@ -28,9 +29,8 @@ class File(Serializable):
         self._descr = None
         self.descr = descr
 
-        self._ext = None
-        self.ext = ext
-
+        # self._ext = None
+        # self.ext = ext
 
 
 class Data(BaseModel):

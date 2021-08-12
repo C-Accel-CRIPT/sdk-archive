@@ -3,8 +3,7 @@ Collection Node
 
 """
 
-from .base import BaseModel
-from .utils.type_check import *
+from . import BaseModel
 
 
 class Collection(BaseModel):
