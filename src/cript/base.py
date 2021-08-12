@@ -5,9 +5,7 @@ from typing import Union
 from datetime import datetime
 import warnings
 
-from pint.unit import Unit
-
-from . import __version__
+from . import __version__, Unit
 from .utils.serializable import Serializable
 from .utils.type_check import *
 
@@ -302,14 +300,14 @@ class Prop(Serializable):
             unit: Unit = None,
             uncer: Union[float, int, str] = None,
             method: str = None,
-            mat_id: int = None,
+            mat_id: int = 0,
             component: str = None,
             data_uid: str = None,
-            conditions: list[Cond] = None
+            conditions: Union[list[Cond], Cond] = None
     ):
         """
 
-        :param mat_id:
+        :param mat_id: mat_id=0 is for bulk (default)
         :param key:
         :param value:
         :param uncer:
@@ -424,7 +422,7 @@ class Prop(Serializable):
         return self._conditions
 
     @conditions.setter
-    @type_check_property
+    @type_check((list[Cond], Cond, None))
     def conditions(self, conditions):
         self._conditions = conditions
 

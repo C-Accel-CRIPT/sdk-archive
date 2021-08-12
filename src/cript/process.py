@@ -4,7 +4,7 @@ Process Node
 """
 from typing import Union
 
-from pint.unit import Unit
+from . import Unit
 
 from .base import BaseModel, Cond, Prop
 from .keywords.process import *
@@ -78,7 +78,7 @@ class Ingredient(Serializable):
             self,
             mat_id,
             type_: str,
-            qty: list[Qty]
+            qty: Union[list[Qty], Qty]
     ):
         """
 

@@ -1,4 +1,5 @@
 from typing import get_type_hints, _UnionGenericAlias
+from typing import Union, get_origin
 from types import GenericAlias
 from functools import wraps
 import builtins
@@ -17,6 +18,75 @@ def custom_formatwarning(msg, *args, **kwargs):
 
 
 warnings.formatwarning = custom_formatwarning
+
+
+def type_check(type_options: Union[tuple, type]):
+    """
+    This is a decorator that can do type checking only two levels deep
+    """
+    def _type_check_decorator(func):
+        @wraps(func)
+        def _wrapper(*args, **kwargs):
+            try:
+                arg = args[1]
+                _do_check(arg, type_options, func)
+            except Exception:
+                pass
+
+            return func(*args, **kwargs)
+        return _wrapper
+    return _type_check_decorator
+
+
+def _do_check(arg, type_options, func):
+
+    # arg pre- processing
+    if isinstance(arg, (list, tuple, dict)):
+        arg_generic = True
+        arg_layer_1 = type(arg)
+        if isinstance(arg, (list, tuple)):
+            arg_layer_2 = type(arg[0])
+        elif isinstance(arg, dict):
+            arg_layer_2 = (type(list(arg.keys())[0]), type(list(arg.values())[0]))
+    else:
+        arg_generic = False
+
+    # type_options pre-processing
+    # make input to tuple if not
+    if isinstance(type_options, type):
+        type_options = (type_options,)
+
+    # make list to check for GenericAlias
+    type_list = []  # 1: Generic, 0: not generic
+    for i in type_options:
+        if type(i) is GenericAlias:
+            type_list.append(1)
+        else:
+            type_list.append(0)
+
+    op_generic = any(type_list)
+
+    # Options
+    if arg_generic and op_generic:
+        result = False
+        for i in type_options:
+            if type(i) is GenericAlias:
+                layer_1 = get_origin(i)
+                layer_2 = i.__args__
+                if isinstance(arg_layer_1, layer_1):
+                    if arg_layer_2 == layer_2:
+                        result = True
+                        break
+    elif arg_generic:
+        result = False
+    elif op_generic:
+        type_options = tuple([a for a,b in zip(type_options, type_list) if b])
+        result = isinstance(arg, type_options)
+    else:
+        result = isinstance(arg, type_options)
+
+    if not result:
+        raise TypeError(f"Expected {type_options} but got {arg} for property: {func.__name__}.")
 
 
 def type_check_property(func):
@@ -204,7 +274,7 @@ def parse_generic_type_union(text_in: str) -> dict:
                 word = ""
             else:
                 word = word + letter
-                if word == "typing.":
+                if word == "typing." or word == "list[":
                     nesting = True
                     bracket_counter = 0
 
@@ -286,8 +356,8 @@ def text_to_type(text: str):
         return parse_generic_type(text)
     elif text.startswith("cript.") and text.split(".")[-1] in cript.cript_types.keys():
         return cript.cript_types[text.split(".")[-1]]
-    elif text.startswith("pint.") and text.split(".")[-1] in pint_types.keys():
-        return pint_types[text.split(".")[-1]]
+    # elif text.startswith("pint.") and text.split(".")[-1] in pint_types.keys():
+    #     return pint_types[text.split(".")[-1]]
     else:
         warnings.warn(f"Type check not valid. {text}")
         return None

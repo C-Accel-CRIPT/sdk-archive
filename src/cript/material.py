@@ -2,17 +2,21 @@
 Material Node
 
 """
+from typing import Union
+from json import dumps
 
+from . import load, CRIPTError
 from .base import BaseModel, Cond, Prop
 from .keywords.material import *
 from .utils.serializable import Serializable
 from .utils.type_check import *
 
 
-class Identifiers(Serializable):
+class Iden(Serializable):
     def __init__(
             self,
-            preferred_name: str,
+            c_material=None,
+            preferred_name: str = None,
             names: list[str] = None,
             cas: str = None,
             bigsmiles: str = None,
@@ -38,9 +42,6 @@ class Identifiers(Serializable):
         :param mat_id:
         :param main_uid:
         """
-
-        self.mat_id = None
-        self.main_uid = None
 
         self._preferred_name = None
         self.preferred_name = preferred_name
@@ -71,6 +72,15 @@ class Identifiers(Serializable):
 
         self._inchi_key = None
         self.inchi_key = inchi_key
+
+        self._c_material = None
+        self.c_material = c_material
+
+    def __repr__(self):
+        return dumps(self.dict_datetime_to_str(self.as_dict()), indent=2, sort_keys=True)
+
+    def __str__(self):
+        return dumps(self.dict_datetime_to_str(self.dict_remove_none(self.as_dict())), indent=2, sort_keys=True)
 
     @property
     def preferred_name(self):
@@ -162,6 +172,15 @@ class Identifiers(Serializable):
     def inchi_key(self, inchi_key):
         self._inchi_key = inchi_key
 
+    @property
+    def c_material(self):
+        return self._c_material
+
+    @c_material.setter
+    def c_material(self, c_material):
+        pass
+        #BaseModel._setter_CRIPT_prop(c_material, "c_material")
+
 
 class Material(BaseModel):
     op_keywords = [k for k in keywords_material_p.keys()] + [k for k in keywords_material.keys()]
@@ -169,7 +188,7 @@ class Material(BaseModel):
 
     def __init__(
             self,
-            identifier: list[Identifiers],
+            identifier, # : Union[list[Iden], Iden, list[Material], Material]
             name: str = None,
             properties: list[Prop] = None,
             keywords: list[str] = None,
@@ -181,9 +200,9 @@ class Material(BaseModel):
             **kwargs
     ):
         """
-        :param name: The name of the user.
         :param identifier:
 
+        :param name: The name of the user. (automatic populated from identifier if not given)
         :param properties:
         :param keywords:
         :param source:
@@ -199,10 +218,6 @@ class Material(BaseModel):
         :param last_modified_date: Last date the node was modified.
         :param created_date: Date it was created.
         """
-        if name is None:
-            name = identifier[0].preferred_name
-
-        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
         self._identifier = None
         self.identifier = identifier
@@ -225,13 +240,40 @@ class Material(BaseModel):
         self._hazard = None
         self.hazard = hazard
 
+        if name is None:
+            name = identifier[0].preferred_name
+
+        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
+
     @property
     def identifier(self):
         return self._identifier
 
     @identifier.setter
-    @type_check_property
+    #@type_check((list[Iden], Iden, list[], Material, dict))
     def identifier(self, identifier):
+        ddict = dict()
+
+        if isinstance(identifier, dict):
+            obj = load(identifier)
+
+        if isinstance(identifier, Iden):
+            ddict["1"] = identifier.as_dict()
+        elif isinstance(identifier, Material):
+            ddict["1"] = identifier._reference
+        elif isinstance(identifier, list):
+            for i, iden in enumerate(identifier):
+                if isinstance(iden, Iden):
+                    ddict[f"{i+1}"] = iden.as_dict()
+                elif isinstance(iden, Material):
+                    ddict[f"{i+1}"] = iden._reference
+                else:
+                    mes = "Invalid Identifier provided."
+                    raise CRIPTError(mes)
+        else:
+            mes = "Invalid Identifier provided."
+            raise CRIPTError(mes)
+
         self._identifier = identifier
 
     @property

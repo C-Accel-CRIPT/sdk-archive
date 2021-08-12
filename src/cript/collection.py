@@ -16,6 +16,7 @@ class Collection(BaseModel):
         name: str,
         c_collection=None,
         c_experiment=None,
+        c_inventory=None,
         notes: str = None,
         **kwargs
     ):
@@ -24,6 +25,7 @@ class Collection(BaseModel):
 
         :param c_collection:
         :param c_experiment:
+        :param c_inventory:
 
         :param notes: Any miscellaneous notes related to the user.
         :param _class: class of node.
@@ -41,6 +43,9 @@ class Collection(BaseModel):
         self._c_experiment = None
         self.c_experiment = c_experiment
 
+        self._c_inventory = None
+        self.c_inventory = c_inventory
+
     @property
     def c_collection(self):
         return self._c_collection
@@ -56,3 +61,11 @@ class Collection(BaseModel):
     @c_experiment.setter
     def c_experiment(self, c_experiment):
         self._setter_CRIPT_prop(c_experiment, "c_experiment")
+
+    @property
+    def c_inventory(self):
+        return self._c_inventory
+
+    @c_inventory.setter
+    def c_inventory(self, c_inventory):
+        self._setter_CRIPT_prop(c_inventory, "c_inventory")
