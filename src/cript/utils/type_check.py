@@ -1,4 +1,4 @@
-from typing import get_type_hints, get_origin, _UnionGenericAlias
+from typing import get_type_hints, get_origin, _UnionGenericAlias, Union
 from types import GenericAlias
 from functools import wraps
 import builtins
@@ -7,7 +7,6 @@ from inspect import getmembers, isclass
 
 import pint
 
-from .. import Union
 import cript
 
 builtin_types = {getattr(builtins, d).__name__: getattr(builtins, d) for d in dir(builtins) if isinstance(getattr(builtins, d), type) and "Error" not in getattr(builtins, d).__name__ and "Warning" not in getattr(builtins, d).__name__}

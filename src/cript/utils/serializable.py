@@ -1,14 +1,8 @@
 from abc import ABC
 from datetime import datetime
 
-from .. import cript_types, Unit
+from .. import Unit
 
-
-def load(ddict: dict):
-    ddict["uid"] = str(ddict.pop("_id"))
-    class_ = ddict.pop("class_")
-    obj = cript_types[class_](**ddict)
-    return obj
 
 
 class Serializable(ABC):

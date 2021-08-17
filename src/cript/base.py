@@ -98,7 +98,9 @@ class BaseModel(Serializable, ABC):
 
     @uid.setter
     def uid(self, uid):
-        if type(uid) is ObjectId:
+        if uid is None:
+            pass
+        elif type(uid) is ObjectId:
             uid = str(uid)
         else:
             if not id_type_check(uid):
@@ -240,3 +242,10 @@ class CRIPTWarning(Warning):
 
     def __init__(self, message):
         self.message = message
+
+
+def load(ddict: dict):
+    ddict["uid"] = str(ddict.pop("_id"))
+    class_ = ddict.pop("class_")
+    obj = C.cript_types[class_](**ddict)
+    return obj

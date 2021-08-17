@@ -94,7 +94,7 @@ class Prop(Serializable):
             unit: Unit = None,
             uncer: Union[float, int, str] = None,
             method: str = None,
-            mat_uid: int = 0,
+            mat_id: int = 0,
             component: str = None,
             data_uid: str = None,
             cond: Union[list[Cond], Cond] = None

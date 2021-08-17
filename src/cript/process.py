@@ -2,6 +2,7 @@
 Process Node
 
 """
+from typing import Union
 
 from . import BaseModel, Cond, Prop, Unit
 from .utils.serializable import Serializable

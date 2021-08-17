@@ -12,7 +12,7 @@ from jsonpatch import JsonPatch
 
 from .utils.type_check import *
 from .utils.database_tools import *
-from .base import load
+from .base import load, CRIPTError
 import cript as C
 
 
@@ -48,8 +48,7 @@ class CriptDB:
 
         try:
             self.client = MongoClient(
-                f"mongodb+srv://{db_username}:{db_password}@cluster0.ekf91.mongodb.net"
-                f"/{db_project}?retryWrites=true&w=majority")
+                f"mongodb+srv://{db_username}:{db_password}@cluster0.ekf91.mongodb.net/{db_project}?retryWrites=true&w=majority")
             self.client.server_info()  # test database connection
         except errors.ServerSelectionTimeoutError:
             msg = "Connection to database failed.\n\n"
