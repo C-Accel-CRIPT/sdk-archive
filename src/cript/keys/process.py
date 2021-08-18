@@ -3,7 +3,37 @@ Keywords for Process node
 
 """
 
-keywords_Ingredients = {
+max_limit = 1.79E308
+
+Qty_keys = {
+    "mass": {
+        "type": float,
+        "range": [0, max_limit],
+        "unit": "g",
+        "descr": "mass"
+    },
+    "vol": {
+        "type": float,
+        "range": [0, max_limit],
+        "unit": "ml",
+        "descr": "volume"
+    },
+    "pres": {
+        "type": float,
+        "range": [0, max_limit],
+        "unit": "kPa",
+        "descr": "pressure"
+    },
+    "equiv": {
+        "type": float,
+        "range": [0, max_limit],
+        "unit": "",
+        "descr": "equivalence"
+    },
+}
+
+
+Ingr_keys = {
     'monomer': 'the major chemical to be incorporated into a repeating unit of a polymer',
     'polymer': 'a chemical that consists of a large number of similar units bonded together',
     'initiator': 'a chemical which starts the growth of a polymer',

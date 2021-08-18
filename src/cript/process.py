@@ -6,7 +6,6 @@ from typing import Union
 
 from . import BaseModel, Cond, Prop, Unit
 from .utils.serializable import Serializable
-from .utils.type_check import type_check_property, type_check, id_type_check
 from .keys.process import *
 
 class Qty(Serializable):
@@ -70,7 +69,7 @@ class Qty(Serializable):
 
 
 class Ingr(Serializable):
-    keywords = keywords_Ingredients
+    keywords = None
 
     def __init__(
             self,

@@ -6,7 +6,7 @@ Group Node
 import re
 
 from . import BaseModel, CRIPTError
-from .utils.type_check import type_check_property
+from cript.utils.validator.type_check import type_check_property
 
 
 class Group(BaseModel):

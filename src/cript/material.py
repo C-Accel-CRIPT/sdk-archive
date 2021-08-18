@@ -2,12 +2,12 @@
 Material Node
 
 """
-
+from json import dumps
 from typing import Union
 
 from . import load, CRIPTError, BaseModel, Cond, Prop
 from .utils.serializable import Serializable
-from .utils.type_check import type_check_property, type_check, id_type_check
+from cript.utils.validator.type_check import type_check_property, type_check
 from .keys.material import *
 
 class Iden(Serializable):
@@ -75,10 +75,10 @@ class Iden(Serializable):
         self.c_material = c_material
 
     def __repr__(self):
-        return dumps(self.dict_datetime_to_str(self.as_dict()), indent=2, sort_keys=True)
+        return dumps(self.dict_cleanup(self.as_dict()), indent=2, sort_keys=True)
 
     def __str__(self):
-        return dumps(self.dict_datetime_to_str(self.dict_remove_none(self.as_dict())), indent=2, sort_keys=True)
+        return dumps(self.dict_cleanup(self.dict_remove_none(self.as_dict())), indent=2, sort_keys=True)
 
     @property
     def name(self):

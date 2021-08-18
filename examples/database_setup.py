@@ -68,20 +68,20 @@ mat_styrene = C.Material(
     ),
     prop=[C.Prop(key="phase", value="liquid"),
           C.Prop(key="color", value="colorless"),
-          C.Prop(key="mw", value=104.15, unit=C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.906, unit=C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=25, unit=C.Unit("degC"))]
+          C.Prop(key="molar_mass", value=104.15 * C.Unit("g/mol"), method="prescribed"),
+          C.Prop(key="density", value=0.906 * C.Unit("g/ml"),
+                 cond=[C.Cond(key="temp", value=25 * C.Unit("degC"))]
                  ),
-          C.Prop(key="bp", value=145, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pressure", value=1, unit=C.Unit("atm"))]
+          C.Prop(key="bp", value=145 * C.Unit("degC"),
+                 cond=[C.Cond(key="pressure", value=1 * C.Unit("atm"))]
                  ),
-          C.Prop(key="mp", value=-30, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pressure", value=1, unit=C.Unit("bar"))]
+          C.Prop(key="mp", value=-30 * C.Unit("degC"),
+                 cond=[C.Cond(key="pressure", value=1 * C.Unit("bar"))]
                  )
           ],
     keywords=["styrene"],
     storage=[
-        C.Cond(key="temp", value=-20, unit=C.Unit("degC")),
+        C.Cond(key="temp", value=-20 * C.Unit("degC")),
         C.Cond(key="atm", value="argon")
     ]
 )
@@ -98,19 +98,19 @@ mat_toluene = C.Material(
     ),
     prop=[C.Prop(key="phase", value="liquid"),
           C.Prop(key="color", value="colorless"),
-          C.Prop(key="mw", value=92.141, unit=C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.87, unit=C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=20, unit=C.Unit("degC"))]
+          C.Prop(key="molar_mass", value=92.141 * C.Unit("g/mol"), method="prescribed"),
+          C.Prop(key="density", value=0.87 * C.Unit("g/ml"),
+                 cond=[C.Cond(key="temp", value=20 * C.Unit("degC"))]
                  ),
-          C.Prop(key="bp", value=111, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pressure", value=1, unit=C.Unit("atm"))]
+          C.Prop(key="bp", value=111 * C.Unit("degC"),
+                 cond=[C.Cond(key="pressure", value=1 * C.Unit("atm"))]
                  ),
-          C.Prop(key="mp", value=-95, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pressure", value=1, unit=C.Unit("bar"))]
+          C.Prop(key="mp", value=-95 * C.Unit("degC"),
+                 cond=[C.Cond(key="pressure", value=1 * C.Unit("bar"))]
                  ),
-          C.Prop(key="solubility", value=0.52, unit=C.Unit("g/L"),
+          C.Prop(key="solubility", value=0.52 * C.Unit("g/L"),
                  cond=[
-                     C.Cond(key="temp", value=20, unit=C.Unit("degC")),
+                     C.Cond(key="temp", value=20 * C.Unit("degC")),
                      C.Cond(key="solvent", value="water")
                  ]
                  ),
@@ -128,19 +128,19 @@ mat_thf = C.Material(
     ),
     prop=[C.Prop(key="phase", value="liquid"),
           C.Prop(key="color", value="colorless"),
-          C.Prop(key="mw", value=72.107, unit=C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.8876, unit=C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=20, unit=C.Unit("degC"))]
+          C.Prop(key="molar_mass", value=72.107 * C.Unit("g/mol"), method="prescribed"),
+          C.Prop(key="density", value=0.8876 * C.Unit("g/ml"),
+                 cond=[C.Cond(key="temp", value=20 * C.Unit("degC"))]
                  ),
-          C.Prop(key="bp", value=66, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pressure", value=1, unit=C.Unit("atm"))]
+          C.Prop(key="bp", value=66 * C.Unit("degC"),
+                 cond=[C.Cond(key="pressure", value=1 * C.Unit("atm"))]
                  ),
-          C.Prop(key="mp", value=-108, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pressure", value=1, unit=C.Unit("bar"))]
+          C.Prop(key="mp", value=-108 * C.Unit("degC"),
+                 cond=[C.Cond(key="pressure", value=1 * C.Unit("bar"))]
                  ),
           C.Prop(key="solubility", value="miscible",
                  cond=[
-                     C.Cond(key="temp", value=20, unit=C.Unit("degC")),
+                     C.Cond(key="temp", value=20 * C.Unit("degC")),
                      C.Cond(key="solvent", value="water")
                  ]
                  ),
@@ -158,19 +158,19 @@ mat_nBuOH = C.Material(
     ),
     prop=[C.Prop(key="phase", value="liquid"),
           C.Prop(key="color", value="colorless"),
-          C.Prop(key="mw", value=74.123, unit=C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.81, unit=C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=20, unit=C.Unit("degC"))]
+          C.Prop(key="molar_mass", value=74.123 * C.Unit("g/mol"), method="prescribed"),
+          C.Prop(key="density", value=0.81 * C.Unit("g/ml"),
+                 cond=[C.Cond(key="temp", value=20 * C.Unit("degC"))]
                  ),
-          C.Prop(key="bp", value=117.7, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pressure", value=1, unit=C.Unit("atm"))]
+          C.Prop(key="bp", value=117.7 * C.Unit("degC"),
+                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
                  ),
-          C.Prop(key="mp", value=-89.8, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pressure", value=1, unit=C.Unit("bar"))]
+          C.Prop(key="mp", value=-89.8 * C.Unit("degC"),
+                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
                  ),
-          C.Prop(key="solubility", value=73, unit=C.Unit("g/L"),
+          C.Prop(key="solubility", value=73 * C.Unit("g/L"),
                  cond=[
-                     C.Cond(key="temp", value=25, unit=C.Unit("degC")),
+                     C.Cond(key="temp", value=25 * C.Unit("degC")),
                      C.Cond(key="solvent", value="water")
                  ]
                  ),
@@ -188,19 +188,19 @@ mat_MeOH = C.Material(
     ),
     prop=[C.Prop(key="phase", value="liquid"),
           C.Prop(key="color", value="colorless"),
-          C.Prop(key="mw", value=32.04, unit=C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.792, unit=C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=20, unit=C.Unit("degC"))]
+          C.Prop(key="molar_mass", value=32.04 * C.Unit("g/mol"), method="prescribed"),
+          C.Prop(key="density", value=0.792 * C.Unit("g/ml"),
+                 cond=[C.Cond(key="temp", value=20 * C.Unit("degC"))]
                  ),
-          C.Prop(key="bp", value=64.7, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pressure", value=1, unit=C.Unit("atm"))]
+          C.Prop(key="bp", value=64.7 * C.Unit("degC"),
+                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
                  ),
-          C.Prop(key="mp", value=-97.6, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pressure", value=1, unit=C.Unit("bar"))]
+          C.Prop(key="mp", value=-97.6 * C.Unit("degC"),
+                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
                  ),
           C.Prop(key="solubility", value="miscible",
                  cond=[
-                     C.Cond(key="temp", value=25, unit=C.Unit("degC")),
+                     C.Cond(key="temp", value=25 * C.Unit("degC")),
                      C.Cond(key="solvent", value="water")
                  ]
                  ),
@@ -217,19 +217,19 @@ mat_cHex = C.Material(
     ),
     prop=[C.Prop(key="phase", value="liquid"),
           C.Prop(key="color", value="colorless"),
-          C.Prop(key="mw", value=84.162, unit=C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.7739, unit=C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=20, unit=C.Unit("degC"))]
+          C.Prop(key="molar_mass", value=84.162 * C.Unit("g/mol"), method="prescribed"),
+          C.Prop(key="density", value=0.7739 * C.Unit("g/ml"),
+                 cond=[C.Cond(key="temp", value=20 * C.Unit("degC"))]
                  ),
-          C.Prop(key="bp", value=80.74, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1, unit=C.Unit("atm"))]
+          C.Prop(key="bp", value=80.74 * C.Unit("degC"),
+                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
                  ),
-          C.Prop(key="mp", value=6.47, unit=C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1, unit=C.Unit("bar"))]
+          C.Prop(key="mp", value=6.47 * C.Unit("degC"),
+                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
                  ),
           C.Prop(key="solubility", value="immiscible",
                  cond=[
-                     C.Cond(key="temp", value=25, unit=C.Unit("degC")),
+                     C.Cond(key="temp", value=25 * C.Unit("degC")),
                      C.Cond(key="solvent", value="water")
                  ]
                  ),
@@ -244,7 +244,7 @@ mat_sBuLi = C.Material(
         cas="598-30-1",
         inchi_key="VATDYQWILMGLEW-UHFFFAOYSA-N"
     ),
-    prop=[C.Prop(key="mw", value=64.06, unit=C.Unit("g/mol"), method="prescribed")
+    prop=[C.Prop(key="molar_mass", value=64.06 * C.Unit("g/mol"), method="prescribed")
           ])
 
 db.save(mat_styrene, [expt, inventory])
@@ -260,13 +260,13 @@ mat_solution = C.Material(
     iden=[mat_cHex, mat_sBuLi],
     prop=[
         C.Prop(key="phase", value="liquid"),
-        C.Prop(key="density", value=0.769, unit=C.Unit("g/ml"),
-               cond=C.Cond(key="pres", value=1, unit=C.Unit("bar"))
+        C.Prop(key="density", value=0.769 * C.Unit("g/ml"),
+               cond=C.Cond(key="pres", value=1 * C.Unit("bar"))
                ),
-        C.Prop(mat_id=2, key="conc", value=1.4, unit=C.Unit("M"))
+        C.Prop(mat_id=2, key="molar_conc", value=1.4 * C.Unit("M"))
     ],
     storage=[
-        C.Cond(key="temp", value=2, unit=C.Unit("degC")),
+        C.Cond(key="temp", value=2 * C.Unit("degC")),
         C.Cond(key="atm", value="argon")
     ]
 )
@@ -324,8 +324,8 @@ mat_poly = C.Material(
     prop=[
         C.Prop(key="phase", value="solid"),
         C.Prop(key="color", value="white"),
-        C.Prop(key="m_n", method="nmr", value=4800, uncer=400, unit=C.Unit("g/mol")),
-        C.Prop(key="m_n", method="sec", value=5200, uncer=100, unit=C.Unit("g/mol")),
+        C.Prop(key="m_n", method="nmr", value=4800, uncer=400 * C.Unit("g/mol")),
+        C.Prop(key="m_n", method="sec", value=5200, uncer=100 * C.Unit("g/mol")),
         C.Prop(key="d", method="sec", value=1.03, uncer=0.02)
     ]
 )

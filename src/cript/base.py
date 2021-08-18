@@ -8,18 +8,18 @@ Contains CRIPTError and CRIPTWarning
 
 from abc import ABC
 from typing import Union
-from json import dumps
 from datetime import datetime
 
 from bson import ObjectId
 
-from . import __version__
+from . import __version__, CRIPTError, CRIPTWarning
 from .utils.serializable import Serializable
-from .utils.type_check import type_check_property, type_check, id_type_check
-import cript as C
+from cript.utils.validator.type_check import type_check_property, id_type_check
 
 
 class BaseModel(Serializable, ABC):
+    cript_types = None
+
     def __init__(
         self,
         name: str,
@@ -67,12 +67,6 @@ class BaseModel(Serializable, ABC):
 
         self._created_date = None
         self.created_date = created_date
-
-    def __repr__(self):
-        return dumps(self.dict_datetime_to_str(self.as_dict()), indent=2, sort_keys=True)
-
-    def __str__(self):
-        return dumps(self.dict_datetime_to_str(self.dict_remove_none(self.as_dict())), indent=2, sort_keys=True)
 
     @property
     def name(self):
@@ -140,6 +134,11 @@ class BaseModel(Serializable, ABC):
     def created_date(self, created_date):
         self._created_date = created_date
 
+    @classmethod
+    def _init_(cls):
+        from . import cript_types
+        cls.cript_types = cript_types
+
     def _reference(self) -> dict:
         """
         From a filled out node, create reference dictionary.
@@ -169,7 +168,7 @@ class BaseModel(Serializable, ABC):
         :return:
         """
         _class = prop[2:]  # strip "c_"
-        _type = C.cript_types[_class.capitalize()]
+        _type = BaseModel.cript_types[_class.capitalize()]
 
         if objs is None:
             setattr(self, f"_{prop}", None)
@@ -232,20 +231,19 @@ class BaseModel(Serializable, ABC):
                 exec(f"self._{prop}.append(obj_info)")
 
 
-class CRIPTError(Exception):
+class load:
+    """Given a document from the database convert it into a CRIPT object."""
+    cript_types = None
 
-    def __init__(self, message):
-        self.message = message
+    def __call__(self, ddict):
+        if self.cript_types is None:
+            load._init_()
+        ddict["uid"] = str(ddict.pop("_id"))
+        class_ = ddict.pop("class_")
+        obj = self.cript_types[class_](**ddict)
+        return obj
 
-
-class CRIPTWarning(Warning):
-
-    def __init__(self, message):
-        self.message = message
-
-
-def load(ddict: dict):
-    ddict["uid"] = str(ddict.pop("_id"))
-    class_ = ddict.pop("class_")
-    obj = C.cript_types[class_](**ddict)
-    return obj
+    @classmethod
+    def _init_(cls):
+        from . import cript_types
+        cls.cript_types = cript_types

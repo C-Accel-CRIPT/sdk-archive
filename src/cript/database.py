@@ -10,7 +10,7 @@ from pymongo import MongoClient, errors
 from bson import ObjectId
 from jsonpatch import JsonPatch
 
-from .utils.type_check import *
+from cript.utils.validator.type_check import *
 from .utils.database_tools import *
 from .base import load, CRIPTError
 import cript as C

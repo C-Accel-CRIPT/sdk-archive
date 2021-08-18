@@ -3,14 +3,17 @@ from types import GenericAlias
 from functools import wraps
 import builtins
 import warnings
-from inspect import getmembers, isclass
-
-import pint
-
-import cript
+# from inspect import getmembers, isclass
+from cript import CRIPTError
 
 builtin_types = {getattr(builtins, d).__name__: getattr(builtins, d) for d in dir(builtins) if isinstance(getattr(builtins, d), type) and "Error" not in getattr(builtins, d).__name__ and "Warning" not in getattr(builtins, d).__name__}
-pint_types = {pair[0]: pair[1] for pair in getmembers(pint, isclass)}
+cript_types = None
+
+
+def _init_():
+    global cript_types
+    from ... import cript_types
+    cript_types = cript_types
 
 
 def custom_formatwarning(msg, *args, **kwargs):
@@ -26,14 +29,14 @@ def type_check(type_options: Union[tuple, type]):
     """
     def _type_check_decorator(func):
         @wraps(func)
-        def _wrapper(*args, **kwargs):
+        def _type_check(*args, **kwargs):
             try:
                 _do_check(*args, type_options, func)
             except Exception:
                 pass
 
             return func(*args, **kwargs)
-        return _wrapper
+        return _type_check
     return _type_check_decorator
 
 
@@ -110,6 +113,9 @@ def type_check_property(func):
     """
     @wraps(func)
     def _wrapper(*args, **kwargs):
+        if cript_types is None:
+            _init_()
+
         try:
             # get variable type
             arg_type_op = get_type_hints(args[0].__init__)[func.__name__]
@@ -206,8 +212,7 @@ def get_arg_types(arg) -> dict:
     type_out = type(arg)
 
     if type_out in builtin_types.values() or\
-            type_out in pint_types.values() or\
-            type_out in cript.cript_types.values():
+            type_out in cript_types.values():
         return {type_out: ""}
 
     if type_out == list or type_out == tuple:
@@ -221,6 +226,7 @@ def get_arg_types(arg) -> dict:
         pass
     if type_out == set:
         pass
+
 
 
 def parse_generic_type(text_in: str):
@@ -367,10 +373,10 @@ def text_to_type(text: str):
         return None
     elif text.startswith("typing."):
         return parse_generic_type(text)
-    elif text.startswith("cript.") and text.split(".")[-1] in cript.cript_types.keys():
-        return cript.cript_types[text.split(".")[-1]]
-    # elif text.startswith("pint.") and text.split(".")[-1] in pint_types.keys():
-    #     return pint_types[text.split(".")[-1]]
+    elif text.startswith("cript.") and text.split(".")[-1] in cript_types.keys():
+        return cript_types[text.split(".")[-1]]
+    elif text.startswith("pint.") and text.split(".")[-1] in cript_types.keys():
+        return cript_types[text.split(".")[-1]]
     else:
         warnings.warn(f"Type check not valid. {text}")
         return None
@@ -379,10 +385,10 @@ def text_to_type(text: str):
 def id_type_check(uid: str):
     if type(uid) != str:
         msg = f"uids should be type 'str'. The provided uid is {type(uid)}."
-        raise cript.CRIPTError(msg)
+        raise CRIPTError(msg)
     if len(uid) != 24:
         msg = f"uids are 24 letters or numbers long. The provided uid is {len(uid)} long."
-        raise cript.CRIPTError(msg)
+        raise CRIPTError(msg)
 
     return True
 
@@ -390,5 +396,5 @@ def id_type_check(uid: str):
 def id_type_check_bool(uid: str) -> bool:
     try:
         return id_type_check(uid)
-    except cript.CRIPTError:
+    except CRIPTError:
         return False

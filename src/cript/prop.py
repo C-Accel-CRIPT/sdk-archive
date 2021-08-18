@@ -1,98 +1,22 @@
-"""
-Condition and Property sub-nodes
-
-"""
-
 from typing import Union
 
-from .utils.type_check import type_check_property, type_check
+from . import Quantity, Cond
+from .utils.validator.type_check import type_check_property, type_check
+from .utils.validator.prop import prop_keys_check
 from .utils.serializable import Serializable
-from . import Unit
-
-
-class Cond(Serializable):
-    def __init__(
-            self,
-            key: str = None,
-            value: Union[float, str, int] = None,
-            unit: Unit = None,
-            uncer: Union[float, str] = None,
-            data_uid=None,
-    ):
-        """
-
-        :param key: time, temp, pres, solvent, standard, relative, atmosphere
-        :param unit:
-        """
-
-        self._key = None
-        self.key = key
-
-        self._value = None
-        self.value = value
-
-        self._unit = None
-        self.unit = unit
-
-        self._uncer = None
-        self.uncer = uncer
-
-        self._data_uid = None
-        self.data_uid = data_uid
-
-    @property
-    def key(self):
-        return self._key
-
-    @key.setter
-    @type_check_property
-    def key(self, key):
-        self._key = key
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    @type_check_property
-    def value(self, value):
-        self._value = value
-
-    @property
-    def unit(self):
-        return self._unit
-
-    @unit.setter
-    @type_check_property
-    def unit(self, unit):
-        self._unit = unit
-
-    @property
-    def uncer(self):
-        return self._uncer
-
-    @uncer.setter
-    @type_check_property
-    def uncer(self, uncer):
-        self._uncer = uncer
-
-    @property
-    def data_uid(self):
-        return self._data_uid
-
-    @data_uid.setter
-    @type_check_property
-    def data_uid(self, data_uid):
-        self._data_uid = data_uid
 
 
 class Prop(Serializable):
+    keys_molecule = None
+    keys_polymer = None
+    keys_rxn = None
+    keys = None
+
     def __init__(
             self,
             key: str,
-            value: Union[float, int, str],
-            unit: Unit = None,
-            uncer: Union[float, int, str] = None,
+            value: Union[float, int, str, Quantity],
+            uncer: Union[float, int, Quantity] = None,
             method: str = None,
             mat_id: int = 0,
             component: str = None,
@@ -105,7 +29,6 @@ class Prop(Serializable):
         :param key:
         :param value:
         :param uncer:
-        :param unit:
         :param component:
         :param method:
         :param data_uid:
@@ -123,9 +46,6 @@ class Prop(Serializable):
 
         self._uncer = None
         self.uncer = uncer
-
-        self._unit = None
-        self.unit = unit
 
         self._component = None
         self.component = component
@@ -176,15 +96,6 @@ class Prop(Serializable):
         self._uncer = uncer
 
     @property
-    def unit(self):
-        return self._unit
-
-    @unit.setter
-    @type_check_property
-    def unit(self, unit):
-        self._unit = unit
-
-    @property
     def component(self):
         return self._component
 
@@ -219,3 +130,29 @@ class Prop(Serializable):
     @type_check((list[Cond], Cond, None))
     def cond(self, cond):
         self._cond = cond
+
+    @classmethod
+    def _init_(cls):
+        from .keys.prop import prop_keys_mat, prop_keys_poly, prop_keys_rxn
+        cls.keys_molecule = prop_keys_mat
+        cls.keys_polymer = prop_keys_poly
+        cls.keys_rxn = prop_keys_rxn
+        cls.keys = cls.keys_molecule | cls.keys_polymer | cls.keys_rxn
+
+    @classmethod
+    def key_table(cls):
+        print("\nMolecular Properties")
+        print("-" * 20)
+        text = cls.to_table(cls.keys_molecule)
+        print(text)
+
+        print("\nPolymer Properties")
+        print("-" * 18)
+        text = cls.to_table(cls.keys_polymer)
+        print(text)
+
+        print("\nReaction Properties")
+        print("-" * 19)
+        text = cls.to_table(cls.keys_rxn)
+        print(text)
+
