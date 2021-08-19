@@ -2,7 +2,7 @@
 Property Keywords
 
 """
-
+from .. import cript_types
 from . import float_limit, str_limit
 
 prop_keys_rxn = {
@@ -90,7 +90,7 @@ prop_keys_mat = {
         "names": []
     },
     "density": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, 23],  # Osmium is densest element at 22 g/cm^3
         "unit": "g/ml",
         "method": [],
@@ -100,7 +100,7 @@ prop_keys_mat = {
         "names": ["specific mass"]
     },
     "molar_mass": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "g/mol",
         "method": ["prescribed"],
@@ -111,7 +111,7 @@ prop_keys_mat = {
         "names": []
     },
     "mass_conc": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "g/ml",
         "method": [],
@@ -121,7 +121,7 @@ prop_keys_mat = {
         "names": ["concentration"]
     },
     "molar_conc": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "M",
         "method": [],
@@ -131,7 +131,7 @@ prop_keys_mat = {
         "names": ["concentration"]
     },
     "number_conc": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "1/ml",
         "method": [],
@@ -151,7 +151,7 @@ prop_keys_mat = {
         "names": ["concentration"]
     },
     "bp": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "degC",
         "method": [],
@@ -161,7 +161,7 @@ prop_keys_mat = {
         "names": ["boiling point", "boiling temperature"]
     },
     "mp": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "degC",
         "method": [],
@@ -181,7 +181,7 @@ prop_keys_mat = {
         "names": ["refractive index"]
     },
     "solubility": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "g/ml",
         'methods': [],
@@ -194,7 +194,7 @@ prop_keys_mat = {
 
 prop_keys_poly = {
     "m_n": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "g/mol",
         'methods': ['nmr', 'sec', 'maldi', 'osmtic_pres'],
@@ -204,7 +204,7 @@ prop_keys_poly = {
         "names": ["number average molecular weight", "number average molar molecular"]
     },
     "m_w": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "g/mol",
         'methods': ['nmr', 'sec', 'maldi', 'ls'],
@@ -214,7 +214,7 @@ prop_keys_poly = {
         "names": ["weight average molecular weight", "weight average molar molecular"]
     },
     "m_z": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "g/mol",
         'methods': ['nmr', 'sec', 'maldi', 'osmtic_pres'],
@@ -224,7 +224,7 @@ prop_keys_poly = {
         "names": ["Z Average Molecular Weight"]
     },
     "d": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [1, float_limit],
         "unit": "",
         'methods': ['nmr', 'sec', 'maldi'],
@@ -234,7 +234,7 @@ prop_keys_poly = {
         "names": ["dispersity", "pdi", "polydispersity index", "molecular weight dispersity"]
     },
     "m_v": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "g/mol",
         'methods': ['viscometer'],
@@ -244,7 +244,7 @@ prop_keys_poly = {
         "names": ["viscosity average molecular weight"]
     },
     "mw_std_dev": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "g/mol",
         'methods': ['nmr', 'sec', 'maldi'],
@@ -255,7 +255,7 @@ prop_keys_poly = {
         "names": ["molecular weight standard deviation"]
     },
     "mw_var": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "g/mol",
         'methods': ['nmr', 'sec', 'maldi'],
@@ -266,7 +266,7 @@ prop_keys_poly = {
         "names": ["molecular weight variance"]
     },
     "mw_skew": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "g/mol",
         'methods': ['nmr', 'sec', 'maldi'],
@@ -277,7 +277,7 @@ prop_keys_poly = {
         "names": ["molecular weight skewness"]
     },
     "mw_kurtosis": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "g/mol",
         'methods': ['nmr', 'sec', 'maldi'],
@@ -290,7 +290,7 @@ prop_keys_poly = {
 
     # Thermal Properties
     "t_m": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [-273.15, float_limit],
         "unit": "degC",
         'methods': ['dsc'],
@@ -300,7 +300,7 @@ prop_keys_poly = {
         "names": ["melting temperature"]
     },
     "t_g": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [-273.15, float_limit],
         "unit": "degC",
         'methods': ['dsc'],
@@ -320,7 +320,7 @@ prop_keys_poly = {
         "names": ["fraction crystallinity by weight"]
     },
     "enth_crys": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
         "unit": "J/mol",
         'methods': ['dsc'],
@@ -330,7 +330,7 @@ prop_keys_poly = {
         "names": ["enthalpy of crystallization"]
     },
     "entr_crys": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
         "unit": "J/mol/K",
         'methods': ['dsc'],
@@ -340,7 +340,7 @@ prop_keys_poly = {
         "names": ["entropy of crystallization"]
     },
     "therm_cond": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
         "unit": "W/m/k",
         'methods': [],
@@ -350,7 +350,7 @@ prop_keys_poly = {
         "names": ["specific thermal conductivity"]
     },
     "therm_expand_v": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
         "unit": "1/k",
         'methods': [],
@@ -360,7 +360,7 @@ prop_keys_poly = {
         "names": ["volumetric thermal expansion"]
     },
     "therm_expand_l": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
         "unit": "1/k",
         'methods': [],
@@ -370,7 +370,7 @@ prop_keys_poly = {
         "names": ["linear thermal expansion"]
     },
     "c_p": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
         "unit": "J/mol/K",
         'methods': ['calorimetry', 'dsc'],
@@ -381,7 +381,7 @@ prop_keys_poly = {
         "names": ["molar heat capacity constant pressure"]
     },
     "c_v": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
         "unit": "J/mol/K",
         'methods': ['calorimetry', 'dsc'],
@@ -392,7 +392,7 @@ prop_keys_poly = {
         "names": ["molar heat capacity constant volume"]
     },
     "therm_diff": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
         "unit": "m**2/s",
         'methods': ['calorimetry', 'dsc'],
@@ -440,3 +440,6 @@ keys_methods = {
     'sem': 'scanning electron microscopy',
     'scale': 'scale',
 }
+
+
+# Vapor pressure, pH, element content, surface tension, heat of vaportization, dipole moment

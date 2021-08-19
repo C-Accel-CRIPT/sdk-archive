@@ -3,7 +3,7 @@ import pkg_resources
 __all__ = [
     "VERSION", "__version__", "__short_version__", "Unit", "load", "CriptDB",
     "User", "Group", "Collection", "Publication", "Experiment", "Material", "Process", "Data",
-    "Inventory", "Simulation", "Cond", "Prop", "Qty", "Ingr"
+    "Inventory", "Simulation", "Cond", "Prop", "Qty", "Ingr", "Iden"
 ]
 
 
@@ -54,10 +54,10 @@ from inspect import getmembers, isclass
 cript_types = {pair[0]: pair[1] for pair in getmembers(sys.modules[__name__], isclass) if "cript." in str(pair[1])}
 cript_types["Unit"] = Unit
 cript_types["Quantity"] = Quantity
-cript_types_tuple = tuple(cript_types.values())
 
 
+BaseModel._init_()
 Cond._init_()
 Prop._init_()
-
+CriptDB._init_()
 

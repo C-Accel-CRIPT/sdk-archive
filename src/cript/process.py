@@ -8,6 +8,7 @@ from . import BaseModel, Cond, Prop, Unit
 from .utils.serializable import Serializable
 from .keys.process import *
 
+
 class Qty(Serializable):
     def __init__(
             self,

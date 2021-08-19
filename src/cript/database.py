@@ -4,7 +4,7 @@ Database Connection
 """
 import sys
 from datetime import datetime
-# from typing import Union
+from typing import Union
 
 from pymongo import MongoClient, errors
 from bson import ObjectId
@@ -12,11 +12,11 @@ from jsonpatch import JsonPatch
 
 from cript.utils.validator.type_check import *
 from .utils.database_tools import *
-from .base import load, CRIPTError
-import cript as C
+from . import load, CRIPTError, User
 
 
 class CriptDB:
+    cript_types = None
     instances = 0
     user_update = 0
 
@@ -25,7 +25,7 @@ class CriptDB:
                  db_password: str,
                  db_project: str,
                  db_database: str,
-                 user: Union[str, C.User] = None,
+                 user: Union[str, User] = None,
                  op_print: bool = True):
         """
         This class handles all communication with MongoDB.
@@ -72,6 +72,11 @@ class CriptDB:
         return f"\nYou are connected to: {self.db_database}" \
                f"\n\tLogged in as: {self.user}"
 
+    @classmethod
+    def _init_(cls):
+        from . import cript_types
+        cls.cript_types = cript_types
+
     @property
     def user(self):
         return self._user
@@ -94,7 +99,7 @@ class CriptDB:
             self._user = self._user_find_by_email(user)
         elif isinstance(user, str) and id_type_check(user):
             self._user = self._user_find_by_id(user)
-        elif isinstance(user, C.cript_types["User"]) and user.uid is not None:
+        elif isinstance(user, User) and user.uid is not None:
             self._user = user
             CriptDB.user_update += 1
             if CriptDB.user_update > 1:
@@ -107,7 +112,7 @@ class CriptDB:
         if self.op_print:
             print(f"Login as '{self.user.name}' was successful.")
 
-    def _user_find_by_email(self, email: str) -> C.User:
+    def _user_find_by_email(self, email: str) -> User:
         """
         Find User by email address
         :param email:
@@ -117,11 +122,11 @@ class CriptDB:
         doc = coll.find_one({"email": email})
         if doc is None:
             msg = f"{email} not found in database."
-            raise cript.CRIPTError(msg)
+            raise CRIPTError(msg)
 
         return load(doc)
 
-    def _user_find_by_id(self, uid: str) -> C.User:
+    def _user_find_by_id(self, uid: str) -> User:
         """
         Given the uid check if user exists
         :param uid:
@@ -131,7 +136,7 @@ class CriptDB:
         doc = coll.find_one({"_id": ObjectId(uid)})
         if doc is None:
             msg = f"{uid} not found in database."
-            raise cript.CRIPTError(msg)
+            raise CRIPTError(msg)
 
         return load(doc)
 
@@ -164,7 +169,7 @@ class CriptDB:
         """
         # pre - checks
         if isinstance(parent_obj, dict):
-            parent_obj = C.load(parent_obj)
+            parent_obj = load(parent_obj)
         self._pre_save_checks(obj, parent_obj)
 
         # save to database
@@ -239,7 +244,7 @@ class CriptDB:
                         coll = self.db[key[2:].capitalize()]
                         result = coll.find_one({"_id": ObjectId(item)})
                         if result:
-                            node = cript.load(result)
+                            node = load(result)
                             new_value.append(node._reference())
                         else:
                             msg = f"'{item}' in '{key}' not found in database."
@@ -271,7 +276,7 @@ class CriptDB:
                         coll = self.db[coll_name]
                         result = coll.find_one({"_id": ObjectId(item)})
                         if result:
-                            node = cript.load(result)
+                            node = load(result)
                             new_value.append(node._reference())
                         else:
                             msg = f"'{item}' in '{key}' not found in database."
@@ -289,38 +294,38 @@ class CriptDB:
         This function checks the database for conflicts.
         """
         # General checks
-        if not isinstance(obj, C.cript_types_tuple):
+        if not isinstance(obj, tuple(self.cript_types.values())):
             msg = f"{obj} is not a valid CRIPT node."
-            raise cript.CRIPTError(msg)
+            raise CRIPTError(msg)
 
-        if isinstance(parent_obj, C.cript_types_tuple) or parent_obj is None:
+        if isinstance(parent_obj, tuple(self.cript_types.values())) or parent_obj is None:
             pass
         elif isinstance(parent_obj, list):
             for i in parent_obj:
-                if isinstance(i, C.cript_types_tuple):
+                if isinstance(i, tuple(self.cript_types.values())):
                     pass
                 else:
                     msg = f"{i} is not a valid CRIPT node for {obj.name}."
-                    raise cript.CRIPTError(msg)
+                    raise CRIPTError(msg)
         else:
             msg = f"{parent_obj} is not a valid CRIPT node."
-            raise cript.CRIPTError(msg)
+            raise CRIPTError(msg)
 
         if obj.uid is not None:
             msg = "uid should not have an id already. If you are trying to update an existing doc, "\
                             "don't use 'save', use 'update'."
-            raise cript.CRIPTError(msg)
+            raise CRIPTError(msg)
 
         if parent_obj is not None:
             if isinstance(parent_obj, list):
                 for i in parent_obj:
                     if i.uid is None:
                         msg = f"{i.name} needs to be saved first."
-                        raise cript.CRIPTError(msg)
+                        raise CRIPTError(msg)
             else:
                 if parent_obj.uid is None:
                     msg = f"{parent_obj.name} needs to be saved first."
-                    raise cript.CRIPTError(msg)
+                    raise CRIPTError(msg)
 
         # Class specific checks.
         if obj.class_ == "User":
@@ -398,7 +403,7 @@ class CriptDB:
                 for i in range(100):
                     frames = sys._getframe(i)
                     globals_ = frames.f_globals
-                    user_node = [globals_[k] for k, v in globals_.items() if isinstance(v, C.User) and k[0] != "_"]
+                    user_node = [globals_[k] for k, v in globals_.items() if isinstance(v, User) and k[0] != "_"]
                     if user_node:
                         user_node = user_node[0]
                         user_node.c_group = obj.uid
@@ -471,7 +476,7 @@ class CriptDB:
         :return:
         """
         # if obj is cript node
-        if obj in C.cript_types_tuple:
+        if obj in tuple(self.cript_types.values()):
             result, key = self._search(obj, query, num_results)
             self._print_table(result, key)
 
@@ -486,13 +491,13 @@ class CriptDB:
 
             if result is None:
                 mes = f"{obj} not found."
-                raise cript.CRIPTError(mes)
+                raise CRIPTError(mes)
             else:
                 print(result)
 
         else:
             msg = "Invalid input."
-            raise cript.CRIPTError(msg)
+            raise CRIPTError(msg)
 
         return result
 
@@ -514,7 +519,7 @@ class CriptDB:
             result, key = self._search_local(obj, num_results)
         else:
             mes = f"{query} is not a valid object for viewing."
-            raise C.CRIPTError(mes)
+            raise CRIPTError(mes)
 
         return result, key
 
@@ -531,27 +536,27 @@ class CriptDB:
                 result = list(coll.find(query["key"], limit=num_results))
             except Exception:
                 mes = f"Not a valid query."
-                raise cript.CRIPTError(mes)
+                raise CRIPTError(mes)
 
         return result
 
-    def _search_local(self, obj, num_results: int = 50):   ### Could be refactored.
+    def _search_local(self, obj, num_results: int = 50):   ######## Could be refactored.
         """
         Get everything the user is associated with.
         """
         result = []
         key = []
 
-        if obj is C.cript_types["User"]:
+        if obj is cript_types["User"]:
             result = self.user
             key = None
-        elif obj is C.cript_types["Group"]:
+        elif obj is cript_types["Group"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
                     result.append(group_dict)
             key = None
-        elif obj is C.cript_types["Collection"]:
+        elif obj is cript_types["Collection"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
@@ -561,7 +566,7 @@ class CriptDB:
                             if coll_dict is not None:
                                 result.append(coll_dict)
                                 key.append(f".{group['name']}")
-        elif obj is C.cript_types["Experiment"]:
+        elif obj is cript_types["Experiment"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
@@ -575,7 +580,7 @@ class CriptDB:
                                         if expt_dict is not None:
                                             result.append(expt_dict)
                                             key.append(f".{group['name']}.{collection['name']}")
-        elif obj is C.cript_types["Inventory"]:
+        elif obj is cript_types["Inventory"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
@@ -598,7 +603,7 @@ class CriptDB:
                                             result.append(inventory_dict)
                                             key.append(f".{group['name']}.{collection['name']}")
 
-        elif obj is C.cript_types["Material"]:
+        elif obj is cript_types["Material"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
@@ -638,7 +643,7 @@ class CriptDB:
                                                     result.append(mat_dict)
                                                     key.append(f".{group['name']}.{expt['name']}")
 
-        elif obj is C.cript_types["Process"]:
+        elif obj is cript_types["Process"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
@@ -656,7 +661,7 @@ class CriptDB:
                                                     result.append(proc_dict)
                                                     key.append(f".{group['name']}.{expt['name']}")
 
-        elif obj is C.cript_types["Data"]:
+        elif obj is cript_types["Data"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
@@ -733,7 +738,7 @@ class CriptDB:
         doc = coll.find_one({"_id": ObjectId(obj.uid)})
         if doc is None:
             mes = f"Previous document not found in database. ('{obj.name}', '{obj.uid}')"
-            raise cript.CRIPTError(mes)
+            raise CRIPTError(mes)
         return doc
 
     @staticmethod

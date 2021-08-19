@@ -9,43 +9,43 @@ from . import float_limit, str_limit
 
 cond_keys = {
     "time": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "min",
         "descr": "Time"
     },
     "temp": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [-273.15, float_limit],
         "unit": "degC",
         "descr": "Temperature"
     },
     "pres": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "kPa",
         "descr": "Absolute pressure"
     },
     "light_power": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "watt",
         "descr": "Light power hitting a surface (Not electrical power)"
     },
     "light_power_e": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "watt",
         "descr": "Electric power driving the light"
     },
     "light_irradiance": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "mW/cm**2",
         "descr": "Light power per area"
     },
     "light_wlength": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "nm",
         "descr": "wave length of light"
@@ -57,7 +57,7 @@ cond_keys = {
         "descr": "rate of stirrer"
     },
     "potential": {
-        "type": float,
+        "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "V",
         "descr": "electrical potential"

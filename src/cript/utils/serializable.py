@@ -2,7 +2,7 @@ from abc import ABC
 from datetime import datetime
 from json import dumps
 
-from .. import Unit, Quantity
+from .. import Quantity
 
 label_length = {
     "keys": 16,
@@ -23,31 +23,30 @@ class Serializable(ABC):
     """Base abstract class for a serializable object."""
 
     def __repr__(self):
-        return dumps(self.dict_cleanup(self.as_dict()), indent=2, sort_keys=True)
+        return dumps(self.dict_cleanup(self.as_dict(save=False)), indent=2, sort_keys=True)
 
     def __str__(self):
-        return dumps(self.dict_remove_none(self.dict_cleanup(self.as_dict())), indent=2, sort_keys=True)
+        return dumps(self.dict_remove_none(self.dict_cleanup(self.as_dict(save=False))), indent=2, sort_keys=True)
 
-    def as_dict(self):
+    def as_dict(self, **kwargs) -> dict:
         """Convert and return object as dictionary."""
         keys = {k.lstrip("_") for k in vars(self) if "__" not in k}
 
         attr = dict()
         for k in keys:
-            value = Serializable._to_dict(self.__getattribute__(k))
-            if isinstance(value, Unit):
-                value = str(value)
+            value = self._to_dict(self.__getattribute__(k), **kwargs)
             attr[k] = value
 
         return attr
 
     @staticmethod
-    def _to_dict(obj):
+    def _to_dict(obj, **kwargs):
         """Convert obj to a dictionary, and return it."""
         if isinstance(obj, list):
-            return [Serializable._to_dict(i) for i in obj]
+            return [Serializable._to_dict(i, **kwargs) for i in obj]
         elif hasattr(obj, "as_dict"):
-            return obj.as_dict()
+            return obj.as_dict(**kwargs)
+
         else:
             return obj
 

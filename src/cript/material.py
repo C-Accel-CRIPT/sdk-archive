@@ -10,6 +10,7 @@ from .utils.serializable import Serializable
 from cript.utils.validator.type_check import type_check_property, type_check
 from .keys.material import *
 
+
 class Iden(Serializable):
     def __init__(
             self,
@@ -188,12 +189,12 @@ class Material(BaseModel):
             self,
             iden: "Union[list[Iden], Iden, list[Material], Material]",
             name: str = None,
-            prop: list[Prop] = None,
+            prop: Union[list[Prop], Prop] = None,
             c_process=None,
             keywords: list[str] = None,
             source: str = None,
             lot_number: str = None,
-            storage: list[Cond] = None,
+            storage: Union[list[Cond], Cond] = None,
             hazard: list[str] = None,
             notes: str = None,
             **kwargs
@@ -257,9 +258,8 @@ class Material(BaseModel):
         ddict = dict()
 
         if isinstance(obj, dict):
-            obj = load(obj)
-
-        if isinstance(obj, Iden):
+            ddict = obj
+        elif isinstance(obj, Iden):
             ddict["1"] = obj.as_dict()
         elif isinstance(obj, Material):
             ddict["1"] = obj._reference
@@ -283,8 +283,14 @@ class Material(BaseModel):
         return self._prop
 
     @prop.setter
-    @type_check_property
+    @type_check((list[Prop], Prop, None))
     def prop(self, prop):
+        if isinstance(prop, list):
+            for i, p in enumerate(prop):
+                if isinstance(p, dict):
+                    prop[i] = Prop(**p, _loading=True)
+        elif isinstance(prop, Prop):
+            prop = [prop]
         self._prop = prop
 
     @property
@@ -327,8 +333,14 @@ class Material(BaseModel):
         return self._storage
 
     @storage.setter
-    @type_check_property
+    @type_check((list[Cond], Cond, None))
     def storage(self, storage):
+        if isinstance(storage, list):
+            for i, s in enumerate(storage):
+                if isinstance(s, dict):
+                    storage[i] = Cond(**s, _loading=True)
+        elif isinstance(storage, Cond):
+            storage = [Cond]
         self._storage = storage
 
     @property

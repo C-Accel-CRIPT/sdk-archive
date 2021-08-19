@@ -1,6 +1,6 @@
 from typing import Union
 
-from . import Quantity, Cond
+from . import Quantity, Unit, Cond
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.validator.prop import prop_keys_check
 from .utils.serializable import Serializable
@@ -21,7 +21,8 @@ class Prop(Serializable):
             mat_id: int = 0,
             component: str = None,
             data_uid: str = None,
-            cond: Union[list[Cond], Cond] = None
+            cond: Union[list[Cond], Cond] = None,
+            _loading: bool = False
     ):
         """
 
@@ -34,6 +35,8 @@ class Prop(Serializable):
         :param data_uid:
         :param cond:
         """
+        if _loading:
+            key, value, uncer = self._loading(key, value, uncer)
 
         self._mat_id = None
         self.mat_id = mat_id
@@ -129,6 +132,12 @@ class Prop(Serializable):
     @cond.setter
     @type_check((list[Cond], Cond, None))
     def cond(self, cond):
+        if isinstance(cond, list):
+            for i, s in enumerate(cond):
+                if isinstance(s, dict):
+                    cond[i] = Cond(**s, _loading=True)
+        elif isinstance(cond, Cond):
+            cond = [Cond]
         self._cond = cond
 
     @classmethod
@@ -156,3 +165,54 @@ class Prop(Serializable):
         text = cls.to_table(cls.keys_rxn)
         print(text)
 
+    def as_dict(self, **kwargs) -> dict:
+        """Convert and return object as dictionary."""
+        keys = {k.lstrip("_") for k in vars(self) if "__" not in k}
+
+        attr = dict()
+        for k in keys:
+            value = self.__getattribute__(k)
+            if isinstance(value, Quantity):
+                value = self._to_dict_units(value, **kwargs)
+            else:
+                value = self._to_dict(value, **kwargs)
+            attr[k] = value
+
+        return attr
+
+    def _to_dict_units(self, value, save: bool = True) -> Union[str, int, float]:
+        if save:
+            if "+" in self.key[0]:
+                return str(value)
+            else:
+                unit_ = self.keys[self.key]["unit"]
+                return value.to(unit_).magnitude
+        else:
+            return str(value)
+
+    def _loading(self, key, value, uncer):
+        """ Loading from database; will add units back to numbers"""
+        if "+" in key:
+            if value is not None:
+                new_value = value.split(" ", 1)
+                try:
+                    value = float(new_value[0]) * Unit(new_value[1])
+                except Exception:
+                    pass
+                if uncer is not None:
+                    new_value = value.split(" ", 1)
+                    try:
+                        value = float(new_value[0]) * Unit(new_value[1])
+                    except Exception:
+                        pass
+
+        else:
+            if key in self.keys.keys():
+                unit_ = self.keys[key]["unit"]
+                if unit_:
+                    if value is not None:
+                        value = value * Unit(unit_)
+                        if uncer is not None:
+                            value = value * Unit(unit_)
+
+        return key, value, uncer

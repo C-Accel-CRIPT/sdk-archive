@@ -154,6 +154,13 @@ class BaseModel(Serializable, ABC):
         * This method may be overwritten in inheritance.
         """
         keys = ["uid", "name"]
+        if not all(k in ddict.keys() and ddict[k] is not None for k in keys):
+            if ddict["uid"] is None and ddict["name"] is not None:
+                mes = f"'{ddict['name']}' needs to be saved before it can generate a reference."
+            else:
+                mes = f"{ddict} is missing one or more of the following keys()"
+            raise CRIPTError(mes)
+
         out = {}
         for key in keys:
             out[key] = ddict[key]
@@ -231,14 +238,15 @@ class BaseModel(Serializable, ABC):
                 exec(f"self._{prop}.append(obj_info)")
 
 
-class load:
+class Load:
     """Given a document from the database convert it into a CRIPT object."""
     cript_types = None
 
     def __call__(self, ddict):
         if self.cript_types is None:
             load._init_()
-        ddict["uid"] = str(ddict.pop("_id"))
+        if "_id" in ddict.keys():
+            ddict["uid"] = str(ddict.pop("_id"))
         class_ = ddict.pop("class_")
         obj = self.cript_types[class_](**ddict)
         return obj
@@ -247,3 +255,6 @@ class load:
     def _init_(cls):
         from . import cript_types
         cls.cript_types = cript_types
+
+
+load = Load()
