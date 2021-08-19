@@ -45,7 +45,7 @@ Ingr_keys = {
     'workup': 'a chemical used in the purification or isolation of a polymer',
 }
 
-keywords_Process = {
+Process_keys = {
     # ** chemical transformations **
     'polymerization': 'a chemical reaction that convert monomer(s) to a polymer',
     'kinetics': 'an experiment were multiple data points are take over a span of time',

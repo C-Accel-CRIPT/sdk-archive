@@ -547,16 +547,16 @@ class CriptDB:
         result = []
         key = []
 
-        if obj is cript_types["User"]:
+        if obj is self.cript_types["User"]:
             result = self.user
             key = None
-        elif obj is cript_types["Group"]:
+        elif obj is self.cript_types["Group"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
                     result.append(group_dict)
             key = None
-        elif obj is cript_types["Collection"]:
+        elif obj is self.cript_types["Collection"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
@@ -566,7 +566,7 @@ class CriptDB:
                             if coll_dict is not None:
                                 result.append(coll_dict)
                                 key.append(f".{group['name']}")
-        elif obj is cript_types["Experiment"]:
+        elif obj is self.cript_types["Experiment"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
@@ -580,7 +580,7 @@ class CriptDB:
                                         if expt_dict is not None:
                                             result.append(expt_dict)
                                             key.append(f".{group['name']}.{collection['name']}")
-        elif obj is cript_types["Inventory"]:
+        elif obj is self.cript_types["Inventory"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
@@ -603,7 +603,7 @@ class CriptDB:
                                             result.append(inventory_dict)
                                             key.append(f".{group['name']}.{collection['name']}")
 
-        elif obj is cript_types["Material"]:
+        elif obj is self.cript_types["Material"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
@@ -643,7 +643,7 @@ class CriptDB:
                                                     result.append(mat_dict)
                                                     key.append(f".{group['name']}.{expt['name']}")
 
-        elif obj is cript_types["Process"]:
+        elif obj is self.cript_types["Process"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
@@ -661,7 +661,7 @@ class CriptDB:
                                                     result.append(proc_dict)
                                                     key.append(f".{group['name']}.{expt['name']}")
 
-        elif obj is cript_types["Data"]:
+        elif obj is self.cript_types["Data"]:
             for group in self.user.c_group:
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:

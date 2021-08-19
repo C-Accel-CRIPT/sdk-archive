@@ -1,22 +1,11 @@
 from abc import ABC
 from datetime import datetime
 from json import dumps
+from typing import Union
 
 from .. import Quantity
 
-label_length = {
-    "keys": 16,
-    "method": 25,
-    "cond": 22,
-    "required": 20,
-    "type": 22,
-    "range": 25,
-    "unit": 12,
-    "descr": 50,
-    "names": 30
-}
 
-window = 150
 
 
 class Serializable(ABC):
@@ -94,56 +83,30 @@ class Serializable(ABC):
         else:
             return obj
 
-    @staticmethod
-    def to_table(ddict: dict) -> str:
-        levels = 0
-        if isinstance(ddict, dict):
-            levels = 1
-            if isinstance(list(ddict.values())[0], dict):
-                levels = 2
 
-        if levels == 0:
-            raise TypeError(f"Needs to be a dictionary.")
+class SerializableSub(Serializable, ABC):
 
-        elif levels == 1:
-            row_format = "{:<30}" + "{:<" + str(window - 30) + "}"
-            text_out = row_format.format("key", "description")
-            text_out = text_out + "\n" + "-" * window
-            for k, v in ddict.items():
-                text_out = text_out + "\n" + row_format.format(k, v, )
-            text_out = text_out + "\n"
+    def as_dict(self, **kwargs) -> dict:
+        """Convert and return object as dictionary."""
+        keys = {k.lstrip("_") for k in vars(self) if "__" not in k}
 
-            return text_out
+        attr = dict()
+        for k in keys:
+            value = self.__getattribute__(k)
+            if isinstance(value, Quantity):
+                value = self._to_dict_units(value, **kwargs)
+            else:
+                value = self._to_dict(value, **kwargs)
+            attr[k] = value
 
-        elif levels == 2:
-            headers = list(list(ddict.values())[0].keys())
-            headers.insert(0, "keys")
-            row_format = ""
-            for i in headers:
-                row_format = row_format + Serializable._label_length(i)
-            text_out = row_format.format(*headers)
-            text_out = text_out + "\n" + "-" * window
-            for k, v in ddict.items():
-                entries = [str(i) for i in list(v.values())]
-                for i, (entry, header) in enumerate(zip(entries, headers[1:])):
-                    entries[i] = Serializable._length_limit(header, entry)
-                text_out = text_out + "\n" + row_format.format(k, *entries)
-            text_out = text_out + "\n"
+        return attr
 
-            return text_out
-
-    @staticmethod
-    def _label_length(label: str) -> str:
-        if label in label_length.keys():
-            return "{:<" + str(label_length[label]) + "}"
+    def _to_dict_units(self, value, save: bool = True) -> Union[str, int, float]:
+        if save:
+            if "+" in self.key[0]:
+                return str(value)
+            else:
+                unit_ = self.keys[self.key]["unit"]
+                return value.to(unit_).magnitude
         else:
-            return "{:<30}"
-
-    @staticmethod
-    def _length_limit(label: str, entry) -> str:
-        if label in label_length.keys():
-            length_limit = label_length[label]
-            if len(entry) > length_limit:
-                return entry[0:length_limit-5] + "..."
-
-        return entry
+            return str(value)

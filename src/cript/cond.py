@@ -8,10 +8,11 @@ from typing import Union
 from . import Quantity, Unit
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.validator.cond import cond_keys_check
-from .utils.serializable import Serializable
+from .utils.serializable import SerializableSub
+from .utils.printing import KeyPrinting
 
 
-class Cond(Serializable):
+class Cond(SerializableSub, KeyPrinting):
     keys = None
     cript_types = None
 
@@ -92,34 +93,6 @@ class Cond(Serializable):
         from . import cript_types
         cls.keys = cond_keys
         cls.cript_types = cript_types
-
-    @classmethod
-    def key_table(cls):
-        text = cls.to_table(cls.keys)
-        print(text)
-
-    def as_dict(self, **kwargs) -> dict:
-        """Convert and return object as dictionary."""
-        keys = {k.lstrip("_") for k in vars(self) if "__" not in k}
-
-        attr = dict()
-        for k in keys:
-            value = self.__getattribute__(k)
-            if isinstance(value, Quantity):
-                value = self._to_dict_units(value, **kwargs)
-            attr[k] = value
-
-        return attr
-
-    def _to_dict_units(self, value, save: bool = True) -> Union[str, int, float]:
-        if save:
-            if "+" in self.key[0]:
-                return str(value)
-            else:
-                unit_ = self.keys[self.key]["unit"]
-                return value.to(unit_).magnitude
-        else:
-            return str(value)
 
     def _loading(self, key, value, uncer):
         """ Loading from database; will add units back to numbers"""

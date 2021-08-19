@@ -23,6 +23,7 @@ class Experiment(BaseModel):
         c_process=None,
         c_data=None,
         notes: str = None,
+        **kwargs
     ):
         """
 
@@ -30,7 +31,7 @@ class Experiment(BaseModel):
 
         :param notes: Any miscellaneous notes related to the user.
         """
-        super().__init__(name=name, _class=self._class, notes=notes)
+        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
         self._c_material = None
         self.c_material = c_material

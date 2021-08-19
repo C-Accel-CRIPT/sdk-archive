@@ -361,11 +361,11 @@ db.save(mat_solution, [expt, inventory])
 
 
 ingr = [
-    C.Ingr(mat_id=expt.get("SecBuLi solution"), type_="initiator", qty=C.Qty(0.17, C.Unit("ml"))),
-    C.Ingr(mat_id=inventory.get("toluene"), type_="solvent", qty=C.Qty(10, C.Unit("ml"))),
-    C.Ingr(mat_id=mat_styrene, type_="monomer", qty=C.Qty(0.455, C.Unit("g"))),
-    C.Ingr(mat_id=mat_nBuOH, type_="quench", qty=C.Qty(5, "Eq", mat_id="secBuLi")),
-    C.Ingr(mat_id=mat_MeOH, type_="workup", qty=C.Qty(100, C.Unit("ml")))
+    C.Ingr(expt.get("SecBuLi solution"), type_="initiator", qty=C.Qty(0.17 * C.Unit("mol"), mat_id="secBuLi")),
+    C.Ingr(inventory.get("toluene"), type_="solvent", qty=C.Qty(10 * C.Unit("ml"))),
+    C.Ingr(mat_styrene, type_="monomer", qty=C.Qty(0.455 * C.Unit("g"))),
+    C.Ingr(mat_nBuOH, type_="quench", qty=C.Qty(5, equiv="secBuLi")),
+    C.Ingr(mat_MeOH, type_="workup", qty=C.Qty(100 * C.Unit("ml")))
 ]
 
 # Generate node
@@ -378,12 +378,12 @@ process = C.Process(
               "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
               "precipitation in methanol 3 times and dried under vacuum.",
     cond=[
-        C.Cond("temp", 25, C.Unit("degC")),
-        C.Cond("time", 60, C.Unit("min")),
+        C.Cond("temp", 25 * C.Unit("degC")),
+        C.Cond("time", 60 * C.Unit("min")),
         C.Cond(key="atm", value=mat_argon)
     ],
     prop=[
-        C.Prop("yield_mass", 0.47, C.Unit("g"), 0.02, method="scale")
+        C.Prop("yield_mass", 0.47 * C.Unit("g"), 0.02 * C.Unit("g"), method="scale")
     ],
     keywords=["polymerization", "living_poly", "anionic", "solution"]
 )
@@ -409,8 +409,8 @@ mat_poly = C.Material(
     prop=[
         C.Prop(key="phase", value="solid"),
         C.Prop(key="color", value="white"),
-        C.Prop(key="m_n", method="nmr", value=4800, uncer=400 * C.Unit("g/mol")),
-        C.Prop(key="m_n", method="sec", value=5200, uncer=100 * C.Unit("g/mol")),
+        C.Prop(key="m_n", method="nmr", value=4800 * C.Unit("g/mol"), uncer=400 * C.Unit("g/mol")),
+        C.Prop(key="m_n", method="sec", value=5200 * C.Unit("g/mol"), uncer=100 * C.Unit("g/mol")),
         C.Prop(key="d", method="sec", value=1.03, uncer=0.02)
     ]
 )

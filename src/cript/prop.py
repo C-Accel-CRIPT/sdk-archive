@@ -3,10 +3,11 @@ from typing import Union
 from . import Quantity, Unit, Cond
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.validator.prop import prop_keys_check
-from .utils.serializable import Serializable
+from .utils.serializable import SerializableSub
+from .utils.printing import KeyPrinting
 
 
-class Prop(Serializable):
+class Prop(SerializableSub, KeyPrinting):
     keys_molecule = None
     keys_polymer = None
     keys_rxn = None
@@ -137,7 +138,7 @@ class Prop(Serializable):
                 if isinstance(s, dict):
                     cond[i] = Cond(**s, _loading=True)
         elif isinstance(cond, Cond):
-            cond = [Cond]
+            cond = [cond]
         self._cond = cond
 
     @classmethod
@@ -165,30 +166,30 @@ class Prop(Serializable):
         text = cls.to_table(cls.keys_rxn)
         print(text)
 
-    def as_dict(self, **kwargs) -> dict:
-        """Convert and return object as dictionary."""
-        keys = {k.lstrip("_") for k in vars(self) if "__" not in k}
-
-        attr = dict()
-        for k in keys:
-            value = self.__getattribute__(k)
-            if isinstance(value, Quantity):
-                value = self._to_dict_units(value, **kwargs)
-            else:
-                value = self._to_dict(value, **kwargs)
-            attr[k] = value
-
-        return attr
-
-    def _to_dict_units(self, value, save: bool = True) -> Union[str, int, float]:
-        if save:
-            if "+" in self.key[0]:
-                return str(value)
-            else:
-                unit_ = self.keys[self.key]["unit"]
-                return value.to(unit_).magnitude
-        else:
-            return str(value)
+    # def as_dict(self, **kwargs) -> dict:
+    #     """Convert and return object as dictionary."""
+    #     keys = {k.lstrip("_") for k in vars(self) if "__" not in k}
+    #
+    #     attr = dict()
+    #     for k in keys:
+    #         value = self.__getattribute__(k)
+    #         if isinstance(value, Quantity):
+    #             value = self._to_dict_units(value, **kwargs)
+    #         else:
+    #             value = self._to_dict(value, **kwargs)
+    #         attr[k] = value
+    #
+    #     return attr
+    #
+    # def _to_dict_units(self, value, save: bool = True) -> Union[str, int, float]:
+    #     if save:
+    #         if "+" in self.key[0]:
+    #             return str(value)
+    #         else:
+    #             unit_ = self.keys[self.key]["unit"]
+    #             return value.to(unit_).magnitude
+    #     else:
+    #         return str(value)
 
     def _loading(self, key, value, uncer):
         """ Loading from database; will add units back to numbers"""

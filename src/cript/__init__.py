@@ -41,9 +41,9 @@ from .user import *
 from .group import *
 from .publication import *
 from .collection import *
-from .data import *
 from .experiment import *
 from .inventory import *
+from .data import *
 from .material import *
 from .process import *
 from .simulation import *

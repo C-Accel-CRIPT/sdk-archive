@@ -2,7 +2,6 @@
 Material Node
 
 """
-from json import dumps
 from typing import Union
 
 from . import load, CRIPTError, BaseModel, Cond, Prop
@@ -14,7 +13,7 @@ from .keys.material import *
 class Iden(Serializable):
     def __init__(
             self,
-            c_material=None,
+            c_material: Union[str, "Material"] = None,
             name: str = None,
             names: list[str] = None,
             cas: str = None,
@@ -74,12 +73,6 @@ class Iden(Serializable):
 
         self._c_material = None
         self.c_material = c_material
-
-    def __repr__(self):
-        return dumps(self.dict_cleanup(self.as_dict()), indent=2, sort_keys=True)
-
-    def __str__(self):
-        return dumps(self.dict_cleanup(self.dict_remove_none(self.as_dict())), indent=2, sort_keys=True)
 
     @property
     def name(self):
@@ -182,7 +175,7 @@ class Iden(Serializable):
 
 
 class Material(BaseModel):
-    op_keywords = [k for k in keywords_material_p.keys()] + [k for k in keywords_material.keys()]
+    keys = [k for k in keywords_material_p.keys()] + [k for k in keywords_material.keys()]
     _class = "Material"
 
     def __init__(

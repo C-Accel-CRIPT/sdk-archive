@@ -1,38 +1,51 @@
-from cript import *
+#from cript import *
+import cript as C
 
 db_username = "DW_cript"
 db_password = "YXMaoE1"
 db_project = "cript_testing"
 db_database = "test"
 user = "dylanwal@mit.edu"
-db = CriptDB(db_username, db_password, db_project, db_database, user)
+db = C.CriptDB(db_username, db_password, db_project, db_database, user)
+
+expt_doc = db.view(C.Experiment)
+
+expt = C.load(expt_doc[0])
+
+ingr = [
+    C.Ingr(expt.get("SecBuLi solution"), C.Qty(0.17 * C.Unit("mol"), mat_uid=1), "initiator"),
+    C.Ingr(expt.get("toluene"), C.Qty(10 * C.Unit("ml")), "solvent"),
+    C.Ingr(expt.get("styrene"), C.Qty(0.455 * C.Unit("g")), "monomer"),
+    C.Ingr(expt.get("nBuOH"), C.Qty(5, equiv="secBuLi"), "quench"),
+    C.Ingr(expt.get("MeOH"), C.Qty(100 * C.Unit("ml")), "workup")
+]
+
+ingr = C.Ingr()
+ingr.add(expt.get("SecBuLi solution"), C.Qty(0.17 * C.Unit("mol"), mat_uid=1), "initiator")
+ingr.remove()
+ingr.scale()
+ingr.scale_one()
 
 
-# mat_cHex = Material(
-#     iden=Iden(
-#         name="Cyclohexane",
-#         chem_formula="C6H12",
-#         smiles="C1CCCCC1",
-#         cas="110-82-7",
-#         pubchem_cid="8078",
-#         inchi_key="XDTMQSROBMDMFD-UHFFFAOYSA-N"
-#     ),
-#     prop=[Prop(key="phase", value="liquid"),
-#           Prop(key="color", value="colorless"),
-#           Prop(key="molar_mass", value=84.162 * Unit("g/mol"), method="prescribed"),
-#           Prop(key="density", value=0.7739 * Unit("g/ml"),
-#                cond=[Cond(key="temp", value=20 * Unit("degC"))]
-#                ),
-#           Prop(key="bp", value=80.74 * Unit("degC"),
-#                cond=[Cond(key="pres", value=1 * Unit("atm"))]
-#                ),
-#           Prop(key="mp", value=6.47 * Unit("degC"),
-#                cond=[Cond(key="pres", value=1 * Unit("bar"))]
-#                )
-#           ])
-#
-# db.save(mat_cHex)
-# print(mat_cHex)
+# Generate node
+process = C.Process(
+    name="Anionic of Styrene",
+    ingr=ingr,
+    procedure="In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
+              "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
+              "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
+              "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
+              "precipitation in methanol 3 times and dried under vacuum.",
+    cond=[
+        C.Cond("temp", 25 * C.Unit("degC")),
+        C.Cond("time", 60 * C.Unit("min")),
+        C.Cond(key="atm", value=expt.get("argon"))
+    ],
+    prop=[
+        C.Prop("yield_mass", 0.47 * C.Unit("g"), 0.02 * C.Unit("g"), method="scale")
+    ],
+    keywords=["polymerization", "living_poly", "anionic", "solution"]
+)
 
 ddict = db.view("611db07f3cdaf1d53cdb3b2a")
 a = load(ddict)
