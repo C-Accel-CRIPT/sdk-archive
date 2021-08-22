@@ -3,33 +3,52 @@ Keywords for Process node
 
 """
 
-max_limit = 1.79E308
+from . import float_limit, str_limit
+
 
 Qty_keys = {
     "mass": {
         "type": float,
-        "range": [0, max_limit],
+        "range": [0, float_limit],
         "unit": "g",
         "descr": "mass"
     },
     "vol": {
         "type": float,
-        "range": [0, max_limit],
+        "range": [0, float_limit],
         "unit": "ml",
         "descr": "volume"
     },
     "pres": {
         "type": float,
-        "range": [0, max_limit],
+        "range": [0, float_limit],
         "unit": "kPa",
         "descr": "pressure"
     },
+    "mole": {
+        "type": float,
+        "range": [0, float_limit],
+        "unit": "mole",
+        "descr": "mole"
+    },
     "equiv": {
         "type": float,
-        "range": [0, max_limit],
+        "range": [0, float_limit],
         "unit": "",
         "descr": "equivalence"
     },
+    "molarity": {
+        "type": float,
+        "range": [0, float_limit],
+        "unit": "M",
+        "descr": "molarity"
+    },
+    "mass_frac": {
+        "type": float,
+        "range": [0, 1],
+        "unit": "",
+        "descr": "mass fraction"
+    }
 }
 
 

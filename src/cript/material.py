@@ -3,6 +3,7 @@ Material Node
 
 """
 from typing import Union
+from difflib import SequenceMatcher
 
 from . import load, CRIPTError, BaseModel, Cond, Prop
 from .utils.serializable import Serializable
@@ -359,3 +360,21 @@ class Material(BaseModel):
                 name = name + "." + self.iden[key]["name"]
 
         return name
+
+    def _get_mat_id(self, target: str) -> int:
+        """given a string (likely chemical name) find mat_id."""
+        results = []
+
+        # quick search
+        for _id, mat in self.iden.items():
+            r = SequenceMatcher(None, target, mat["name"]).ratio()
+            if r > 0.95:
+                return _id
+            else:
+                results.append([_id, r])
+
+        if max_ := max([i[1] for i in results]) > 0.8:
+            return [i[0] for i in results if i[1] == max_][0]
+        else:
+            mes = f"'{target}' not found or wasn't close enough to material name."
+            CRIPTError(mes)

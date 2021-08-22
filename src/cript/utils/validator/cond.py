@@ -88,6 +88,9 @@ def _cond_keys_check_value(*args):
     range_ = args[0].keys[args[0].key]["range"]
     unit_ = args[0].keys[args[0].key]["unit"]
 
+    if hasattr(type_, "class_"):
+        type_ = (type_, dict)
+
     if isinstance(args[1], type_):
         pass
     else:

@@ -12,16 +12,22 @@ expt_doc = db.view(C.Experiment)
 
 expt = C.load(expt_doc[0])
 
-ingr = [
-    C.Ingr(expt.get("SecBuLi solution"), C.Qty(0.17 * C.Unit("mol"), mat_uid=1), "initiator"),
-    C.Ingr(expt.get("toluene"), C.Qty(10 * C.Unit("ml")), "solvent"),
-    C.Ingr(expt.get("styrene"), C.Qty(0.455 * C.Unit("g")), "monomer"),
-    C.Ingr(expt.get("nBuOH"), C.Qty(5, equiv="secBuLi"), "quench"),
-    C.Ingr(expt.get("MeOH"), C.Qty(100 * C.Unit("ml")), "workup")
-]
+# ingr = [
+#     C.Ingr(expt.get("SecBuLi solution"), C.Qty(0.17 * C.Unit("mol"), mat_uid=1), "initiator"),
+#     C.Ingr(expt.get("toluene"), C.Qty(10 * C.Unit("ml")), "solvent"),
+#     C.Ingr(expt.get("styrene"), C.Qty(0.455 * C.Unit("g")), "monomer"),
+#     C.Ingr(expt.get("nBuOH"), C.Qty(5, equiv="secBuLi"), "quench"),
+#     C.Ingr(expt.get("MeOH"), C.Qty(100 * C.Unit("ml")), "workup")
+# ]
 
-ingr = C.Ingr()
-ingr.add(expt.get("SecBuLi solution"), C.Qty(0.17 * C.Unit("mol"), mat_uid=1), "initiator")
+ingr = C.Ingr(
+        [expt.get("toluene"), 10 * C.Unit("ml"), "solvent"],
+        [expt.get("styrene"), 0.455 * C.Unit("g"), "monomer"],
+        [expt.get("nBuOH"), 5, "quench", {"ref_ma": "secBuLi"}],
+        [expt.get("MeOH"), 100 * C.Unit("ml"), "workup"]
+)
+
+ingr.add(expt.get("SecBuLi solution"), 0.17 * C.Unit("mol"), "initiator", {"mat_uid": "secBuLi"})
 ingr.remove()
 ingr.scale()
 ingr.scale_one()
