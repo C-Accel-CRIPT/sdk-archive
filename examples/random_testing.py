@@ -25,7 +25,7 @@ inv = C.load(inv_doc[0])
 # ]
 
 ingr = C.Ingr(
-        [expt.get("SecBuLi solution 1.4M cHex"), 0.17 * C.Unit("mol"), "initiator", {"mat_id": "secBuLi"}],
+        [expt.get("SecBuLi solution 1.4"), 0.17 * C.Unit("mol"), "initiator", {"mat_id": "secBuLi"}],
         [expt.get("toluene"), 10 * C.Unit("ml"), "solvent"],
         [expt.get("styrene"), 0.455 * C.Unit("g"), "monomer"],
         [expt.get("1BuOH"), 5, "quench", {"eq_mat": "secBuLi"}],

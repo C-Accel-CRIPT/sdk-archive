@@ -3,18 +3,18 @@ Experiment Node
 
 """
 
-import sys
-from fuzzywuzzy import process
-
-
-from bson import ObjectId
-
 from . import BaseModel, CRIPTError
-import cript as C
+from .utils.external_database_code import GetMaterial
 
 
-class Experiment(BaseModel):
+class ExperimentError(CRIPTError):
+    def __init__(self, *msg):
+        super().__init__(*msg)
 
+
+class Experiment(BaseModel, GetMaterial):
+
+    _error = ExperimentError
     _class = "Experiment"
 
     def __init__(
@@ -67,55 +67,55 @@ class Experiment(BaseModel):
     def c_data(self, c_data):
         self._setter_CRIPT_prop(c_data, "c_data")
 
-    def get(self, str_):
-        mats = self._get_all_mat()
-        if "poly" in str_:
-            scores = []
-            for mat in mats:
-                best_match = 0
-                for iden in mat["iden"].values():
-                    for v in iden.values():
-                        if isinstance(v, list):
-                            for i in v:
-                                if "poly" in v:
-                                    best_match = max([best_match, process.extractOne(str_, v)[1]])
-                        else:
-                            if "poly" in v:
-                                best_match = max([best_match, process.extractOne(str_, v)[1]])
-                scores.append(best_match)
-        else:
-            scores = []
-            for mat in mats:
-                best_match = 0
-                for iden in mat["iden"].values():
-                    for v in iden.values():
-                        if isinstance(v, list):
-                            for i in v:
-                                if "poly" not in v:
-                                    best_match = max([best_match, process.extractOne(str_, v)[1]])
-                        else:
-                            if "poly" not in v:
-                                best_match = max([best_match, process.extractOne(str_, v)[1]])
-                scores.append(best_match)
-
-        best_match_index = scores.index(max(scores))
-        return mats[best_match_index]
-
-    def _get_all_mat(self) -> list[dict]:
-        try:  # Try to find a user node in the Python stack/globals
-            for i in range(100):
-                frames = sys._getframe(i)
-                globals_ = frames.f_globals
-                database = [globals_[k] for k, v in globals_.items() if isinstance(v, C.CriptDB) and k[0] != "_"]
-                if database:
-                    database = database[0]
-                    break
-            else:
-                raise Exception
-            coll = database.db["Material"]
-            uids = [ObjectId(mat["uid"]) for mat in self.c_material]
-            return list(coll.find({"_id" : {"$in" : uids}}))
-
-        except Exception:
-            mes = "Database not found in globals, so 'Material.get()' is not working."
-            raise CRIPTError(mes)
+    # def get(self, str_):
+    #     mats = self._get_all_mat()
+    #     if "poly" in str_:
+    #         scores = []
+    #         for mat in mats:
+    #             best_match = 0
+    #             for iden in mat["iden"].values():
+    #                 for v in iden.values():
+    #                     if isinstance(v, list):
+    #                         for i in v:
+    #                             if "poly" in v:
+    #                                 best_match = max([best_match, process.extractOne(str_, v)[1]])
+    #                     else:
+    #                         if "poly" in v:
+    #                             best_match = max([best_match, process.extractOne(str_, v)[1]])
+    #             scores.append(best_match)
+    #     else:
+    #         scores = []
+    #         for mat in mats:
+    #             best_match = 0
+    #             for iden in mat["iden"].values():
+    #                 for v in iden.values():
+    #                     if isinstance(v, list):
+    #                         for i in v:
+    #                             if "poly" not in v:
+    #                                 best_match = max([best_match, process.extractOne(str_, v)[1]])
+    #                     else:
+    #                         if "poly" not in v:
+    #                             best_match = max([best_match, process.extractOne(str_, v)[1]])
+    #             scores.append(best_match)
+    #
+    #     best_match_index = scores.index(max(scores))
+    #     return mats[best_match_index]
+    #
+    # def _get_all_mat(self) -> list[dict]:
+    #     try:  # Try to find a user node in the Python stack/globals
+    #         for i in range(100):
+    #             frames = sys._getframe(i)
+    #             globals_ = frames.f_globals
+    #             database = [globals_[k] for k, v in globals_.items() if isinstance(v, C.CriptDB) and k[0] != "_"]
+    #             if database:
+    #                 database = database[0]
+    #                 break
+    #         else:
+    #             raise Exception
+    #         coll = database.db["Material"]
+    #         uids = [ObjectId(mat["uid"]) for mat in self.c_material]
+    #         return list(coll.find({"_id" : {"$in" : uids}}))
+    #
+    #     except Exception:
+    #         mes = "Database not found in globals, so 'Material.get()' is not working."
+    #         raise CRIPTError(mes)

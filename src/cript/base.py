@@ -144,7 +144,7 @@ class BaseModel(Serializable, ABC):
         From a filled out node, create reference dictionary.
         :return:
         """
-        ddict = self.as_dict()
+        ddict = self.as_dict(save=False)
         return self._create_reference(ddict)
 
     @staticmethod
@@ -258,3 +258,5 @@ class Load:
 
 
 load = Load()
+
+

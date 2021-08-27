@@ -205,7 +205,7 @@ class CriptDB:
         self._obj_reference_check(obj)
 
         # convert to dictionary
-        doc = obj.as_dict()
+        doc = obj.as_dict(save=True)
 
         # remove empty id
         doc["_id"] = doc.pop("uid")

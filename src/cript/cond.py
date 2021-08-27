@@ -21,7 +21,7 @@ class Cond(SerializableSub, KeyPrinting):
             key: str,
             value=None,
             uncer: Union[float, int, Quantity] = None,
-            data_uid=None,
+            data_uid: str = None,
             _loading: bool = False
     ):
         """
@@ -62,7 +62,6 @@ class Cond(SerializableSub, KeyPrinting):
 
     @value.setter
     @cond_keys_check
-    @type_check_property
     def value(self, value):
         if isinstance(value, self.cript_types["Material"]):
             value = value._reference()
