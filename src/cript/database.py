@@ -358,7 +358,8 @@ class CriptDB:
             pass
 
         elif obj.class_ == "Inventory":
-            pass
+            parent_obj_types = ["Group", "Collection"]
+            self._parent_obj_check(obj, parent_obj, parent_obj_types)
 
         elif obj.class_ == "Publication":
             pass
@@ -445,6 +446,16 @@ class CriptDB:
                     self.update(i)
             elif parent_obj is None:
                 pass
+            else:
+                setattr(parent_obj, attr, obj)
+                self.update(parent_obj)
+
+        elif obj.class_ == "Inventory":
+            attr = "c_" + obj.class_.lower()
+            if isinstance(parent_obj, list):
+                for i in parent_obj:
+                    setattr(i, attr, obj)
+                    self.update(i)
             else:
                 setattr(parent_obj, attr, obj)
                 self.update(parent_obj)

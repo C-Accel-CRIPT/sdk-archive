@@ -5,7 +5,7 @@ Condition Keywords
 
 from typing import Union
 
-from . import Quantity, Unit
+from . import Quantity, Unit, load
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.validator.cond import cond_keys_check
 from .utils.serializable import SerializableSub
@@ -65,6 +65,9 @@ class Cond(SerializableSub, KeyPrinting):
     @type_check_property
     def value(self, value):
         if isinstance(value, self.cript_types["Material"]):
+            value = value._reference()
+        elif isinstance(value, dict) and "class_" in value.keys():
+            value = load(value)
             value = value._reference()
         self._value = value
 

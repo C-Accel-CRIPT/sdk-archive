@@ -1,21 +1,20 @@
 from abc import ABC
 from datetime import datetime
+from bson import ObjectId
 from json import dumps
 from typing import Union
 
 from .. import Quantity
 
 
-
-
 class Serializable(ABC):
     """Base abstract class for a serializable object."""
 
     def __repr__(self):
-        return dumps(self.dict_cleanup(self.as_dict(save=False)), indent=2, sort_keys=True)
+        return dumps(self.dict_cleanup(self.as_dict(save=False)), indent=2, sort_keys=False)
 
     def __str__(self):
-        return dumps(self.dict_remove_none(self.dict_cleanup(self.as_dict(save=False))), indent=2, sort_keys=True)
+        return dumps(self.dict_remove_none(self.dict_cleanup(self.as_dict(save=False))), indent=2, sort_keys=False)
 
     def as_dict(self, **kwargs) -> dict:
         """Convert and return object as dictionary."""
@@ -35,7 +34,6 @@ class Serializable(ABC):
             return [Serializable._to_dict(i, **kwargs) for i in obj]
         elif hasattr(obj, "as_dict"):
             return obj.as_dict(**kwargs)
-
         else:
             return obj
 
@@ -76,9 +74,11 @@ class Serializable(ABC):
             return [Serializable._loop_through(i) for i in obj]
         elif isinstance(obj, dict):
             return Serializable.dict_cleanup(obj)
-        elif type(obj) is datetime:
+        elif isinstance(obj, datetime):
             return str(obj)
-        elif type(obj) is Quantity:
+        elif isinstance(obj, ObjectId):
+            return str(obj)
+        elif isinstance(obj, Quantity):
             return str(obj)
         else:
             return obj

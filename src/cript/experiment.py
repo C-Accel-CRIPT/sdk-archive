@@ -4,7 +4,8 @@ Experiment Node
 """
 
 import sys
-from difflib import SequenceMatcher
+from fuzzywuzzy import process
+
 
 from bson import ObjectId
 
@@ -77,10 +78,10 @@ class Experiment(BaseModel):
                         if isinstance(v, list):
                             for i in v:
                                 if "poly" in v:
-                                    best_match = max([best_match, SequenceMatcher(None, str_, v).ratio()])
+                                    best_match = max([best_match, process.extractOne(str_, v)[1]])
                         else:
                             if "poly" in v:
-                                best_match = max([best_match, SequenceMatcher(None, str_, v).ratio()])
+                                best_match = max([best_match, process.extractOne(str_, v)[1]])
                 scores.append(best_match)
         else:
             scores = []
@@ -91,10 +92,10 @@ class Experiment(BaseModel):
                         if isinstance(v, list):
                             for i in v:
                                 if "poly" not in v:
-                                    best_match = max([best_match, SequenceMatcher(None, str_, v).ratio()])
+                                    best_match = max([best_match, process.extractOne(str_, v)[1]])
                         else:
                             if "poly" not in v:
-                                best_match = max([best_match, SequenceMatcher(None, str_, v).ratio()])
+                                best_match = max([best_match, process.extractOne(str_, v)[1]])
                 scores.append(best_match)
 
         best_match_index = scores.index(max(scores))

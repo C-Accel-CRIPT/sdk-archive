@@ -233,7 +233,7 @@ mat_thf = C.Material(
 mat_nBuOH = C.Material(
     iden=C.Iden(
         name="1-butanol",
-        names=["n-butanol", "n-butyl alcohol", "1-butyl alcohol"],
+        names=["n-butanol", "n-butyl alcohol", "1-butyl alcohol", "nBuOH"],
         chem_formula="C4H10O",
         smiles="OCCCC",
         cas="71-36-3",
@@ -262,7 +262,7 @@ mat_nBuOH = C.Material(
 
 mat_MeOH = C.Material(
     iden=C.Iden(
-        name="Methanol",
+        name="methanol",
         names=["Methyl alcohol", "CH3OH", "MeOH"],
         chem_formula="CH4O",
         smiles="CO",
@@ -292,7 +292,7 @@ mat_MeOH = C.Material(
 
 mat_cHex = C.Material(
     iden=C.Iden(
-        name="Cyclohexane",
+        name="cyclohexane",
         chem_formula="C6H12",
         smiles="C1CCCCC1",
         cas="110-82-7",
@@ -360,13 +360,21 @@ db.save(mat_solution, [expt, inventory])
 ########################################################################
 
 
-ingr = [
-    C.Ingr(expt.get("SecBuLi solution"), type_="initiator", qty=C.Qty(0.17 * C.Unit("mol"), mat_id="secBuLi")),
-    C.Ingr(inventory.get("toluene"), type_="solvent", qty=C.Qty(10 * C.Unit("ml"))),
-    C.Ingr(mat_styrene, type_="monomer", qty=C.Qty(0.455 * C.Unit("g"))),
-    C.Ingr(mat_nBuOH, type_="quench", qty=C.Qty(5, equiv="secBuLi")),
-    C.Ingr(mat_MeOH, type_="workup", qty=C.Qty(100 * C.Unit("ml")))
-]
+ingr = C.Ingr(
+        [expt.get("SecBuLi solution 1.4M cHex"), 0.17 * C.Unit("mol"), "initiator", {"mat_id": "secBuLi"}],
+        [expt.get("toluene"), 10 * C.Unit("ml"), "solvent"],
+        [expt.get("styrene"), 0.455 * C.Unit("g"), "monomer"],
+        [expt.get("1BuOH"), 5, "quench", {"eq_mat": "secBuLi"}],
+        [expt.get("MeOH"), 100 * C.Unit("ml"), "workup"]
+)
+
+# ingr = [
+#     C.Ingr(expt.get("SecBuLi solution"), type_="initiator", qty=C.Qty(0.17 * C.Unit("mol"), mat_id="secBuLi")),
+#     C.Ingr(inventory.get("toluene"), type_="solvent", qty=C.Qty(10 * C.Unit("ml"))),
+#     C.Ingr(mat_styrene, type_="monomer", qty=C.Qty(0.455 * C.Unit("g"))),
+#     C.Ingr(mat_nBuOH, type_="quench", qty=C.Qty(5, equiv="secBuLi")),
+#     C.Ingr(mat_MeOH, type_="workup", qty=C.Qty(100 * C.Unit("ml")))
+# ]
 
 # Generate node
 process = C.Process(

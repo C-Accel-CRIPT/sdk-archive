@@ -12,6 +12,10 @@ expt_doc = db.view(C.Experiment)
 
 expt = C.load(expt_doc[0])
 
+inv_doc = db.view(C.Inventory)
+
+inv = C.load(inv_doc[0])
+
 # ingr = [
 #     C.Ingr(expt.get("SecBuLi solution"), C.Qty(0.17 * C.Unit("mol"), mat_uid=1), "initiator"),
 #     C.Ingr(expt.get("toluene"), C.Qty(10 * C.Unit("ml")), "solvent"),
@@ -21,16 +25,19 @@ expt = C.load(expt_doc[0])
 # ]
 
 ingr = C.Ingr(
+        [expt.get("SecBuLi solution 1.4M cHex"), 0.17 * C.Unit("mol"), "initiator", {"mat_id": "secBuLi"}],
         [expt.get("toluene"), 10 * C.Unit("ml"), "solvent"],
         [expt.get("styrene"), 0.455 * C.Unit("g"), "monomer"],
-        [expt.get("nBuOH"), 5, "quench", {"ref_ma": "secBuLi"}],
+        [expt.get("1BuOH"), 5, "quench", {"eq_mat": "secBuLi"}],
         [expt.get("MeOH"), 100 * C.Unit("ml"), "workup"]
 )
 
-ingr.add(expt.get("SecBuLi solution"), 0.17 * C.Unit("mol"), "initiator", {"mat_uid": "secBuLi"})
-ingr.remove()
-ingr.scale()
-ingr.scale_one()
+# sec_buLi = db.view(expt.c_material[7]["uid"])
+#
+# ingr.add(sec_buLi, 0.17 * C.Unit("ml"), "initiator", mat_id="secBuLi")
+# ingr.remove("MeOH")
+# ingr.scale(2)
+# ingr.scale_one("styrene", 2)
 
 
 # Generate node
@@ -45,7 +52,7 @@ process = C.Process(
     cond=[
         C.Cond("temp", 25 * C.Unit("degC")),
         C.Cond("time", 60 * C.Unit("min")),
-        C.Cond(key="atm", value=expt.get("argon"))
+        C.Cond(key="atm", value=inv.get("argon"))
     ],
     prop=[
         C.Prop("yield_mass", 0.47 * C.Unit("g"), 0.02 * C.Unit("g"), method="scale")
@@ -53,8 +60,7 @@ process = C.Process(
     keywords=["polymerization", "living_poly", "anionic", "solution"]
 )
 
-ddict = db.view("611db07f3cdaf1d53cdb3b2a")
-a = load(ddict)
-print(a)
+
+print(process)
 print("hi")
 

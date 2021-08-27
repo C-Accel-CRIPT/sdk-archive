@@ -1,10 +1,12 @@
+from typing import Union
 
-from .. import Quantity, Unit, CRIPTError, CRIPTWarning
+from .. import Quantity, Unit, CRIPTError
 from ..keys.process import Qty_keys
 
 default_density = 1 * Unit("g/ml")
 
-class UnitError(Exception):
+
+class UnitError(CRIPTError):
     def __init__(self, opt1, opt2=None):
         if opt2 is None:
             self.message = opt1
@@ -113,7 +115,6 @@ def approx_same_in_dict(ingr: dict, qty: Quantity, param: str):
 
 
 def ingr_calc_mass_vol_mole(ingr: dict) -> dict:
-
     if "mass" in ingr.keys():
         if "density" in ingr.keys():
             vol = mass_to_vol(ingr["mass"], ingr["density"])
@@ -127,8 +128,8 @@ def ingr_calc_mass_vol_mole(ingr: dict) -> dict:
             ingr["mole"] = mole
 
     elif "mole" in ingr.keys():
-        if "conc" in ingr.keys():
-            vol = mole_to_vol(ingr["mole"], ingr["conc"])
+        if "molar_conc" in ingr.keys():
+            vol = mole_to_vol(ingr["mole"], ingr["molar_conc"])
             _range_check(vol)
             approx_same_in_dict(ingr, vol, "vol")
             ingr["vol"] = vol
@@ -144,8 +145,8 @@ def ingr_calc_mass_vol_mole(ingr: dict) -> dict:
             ingr["vol"] = vol
 
     elif "vol" in ingr.keys():
-        if "conc" in ingr.keys():
-            mole = vol_to_mole_conc(ingr["vol"], ingr["conc"])
+        if "molar_conc" in ingr.keys():
+            mole = vol_to_mole_conc(ingr["vol"], ingr["molar_conc"])
             _range_check(mole)
             approx_same_in_dict(ingr, mole, "mole")
             ingr["mole"] = mole
@@ -240,3 +241,15 @@ def ingr_generator(ingr: list[dict], minus: list[str] = None):
     for i in ingr:
         if i["keyword"] not in minus:
             yield i
+
+
+def scale_one(ingr: dict, factor: Union[int, float]) -> dict:
+    keys_to_be_scaled = ["mass", "vol", "moles"]
+    flag = True
+    for k in keys_to_be_scaled:
+        if k in ingr.keys():
+            ingr[k] = ingr[k] * factor
+            flag = False
+
+
+    return ingr

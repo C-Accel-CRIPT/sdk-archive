@@ -45,6 +45,13 @@ class Iden(Serializable):
         self._name = None
         self.name = name
 
+        # adding name to names
+        if names is None:
+            names = [name]
+        elif isinstance(names, list):
+            if name not in names:
+                names.append(name)
+
         self._names = None
         self.names = names
 

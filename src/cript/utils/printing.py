@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+QUANTITY_LENGTH = 10
 
 # limits of printout length
 label_length = {
@@ -11,7 +12,14 @@ label_length = {
     "range": 25,
     "unit": 12,
     "descr": 50,
-    "names": 30
+    "names": 30,
+    "mass": QUANTITY_LENGTH,
+    "vol": QUANTITY_LENGTH,
+    "pres": QUANTITY_LENGTH,
+    "mole": QUANTITY_LENGTH,
+    "equiv": QUANTITY_LENGTH,
+    "molarity": QUANTITY_LENGTH,
+    "mass_frac": QUANTITY_LENGTH
 }
 
 window = 150

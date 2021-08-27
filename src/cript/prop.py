@@ -166,31 +166,6 @@ class Prop(SerializableSub, KeyPrinting):
         text = cls.to_table(cls.keys_rxn)
         print(text)
 
-    # def as_dict(self, **kwargs) -> dict:
-    #     """Convert and return object as dictionary."""
-    #     keys = {k.lstrip("_") for k in vars(self) if "__" not in k}
-    #
-    #     attr = dict()
-    #     for k in keys:
-    #         value = self.__getattribute__(k)
-    #         if isinstance(value, Quantity):
-    #             value = self._to_dict_units(value, **kwargs)
-    #         else:
-    #             value = self._to_dict(value, **kwargs)
-    #         attr[k] = value
-    #
-    #     return attr
-    #
-    # def _to_dict_units(self, value, save: bool = True) -> Union[str, int, float]:
-    #     if save:
-    #         if "+" in self.key[0]:
-    #             return str(value)
-    #         else:
-    #             unit_ = self.keys[self.key]["unit"]
-    #             return value.to(unit_).magnitude
-    #     else:
-    #         return str(value)
-
     def _loading(self, key, value, uncer):
         """ Loading from database; will add units back to numbers"""
         if "+" in key:

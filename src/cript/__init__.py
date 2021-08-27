@@ -3,7 +3,7 @@ import pkg_resources
 __all__ = [
     "VERSION", "__version__", "__short_version__", "Unit", "load", "CriptDB",
     "User", "Group", "Collection", "Publication", "Experiment", "Material", "Process", "Data",
-    "Inventory", "Simulation", "Cond", "Prop", "Qty", "Ingr", "Iden"
+    "Inventory", "Simulation", "Cond", "Prop", "Ingr", "Iden"
 ]
 
 

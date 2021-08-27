@@ -4,179 +4,62 @@ Process Node
 """
 from typing import Union
 
-
-from pint.errors import DimensionalityError
+from fuzzywuzzy import process
 
 from . import BaseModel, Cond, Prop, Unit, Quantity, CRIPTError, CRIPTWarning, Material, load
 from .utils.serializable import Serializable, SerializableSub
 from .utils.printing import KeyPrinting
 from .keys.process import *
-from .utils.ingr_calc import unit_check_bool, ingr_calc_mass_vol_mole, unit_to_qty_key, ingr_equiv_molarity_mass_frac
-
-# class Qty(SerializableSub, KeyPrinting):
-#     keys = Qty_keys
-#
-#     def __init__(
-#             self,
-#             value: Union[Quantity, int, float],
-#             uncer: Union[Quantity, int, float] = None,
-#             equiv: str = None,
-#             mat_uid: int = None,
-#             _key: str = None
-#     ):
-#         """
-#
-#         :param value:
-#         :param uncer:
-#         """
-#
-#         self._equiv = None
-#         self.equiv = equiv
-#
-#         self._mat_uid = None
-#         self.mat_uid = mat_uid
-#
-#         self._value = None
-#         self.value = value
-#
-#         self._uncer = None
-#         self.uncer = uncer
-#
-#         self._key = None
-#         if _key:
-#             if isinstance(_key, str) and _key in self.keys.keys():
-#                 self.key = _key
-#         else:
-#             self.key = self._get_key()
-#
-#     def __repr__(self):
-#         return self._create_str()
-#
-#     def __str__(self):
-#         return self._create_str()
-#
-#     @property
-#     def value(self):
-#         return self._value
-#
-#     @value.setter
-#     def value(self, value):
-#         if isinstance(value, (int, float)):
-#             if self.equiv is None:
-#                 mes = "You must add units or use 'equiv'."
-#                 raise CRIPTError(mes)
-#         self._value = value
-#
-#     @property
-#     def uncer(self):
-#         return self._uncer
-#
-#     @uncer.setter
-#     def uncer(self, uncer):
-#         self._uncer = uncer
-#
-#     @property
-#     def equiv(self):
-#         return self._equiv
-#
-#     @equiv.setter
-#     def equiv(self, equiv):
-#         self._equiv = equiv
-#
-#     @property
-#     def mat_uid(self):
-#         return self._mat_uid
-#
-#     @mat_uid.setter
-#     def mat_uid(self, mat_uid):
-#         self._mat_uid = mat_uid
-#
-#     @property
-#     def key(self):
-#         return self._key
-#
-#     @key.setter
-#     def key(self, key):
-#         self._key = key
-#
-#     def _loading(self, value, uncer):
-#         return value, uncer
-#
-#     def _get_key(self) -> str:
-#         """
-#         It will use the units on self.value to determine the key for self.keys.
-#         """
-#         if isinstance(self.value, Quantity):
-#             for k, v in self.keys.items():
-#                 try:
-#                     if u := v["unit"]:
-#                         self.value.to(u)
-#                     return k
-#                 except DimensionalityError:
-#                     pass
-#
-#     def _create_str(self) -> str:
-#         """
-#         Creates a nice string print out.
-#         """
-#         text_out = ""
-#         if isinstance(self.value, Quantity):
-#             text_out += f"{self.value.magnitude}"
-#             if self.uncer is not None:
-#                 text_out += f" +-{self.uncer.to(self.value.units).magnitude}"
-#             text_out += f" {self.value.units}"
-#
-#         elif isinstance(self.value, (float, int)):
-#             text_out += f"{self.value}"
-#             if self.uncer is not None:
-#                 text_out += f" +-{self.uncer}"
-#             if self.equiv is not None:
-#                 text_out += f" '{self.equiv}'"
-#
-#         if self.mat_uid is not None:
-#             text_out += f" (mat: {self.mat_uid})"
-#
-#         return text_out
+from .utils.ingr_calc import unit_check_bool, ingr_calc_mass_vol_mole, unit_to_qty_key, ingr_equiv_molarity_mass_frac, scale_one
 
 
-class Ingr(Serializable, KeyPrinting):
+class ProcessError(CRIPTError):
+    def __init__(self, *msg):
+        super().__init__(*msg)
+
+
+class IngrError(CRIPTError):
+    def __init__(self, *msg):
+        super().__init__(*msg)
+
+
+class Ingr(KeyPrinting):
     keys = Ingr_keys
     keys_Qty = Qty_keys
 
-    def __init__(
-            self,
-            *args,
-            **kwargs
-    ):
+    def __init__(self, *args, **kwargs):
         """
+        Functions: add, remove, scale, scale_one
+        __init__ calls add
 
+        :param see add function
         """
-
-        # if _key:
-        #     value = self._loading(value, uncer)
 
         self._ingr = []
 
+        # Load existing ingr
+        # if _key:
+        #     value = self._loading(value, uncer)
+
+        # add ingrs
         for arg in args:
+            kwarg = {}
             if isinstance(arg, list):
-                self.add(*arg)
+                for i, a in enumerate(arg):  # get keyword arguments
+                    if isinstance(a, dict) and len(a.keys()) == 1:
+                        kwarg = kwarg | arg.pop(i)
+                self.add(*arg, **kwarg)
 
     def __repr__(self):
         return ""
 
     def __str__(self):
-        return self.table()
+        return self._table()
 
-    def add(
-            self,
-            mat: Union[Material],
-            qty: Union[int, float, Quantity],
-            keyword: str = None,
-            eq_mat=None,
-            mat_id=None,
-            ):
+    def add(self, mat: Union[Material], qty: Union[int, float, Quantity], keyword: str = None,
+            eq_mat=None, mat_id=None):
         """
-
+        Adds mat to Ingr and performs calculations for the other quantities.
         :param mat:
         :param qty:
         :param keyword:
@@ -188,16 +71,16 @@ class Ingr(Serializable, KeyPrinting):
         # check if Material is valid input
         if isinstance(mat, Material):
             mat_ref = mat._referance()
-        elif isinstance(mat, dict) and isinstance(mat := load(mat), Material):
-                mat_ref = mat._reference()
+        elif isinstance(mat, dict) and "class_" in mat.keys() and isinstance(mat := load(mat), Material):
+            mat_ref = mat._reference()
         else:
             mes = "Invalid 'mat'"
-            raise CRIPTError(mes)
+            raise IngrError(mes)
 
         # check if Material already added
         if mat_ref["uid"] in [i["uid"] for i in self._ingr]:
             mes = f"'{mat_ref['name']}' is already an ingredient."
-            raise CRIPTError(mes)
+            raise IngrError(mes)
 
         # Add material
         new_ingr = mat_ref
@@ -210,13 +93,12 @@ class Ingr(Serializable, KeyPrinting):
             new_ingr["keyword"] = keyword
         else:
             mes = f"'{keyword}' is an invalid keyword. Valid keywords are: {list[self.keys.keys()]}"
-            CRIPTError(mes)
+            raise IngrError(mes)
 
         # Add mass, vol, mole
         if isinstance(qty, Quantity) and unit_check_bool(qty, Unit("kPa")) and eq_mat is None:
             new_ingr["pres"] = qty
             self._ingr.append(new_ingr)
-            return
 
         elif isinstance(qty, Quantity) and eq_mat is None:
             key = unit_to_qty_key(qty)
@@ -224,29 +106,84 @@ class Ingr(Serializable, KeyPrinting):
             new_ingr = ingr_calc_mass_vol_mole(new_ingr)
             self._ingr.append(new_ingr)
             self._ingr = ingr_equiv_molarity_mass_frac(self._ingr)
-            return
 
-        elif isinstance(qty, (float, int)) and eq_mat is None:
-            if isinstance(eq_mat, int):
-                qty = self._ingr[eq_mat]["moles"] * qty
-            elif isinstance(eq_mat, str):
-                pass
-                qty = self._ingr[eq_mat]["moles"] * qty
+        elif isinstance(qty, (float, int)) and eq_mat is not None:
+            if isinstance(eq_mat, int):  # given the material index
+                qty = self._ingr[eq_mat]["mole"] * qty
+            elif isinstance(eq_mat, str):  # get material index based on name
+                mat_index = self.get_mat_index(eq_mat)
+                qty = self._ingr[mat_index]["mole"] * qty
             elif isinstance(eq_mat, Material):
-                pass
+                target = eq_mat.name
+                mat_index = self.get_mat_index(target)
+                qty = self._ingr[mat_index]["mole"] * qty
             else:
                 pass
 
+            key = unit_to_qty_key(qty)
+            new_ingr[key] = qty
+            new_ingr = ingr_calc_mass_vol_mole(new_ingr)
             self._ingr.append(new_ingr)
-            return
+            self._ingr = ingr_equiv_molarity_mass_frac(self._ingr)
 
         else:
             mes = "Invaid"
-            CRIPTError(mes)
+            raise IngrError(mes)
+
+    def remove(self, mat: Union[int, str]):
+        """
+        Removes mat from ingr
+        :param mat: material to be scaled
+        :param factor: scale factor
+        """
+        if isinstance(mat, int) and mat <= len(self._ingr):
+            del self._ingr[mat]
+        elif isinstance(mat, str):
+            mat = self.get_mat_index(mat)
+            del self._ingr[mat]
+        else:
+            mes = f"'{mat}' invalid"
+            raise IngrError(mes)
+
+    def scale(self, factor: Union[int, float]):
+        """
+        Scales all ingredients' mass, volume, moles by a factor.
+        :param factor: scale factor
+        """
+        for i in range(len(self._ingr)):
+            self.scale_one(i, factor)
+
+    def scale_one(self, mat: Union[int, str], factor: Union[int, float]):
+        """
+        Scales one ingredient's mass, volume, moles by a factor.
+        :param mat: material to be scaled
+        :param factor: scale factor
+        """
+        if isinstance(mat, int) and mat <= len(self._ingr):
+            self._ingr[mat] = scale_one(self._ingr[mat], factor)
+        elif isinstance(mat, str):
+            mat = self.get_mat_index(mat)
+            self._ingr[mat] = scale_one(self._ingr[mat], factor)
+
+    def as_dict(self, save: False) -> list[dict]:
+        out = []
+        keys = ["uid", "name"] + list(self.keys_Qty.keys())
+        for ingr in self._ingr:
+            ingr_dict = {}
+            for k in keys:
+                if k in ingr.keys():
+                    value = ingr[k]
+                    if isinstance(value, Quantity):
+                        value = value.to(self.keys_Qty[k]["unit"]).magnitude
+                    ingr_dict[k] = value
+
+            out.append(ingr_dict)
+
+        return out
 
     @staticmethod
     def _get_mat_prop(mat, mat_id=None) -> dict:
-        mat_prop = Ingr._get_prop_from_mat_id(mat, ["phase", "molar_mass", "m_n", "conc", "density"])
+        mat_prop = Ingr._get_prop_from_mat_id(mat, ["phase", "molar_mass", "m_n", "molar_conc", "density"])
         if mat_id is not None:
             if isinstance(mat_id, str):
                 mat_id = mat._get_mat_id(mat_id)
@@ -254,9 +191,9 @@ class Ingr(Serializable, KeyPrinting):
                 pass  # Good mat_id provided
             else:
                 mes = "Invalid mat_id."
-                raise CRIPTError(mes)
+                raise IngrError(mes)
             # this can add or overwrite bulk props
-            mat_prop_2 = Ingr._get_prop_from_mat_id(mat, ["molar_mass", "m_n", "conc", "density"], mat_id)
+            mat_prop_2 = Ingr._get_prop_from_mat_id(mat, ["molar_mass", "m_n", "molar_conc", "density"], mat_id)
             if mat_prop_2 == {}:
                 mes = f"'mat_id' for {mat.name} found no properties to assist with ingredient calculations."
                 CRIPTWarning(mes)
@@ -274,14 +211,46 @@ class Ingr(Serializable, KeyPrinting):
                 out[p[0]] = p[1]
         return out
 
-    def table(self) -> str:
-        headers_list = list(Qty_keys.keys())
-        row_format = "{:<30}" * len(headers_list)
-        text_out = row_format.format(*headers_list)
-        for k, v in self.qty:
-            text_out += "\n"
+    def _table(self) -> str:
+
+        if len(self._ingr) == 0:
+            print("No ingredients.")
+
+        headers = self._table_headers()
+        row_format = ""
+        for i in headers:
+            row_format = row_format + self._label_length(i)
+        text_out = row_format.format(*headers)
+        text_out = text_out + "\n" + "-" * 150
+        for ingr in self._ingr:
+            entries = []
+            for k in headers:
+                if k in ingr.keys():
+                    entries.append(self._length_limit(k, str(ingr[k])))
+                else:
+                    entries.append("-")
+
+            text_out = text_out + "\n" + row_format.format(k, *entries)
 
         return text_out
+
+    def _table_headers(self):
+        headers = list(Qty_keys.keys())
+        for ingr in self._ingr:
+            for k in ingr.keys():
+                if k not in headers:
+                    headers.append(k)
+
+        return headers
+
+    def get_mat_index(self, target: str):
+        names = [i["name"] for i in self._ingr]
+        closest_name, score = process.extractOne(target, names,)
+        if score < 0.5:
+            mes = f"No match to '{target}' found in ingredients. Try a different writing of the chemical name."
+            raise IngrError(mes)
+
+        return names.index(closest_name)
 
 
 class Process(BaseModel):
@@ -291,7 +260,7 @@ class Process(BaseModel):
     def __init__(
             self,
             name: str,
-            ingr: list[Ingr],
+            ingr: Ingr,
             procedure: str,
             cond: list[Cond],
             prop: list[Prop] = None,
