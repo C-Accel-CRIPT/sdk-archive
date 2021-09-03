@@ -28,3 +28,4 @@ To rebuild cript and refresh:
 tutorials:
 * advanced searching
 * publications
+* tracking views of documents

@@ -26,6 +26,7 @@ class IngrError(CRIPTError):
 class Ingr(KeyPrinting):
     keys = Ingr_keys
     keys_Qty = Qty_keys
+    _error = IngrError
 
     def __init__(self, *args, **kwargs):
         """
@@ -75,12 +76,12 @@ class Ingr(KeyPrinting):
             mat_ref = mat._reference()
         else:
             mes = "Invalid 'mat'"
-            raise IngrError(mes)
+            raise self._error(mes)
 
         # check if Material already added
         if mat_ref["uid"] in [i["uid"] for i in self._ingr]:
             mes = f"'{mat_ref['name']}' is already an ingredient."
-            raise IngrError(mes)
+            raise self._error(mes)
 
         # Add material
         new_ingr = mat_ref
@@ -93,7 +94,7 @@ class Ingr(KeyPrinting):
             new_ingr["keyword"] = keyword
         else:
             mes = f"'{keyword}' is an invalid keyword. Valid keywords are: {list[self.keys.keys()]}"
-            raise IngrError(mes)
+            raise self._error(mes)
 
         # Add mass, vol, mole
         if isinstance(qty, Quantity) and unit_check_bool(qty, Unit("kPa")) and eq_mat is None:
@@ -143,7 +144,7 @@ class Ingr(KeyPrinting):
             del self._ingr[mat]
         else:
             mes = f"'{mat}' invalid"
-            raise IngrError(mes)
+            raise self._error(mes)
 
     def scale(self, factor: Union[int, float]):
         """
@@ -256,6 +257,7 @@ class Ingr(KeyPrinting):
 class Process(BaseModel):
     keys = Process_keys
     _class = "Process"
+    _error = ProcessError
 
     def __init__(
             self,

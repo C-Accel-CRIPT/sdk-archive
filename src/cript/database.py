@@ -9,16 +9,23 @@ from typing import Union
 from pymongo import MongoClient, errors
 from bson import ObjectId
 from jsonpatch import JsonPatch
+from gridfs import GridFS
 
 from cript.utils.validator.type_check import *
 from .utils.database_tools import *
-from . import load, CRIPTError, User
+from . import load, CRIPTError, User, File
+
+
+class CriptDBError(CRIPTError):
+    def __init__(self, *msg):
+        super().__init__(*msg)
 
 
 class CriptDB:
     cript_types = None
     instances = 0
     user_update = 0
+    _error = CriptDBError
 
     def __init__(self,
                  db_username: str,
@@ -52,7 +59,7 @@ class CriptDB:
             self.client.server_info()  # test database connection
         except errors.ServerSelectionTimeoutError:
             msg = "Connection to database failed.\n\n"
-            raise CRIPTError(msg)
+            raise self._error(msg)
 
         self.op_print = op_print
         if self.op_print:
@@ -107,7 +114,7 @@ class CriptDB:
         else:
             msg = f"User login failed due to invalid object ({user}) passed to user. " \
                   f"(accepted values: email or uid or user node 'after being saved')\n\n"
-            raise CRIPTError(msg)
+            raise self._error(msg)
 
         if self.op_print:
             print(f"Login as '{self.user.name}' was successful.")
@@ -122,7 +129,7 @@ class CriptDB:
         doc = coll.find_one({"email": email})
         if doc is None:
             msg = f"{email} not found in database."
-            raise CRIPTError(msg)
+            raise self._error(msg)
 
         return load(doc)
 
@@ -136,7 +143,7 @@ class CriptDB:
         doc = coll.find_one({"_id": ObjectId(uid)})
         if doc is None:
             msg = f"{uid} not found in database."
-            raise CRIPTError(msg)
+            raise self._error(msg)
 
         return load(doc)
 
@@ -248,10 +255,10 @@ class CriptDB:
                             new_value.append(node._reference())
                         else:
                             msg = f"'{item}' in '{key}' not found in database."
-                            raise CRIPTError(msg)
+                            raise self._error(msg)
                     else:
                         msg = f"'{item}' in '{key}' is an invalid object type."
-                        raise CRIPTError(msg)
+                        raise self._error(msg)
 
                 setattr(obj, key, "_clear")
                 setattr(obj, key, new_value)
@@ -280,10 +287,10 @@ class CriptDB:
                             new_value.append(node._reference())
                         else:
                             msg = f"'{item}' in '{key}' not found in database."
-                            raise CRIPTError(msg)
+                            raise self._error(msg)
                     else:
                         msg = f"'{item}' in '{key}' is an invalid object type."
-                        raise CRIPTError(msg)
+                        raise self._error(msg)
 
                 doc[key] = new_value
 
@@ -296,7 +303,7 @@ class CriptDB:
         # General checks
         if not isinstance(obj, tuple(self.cript_types.values())):
             msg = f"{obj} is not a valid CRIPT node."
-            raise CRIPTError(msg)
+            raise self._error(msg)
 
         if isinstance(parent_obj, tuple(self.cript_types.values())) or parent_obj is None:
             pass
@@ -306,26 +313,26 @@ class CriptDB:
                     pass
                 else:
                     msg = f"{i} is not a valid CRIPT node for {obj.name}."
-                    raise CRIPTError(msg)
+                    raise self._error(msg)
         else:
             msg = f"{parent_obj} is not a valid CRIPT node."
-            raise CRIPTError(msg)
+            raise self._error(msg)
 
         if obj.uid is not None:
             msg = "uid should not have an id already. If you are trying to update an existing doc, "\
                             "don't use 'save', use 'update'."
-            raise CRIPTError(msg)
+            raise self._error(msg)
 
         if parent_obj is not None:
             if isinstance(parent_obj, list):
                 for i in parent_obj:
                     if i.uid is None:
                         msg = f"{i.name} needs to be saved first."
-                        raise CRIPTError(msg)
+                        raise self._error(msg)
             else:
                 if parent_obj.uid is None:
                     msg = f"{parent_obj.name} needs to be saved first."
-                    raise CRIPTError(msg)
+                    raise self._error(msg)
 
         # Class specific checks.
         if obj.class_ == "User":
@@ -333,7 +340,7 @@ class CriptDB:
             # must have unique email address
             if coll.find_one({"email": obj.email}) is not None:
                 msg = f"{obj.email} is already registered in the database."
-                raise CRIPTError(msg)
+                raise self._error(msg)
 
         elif obj.class_ == "Group":
             obj.c_owner = self.user._reference()
@@ -355,7 +362,9 @@ class CriptDB:
             self._parent_obj_check(obj, parent_obj, parent_obj_types)
 
         elif obj.class_ == "Data":
-            pass
+            parent_obj_types = ["Experiment", "Material", "Process"]
+            self._parent_obj_check(obj, parent_obj, parent_obj_types)
+            obj = self._save_file(obj)
 
         elif obj.class_ == "Inventory":
             parent_obj_types = ["Group", "Collection"]
@@ -366,10 +375,9 @@ class CriptDB:
 
         else:
             msg = f"{obj.class_} cannot be saved by itself."
-            raise CRIPTError(msg)
+            raise self._error(msg)
 
-    @staticmethod
-    def _parent_obj_check(obj, parent_obj, parent_obj_types):
+    def _parent_obj_check(self, obj, parent_obj, parent_obj_types):
         if parent_obj is None:
             if None in parent_obj_types:
                 return
@@ -389,7 +397,22 @@ class CriptDB:
             pass
 
         msg = f"Saving a {obj.class_} requires a parent_obj to be {parent_obj_types}."
-        raise CRIPTError(msg)
+        raise self._error(msg)
+
+    def _save_file(self, obj):
+        file_storage = GridFS(self.db)
+
+        keys_of_files = [k.lstrip("_") for k, v in vars(obj).items() if isinstance(v, File)]
+        for key in keys_of_files:
+            file = obj.__getattribute__(key)
+            if file.uid is None:
+                with open(file.path, 'rb') as f:
+                    contents = f.read()
+                file.uid = file_storage.put(contents)
+                file.path = None  # clear path - we don't need users personal file path
+            else:
+                mes = "update file not setup yet"
+                raise self._error(mes)
 
     def _post_save_checks(self, obj, parent_obj):
         """
@@ -438,6 +461,16 @@ class CriptDB:
                 setattr(parent_obj, attr, obj)
                 self.update(parent_obj)
 
+        elif obj.class_ == "Inventory":
+            attr = "c_" + obj.class_.lower()
+            if isinstance(parent_obj, list):
+                for i in parent_obj:
+                    setattr(i, attr, obj)
+                    self.update(i)
+            else:
+                setattr(parent_obj, attr, obj)
+                self.update(parent_obj)
+
         elif obj.class_ == "Material":
             attr = "c_" + obj.class_.lower()
             if isinstance(parent_obj, list):
@@ -450,7 +483,17 @@ class CriptDB:
                 setattr(parent_obj, attr, obj)
                 self.update(parent_obj)
 
-        elif obj.class_ == "Inventory":
+        elif obj.class_ == "Process":
+            attr = "c_" + obj.class_.lower()
+            if isinstance(parent_obj, list):
+                for i in parent_obj:
+                    setattr(i, attr, obj)
+                    self.update(i)
+            else:
+                setattr(parent_obj, attr, obj)
+                self.update(parent_obj)
+
+        elif obj.class_ == "Data":
             attr = "c_" + obj.class_.lower()
             if isinstance(parent_obj, list):
                 for i in parent_obj:
@@ -502,13 +545,13 @@ class CriptDB:
 
             if result is None:
                 mes = f"{obj} not found."
-                raise CRIPTError(mes)
+                raise self._error(mes)
             else:
                 print(result)
 
         else:
             msg = "Invalid input."
-            raise CRIPTError(msg)
+            raise self._error(msg)
 
         return result
 
@@ -530,7 +573,7 @@ class CriptDB:
             result, key = self._search_local(obj, num_results)
         else:
             mes = f"{query} is not a valid object for viewing."
-            raise CRIPTError(mes)
+            raise self._error(mes)
 
         return result, key
 
@@ -547,7 +590,7 @@ class CriptDB:
                 result = list(coll.find(query["key"], limit=num_results))
             except Exception:
                 mes = f"Not a valid query."
-                raise CRIPTError(mes)
+                raise self._error(mes)
 
         return result
 
@@ -749,7 +792,7 @@ class CriptDB:
         doc = coll.find_one({"_id": ObjectId(obj.uid)})
         if doc is None:
             mes = f"Previous document not found in database. ('{obj.name}', '{obj.uid}')"
-            raise CRIPTError(mes)
+            raise self._error(mes)
         return doc
 
     @staticmethod
@@ -784,7 +827,7 @@ class CriptDB:
         result = coll.update_one({"_id": ObjectId(obj.uid)}, {"$set": changes})
         if not result.acknowledged:
             msg = f"Error in updating {obj.name}."
-            raise CRIPTError(msg)
+            raise self._error(msg)
         else:
             print(f"Update of '{obj.name}' successful!")
 

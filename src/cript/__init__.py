@@ -3,7 +3,7 @@ import pkg_resources
 __all__ = [
     "VERSION", "__version__", "__short_version__", "Unit", "load", "CriptDB",
     "User", "Group", "Collection", "Publication", "Experiment", "Material", "Process", "Data",
-    "Inventory", "Simulation", "Cond", "Prop", "Ingr", "Iden"
+    "Inventory", "Simulation", "Cond", "Prop", "Ingr", "Iden", "Path", "tutorial"
 ]
 
 
@@ -19,6 +19,8 @@ import pint
 u = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
 Unit = u.Unit
 Quantity = u.Quantity
+
+from pathlib import Path
 
 
 class CRIPTError(Exception):
