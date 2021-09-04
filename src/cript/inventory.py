@@ -3,7 +3,8 @@ Inventory Node
 
 """
 
-from .base import BaseModel, CRIPTError
+from . import CRIPTError
+from .base import BaseModel, BaseReference
 from .utils.external_database_code import GetMaterial
 
 
@@ -12,7 +13,7 @@ class InventoryError(CRIPTError):
         super().__init__(*msg)
 
 
-class Inventory(BaseModel, GetMaterial):
+class Inventory(BaseModel):
 
     _error = InventoryError
     _class = "Inventory"
@@ -39,13 +40,7 @@ class Inventory(BaseModel, GetMaterial):
         """
         super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
-        self._c_material = None
-        self.c_material = c_material
+        self.c_material = BaseReference("Material", c_material)
 
-    @property
-    def c_material(self):
-        return self._c_material
-
-    @c_material.setter
-    def c_material(self, c_material):
-        self._setter_CRIPT_prop(c_material, "c_material")
+    def get(self, target):
+        return GetMaterial.get(target, self.c_material())

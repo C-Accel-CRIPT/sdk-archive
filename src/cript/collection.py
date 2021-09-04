@@ -3,12 +3,18 @@ Collection Node
 
 """
 
-from . import BaseModel
+from . import CRIPTError
+from .base import BaseModel, BaseReference
+
+
+class CollectionError(CRIPTError):
+    def __init__(self, *msg):
+        super().__init__(*msg)
 
 
 class Collection(BaseModel):
-
     _class = "Collection"
+    _error = CollectionError
 
     def __init__(
         self,
@@ -36,35 +42,6 @@ class Collection(BaseModel):
         """
         super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
-        self._c_collection = None
-        self.c_collection = c_collection
-
-        self._c_experiment = None
-        self.c_experiment = c_experiment
-
-        self._c_inventory = None
-        self.c_inventory = c_inventory
-
-    @property
-    def c_collection(self):
-        return self._c_collection
-
-    @c_collection.setter
-    def c_collection(self, c_collection):
-        self._setter_CRIPT_prop(c_collection, "c_collection")
-
-    @property
-    def c_experiment(self):
-        return self._c_experiment
-
-    @c_experiment.setter
-    def c_experiment(self, c_experiment):
-        self._setter_CRIPT_prop(c_experiment, "c_experiment")
-
-    @property
-    def c_inventory(self):
-        return self._c_inventory
-
-    @c_inventory.setter
-    def c_inventory(self, c_inventory):
-        self._setter_CRIPT_prop(c_inventory, "c_inventory")
+        self.c_experiment = BaseReference("Experiment", c_experiment)
+        self.c_collection = BaseReference("Collection", c_collection)
+        self.c_inventory = BaseReference("Inventory", c_inventory)

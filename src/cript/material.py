@@ -5,7 +5,8 @@ Material Node
 from typing import Union
 from difflib import SequenceMatcher
 
-from . import load, CRIPTError, BaseModel, Cond, Prop
+from . import CRIPTError, Cond, Prop
+from .base import BaseModel, BaseReference
 from .utils.serializable import Serializable
 from cript.utils.validator.type_check import type_check_property, type_check
 from .keys.material import *
@@ -226,9 +227,6 @@ class Material(BaseModel):
         self._prop = None
         self.prop = prop
 
-        self._c_process = None
-        self.c_process = c_process
-
         self._keywords = None
         self.keywords = keywords
 
@@ -243,6 +241,8 @@ class Material(BaseModel):
 
         self._hazard = None
         self.hazard = hazard
+
+        self.c_process = BaseReference("Process", c_process)
 
         if name is None:
             name = self._name_from_identifier()
@@ -302,14 +302,6 @@ class Material(BaseModel):
     @type_check_property
     def keywords(self, keywords):
         self._keywords = keywords
-
-    @property
-    def c_process(self):
-        return self._c_process
-
-    @c_process.setter
-    def c_process(self, c_process):
-        self._setter_CRIPT_prop(c_process, "c_process")
 
     @property
     def source(self):

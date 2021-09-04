@@ -5,16 +5,22 @@ Condition Keywords
 
 from typing import Union
 
-from . import Quantity, Unit, load
+from . import Quantity, Unit, CRIPTError
+from .base import load, CriptTypes
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.validator.cond import cond_keys_check
 from .utils.serializable import SerializableSub
 from .utils.printing import KeyPrinting
 
 
-class Cond(SerializableSub, KeyPrinting):
+class CondError(CRIPTError):
+    def __init__(self, *msg):
+        super().__init__(*msg)
+
+
+class Cond(SerializableSub, KeyPrinting, CriptTypes):
     keys = None
-    cript_types = None
+    _error = CondError
 
     def __init__(
             self,
@@ -91,10 +97,9 @@ class Cond(SerializableSub, KeyPrinting):
 
     @classmethod
     def _init_(cls):
+        CriptTypes._init_()
         from .keys.cond import cond_keys
-        from . import cript_types
         cls.keys = cond_keys
-        cls.cript_types = cript_types
 
     def _loading(self, key, value, uncer):
         """ Loading from database; will add units back to numbers"""

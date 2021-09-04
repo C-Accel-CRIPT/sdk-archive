@@ -3,14 +3,20 @@ User Node
 
 """
 
-import re
+from . import CRIPTError
+from .base import BaseModel, BaseReference
+from .utils.validator.type_check import type_check_property
+from .utils.validator.user import email_format_check, phone_format_check, orcid_format_check
 
-from . import BaseModel, CRIPTError
-from cript.utils.validator.type_check import type_check_property
+
+class UserError(CRIPTError):
+    def __init__(self, *msg):
+        super().__init__(*msg)
 
 
 class User(BaseModel):
     _class = "User"
+    _error = UserError
 
     def __init__(
             self,
@@ -73,57 +79,28 @@ class User(BaseModel):
         self._position = None
         self.position = position
 
-        self._c_group = None
-        self.c_group = c_group
-
-        self._c_publication = None
-        self.c_publication = c_publication
-
-    @property
-    def c_group(self):
-        return self._c_group
-
-    @c_group.setter
-    def c_group(self, c_group):
-        self._setter_CRIPT_prop(c_group, "c_group")
-
-    @property
-    def c_publication(self):
-        return self._c_publication
-
-    @c_publication.setter
-    def c_publication(self, c_publication):
-        self._setter_CRIPT_prop(c_publication, "c_publication")
+        self.c_group = BaseReference("Group", c_group)
+        self.c_publication = BaseReference("Publication", c_publication)
 
     @property
     def email(self):
         return self._email
 
     @email.setter
+    @email_format_check
     @type_check_property
     def email(self, email):
-        if email is None:
-            self._email = email
-        elif self._email_format_check(email):
-            self._email = email
-        else:
-            msg = f"Email {email} not of correct format. (format: text@text.text)"
-            raise CRIPTError(msg)
+        self._email = email
 
     @property
     def phone(self):
         return self._phone
 
     @phone.setter
+    @phone_format_check
     @type_check_property
     def phone(self, phone):
-        if phone is None:
-            self._phone = phone
-        elif self._phone_format_check(phone):
-            self._phone = phone
-        else:
-            msg = f"Phone number {phone} not of correct format. (format: numbers and dash only)"
-            raise CRIPTError(msg)
+        self._phone = phone
 
     @property
     def website(self):
@@ -148,18 +125,10 @@ class User(BaseModel):
         return self._orcid
 
     @orcid.setter
+    @orcid_format_check
     @type_check_property
     def orcid(self, orcid):
-        if orcid is None:
-            self._orcid = orcid
-        elif self._orcid_format_check(orcid):
-            self._orcid = orcid
-        elif self._orcid_format_check2(orcid):
-            orcid = orcid[0:4] + "-" + orcid[4:8] + "-" + orcid[8:12] + "-" + orcid[12:]
-            self._orcid = orcid
-        else:
-            msg = f"{orcid} invalid format, and not added to user node. (format: ####-####-####-####)"
-            raise CRIPTError(msg)
+        self._orcid = orcid
 
     @property
     def organization(self):
@@ -178,47 +147,3 @@ class User(BaseModel):
     @type_check_property
     def position(self, position):
         self._position = position
-
-    @staticmethod
-    def _email_format_check(email: str) -> bool:
-        """
-        Check email is text@text.text
-        """
-        regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-        if re.match(regex, email):
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def _phone_format_check(phone: str) -> bool:
-        """
-        Check phone format
-        """
-        regex = r'[0-9|-]{10}'
-        if re.match(regex, phone):
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def _orcid_format_check(orcid: str) -> bool:
-        """
-        Check orcid format   ####-####-####-####
-        """
-        regex = r'[0-9]{4}[-]{1}[0-9]{4}[-]{1}[0-9]{4}[-]{1}[0-9]{4}'
-        if re.match(regex, orcid):
-            return True
-        else:
-            return False
-
-    @staticmethod
-    def _orcid_format_check2(orcid: str) -> bool:
-        """
-        Check orcid format  (no dashes)  ################
-        """
-        regex = r'[0-9]{16}'
-        if re.match(regex, orcid):
-            return True
-        else:
-            return False

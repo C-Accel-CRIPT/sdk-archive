@@ -1,24 +1,32 @@
 """
 base:
 
-Contains BaseModel that all core CRIPT nodes inherits from.
-Contains CRIPTError and CRIPTWarning
+Contains BaseModel, BaseReference, and load
 
 """
-
 from abc import ABC
 from typing import Union
 from datetime import datetime
 
 from bson import ObjectId
+from fuzzywuzzy import process
 
-from . import __version__, CRIPTError, CRIPTWarning
+from . import __version__, CRIPTError
 from .utils.serializable import Serializable
-from cript.utils.validator.type_check import type_check_property, id_type_check
+from .utils.validator.type_check import type_check_property, id_type_check_bool, id_type_check
+from .utils.external_database_code import GetObject
 
 
-class BaseModel(Serializable, ABC):
+class CriptTypes:
     cript_types = None
+
+    @classmethod
+    def _init_(cls):
+        from . import cript_types
+        cls.cript_types = cript_types
+
+
+class BaseModel(Serializable, CriptTypes, ABC):
 
     def __init__(
         self,
@@ -134,11 +142,6 @@ class BaseModel(Serializable, ABC):
     def created_date(self, created_date):
         self._created_date = created_date
 
-    @classmethod
-    def _init_(cls):
-        from . import cript_types
-        cls.cript_types = cript_types
-
     def _reference(self) -> dict:
         """
         From a filled out node, create reference dictionary.
@@ -154,6 +157,9 @@ class BaseModel(Serializable, ABC):
         * This method may be overwritten in inheritance.
         """
         keys = ["uid", "name"]
+        if "_id" in ddict.keys():
+            ddict["uid"] = ddict.pop("_id")
+
         if not all(k in ddict.keys() and ddict[k] is not None for k in keys):
             if ddict["uid"] is None and ddict["name"] is not None:
                 mes = f"'{ddict['name']}' needs to be saved before it can generate a reference."
@@ -167,75 +173,135 @@ class BaseModel(Serializable, ABC):
 
         return out
 
-    def _setter_CRIPT_prop(self, objs, prop: str):
-        """
-        This can set CRIPT properties
-        :param objs: List of CRIPT objects or Lists of strings to add to prop
-        :param prop: The property to be set
-        :return:
-        """
-        _class = prop[2:]  # strip "c_"
-        _type = BaseModel.cript_types[_class.capitalize()]
 
-        if objs is None:
-            setattr(self, f"_{prop}", None)
-        elif isinstance(objs, str) and objs == "_clear":
-            setattr(self, f"_{prop}", None)
+class BaseReference(CriptTypes):
+    _error = CRIPTError
+
+    def __init__(self, node: str, objs=None):
+        self._reference = []
+        self._uids = []
+        self._node = node
+
+        if objs is not None:
+            self.add(objs)
+
+    def __repr__(self):
+        return repr(self._reference)
+
+    def __call__(self):
+        return self._reference
+
+    def __getitem__(self, item):
+        if isinstance(item, int):
+            return self._reference[item]
+        elif isinstance(item, str):
+            index = self._get_index_from_name(item)
+            return self._reference[index]
         else:
-            # get uid already in node
-            current_uids = []
-            if isinstance(getattr(self, prop), list):
-                for g in getattr(self, prop):
-                    if isinstance(g, dict):
-                        current_uids.append(g["uid"])
+            mes = "Item not found."
+            raise self._error(mes)
 
-            # if list not given, make it a list
-            if isinstance(objs, _type) or isinstance(objs, str) or isinstance(objs, dict):
-                objs = [objs]
+    def _get_index_from_name(self, item: str) -> int:
+        values = [i["name"] for i in self._reference]
+        text, score = process.extractOne(item, values)
+        if score > 50:
+            return values.index(text)
+        else:
+            mes = f"'{item}' not found."
+            raise self._error(mes)
 
-            # loop through list
-            for obj in objs:
-                if isinstance(obj, dict):  # happens when loading node, or passing node from cript.view().
-                    if "_id" in obj.keys():   # happens when passing node from cript.view()
-                        obj["uid"] = str(obj.pop("_id"))
-                    obj_info = _type._create_reference(obj)
+    def add(self, objs):
+        if not isinstance(objs, list):
+            objs = [objs]
 
-                    if obj_info["uid"] in current_uids:
-                        msg = f"{_class} {obj['uid']} already in node."
-                        CRIPTWarning(msg)
-                        continue
+        for obj in objs:
+            if isinstance(obj, dict):
+                ref = self._obj_is_dict(obj)
+            elif isinstance(obj, str) and id_type_check_bool(obj):
+                ref = self._obj_is_uid(obj)
+            elif isinstance(obj, self.cript_types[self._node]):
+                ref = self._obj_is_cript_node(obj)
+            else:
+                mes = f"Invalid reference object type. '{obj}'"
+                raise self._error(mes)
 
-                elif isinstance(obj, str):  # user may give just id as string -> just store string, will be expanded on database upload
-                    if id_type_check(obj):
-                        obj_info = obj
+            if ref["uid"] not in self._uids:
+                self._reference.append(ref)
+                self._uids.append(ref["uid"])
+            else:
+                mes = f"Reference already in list.'{obj}'"
+                raise self._error(mes)
 
-                        if obj_info in current_uids:
-                            msg = f"{_class} {obj} already in node."
-                            CRIPTWarning(msg)
-                            continue
+    def _obj_is_dict(self, obj: dict) -> dict:
+        """
+        Happens when passing node from cript.view() or is a referance already
+        """
+        if "_id" in obj.keys():
+            return self.cript_types[self._node]._create_reference(obj)
+        elif "uid" in obj.keys():
+            return obj
+        else:
+            mes = f"Invalid reference object. '{obj}'"
+            raise self._error(mes)
 
-                elif isinstance(obj, _type):  # user may give a CRIPT node -> then extract dictionary
-                    if obj.uid is None:
-                        msg = f"{_class} '{obj.name}' needs to be saved before adding it to the node."
-                        CRIPTWarning(msg)
-                        continue
+    def _obj_is_uid(self, obj: str) -> dict:
+        """
+        User may give just id as string
+        """
+        obj = GetObject.get_from_uid(self._node, obj)
+        return self.cript_types[self._node]._create_reference(obj[0])
 
-                    obj_info = obj._reference()   # Generates reference
+    @staticmethod
+    def _obj_is_cript_node(obj: str) -> dict:
+        """
+        User may give a CRIPT node
+        """
+        return obj._reference()
 
-                    if obj_info["uid"] in current_uids:
-                        msg = f"{_class} {obj} already in node."
-                        CRIPTWarning(msg)
-                        continue
+    def remove(self, objs):
+        if not isinstance(objs, list):
+            objs = [objs]
 
-                else:
-                    msg = f"{_class} {obj} not of type {_type}. Skipped."
-                    CRIPTWarning(msg)
-                    continue
+        remove = []
+        for obj in objs:
+            if isinstance(obj, dict):
+                remove.append(obj["uid"])
+            elif isinstance(obj, str) and id_type_check_bool(obj):
+                remove.append(obj)
+            elif isinstance(obj, str):
+                remove.append(self._remove_by_name(obj))
+            elif isinstance(obj, self.cript_types[self._node]):
+                remove.append(obj.uid)
+            elif isinstance(obj, int):
+                remove.append(self._uids[obj])
+            else:
+                mes = f"Invalid remove object type. '{obj}'"
+                raise self._error(mes)
 
-                if getattr(self, f"_{prop}") is None:
-                    setattr(self, f"_{prop}", [])
+        for r in remove:
+            if r in self._uids:
+                self._remove_reference(r)
+                self._uids.remove(r)
+            else:
+                mes = f"{r} not in list, so it can't be removed."
+                raise self._error(mes)
 
-                exec(f"self._{prop}.append(obj_info)")
+    def _remove_by_name(self, name: str):
+        for i in self._reference:
+            if i["name"] == name:
+                return i["uid"]
+
+        else:
+            mes = f"{name} not found."
+            raise self._error(mes)
+
+    def _remove_reference(self, remove: str):
+        for i in self._reference:
+            if i["uid"] == remove:
+                self._reference.remove(i)
+
+    def as_dict(self, **kwags):
+        return self._reference
 
 
 class Load:
@@ -258,5 +324,3 @@ class Load:
 
 
 load = Load()
-
-

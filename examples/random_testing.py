@@ -63,28 +63,35 @@ inv = C.load(inv_doc[0])
 
 # print(process)
 
-from cript.tutorial import tutorial_data_part2
+# from cript.tutorial import tutorial_data_part2
+#
+# sec_data_path = tutorial_data_part2["polystyrene_sec"]["path"]
+# cal_path = tutorial_data_part2["sec_calibration_curve"]["path"]
+# sample_prep_text = "5 mg of polmyer in 1 ml of THF, filtered 0.45um pores."
+#
+#
+# sec_data = C.Data(
+#     name="Crude SEC of polystyrene",
+#     _type="sec_trace",
+#     file=C.File(sec_data_path),
+#     sample_prep=sample_prep_text,
+#     cond=[
+#         C.Cond("temp", 30 * C.Unit("degC")),
+#         C.Cond("time", 60 * C.Unit("min")),
+#         C.Cond("solvent", value=inv.get("THF")),
+#         # C.Cond("flow_rate", 1 * C.Unit("ml/min"))
+#     ],
+#     calibration=C.File(cal_path)
+# )
+#
+# db.save(sec_data, expt)
 
-sec_data_path = tutorial_data_part2["polystyrene_sec"]["path"]
-cal_path = tutorial_data_part2["sec_calibration_curve"]["path"]
-sample_prep_text = "5 mg of polmyer in 1 ml of THF, filtered 0.45um pores."
-
-
-sec_data = C.Data(
-    name="Crude SEC of polystyrene",
-    _type="sec_trace",
-    file=C.File(sec_data_path),
-    sample_prep=sample_prep_text,
-    cond=[
-        C.Cond("temp", 30 * C.Unit("degC")),
-        C.Cond("time", 60 * C.Unit("min")),
-        C.Cond("solvent", value=inv.get("THF")),
-        # C.Cond("flow_rate", 1 * C.Unit("ml/min"))
-    ],
-    calibration=C.File(cal_path)
+user_node = C.User(
+    name="Dylan Walsh",
+    email="dylanwal2@mit.edu",
+    organization="Mass. Institute of Technology",
+    position="Postdoc"
 )
-
-db.save(sec_data, expt)
 
 print("hi")
 

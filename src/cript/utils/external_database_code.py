@@ -11,11 +11,45 @@ from warnings import warn
 from bson import ObjectId
 from fuzzywuzzy import process, fuzz
 
-from .. import CRIPTError, CRIPTWarning
+from .. import CRIPTError
 
 
 class GetObject(ABC):
     _error = CRIPTError
+    _cript_database = None
+    _cript_type_db = None
+
+    @classmethod
+    def get_from_uid(cls, node: str, uid: Union[str, list[str], ObjectId, list[ObjectId]]) -> list[dict]:
+        """
+        Gets documents from database.
+        :param node: Used to find collection on mongodb
+        :param uid: document ids you want to find
+        :return:
+        """
+        cls._get_database()
+        coll = cls._cript_database.db[node]
+        if isinstance(uid, str):
+            uid = [ObjectId(uid)]
+        elif isinstance(uid, list):
+            uid = [ObjectId(u) for u in uid]
+
+        return list(coll.find({"_id": {"$in": uid}}))
+
+    @classmethod
+    def _get_database(cls):
+        """
+        Checks if database has been grabbed from stack, if not it gets it
+        """
+        if cls._cript_type_db is None:
+            cls._get_cript_type_db()
+        if cls._cript_database is None:
+            cls._cript_database = cls._get_from_stack(cls._cript_type_db)
+
+    @classmethod
+    def _get_cript_type_db(cls):
+        from .. import CriptDB
+        cls._cript_type_db = CriptDB
 
     @staticmethod
     def _get_from_stack(obj):
@@ -24,8 +58,8 @@ class GetObject(ABC):
         Stops at first object it finds
 
         Example:
-        db = self._get_from_stack(cript.CriptDB)
-        user = self._get_from_stack(cript.User)
+        db = cls._get_from_stack(cript.CriptDB)
+        user = cls._get_from_stack(cript.User)
 
         :param obj:
         :return: returns the object looking for
@@ -38,8 +72,8 @@ class GetObject(ABC):
                 found_obj = found_obj[0]
                 break
         else:
-            mes = "Database not found in globals, so 'Material.get()' is not working."
-            raise Exception
+            mes = f"{obj} not found in globals, so 'Material.get()' is not working."
+            raise Exception(mes)
 
         return found_obj
 
@@ -47,28 +81,27 @@ class GetObject(ABC):
 class GetMaterial(GetObject, ABC):
     """For Experiment and Inventory only."""
 
-    _error = CRIPTError
-    _cript_type_db = None
-    _cript_database = None
-
-    def get(self, target: str):
+    @classmethod
+    def get(cls, target: str, materials: list[dict]) -> dict:
         """
         Get material, if exact match found it will be returned otherwise best guess within limit.
         :param target: name of chemical, cas #, Chemical formula
+        :param materials: c_material
         :return:
         """
-        mats = self._get_all_mat()
+        mats = cls._get_all_mat(materials)
 
         if "poly" in target:
-            index = self._find_closest_match(target, mats, require="poly")
+            index = cls._find_closest_match(target, mats, require="poly")
         else:
-            index = self._find_closest_match(target, mats, reject="poly")
+            index = cls._find_closest_match(target, mats, reject="poly")
 
         return mats[index]
 
-    def _find_closest_match(self,
+    @classmethod
+    def _find_closest_match(cls,
                             target: str,
-                            mats,
+                            mats: list[dict],
                             require: Union[str, list[str]] = None,
                             reject: Union[str, list[str]] = None,
                             cutoff: int = 75,
@@ -84,20 +117,20 @@ class GetMaterial(GetObject, ABC):
         """
         scores = []
         for mat in mats:
-            values = self._get_set_of_values(mat)
+            values = cls._get_set_of_values(mat)
             if require is not None:
-                values = self._str_check(values, require, cutoff=0.2, op=True)
+                values = cls._str_check(values, require, cutoff=0.2, op=True)
             if reject is not None:
-                values = self._str_check(values, reject, cutoff=0.5, op=False)
-            scores.append(self._get_score(target, values)[1])
+                values = cls._str_check(values, reject, cutoff=0.5, op=False)
+            scores.append(cls._get_score(target, values)[1])
 
         best_match_index = scores.index(max(scores))
         if scores[best_match_index] < cutoff:
-            mes = f"'{target}' not found in '{self.name}'."
-            raise self._error(mes)
+            mes = f"'{target}' not found."
+            raise cls._error(mes)
         else:
             if scores[best_match_index] != 100:
-                mes = f"Perfect match not found for '{target}', but close match found and used " \
+                mes = f"Perfect match not found for '{target}', but close match found: " \
                       f"'{mats[best_match_index]['name']}'."
                 warn(mes)
 
@@ -141,7 +174,7 @@ class GetMaterial(GetObject, ABC):
         return text, score
 
     @staticmethod
-    def _get_set_of_values(mat) -> set[str]:
+    def _get_set_of_values(mat: dict) -> set[str]:
         """ Returns a set of all idens """
         out = set()
         out.add(mat["name"])
@@ -188,30 +221,11 @@ class GetMaterial(GetObject, ABC):
         else:
             return set()
 
-    def _get_all_mat(self) -> list[dict]:
-        if self._cript_type_db is None:
-            self._get_cript_type_db()
-        if self._cript_database is None:
-            self._cript_database = self._get_from_stack(self._get_cript_db)
+    @classmethod
+    def _get_all_mat(cls, materials) -> list[dict]:
+        uids = [mat["uid"] for mat in materials]
+        return cls.get_from_uid("Material", uids)
 
-        database = self._get_from_stack(self._get_cript_db)
-        coll = database.db["Material"]
-        uids = [ObjectId(mat["uid"]) for mat in self.c_material]
-        return list(coll.find({"_id": {"$in": uids}}))
-
-    def _get_one_mat(self, uid) -> dict:
-        if self._cript_type_db is None:
-            self._get_cript_type_db()
-        if self._cript_database is None:
-            self._cript_database = self._get_from_stack(self._get_cript_db)
-
-        coll = self._cript_database.db["Material"]
-        uid = ObjectId(uid)
-        return coll.find_one({"_id": {"$in": uid}})
-
-    def _get_cript_type_db(self):
-        try:
-            self._get_cript_db = self.cript_types["CriptDB"]
-        except Exception:
-            from ..import CriptDB
-            self._get_cript_db = CriptDB
+    @classmethod
+    def _get_one_mat(cls, uid) -> dict:
+        return cls.get_from_uid("Material", uid)[0]

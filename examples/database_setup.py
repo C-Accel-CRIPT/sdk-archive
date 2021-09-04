@@ -1,4 +1,4 @@
-import cript as C
+from cript import *
 
 # Connect to database
 db_username = "DW_cript"
@@ -6,10 +6,10 @@ db_password = "YXMaoE1"
 db_project = "cript_testing"
 db_database = "test"
 
-db = C.CriptDB(db_username, db_password, db_project, db_database)
+db = CriptDB(db_username, db_password, db_project, db_database)
 
 # Generate your User node
-user_node = C.User(
+user_node = User(
     name="Dylan Walsh",
     email="dylanwal@mit.edu",
     organization="Mass. Institute of Technology",
@@ -18,46 +18,46 @@ user_node = C.User(
 db.save(user_node)
 
 #####################################################
-new_group = C.Group(
+new_group = Group(
     name="CRIPT_development_team"
 )
 db.save(new_group)
 
-new_group = C.Group(
+new_group = Group(
     name="Mass. Institute of Technology"
 )
 db.save(new_group)
 
-new_group = C.Group(
+new_group = Group(
     name="Brad Olsen Research Group",
     website="https://olsenlab.mit.edu/"
 )
 db.save(new_group)
 
-new_group = C.Group(
+new_group = Group(
     name="Klavs Jensen Research Group",
     website="https://jensenlab.mit.edu/"
 )
 db.save(new_group)
 
-new_group = C.Group(
+new_group = Group(
     name="CRIPT_community"
 )
 db.save(new_group)
 
 #####################################################
 
-collection = C.Collection("Tutorial Examples")
+collection = Collection("Tutorial Examples")
 db.save(collection, new_group)
 
-expt = C.Experiment("Anionic Polymerization of Styrene with SecBuLi")
+expt = Experiment("Anionic Polymerization of Styrene with SecBuLi")
 db.save(expt, collection)
 
-inventory = C.Inventory("Tutorial Materials")
+inventory = Inventory("Tutorial Materials")
 db.save(inventory, collection)
 
-mat_water = C.Material(
-    iden=C.Iden(
+mat_water = Material(
+    iden=Iden(
         name="water",
         names=["h2o", "dihydrogen oxide"],
         chem_formula="H2O",
@@ -66,25 +66,25 @@ mat_water = C.Material(
         pubchem_cid="962",
         inchi_key="XLYOFNOQVPJJNP-UHFFFAOYSA-N"
     ),
-    prop=[C.Prop(key="phase", value="liquid"),
-          C.Prop(key="color", value="colorless"),
-          C.Prop(key="molar_mass", value=18.015 * C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=1.0 * C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=4 * C.Unit("degC"))]
-                 ),
-          C.Prop(key="bp", value=100 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
-                 ),
-          C.Prop(key="mp", value=0 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
-                 )
+    prop=[Prop(key="phase", value="liquid"),
+          Prop(key="color", value="colorless"),
+          Prop(key="molar_mass", value=18.015 * Unit("g/mol"), method="prescribed"),
+          Prop(key="density", value=1.0 * Unit("g/ml"),
+               cond=[Cond(key="temp", value=4 * Unit("degC"))]
+               ),
+          Prop(key="bp", value=100 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("atm"))]
+               ),
+          Prop(key="mp", value=0 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("bar"))]
+               )
           ],
 )
 
 db.save(mat_water, inventory)
 
-mat_nitrogen = C.Material(
-    iden=C.Iden(
+mat_nitrogen = Material(
+    iden=Iden(
         name="nitrogen",
         names=["N2", "dinitrogen"],
         chem_formula="N2",
@@ -93,25 +93,25 @@ mat_nitrogen = C.Material(
         pubchem_cid="947",
         inchi_key="IJGRMHOSHXDMSA-UHFFFAOYSA-N"
     ),
-    prop=[C.Prop(key="phase", value="liquid"),
-          C.Prop(key="color", value="colorless"),
-          C.Prop(key="molar_mass", value=28.014 * C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=1.25 * C.Unit("g/l"),
-                 cond=[C.Cond(key="temp", value=4 * C.Unit("degC"))]
-                 ),
-          C.Prop(key="bp", value=77.355 * C.Unit("K"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
-                 ),
-          C.Prop(key="mp", value=63.23 * C.Unit("K"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
-                 )
+    prop=[Prop(key="phase", value="liquid"),
+          Prop(key="color", value="colorless"),
+          Prop(key="molar_mass", value=28.014 * Unit("g/mol"), method="prescribed"),
+          Prop(key="density", value=1.25 * Unit("g/l"),
+               cond=[Cond(key="temp", value=4 * Unit("degC"))]
+               ),
+          Prop(key="bp", value=77.355 * Unit("K"),
+               cond=[Cond(key="pres", value=1 * Unit("atm"))]
+               ),
+          Prop(key="mp", value=63.23 * Unit("K"),
+               cond=[Cond(key="pres", value=1 * Unit("bar"))]
+               )
           ],
 )
 
 db.save(mat_nitrogen, inventory)
 
-mat_argon = C.Material(
-    iden=C.Iden(
+mat_argon = Material(
+    iden=Iden(
         name="argon",
         names=["Ar"],
         chem_formula="Ar",
@@ -120,28 +120,28 @@ mat_argon = C.Material(
         pubchem_cid="23968",
         inchi_key="XKRFYHLGVUSROY-UHFFFAOYSA-N"
     ),
-    prop=[C.Prop(key="phase", value="gas"),
-          C.Prop(key="color", value="colorless"),
-          C.Prop(key="molar_mass", value=39.95 * C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=1.784 * C.Unit("g/l"),
-                 cond=[
-                     C.Cond(key="temp", value=0 * C.Unit("degC")),
-                     C.Cond(key="pres", value=1 * C.Unit("bar"))
-                 ]
-                 ),
-          C.Prop(key="bp", value=87.3 * C.Unit("K"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
-                 ),
-          C.Prop(key="mp", value=83.81 * C.Unit("K"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
-                 )
+    prop=[Prop(key="phase", value="gas"),
+          Prop(key="color", value="colorless"),
+          Prop(key="molar_mass", value=39.95 * Unit("g/mol"), method="prescribed"),
+          Prop(key="density", value=1.784 * Unit("g/l"),
+               cond=[
+                   Cond(key="temp", value=0 * Unit("degC")),
+                   Cond(key="pres", value=1 * Unit("bar"))
+               ]
+               ),
+          Prop(key="bp", value=87.3 * Unit("K"),
+               cond=[Cond(key="pres", value=1 * Unit("atm"))]
+               ),
+          Prop(key="mp", value=83.81 * Unit("K"),
+               cond=[Cond(key="pres", value=1 * Unit("bar"))]
+               )
           ],
 )
 
 db.save(mat_argon, inventory)
 
-mat_styrene = C.Material(
-    iden=C.Iden(
+mat_styrene = Material(
+    iden=Iden(
         name="styrene",
         names=["vinylbenzene", "phenylethylene", "ethenylbenzene"],
         chem_formula="C8H8",
@@ -150,28 +150,28 @@ mat_styrene = C.Material(
         pubchem_cid="7501",
         inchi_key="PPBRXRYQALVLMV-UHFFFAOYSA-N"
     ),
-    prop=[C.Prop(key="phase", value="liquid"),
-          C.Prop(key="color", value="colorless"),
-          C.Prop(key="molar_mass", value=104.15 * C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.906 * C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=25 * C.Unit("degC"))]
-                 ),
-          C.Prop(key="bp", value=145 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
-                 ),
-          C.Prop(key="mp", value=-30 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
-                 )
+    prop=[Prop(key="phase", value="liquid"),
+          Prop(key="color", value="colorless"),
+          Prop(key="molar_mass", value=104.15 * Unit("g/mol"), method="prescribed"),
+          Prop(key="density", value=0.906 * Unit("g/ml"),
+               cond=[Cond(key="temp", value=25 * Unit("degC"))]
+               ),
+          Prop(key="bp", value=145 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("atm"))]
+               ),
+          Prop(key="mp", value=-30 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("bar"))]
+               )
           ],
     keywords=["styrene"],
     storage=[
-        C.Cond(key="temp", value=-20 * C.Unit("degC")),
-        C.Cond(key="atm", value=mat_argon)
+        Cond(key="temp", value=-20 * Unit("degC")),
+        Cond(key="atm", value=mat_argon)
     ]
 )
 
-mat_toluene = C.Material(
-    iden=C.Iden(
+mat_toluene = Material(
+    iden=Iden(
         name="toluene",
         names=["methylbenzene"],
         chem_formula="C7H8",
@@ -180,28 +180,28 @@ mat_toluene = C.Material(
         pubchem_cid="1140",
         inchi_key="YXFVVABEGXRONW-UHFFFAOYSA-N"
     ),
-    prop=[C.Prop(key="phase", value="liquid"),
-          C.Prop(key="color", value="colorless"),
-          C.Prop(key="molar_mass", value=92.141 * C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.87 * C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=20 * C.Unit("degC"))]
-                 ),
-          C.Prop(key="bp", value=111 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
-                 ),
-          C.Prop(key="mp", value=-95 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
-                 ),
-          C.Prop(key="solubility", value=0.52 * C.Unit("g/L"),
-                 cond=[
-                     C.Cond(key="temp", value=20 * C.Unit("degC")),
-                     C.Cond(key="solvent", value=mat_water)
-                 ]
-                 ),
+    prop=[Prop(key="phase", value="liquid"),
+          Prop(key="color", value="colorless"),
+          Prop(key="molar_mass", value=92.141 * Unit("g/mol"), method="prescribed"),
+          Prop(key="density", value=0.87 * Unit("g/ml"),
+               cond=[Cond(key="temp", value=20 * Unit("degC"))]
+               ),
+          Prop(key="bp", value=111 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("atm"))]
+               ),
+          Prop(key="mp", value=-95 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("bar"))]
+               ),
+          Prop(key="solubility", value=0.52 * Unit("g/L"),
+               cond=[
+                   Cond(key="temp", value=20 * Unit("degC")),
+                   Cond(key="solvent", value=mat_water)
+               ]
+               ),
           ])
 
-mat_thf = C.Material(
-    iden=C.Iden(
+mat_thf = Material(
+    iden=Iden(
         name="tetrahydrofuran",
         names=["oxolane", "1,4-epoxybutane", "oxacyclopentane", "THF", "butylene oxide", "cyclotetramethylene oxide"],
         chem_formula="C4H8O",
@@ -210,28 +210,28 @@ mat_thf = C.Material(
         pubchem_cid="8028",
         inchi_key="WYURNTSHIVDZCO-UHFFFAOYSA-N"
     ),
-    prop=[C.Prop(key="phase", value="liquid"),
-          C.Prop(key="color", value="colorless"),
-          C.Prop(key="molar_mass", value=72.107 * C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.8876 * C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=20 * C.Unit("degC"))]
-                 ),
-          C.Prop(key="bp", value=66 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
-                 ),
-          C.Prop(key="mp", value=-108 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
-                 ),
-          C.Prop(key="solubility", value="miscible",
-                 cond=[
-                     C.Cond(key="temp", value=20 * C.Unit("degC")),
-                     C.Cond(key="solvent", value=mat_water)
-                 ]
-                 ),
+    prop=[Prop(key="phase", value="liquid"),
+          Prop(key="color", value="colorless"),
+          Prop(key="molar_mass", value=72.107 * Unit("g/mol"), method="prescribed"),
+          Prop(key="density", value=0.8876 * Unit("g/ml"),
+               cond=[Cond(key="temp", value=20 * Unit("degC"))]
+               ),
+          Prop(key="bp", value=66 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("atm"))]
+               ),
+          Prop(key="mp", value=-108 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("bar"))]
+               ),
+          Prop(key="solubility", value="miscible",
+               cond=[
+                   Cond(key="temp", value=20 * Unit("degC")),
+                   Cond(key="solvent", value=mat_water)
+               ]
+               ),
           ])
 
-mat_nBuOH = C.Material(
-    iden=C.Iden(
+mat_nBuOH = Material(
+    iden=Iden(
         name="1-butanol",
         names=["n-butanol", "n-butyl alcohol", "1-butyl alcohol", "nBuOH"],
         chem_formula="C4H10O",
@@ -240,28 +240,28 @@ mat_nBuOH = C.Material(
         pubchem_cid="263",
         inchi_key="LRHPLDYGYMQRHN-UHFFFAOYSA-N"
     ),
-    prop=[C.Prop(key="phase", value="liquid"),
-          C.Prop(key="color", value="colorless"),
-          C.Prop(key="molar_mass", value=74.123 * C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.81 * C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=20 * C.Unit("degC"))]
-                 ),
-          C.Prop(key="bp", value=117.7 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
-                 ),
-          C.Prop(key="mp", value=-89.8 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
-                 ),
-          C.Prop(key="solubility", value=73 * C.Unit("g/L"),
-                 cond=[
-                     C.Cond(key="temp", value=25 * C.Unit("degC")),
-                     C.Cond(key="solvent", value=mat_water)
-                 ]
-                 ),
+    prop=[Prop(key="phase", value="liquid"),
+          Prop(key="color", value="colorless"),
+          Prop(key="molar_mass", value=74.123 * Unit("g/mol"), method="prescribed"),
+          Prop(key="density", value=0.81 * Unit("g/ml"),
+               cond=[Cond(key="temp", value=20 * Unit("degC"))]
+               ),
+          Prop(key="bp", value=117.7 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("atm"))]
+               ),
+          Prop(key="mp", value=-89.8 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("bar"))]
+               ),
+          Prop(key="solubility", value=73 * Unit("g/L"),
+               cond=[
+                   Cond(key="temp", value=25 * Unit("degC")),
+                   Cond(key="solvent", value=mat_water)
+               ]
+               ),
           ])
 
-mat_MeOH = C.Material(
-    iden=C.Iden(
+mat_MeOH = Material(
+    iden=Iden(
         name="methanol",
         names=["Methyl alcohol", "CH3OH", "MeOH"],
         chem_formula="CH4O",
@@ -270,28 +270,28 @@ mat_MeOH = C.Material(
         pubchem_cid="887",
         inchi_key="OKKJLVBELUTLKV-UHFFFAOYSA-N"
     ),
-    prop=[C.Prop(key="phase", value="liquid"),
-          C.Prop(key="color", value="colorless"),
-          C.Prop(key="molar_mass", value=32.04 * C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.792 * C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=20 * C.Unit("degC"))]
-                 ),
-          C.Prop(key="bp", value=64.7 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
-                 ),
-          C.Prop(key="mp", value=-97.6 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
-                 ),
-          C.Prop(key="solubility", value="miscible",
-                 cond=[
-                     C.Cond(key="temp", value=25 * C.Unit("degC")),
-                     C.Cond(key="solvent", value=mat_water)
-                 ]
-                 ),
+    prop=[Prop(key="phase", value="liquid"),
+          Prop(key="color", value="colorless"),
+          Prop(key="molar_mass", value=32.04 * Unit("g/mol"), method="prescribed"),
+          Prop(key="density", value=0.792 * Unit("g/ml"),
+               cond=[Cond(key="temp", value=20 * Unit("degC"))]
+               ),
+          Prop(key="bp", value=64.7 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("atm"))]
+               ),
+          Prop(key="mp", value=-97.6 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("bar"))]
+               ),
+          Prop(key="solubility", value="miscible",
+               cond=[
+                   Cond(key="temp", value=25 * Unit("degC")),
+                   Cond(key="solvent", value=mat_water)
+               ]
+               ),
           ])
 
-mat_cHex = C.Material(
-    iden=C.Iden(
+mat_cHex = Material(
+    iden=Iden(
         name="cyclohexane",
         chem_formula="C6H12",
         smiles="C1CCCCC1",
@@ -299,28 +299,28 @@ mat_cHex = C.Material(
         pubchem_cid="8078",
         inchi_key="XDTMQSROBMDMFD-UHFFFAOYSA-N"
     ),
-    prop=[C.Prop(key="phase", value="liquid"),
-          C.Prop(key="color", value="colorless"),
-          C.Prop(key="molar_mass", value=84.162 * C.Unit("g/mol"), method="prescribed"),
-          C.Prop(key="density", value=0.7739 * C.Unit("g/ml"),
-                 cond=[C.Cond(key="temp", value=20 * C.Unit("degC"))]
-                 ),
-          C.Prop(key="bp", value=80.74 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("atm"))]
-                 ),
-          C.Prop(key="mp", value=6.47 * C.Unit("degC"),
-                 cond=[C.Cond(key="pres", value=1 * C.Unit("bar"))]
-                 ),
-          C.Prop(key="solubility", value="immiscible",
-                 cond=[
-                     C.Cond(key="temp", value=25 * C.Unit("degC")),
-                     C.Cond(key="solvent", value=mat_water)
-                 ]
-                 ),
+    prop=[Prop(key="phase", value="liquid"),
+          Prop(key="color", value="colorless"),
+          Prop(key="molar_mass", value=84.162 * Unit("g/mol"), method="prescribed"),
+          Prop(key="density", value=0.7739 * Unit("g/ml"),
+               cond=[Cond(key="temp", value=20 * Unit("degC"))]
+               ),
+          Prop(key="bp", value=80.74 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("atm"))]
+               ),
+          Prop(key="mp", value=6.47 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("bar"))]
+               ),
+          Prop(key="solubility", value="immiscible",
+               cond=[
+                   Cond(key="temp", value=25 * Unit("degC")),
+                   Cond(key="solvent", value=mat_water)
+               ]
+               ),
           ])
 
-mat_sBuLi = C.Material(
-    iden=C.Iden(
+mat_sBuLi = Material(
+    iden=Iden(
         name="sec-butyllithium",
         names=["butan-2-yllithium", "sBuLi", "secBuLi", "s-butyllithium"],
         chem_formula="C4H9Li",
@@ -328,7 +328,7 @@ mat_sBuLi = C.Material(
         cas="598-30-1",
         inchi_key="VATDYQWILMGLEW-UHFFFAOYSA-N"
     ),
-    prop=[C.Prop(key="molar_mass", value=64.06 * C.Unit("g/mol"), method="prescribed")
+    prop=[Prop(key="molar_mass", value=64.06 * Unit("g/mol"), method="prescribed")
           ])
 
 db.save(mat_styrene, [expt, inventory])
@@ -339,19 +339,19 @@ db.save(mat_MeOH, [expt, inventory])
 db.save(mat_cHex, [expt, inventory])
 db.save(mat_sBuLi, [expt, inventory])
 
-mat_solution = C.Material(
+mat_solution = Material(
     name="SecBuLi solution 1.4M cHex",
     iden=[mat_cHex, mat_sBuLi],
     prop=[
-        C.Prop(key="phase", value="liquid"),
-        C.Prop(key="density", value=0.769 * C.Unit("g/ml"),
-               cond=C.Cond(key="pres", value=1 * C.Unit("bar"))
-               ),
-        C.Prop(mat_id=2, key="molar_conc", value=1.4 * C.Unit("M"))
+        Prop(key="phase", value="liquid"),
+        Prop(key="density", value=0.769 * Unit("g/ml"),
+             cond=Cond(key="pres", value=1 * Unit("bar"))
+             ),
+        Prop(mat_id=2, key="molar_conc", value=1.4 * Unit("M"))
     ],
     storage=[
-        C.Cond(key="temp", value=2 * C.Unit("degC")),
-        C.Cond(key="atm", value=mat_argon)
+        Cond(key="temp", value=2 * Unit("degC")),
+        Cond(key="atm", value=mat_argon)
     ]
 )
 
@@ -360,24 +360,28 @@ db.save(mat_solution, [expt, inventory])
 ########################################################################
 
 
-ingr = C.Ingr(
-        [expt.get("SecBuLi solution 1.4M cHex"), 0.17 * C.Unit("mol"), "initiator", {"mat_id": "secBuLi"}],
-        [expt.get("toluene"), 10 * C.Unit("ml"), "solvent"],
-        [expt.get("styrene"), 0.455 * C.Unit("g"), "monomer"],
-        [expt.get("1BuOH"), 5, "quench", {"eq_mat": "secBuLi"}],
-        [expt.get("MeOH"), 100 * C.Unit("ml"), "workup"]
+ingr = Ingr(
+    [expt.get("SecBuLi solution 1.4M cHex"), 0.17 * Unit("mol"), "initiator", {
+        "mat_id": "secBuLi"
+    }],
+    [expt.get("toluene"), 10 * Unit("ml"), "solvent"],
+    [expt.get("styrene"), 0.455 * Unit("g"), "monomer"],
+    [expt.get("1BuOH"), 5, "quench", {
+        "eq_mat": "secBuLi"
+    }],
+    [expt.get("MeOH"), 100 * Unit("ml"), "workup"]
 )
 
 # ingr = [
-#     C.Ingr(expt.get("SecBuLi solution"), type_="initiator", qty=C.Qty(0.17 * C.Unit("mol"), mat_id="secBuLi")),
-#     C.Ingr(inventory.get("toluene"), type_="solvent", qty=C.Qty(10 * C.Unit("ml"))),
-#     C.Ingr(mat_styrene, type_="monomer", qty=C.Qty(0.455 * C.Unit("g"))),
-#     C.Ingr(mat_nBuOH, type_="quench", qty=C.Qty(5, equiv="secBuLi")),
-#     C.Ingr(mat_MeOH, type_="workup", qty=C.Qty(100 * C.Unit("ml")))
+#     Ingr(expt.get("SecBuLi solution"), type_="initiator", qty=Qty(0.17 * Unit("mol"), mat_id="secBuLi")),
+#     Ingr(inventory.get("toluene"), type_="solvent", qty=Qty(10 * Unit("ml"))),
+#     Ingr(mat_styrene, type_="monomer", qty=Qty(0.455 * Unit("g"))),
+#     Ingr(mat_nBuOH, type_="quench", qty=Qty(5, equiv="secBuLi")),
+#     Ingr(mat_MeOH, type_="workup", qty=Qty(100 * Unit("ml")))
 # ]
 
 # Generate node
-process = C.Process(
+process = Process(
     name="Anionic of Styrene",
     ingr=ingr,
     procedure="In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
@@ -386,12 +390,12 @@ process = C.Process(
               "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
               "precipitation in methanol 3 times and dried under vacuum.",
     cond=[
-        C.Cond("temp", 25 * C.Unit("degC")),
-        C.Cond("time", 60 * C.Unit("min")),
-        C.Cond(key="atm", value=mat_argon)
+        Cond("temp", 25 * Unit("degC")),
+        Cond("time", 60 * Unit("min")),
+        Cond(key="atm", value=mat_argon)
     ],
     prop=[
-        C.Prop("yield_mass", 0.47 * C.Unit("g"), 0.02 * C.Unit("g"), method="scale")
+        Prop("yield_mass", 0.47 * Unit("g"), 0.02 * Unit("g"), method="scale")
     ],
     keywords=["polymerization", "living_poly", "anionic", "solution"]
 )
@@ -400,13 +404,13 @@ db.save(process, expt)
 
 ###########################################################
 
-# sec_data = C.Data(
+# sec_data = Data(
 #
 # )
 
 
-mat_poly = C.Material(
-    iden=C.Iden(
+mat_poly = Material(
+    iden=Iden(
         name="polystyrene",
         names=["poly(styrene)", "poly(vinylbenzene)"],
         chem_repeat="C8H8",
@@ -415,11 +419,11 @@ mat_poly = C.Material(
     ),
     c_process=process,
     prop=[
-        C.Prop(key="phase", value="solid"),
-        C.Prop(key="color", value="white"),
-        C.Prop(key="m_n", method="nmr", value=4800 * C.Unit("g/mol"), uncer=400 * C.Unit("g/mol")),
-        C.Prop(key="m_n", method="sec", value=5200 * C.Unit("g/mol"), uncer=100 * C.Unit("g/mol")),
-        C.Prop(key="d", method="sec", value=1.03, uncer=0.02)
+        Prop(key="phase", value="solid"),
+        Prop(key="color", value="white"),
+        Prop(key="m_n", method="nmr", value=4800 * Unit("g/mol"), uncer=400 * Unit("g/mol")),
+        Prop(key="m_n", method="sec", value=5200 * Unit("g/mol"), uncer=100 * Unit("g/mol")),
+        Prop(key="d", method="sec", value=1.03, uncer=0.02)
     ]
 )
 

@@ -39,10 +39,10 @@ class Serializable(ABC):
 
     @staticmethod
     def dict_remove_none(ddict: dict) -> dict:
-        """Remove 'key, value' pair form dictionary if value is None."""
+        """Remove 'key, value' pair form dictionary if value is None or []."""
         _dict = {}
         for k, v in ddict.items():
-            if v is None:
+            if v is None or v == []:
                 continue
             elif isinstance(v, dict):
                 _dict[k] = Serializable.dict_remove_none(v)

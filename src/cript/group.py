@@ -3,14 +3,20 @@ Group Node
 
 """
 
-import re
+from . import CRIPTError
+from .base import BaseModel, BaseReference
+from .utils.validator.type_check import type_check_property
+from .utils.validator.user import email_format_check
 
-from . import BaseModel, CRIPTError
-from cript.utils.validator.type_check import type_check_property
+
+class GroupError(CRIPTError):
+    def __init__(self, *msg):
+        super().__init__(*msg)
 
 
 class Group(BaseModel):
     _class = "Group"
+    _error = GroupError
 
     def __init__(
             self,
@@ -52,35 +58,21 @@ class Group(BaseModel):
         self._website = None
         self.website = website
 
-        self._c_owner = None
-        self.c_owner = c_owner
-
-        self._c_collection = None
-        self.c_collection = c_collection
-
-        self._c_group = None
-        self.c_group = c_group
-
-        self._c_publication = None
-        self.c_publication = c_publication
-
-        self._c_inventory = None
-        self.c_inventory = c_inventory
+        self.c_owner = BaseReference("User", c_owner)
+        self.c_group = BaseReference("Group", c_group)
+        self.c_publication = BaseReference("Publication", c_publication)
+        self.c_collection = BaseReference("Collection", c_collection)
+        self.c_inventory = BaseReference("Inventory", c_inventory)
 
     @property
     def email(self):
         return self._email
 
     @email.setter
+    @email_format_check
     @type_check_property
     def email(self, email):
-        if email is None:
-            self._email = email
-        elif self._email_format_check(email):
-            self._email = email
-        else:
-            msg = f"Email {email} not of correct format. (format: text@text.text)"
-            raise CRIPTError(msg)
+        self._email = email
 
     @property
     def website(self):
@@ -90,54 +82,3 @@ class Group(BaseModel):
     @type_check_property
     def website(self, website):
         self._website = website
-
-    @property
-    def c_owner(self):
-        return self._c_owner
-
-    @c_owner.setter
-    def c_owner(self, c_owner):
-        self._c_owner = c_owner
-
-    @property
-    def c_group(self):
-        return self._c_group
-
-    @c_group.setter
-    def c_group(self, c_group):
-        self._setter_CRIPT_prop(c_group, "c_group")
-
-    @property
-    def c_collection(self):
-        return self._c_collection
-
-    @c_collection.setter
-    def c_collection(self, c_collection):
-        self._setter_CRIPT_prop(c_collection, "c_collection")
-
-    @property
-    def c_publication(self):
-        return self._c_publication
-
-    @c_publication.setter
-    def c_publication(self, c_publication):
-        self._setter_CRIPT_prop(c_publication, "c_publication")
-
-    @property
-    def c_inventory(self):
-        return self._c_inventory
-
-    @c_inventory.setter
-    def c_inventory(self, c_inventory):
-        self._setter_CRIPT_prop(c_inventory, "c_inventory")
-
-    @staticmethod
-    def _email_format_check(email: str) -> bool:
-        """
-        Check email is text@text.text
-        """
-        regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
-        if re.match(regex, email):
-            return True
-        else:
-            return False

@@ -13,7 +13,10 @@ from gridfs import GridFS
 
 from cript.utils.validator.type_check import *
 from .utils.database_tools import *
-from . import load, CRIPTError, User, File
+from . import CRIPTError
+from .base import CriptTypes, load
+from .user import User
+from .data import File
 
 
 class CriptDBError(CRIPTError):
@@ -21,7 +24,7 @@ class CriptDBError(CRIPTError):
         super().__init__(*msg)
 
 
-class CriptDB:
+class CriptDB(CriptTypes):
     cript_types = None
     instances = 0
     user_update = 0
@@ -78,11 +81,6 @@ class CriptDB:
     def __str__(self):
         return f"\nYou are connected to: {self.db_database}" \
                f"\n\tLogged in as: {self.user}"
-
-    @classmethod
-    def _init_(cls):
-        from . import cript_types
-        cls.cript_types = cript_types
 
     @property
     def user(self):
@@ -343,7 +341,7 @@ class CriptDB:
                 raise self._error(msg)
 
         elif obj.class_ == "Group":
-            obj.c_owner = self.user._reference()
+            obj.c_owner.add(self.user)
 
         elif obj.class_ == "Collection":
             parent_obj_types = ["Group", "Publication"]
@@ -430,78 +428,48 @@ class CriptDB:
                     user_node = [globals_[k] for k, v in globals_.items() if isinstance(v, User) and k[0] != "_"]
                     if user_node:
                         user_node = user_node[0]
-                        user_node.c_group = obj.uid
+                        user_node.c_group.add(obj)
                         break
+                else:
+                    raise AttributeError
 
             except AttributeError:  # if no User node found, just load it in and update it
                 coll = self.db["User"]
                 doc = coll.find_one({"_id": ObjectId(self.user)})
                 user_node = load(doc)
-                user_node.c_group = obj.uid
+                user_node.c_group.add(obj)
 
             self.update(user_node)
 
         elif obj.class_ == "Collection":
-            attr = "c_" + obj.class_.lower()
-            if isinstance(parent_obj, list):
-                for i in parent_obj:
-                    setattr(i, attr, obj)
-                    self.update(i)
-            else:
-                setattr(parent_obj, attr, obj)
-                self.update(parent_obj)
+            self._parent_obj_set(obj, parent_obj)
 
         elif obj.class_ == "Experiment":
-            attr = "c_" + obj.class_.lower()
-            if isinstance(parent_obj, list):
-                for i in parent_obj:
-                    setattr(i, attr, obj)
-                    self.update(i)
-            else:
-                setattr(parent_obj, attr, obj)
-                self.update(parent_obj)
+            self._parent_obj_set(obj, parent_obj)
 
         elif obj.class_ == "Inventory":
-            attr = "c_" + obj.class_.lower()
-            if isinstance(parent_obj, list):
-                for i in parent_obj:
-                    setattr(i, attr, obj)
-                    self.update(i)
-            else:
-                setattr(parent_obj, attr, obj)
-                self.update(parent_obj)
+            self._parent_obj_set(obj, parent_obj)
 
         elif obj.class_ == "Material":
-            attr = "c_" + obj.class_.lower()
-            if isinstance(parent_obj, list):
-                for i in parent_obj:
-                    setattr(i, attr, obj)
-                    self.update(i)
-            elif parent_obj is None:
-                pass
-            else:
-                setattr(parent_obj, attr, obj)
-                self.update(parent_obj)
+            self._parent_obj_set(obj, parent_obj)
 
         elif obj.class_ == "Process":
-            attr = "c_" + obj.class_.lower()
-            if isinstance(parent_obj, list):
-                for i in parent_obj:
-                    setattr(i, attr, obj)
-                    self.update(i)
-            else:
-                setattr(parent_obj, attr, obj)
-                self.update(parent_obj)
+            self._parent_obj_set(obj, parent_obj)
 
         elif obj.class_ == "Data":
-            attr = "c_" + obj.class_.lower()
-            if isinstance(parent_obj, list):
-                for i in parent_obj:
-                    setattr(i, attr, obj)
-                    self.update(i)
-            else:
-                setattr(parent_obj, attr, obj)
-                self.update(parent_obj)
+            self._parent_obj_set(obj, parent_obj)
+
+    def _parent_obj_set(self, obj, parent_obj):
+        attr_name = "c_" + obj.class_.lower()
+        if isinstance(parent_obj, list):
+            for i in parent_obj:
+                attr = getattr(i, attr_name)
+                attr.add(obj)
+                self.update(i)
+        else:
+            attr = getattr(parent_obj, attr_name)
+            attr.add(obj)
+            self.update(parent_obj)
 
     @login_check
     def view(self, obj, query: dict = None, num_results: int = 50):
@@ -621,7 +589,7 @@ class CriptDB:
                                 result.append(coll_dict)
                                 key.append(f".{group['name']}")
         elif obj is self.cript_types["Experiment"]:
-            for group in self.user.c_group:
+            for group in self.user.c_group():
                 group_dict = self.db["Group"].find_one({"_id": ObjectId(group["uid"])})
                 if group_dict is not None:
                     if "c_collection" in group_dict.keys():
