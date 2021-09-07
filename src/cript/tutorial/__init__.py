@@ -9,13 +9,14 @@ tutorial_data_part2 = {
         "descr": ""
     },
     "polystyrene_1hnmr": {
-        "path": Path(r".supporting_files/data/Polystyrene_1HNMR.zip"),
+        "path": Path(r"supporting_files/data/Polystyrene_1HNMR.zip"),
         "descr": ""
     },
     "sec_calibration_curve": {
         "path": Path(r"supporting_files/data/sec_calibration_curve.xlsx"),
         "descr": ""
-    }
+    },
+
 }
 
 for k in tutorial_data_part2.keys():

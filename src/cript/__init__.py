@@ -55,6 +55,7 @@ from inspect import getmembers, isclass
 cript_types = {pair[0]: pair[1] for pair in getmembers(sys.modules[__name__], isclass) if "cript." in str(pair[1])}
 cript_types["Unit"] = Unit
 cript_types["Quantity"] = Quantity
+cript_types["Path"] = Path
 
 for node in cript_types.values():
     if hasattr(node, "_init_"):

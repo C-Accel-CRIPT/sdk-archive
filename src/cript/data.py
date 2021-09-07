@@ -5,8 +5,10 @@ Data node
 from typing import Union
 from bson import ObjectId
 
-from . import BaseModel, Cond, CRIPTError, Path
+from . import Cond, CRIPTError, Path
+from .base import BaseModel
 from .utils.serializable import Serializable
+from .utils.printing import KeyPrinting
 from .keys.data import data_keys
 
 
@@ -19,8 +21,8 @@ class File(Serializable):
     def __init__(
             self,
             path: Union[str, Path],
-            labels: str = None,
-            units: str = None,
+            # labels: str = None,
+            # units: str = None,
             descr: str = None,
             file_name: str = None,
             ext: str = None,
@@ -95,10 +97,9 @@ class File(Serializable):
         self._uid = uid
 
 
-class Data(BaseModel):
+class Data(KeyPrinting, BaseModel, _error=DataError):
     keys = data_keys
     _class = "Data"
-    _error = DataError
 
     def __init__(
             self,

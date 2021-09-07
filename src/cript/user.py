@@ -14,9 +14,8 @@ class UserError(CRIPTError):
         super().__init__(*msg)
 
 
-class User(BaseModel):
+class User(BaseModel, _error=UserError):
     _class = "User"
-    _error = UserError
 
     def __init__(
             self,
@@ -79,8 +78,8 @@ class User(BaseModel):
         self._position = None
         self.position = position
 
-        self.c_group = BaseReference("Group", c_group)
-        self.c_publication = BaseReference("Publication", c_publication)
+        self.c_group = BaseReference("Group", c_group, _error=self._error)
+        self.c_publication = BaseReference("Publication", c_publication, _error=self._error)
 
     @property
     def email(self):

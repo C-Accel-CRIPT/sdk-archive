@@ -4,7 +4,7 @@ from bson import ObjectId
 from json import dumps
 from typing import Union
 
-from .. import Quantity
+from .. import Quantity, Unit
 
 
 class Serializable(ABC):
@@ -85,6 +85,7 @@ class Serializable(ABC):
 
 
 class SerializableSub(Serializable, ABC):
+    """ Used with Prop and Cond. """
 
     def as_dict(self, **kwargs) -> dict:
         """Convert and return object as dictionary."""
@@ -110,3 +111,30 @@ class SerializableSub(Serializable, ABC):
                 return value.to(unit_).magnitude
         else:
             return str(value)
+
+    def _loading(self, key, value, uncer):
+        """ Loading from database; will add units back to numbers"""
+        if "+" in key:
+            if value is not None:
+                new_value = value.split(" ", 1)
+                try:
+                    value = float(new_value[0]) * Unit(new_value[1])
+                except Exception:
+                    pass
+                if uncer is not None:
+                    new_value = value.split(" ", 1)
+                    try:
+                        value = float(new_value[0]) * Unit(new_value[1])
+                    except Exception:
+                        pass
+
+        else:
+            if key in self.keys.keys():
+                unit_ = self.keys[key]["unit"]
+                if unit_:
+                    if value is not None:
+                        value = value * Unit(unit_)
+                        if uncer is not None:
+                            value = value * Unit(unit_)
+
+        return key, value, uncer

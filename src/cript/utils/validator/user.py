@@ -2,6 +2,11 @@
 import re
 from functools import wraps
 
+from ... import CRIPTError
+
+
+_error = CRIPTError
+
 
 def email_format_check(func):
     """
@@ -14,7 +19,11 @@ def email_format_check(func):
             regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
             if not re.match(regex, email):
                 msg = f"Email {email} not of correct format. (format: text@text.text)"
-                raise args[0]._error(msg)
+                if hasattr(args[0], "_error"):
+                    raise args[0]._error(msg)
+                else:
+                    global _error
+                    raise _error
 
         value = func(args[0], email)
         return value
@@ -35,7 +44,11 @@ def phone_format_check(func):
                 pass
             else:
                 msg = f"Phone number {phone} not of correct format. (format: numbers and dash only)"
-                raise args[0]._error(msg)
+                if hasattr(args[0], "_error"):
+                    raise args[0]._error(msg)
+                else:
+                    global _error
+                    raise _error
 
         value = func(args[0], phone)
         return value
@@ -56,7 +69,11 @@ def orcid_format_check(func):
                 orcid = orcid[0:4] + "-" + orcid[4:8] + "-" + orcid[8:12] + "-" + orcid[12:]
             else:
                 msg = f"{orcid} invalid format, and not added to user node. (format: ####-####-####-####)"
-                raise args[0]._error(msg)
+                if hasattr(args[0], "_error"):
+                    raise args[0]._error(msg)
+                else:
+                    global _error
+                    raise _error
 
         value = func(args[0], orcid)
         return value

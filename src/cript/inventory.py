@@ -13,9 +13,7 @@ class InventoryError(CRIPTError):
         super().__init__(*msg)
 
 
-class Inventory(BaseModel):
-
-    _error = InventoryError
+class Inventory(BaseModel, _error=InventoryError):
     _class = "Inventory"
 
     def __init__(
@@ -40,7 +38,7 @@ class Inventory(BaseModel):
         """
         super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
-        self.c_material = BaseReference("Material", c_material)
+        self.c_material = BaseReference("Material", c_material, self._error)
 
     def get(self, target):
         return GetMaterial.get(target, self.c_material())

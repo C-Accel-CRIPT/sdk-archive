@@ -70,10 +70,10 @@ class Cond(SerializableSub, KeyPrinting, CriptTypes):
     @cond_keys_check
     def value(self, value):
         if isinstance(value, self.cript_types["Material"]):
-            value = value._reference()
+            value = value.reference()
         elif isinstance(value, dict) and "class_" in value.keys():
             value = load(value)
-            value = value._reference()
+            value = value.reference()
         self._value = value
 
     @property
@@ -100,30 +100,3 @@ class Cond(SerializableSub, KeyPrinting, CriptTypes):
         CriptTypes._init_()
         from .keys.cond import cond_keys
         cls.keys = cond_keys
-
-    def _loading(self, key, value, uncer):
-        """ Loading from database; will add units back to numbers"""
-        if "+" in key:
-            if value is not None:
-                new_value = value.split(" ", 1)
-                try:
-                    value = float(new_value[0]) * Unit(new_value[1])
-                except Exception:
-                    pass
-                if uncer is not None:
-                    new_value = value.split(" ", 1)
-                    try:
-                        value = float(new_value[0]) * Unit(new_value[1])
-                    except Exception:
-                        pass
-
-        else:
-            if key in self.keys.keys():
-                unit_ = self.keys[key]["unit"]
-                if unit_:
-                    if value is not None:
-                        value = value * Unit(unit_)
-                        if uncer is not None:
-                            value = value * Unit(unit_)
-
-        return key, value, uncer

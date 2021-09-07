@@ -250,7 +250,7 @@ class CriptDB(CriptTypes):
                         result = coll.find_one({"_id": ObjectId(item)})
                         if result:
                             node = load(result)
-                            new_value.append(node._reference())
+                            new_value.append(node.reference())
                         else:
                             msg = f"'{item}' in '{key}' not found in database."
                             raise self._error(msg)
@@ -282,7 +282,7 @@ class CriptDB(CriptTypes):
                         result = coll.find_one({"_id": ObjectId(item)})
                         if result:
                             node = load(result)
-                            new_value.append(node._reference())
+                            new_value.append(node.reference())
                         else:
                             msg = f"'{item}' in '{key}' not found in database."
                             raise self._error(msg)
@@ -317,7 +317,7 @@ class CriptDB(CriptTypes):
             raise self._error(msg)
 
         if obj.uid is not None:
-            msg = "uid should not have an id already. If you are trying to update an existing doc, "\
+            msg = f"'uid' for {obj.name} should not have an id already. If you are trying to update an existing doc, "\
                             "don't use 'save', use 'update'."
             raise self._error(msg)
 
@@ -360,7 +360,7 @@ class CriptDB(CriptTypes):
             self._parent_obj_check(obj, parent_obj, parent_obj_types)
 
         elif obj.class_ == "Data":
-            parent_obj_types = ["Experiment", "Material", "Process"]
+            parent_obj_types = ["Experiment"]
             self._parent_obj_check(obj, parent_obj, parent_obj_types)
             obj = self._save_file(obj)
 

@@ -8,11 +8,25 @@ from difflib import SequenceMatcher
 from . import CRIPTError, Cond, Prop
 from .base import BaseModel, BaseReference
 from .utils.serializable import Serializable
-from cript.utils.validator.type_check import type_check_property, type_check
+from .utils.external_database_code import GetMaterialID
+from .utils.validator.type_check import type_check_property, type_check
+from .utils.printing import KeyPrinting
 from .keys.material import *
 
 
+class MaterialError(CRIPTError):
+    def __init__(self, *msg):
+        super().__init__(*msg)
+
+
+class IdenError(CRIPTError):
+    def __init__(self, *msg):
+        super().__init__(*msg)
+
+
 class Iden(Serializable):
+    _error = IdenError
+
     def __init__(
             self,
             c_material: Union[str, "Material"] = None,
@@ -38,9 +52,6 @@ class Iden(Serializable):
         :param pubchem_cid: PubChem CID
         :param inchi: IUPAC International Chemical Identifier
         :param inchi_key: a hashed version of the full InChI
-
-        :param mat_id:
-        :param main_uid:
         """
 
         self._name = None
@@ -80,8 +91,7 @@ class Iden(Serializable):
         self._inchi_key = None
         self.inchi_key = inchi_key
 
-        self._c_material = None
-        self.c_material = c_material
+        self.c_material = BaseReference("Material", c_material, self._error)
 
     @property
     def name(self):
@@ -173,18 +183,9 @@ class Iden(Serializable):
     def inchi_key(self, inchi_key):
         self._inchi_key = inchi_key
 
-    @property
-    def c_material(self):
-        return self._c_material
 
-    @c_material.setter
-    def c_material(self, c_material):
-        pass
-        #BaseModel._setter_CRIPT_prop(c_material, "c_material")
-
-
-class Material(BaseModel):
-    keys = [k for k in keywords_material_p.keys()] + [k for k in keywords_material.keys()]
+class Material(KeyPrinting, BaseModel, _error=MaterialError):
+    keys = keywords_material_p | keywords_material
     _class = "Material"
 
     def __init__(
@@ -242,7 +243,7 @@ class Material(BaseModel):
         self._hazard = None
         self.hazard = hazard
 
-        self.c_process = BaseReference("Process", c_process)
+        self.c_process = BaseReference("Process", c_process, self._error)
 
         if name is None:
             name = self._name_from_identifier()
@@ -263,19 +264,19 @@ class Material(BaseModel):
         elif isinstance(obj, Iden):
             ddict["1"] = obj.as_dict()
         elif isinstance(obj, Material):
-            ddict["1"] = obj._reference
+            ddict["1"] = obj.reference
         elif isinstance(obj, list):
             for i, iden in enumerate(obj):
                 if isinstance(iden, Iden):
                     ddict[f"{i+1}"] = iden.as_dict()
                 elif isinstance(iden, Material):
-                    ddict[f"{i+1}"] = iden._reference()
+                    ddict[f"{i+1}"] = iden.reference()
                 else:
                     mes = "Invalid Identifier provided."
-                    raise CRIPTError(mes)
+                    raise self._error(mes)
         else:
             mes = "Invalid Identifier provided."
-            raise CRIPTError(mes)
+            raise self._error(mes)
 
         self._iden = ddict
 
@@ -362,18 +363,5 @@ class Material(BaseModel):
 
     def _get_mat_id(self, target: str) -> int:
         """given a string (likely chemical name) find mat_id."""
-        results = []
+        return GetMaterialID.get_id(target, self)
 
-        # quick search
-        for _id, mat in self.iden.items():
-            r = SequenceMatcher(None, target, mat["name"]).ratio()
-            if r > 0.95:
-                return _id
-            else:
-                results.append([_id, r])
-
-        if max_ := max([i[1] for i in results]) > 0.8:
-            return [i[0] for i in results if i[1] == max_][0]
-        else:
-            mes = f"'{target}' not found or wasn't close enough to material name."
-            CRIPTError(mes)

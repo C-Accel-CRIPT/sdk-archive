@@ -14,9 +14,8 @@ class GroupError(CRIPTError):
         super().__init__(*msg)
 
 
-class Group(BaseModel):
+class Group(BaseModel, _error=GroupError):
     _class = "Group"
-    _error = GroupError
 
     def __init__(
             self,
@@ -60,9 +59,9 @@ class Group(BaseModel):
 
         self.c_owner = BaseReference("User", c_owner)
         self.c_group = BaseReference("Group", c_group)
-        self.c_publication = BaseReference("Publication", c_publication)
-        self.c_collection = BaseReference("Collection", c_collection)
-        self.c_inventory = BaseReference("Inventory", c_inventory)
+        self.c_publication = BaseReference("Publication", c_publication, self._error)
+        self.c_collection = BaseReference("Collection", c_collection, self._error)
+        self.c_inventory = BaseReference("Inventory", c_inventory, self._error)
 
     @property
     def email(self):

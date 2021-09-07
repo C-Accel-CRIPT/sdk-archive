@@ -1,10 +1,17 @@
 from typing import Union
 
-from . import Quantity, Unit, Cond
+from . import Quantity, CRIPTError
+from .base import BaseReference
+from .cond import Cond
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.validator.prop import prop_keys_check
 from .utils.serializable import SerializableSub
 from .utils.printing import KeyPrinting
+
+
+class CondError(CRIPTError):
+    def __init__(self, *msg):
+        super().__init__(*msg)
 
 
 class Prop(SerializableSub, KeyPrinting):
@@ -12,6 +19,7 @@ class Prop(SerializableSub, KeyPrinting):
     keys_polymer = None
     keys_rxn = None
     keys = None
+    _error = CondError
 
     def __init__(
             self,
@@ -19,9 +27,9 @@ class Prop(SerializableSub, KeyPrinting):
             value: Union[float, int, str, Quantity],
             uncer: Union[float, int, Quantity] = None,
             method: str = None,
-            mat_id: int = 0,
+            mat_id: Union[str, int] = "0",
             component: str = None,
-            data_uid: str = None,
+            c_data=None,
             cond: Union[list[Cond], Cond] = None,
             _loading: bool = False
     ):
@@ -33,7 +41,7 @@ class Prop(SerializableSub, KeyPrinting):
         :param uncer:
         :param component:
         :param method:
-        :param data_uid:
+        :param c_data:
         :param cond:
         """
         if _loading:
@@ -57,20 +65,25 @@ class Prop(SerializableSub, KeyPrinting):
         self._method = None
         self.method = method
 
-        self._data_uid = None
-        self.data_uid = data_uid
-
         self._cond = None
         self.cond = cond
+
+        self._c_data = None
+        self.c_data = BaseReference("Data", c_data, self._error)
 
     @property
     def mat_id(self):
         return self._mat_id
 
     @mat_id.setter
-    @type_check_property
     def mat_id(self, mat_id):
-        self._mat_id = mat_id
+        if isinstance(mat_id, int):
+            mat_id = str(mat_id)
+        if isinstance(mat_id, str):
+            self._mat_id = mat_id
+        else:
+            mes = "Invalid mat_id type."
+            self._error(mes)
 
     @property
     def key(self):
@@ -118,15 +131,6 @@ class Prop(SerializableSub, KeyPrinting):
         self._method = method
 
     @property
-    def data_uid(self):
-        return self._data_uid
-
-    @data_uid.setter
-    @type_check_property
-    def data_uid(self, data_uid):
-        self._data_uid = data_uid
-
-    @property
     def cond(self):
         return self._cond
 
@@ -165,30 +169,3 @@ class Prop(SerializableSub, KeyPrinting):
         print("-" * 19)
         text = cls.to_table(cls.keys_rxn)
         print(text)
-
-    def _loading(self, key, value, uncer):
-        """ Loading from database; will add units back to numbers"""
-        if "+" in key:
-            if value is not None:
-                new_value = value.split(" ", 1)
-                try:
-                    value = float(new_value[0]) * Unit(new_value[1])
-                except Exception:
-                    pass
-                if uncer is not None:
-                    new_value = value.split(" ", 1)
-                    try:
-                        value = float(new_value[0]) * Unit(new_value[1])
-                    except Exception:
-                        pass
-
-        else:
-            if key in self.keys.keys():
-                unit_ = self.keys[key]["unit"]
-                if unit_:
-                    if value is not None:
-                        value = value * Unit(unit_)
-                        if uncer is not None:
-                            value = value * Unit(unit_)
-
-        return key, value, uncer

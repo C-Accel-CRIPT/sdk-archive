@@ -3,14 +3,19 @@ Process Node
 
 """
 from typing import Union
+from warnings import warn
 
 from fuzzywuzzy import process
 
-from . import BaseModel, Cond, Prop, Unit, Quantity, CRIPTError, CRIPTWarning, Material, load
-from .utils.serializable import Serializable, SerializableSub
+from . import Unit, Quantity, CRIPTError
+from .cond import Cond
+from .prop import Prop
+from .material import Material
+from .base import BaseModel, load
 from .utils.printing import KeyPrinting
-from .keys.process import *
-from .utils.ingr_calc import unit_check_bool, ingr_calc_mass_vol_mole, unit_to_qty_key, ingr_equiv_molarity_mass_frac, scale_one
+from .keys.process import Ingr_keys, Qty_keys, Process_keys
+from .utils.ingr_calc import unit_check_bool, ingr_calc_mass_vol_mole, unit_to_qty_key, \
+    ingr_equiv_molarity_mass_frac, scale_one
 
 
 class ProcessError(CRIPTError):
@@ -52,7 +57,7 @@ class Ingr(KeyPrinting):
                 self.add(*arg, **kwarg)
 
     def __repr__(self):
-        return ""
+        return self._table()
 
     def __str__(self):
         return self._table()
@@ -71,9 +76,10 @@ class Ingr(KeyPrinting):
 
         # check if Material is valid input
         if isinstance(mat, Material):
-            mat_ref = mat._referance()
-        elif isinstance(mat, dict) and "class_" in mat.keys() and isinstance(mat := load(mat), Material):
-            mat_ref = mat._reference()
+            mat_ref = mat.reference()
+        elif isinstance(mat, dict) and "class_" in mat.keys() and isinstance(node := load(mat), Material):
+            mat = node
+            mat_ref = mat.reference()
         else:
             mes = "Invalid 'mat'"
             raise self._error(mes)
@@ -129,13 +135,12 @@ class Ingr(KeyPrinting):
 
         else:
             mes = "Invaid"
-            raise IngrError(mes)
+            raise self._error(mes)
 
     def remove(self, mat: Union[int, str]):
         """
         Removes mat from ingr
-        :param mat: material to be scaled
-        :param factor: scale factor
+        :param mat: material to be removed
         """
         if isinstance(mat, int) and mat <= len(self._ingr):
             del self._ingr[mat]
@@ -166,7 +171,7 @@ class Ingr(KeyPrinting):
             mat = self.get_mat_index(mat)
             self._ingr[mat] = scale_one(self._ingr[mat], factor)
 
-    def as_dict(self, save: False) -> list[dict]:
+    def as_dict(self, **kwargs) -> list[dict]:
         out = []
         keys = ["uid", "name"] + list(self.keys_Qty.keys())
         for ingr in self._ingr:
@@ -197,14 +202,14 @@ class Ingr(KeyPrinting):
             mat_prop_2 = Ingr._get_prop_from_mat_id(mat, ["molar_mass", "m_n", "molar_conc", "density"], mat_id)
             if mat_prop_2 == {}:
                 mes = f"'mat_id' for {mat.name} found no properties to assist with ingredient calculations."
-                CRIPTWarning(mes)
+                warn(mes)
             else:
                 mat_prop = mat_prop | mat_prop_2
 
         return mat_prop
 
     @staticmethod
-    def _get_prop_from_mat_id(mat: Material, prop: list[str], mat_id: int = 0) -> dict:
+    def _get_prop_from_mat_id(mat: Material, prop: list[str], mat_id: str = "0") -> dict:
         out = {}
         mat_props = [[p.key, p.value] for p in mat.prop if p.mat_id == mat_id]
         for p in mat_props:
@@ -215,7 +220,7 @@ class Ingr(KeyPrinting):
     def _table(self) -> str:
 
         if len(self._ingr) == 0:
-            print("No ingredients.")
+            return "No ingredients."
 
         headers = self._table_headers()
         row_format = ""
@@ -254,10 +259,9 @@ class Ingr(KeyPrinting):
         return names.index(closest_name)
 
 
-class Process(BaseModel):
-    keys = Process_keys
+class Process(KeyPrinting, BaseModel, _error=ProcessError):
     _class = "Process"
-    _error = ProcessError
+    keys = Process_keys
 
     def __init__(
             self,

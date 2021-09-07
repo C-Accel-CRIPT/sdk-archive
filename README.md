@@ -10,22 +10,14 @@ To rebuild cript and refresh:
 2) pip  install -e .
 
 
-
 <u>To do list:</u>
-* Overall:
-    * security
-        * Groups: owner has to approve new user
-    * `db.view()` allow advance searching and sort (alphabetical, date created, number of members, owner)
-    * deleting
+* security
+* `db.view()` allow advance searching and sort (alphabetical, date created, number of members, owner)
+* deleting
+* view counts per document
+* exporting
 
-* User:
-    *
-    
-* Group
-    * 
-    
 
 tutorials:
 * advanced searching
 * publications
-* tracking views of documents

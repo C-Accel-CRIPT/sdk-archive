@@ -13,9 +13,8 @@ class ExperimentError(CRIPTError):
         super().__init__(*msg)
 
 
-class Experiment(BaseModel):
+class Experiment(BaseModel, _error=ExperimentError):
     _class = "Experiment"
-    _error = ExperimentError
 
     def __init__(
         self,
@@ -38,9 +37,9 @@ class Experiment(BaseModel):
         self._funding = None
         self.funding = funding
 
-        self.c_material = BaseReference("Material", c_material)
-        self.c_process = BaseReference("Process", c_process)
-        self.c_data = BaseReference("Data", c_data)
+        self.c_material = BaseReference("Material", c_material, self._error)
+        self.c_process = BaseReference("Process", c_process, self._error)
+        self.c_data = BaseReference("Data", c_data, self._error)
 
     @property
     def funding(self):
@@ -51,4 +50,5 @@ class Experiment(BaseModel):
         self._funding = funding
 
     def get(self, target):
+        """ Given a target (chemical name, cas number or some other identity find material."""
         return GetMaterial.get(target, self.c_material())

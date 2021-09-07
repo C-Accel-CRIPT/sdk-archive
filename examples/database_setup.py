@@ -15,6 +15,7 @@ user_node = User(
     organization="Mass. Institute of Technology",
     position="Postdoc"
 )
+
 db.save(user_node)
 
 #####################################################
@@ -82,6 +83,34 @@ mat_water = Material(
 )
 
 db.save(mat_water, inventory)
+
+mat_cdcl3 = Material(
+    iden=Iden(
+        name="deuterated chloroform",
+        names=["chloroform-d", "deuterochloroform", "trichloro(deuterio)methane"],
+        chem_formula="CDCl3",
+        smiles="[2H]C(Cl)(Cl)Cl",
+        cas="865-49-6",
+        pubchem_cid="71583",
+        inchi_key="HEDRZPFGACZZDS-MICDWDOJSA-N"
+    ),
+    prop=[Prop(key="phase", value="liquid"),
+          Prop(key="color", value="colorless"),
+          Prop(key="molar_mass", value=120.384* Unit("g/mol"), method="prescribed"),
+          Prop(key="density", value=1.5 * Unit("g/ml"),
+               cond=[Cond(key="temp", value=25 * Unit("degC"))]
+               ),
+          Prop(key="bp", value=61 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("bar"))]
+               ),
+          Prop(key="mp", value=-64 * Unit("degC"),
+               cond=[Cond(key="pres", value=1 * Unit("bar"))]
+               )
+          ],
+)
+
+db.save(mat_cdcl3, inventory)
+
 
 mat_nitrogen = Material(
     iden=Iden(
@@ -360,30 +389,16 @@ db.save(mat_solution, [expt, inventory])
 ########################################################################
 
 
-ingr = Ingr(
-    [expt.get("SecBuLi solution 1.4M cHex"), 0.17 * Unit("mol"), "initiator", {
-        "mat_id": "secBuLi"
-    }],
-    [expt.get("toluene"), 10 * Unit("ml"), "solvent"],
-    [expt.get("styrene"), 0.455 * Unit("g"), "monomer"],
-    [expt.get("1BuOH"), 5, "quench", {
-        "eq_mat": "secBuLi"
-    }],
-    [expt.get("MeOH"), 100 * Unit("ml"), "workup"]
-)
-
-# ingr = [
-#     Ingr(expt.get("SecBuLi solution"), type_="initiator", qty=Qty(0.17 * Unit("mol"), mat_id="secBuLi")),
-#     Ingr(inventory.get("toluene"), type_="solvent", qty=Qty(10 * Unit("ml"))),
-#     Ingr(mat_styrene, type_="monomer", qty=Qty(0.455 * Unit("g"))),
-#     Ingr(mat_nBuOH, type_="quench", qty=Qty(5, equiv="secBuLi")),
-#     Ingr(mat_MeOH, type_="workup", qty=Qty(100 * Unit("ml")))
-# ]
-
 # Generate node
 process = Process(
     name="Anionic of Styrene",
-    ingr=ingr,
+    ingr=Ingr(
+        [expt.get("SecBuLi solution 1.4M cHex"), 0.17 * Unit("mol"), "initiator", {"mat_id": "secBuLi"}],
+        [expt.get("toluene"), 10 * Unit("ml"), "solvent"],
+        [expt.get("styrene"), 0.455 * Unit("g"), "monomer"],
+        [expt.get("1BuOH"), 5, "quench", {"eq_mat": "secBuLi"}],
+        [expt.get("MeOH"), 100 * Unit("ml"), "workup"]
+    ),
     procedure="In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
               "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
               "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
@@ -404,10 +419,39 @@ db.save(process, expt)
 
 ###########################################################
 
-# sec_data = Data(
-#
-# )
 
+sec_data_path = tutorial.tutorial_data_part2["polystyrene_sec"]["path"]
+cal_path = tutorial.tutorial_data_part2["sec_calibration_curve"]["path"]
+nmr1h_path = tutorial.tutorial_data_part2["polystyrene_1hnmr"]["path"]
+
+sec_data = Data(
+    name="Crude SEC of polystyrene",
+    _type="sec_trace",
+    file=File(sec_data_path),
+    sample_prep="5 mg of polymer in 1 ml of THF, filtered 0.45um pores.",
+    cond=[
+        Cond("temp", 30 * Unit("degC")),
+        Cond("time", 60 * Unit("min")),
+        Cond("solvent", value=expt.get("THF")),
+        Cond("+flow_rate", 1 * Unit("ml/min"))
+    ],
+    calibration=File(cal_path)
+)
+
+nmr_data = Data(
+    name="Crude 1H NMR of polystyrene",
+    _type="nmr_h1",
+    file=File(nmr1h_path),
+    cond=[
+        Cond("temp", 25 * Unit("degC")),
+        Cond("solvent", value=inventory.get("CDCl3")),
+    ]
+)
+
+db.save(sec_data, expt)
+db.save(nmr_data, expt)
+
+###########################################################
 
 mat_poly = Material(
     iden=Iden(
@@ -421,9 +465,9 @@ mat_poly = Material(
     prop=[
         Prop(key="phase", value="solid"),
         Prop(key="color", value="white"),
-        Prop(key="m_n", method="nmr", value=4800 * Unit("g/mol"), uncer=400 * Unit("g/mol")),
-        Prop(key="m_n", method="sec", value=5200 * Unit("g/mol"), uncer=100 * Unit("g/mol")),
-        Prop(key="d", method="sec", value=1.03, uncer=0.02)
+        Prop(key="m_n", method="nmr", value=4800 * Unit("g/mol"), uncer=400 * Unit("g/mol"), c_data=nmr_data),
+        Prop(key="m_n", method="sec", value=5200 * Unit("g/mol"), uncer=100 * Unit("g/mol"), c_data=sec_data),
+        Prop(key="d", method="sec", value=1.03, uncer=0.02, c_data=sec_data)
     ]
 )
 

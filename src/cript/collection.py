@@ -12,9 +12,8 @@ class CollectionError(CRIPTError):
         super().__init__(*msg)
 
 
-class Collection(BaseModel):
+class Collection(BaseModel, _error=CollectionError):
     _class = "Collection"
-    _error = CollectionError
 
     def __init__(
         self,
@@ -42,6 +41,6 @@ class Collection(BaseModel):
         """
         super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
 
-        self.c_experiment = BaseReference("Experiment", c_experiment)
-        self.c_collection = BaseReference("Collection", c_collection)
-        self.c_inventory = BaseReference("Inventory", c_inventory)
+        self.c_experiment = BaseReference("Experiment", c_experiment, self._error)
+        self.c_collection = BaseReference("Collection", c_collection, self._error)
+        self.c_inventory = BaseReference("Inventory", c_inventory, self._error)

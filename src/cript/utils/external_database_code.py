@@ -72,7 +72,7 @@ class GetObject(ABC):
                 found_obj = found_obj[0]
                 break
         else:
-            mes = f"{obj} not found in globals, so 'Material.get()' is not working."
+            mes = f"{obj} not found in globals, so '.get()' is not working."
             raise Exception(mes)
 
         return found_obj
@@ -131,7 +131,7 @@ class GetMaterial(GetObject, ABC):
         else:
             if scores[best_match_index] != 100:
                 mes = f"Perfect match not found for '{target}', but close match found: " \
-                      f"'{mats[best_match_index]['name']}'."
+                      f"'{mats[best_match_index]['name']}' and used."
                 warn(mes)
 
             return best_match_index
@@ -173,18 +173,24 @@ class GetMaterial(GetObject, ABC):
 
         return text, score
 
-    @staticmethod
-    def _get_set_of_values(mat: dict) -> set[str]:
+    @classmethod
+    def _get_set_of_values(cls, mat: dict) -> set[str]:
         """ Returns a set of all idens """
         out = set()
         out.add(mat["name"])
         for iden in mat["iden"].values():
-            for v in iden.values():
-                if isinstance(v, list):
-                    for i in v:
-                        out.add(i)
-                else:
-                    out.add(v)
+            out.update(cls._get_set_of_values_from_iden(iden))
+        return out
+
+    @staticmethod
+    def _get_set_of_values_from_iden(iden: dict) -> set[str]:
+        out = set()
+        for v in iden.values():
+            if isinstance(v, list):
+                for i in v:
+                    out.add(i)
+            else:
+                out.add(v)
         return out
 
     @staticmethod
@@ -229,3 +235,25 @@ class GetMaterial(GetObject, ABC):
     @classmethod
     def _get_one_mat(cls, uid) -> dict:
         return cls.get_from_uid("Material", uid)[0]
+
+
+class GetMaterialID(GetMaterial):
+    """For Material."""
+
+    @classmethod
+    def get_id(cls, target, material):
+        scores = []
+        for _id, mat_ref in material.iden.items():
+            mat = cls._get_one_mat(mat_ref["uid"])
+            values = cls._get_set_of_values(mat)
+            r = cls._get_score(target, values)[1]
+            if r > 95:
+                return _id
+            else:
+                scores.append([_id, r])
+
+        if max_ := max([i[1] for i in scores]) > 0.75:
+            return [i[0] for i in scores if i[1] == max_][0]
+        else:
+            mes = f"'{target}' not found or wasn't close enough to material name."
+            raise cls._error(mes)

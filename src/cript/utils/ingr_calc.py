@@ -1,4 +1,5 @@
 from typing import Union
+from warnings import warn
 
 from .. import Quantity, Unit, CRIPTError
 from ..keys.process import Qty_keys
@@ -181,7 +182,7 @@ def calc_equivalence(ingr: list[dict]) -> list[dict]:
     if base_moles is None:
         if fall_back_base_moles is None:
             mes = "No moles on any chemicals so can't calculate equivalence."
-            CRIPTWarning(mes)
+            warn(mes)
         else:
             base_moles = fall_back_base_moles
 
@@ -250,6 +251,5 @@ def scale_one(ingr: dict, factor: Union[int, float]) -> dict:
         if k in ingr.keys():
             ingr[k] = ingr[k] * factor
             flag = False
-
 
     return ingr
