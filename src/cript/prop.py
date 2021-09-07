@@ -3,6 +3,7 @@ from typing import Union
 from . import Quantity, CRIPTError
 from .base import BaseReference
 from .cond import Cond
+from .doc_tools import loading_with_units
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.validator.prop import prop_keys_check
 from .utils.serializable import SerializableSub
@@ -137,12 +138,7 @@ class Prop(SerializableSub, KeyPrinting):
     @cond.setter
     @type_check((list[Cond], Cond, None))
     def cond(self, cond):
-        if isinstance(cond, list):
-            for i, s in enumerate(cond):
-                if isinstance(s, dict):
-                    cond[i] = Cond(**s, _loading=True)
-        elif isinstance(cond, Cond):
-            cond = [cond]
+        cond = loading_with_units(cond, Cond)
         self._cond = cond
 
     @classmethod

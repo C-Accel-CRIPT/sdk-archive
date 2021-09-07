@@ -8,12 +8,14 @@ from .base import BaseModel
 
 
 class Simulation(BaseModel):
-    _class = "Simulation"
+    class_ = "Simulation"
 
     def __init__(
             self,
             name: str,
-            notes: str = None):
-        super().__init__(name=name, _class=self._class, notes=notes)
+            notes: str = None,
+            **kwargs
+    ):
+        super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
 

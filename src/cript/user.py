@@ -15,7 +15,7 @@ class UserError(CRIPTError):
 
 
 class User(BaseModel, _error=UserError):
-    _class = "User"
+    class_ = "User"
 
     def __init__(
             self,
@@ -47,7 +47,7 @@ class User(BaseModel, _error=UserError):
         :param c_group: CRIPT group you belong to
 
         :param notes: Any miscellaneous notes related to the user.
-        :param _class: class of node.
+        :param class_: class of node.
         :param uid: The unique ID of the material.
         :param model_version: Version of CRIPT data model.
         :param version_control: Link to version control node.
@@ -55,7 +55,7 @@ class User(BaseModel, _error=UserError):
         :param created_date: Date it was created.
         """
 
-        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
+        super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
         self._email = None
         self.email = email

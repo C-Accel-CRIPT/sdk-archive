@@ -8,14 +8,15 @@ from warnings import warn
 from fuzzywuzzy import process
 
 from . import Unit, Quantity, CRIPTError
+from .base import BaseModel
 from .cond import Cond
 from .prop import Prop
+from .doc_tools import load, loading_with_units
 from .material import Material
-from .base import BaseModel, load
 from .utils.printing import KeyPrinting
-from .keys.process import Ingr_keys, Qty_keys, Process_keys
 from .utils.ingr_calc import unit_check_bool, ingr_calc_mass_vol_mole, unit_to_qty_key, \
     ingr_equiv_molarity_mass_frac, scale_one
+from .keys.process import Ingr_keys, Qty_keys, Process_keys
 
 
 class ProcessError(CRIPTError):
@@ -43,14 +44,12 @@ class Ingr(KeyPrinting):
 
         self._ingr = []
 
-        # Load existing ingr
-        # if _key:
-        #     value = self._loading(value, uncer)
-
-        # add ingrs
-        for arg in args:
-            kwarg = {}
-            if isinstance(arg, list):
+        if all([isinstance(i, dict) for i in args[0]]):  # if loading from doc
+            self._loading(args[0])
+            return
+        elif all([isinstance(i, list) for i in args[0]]):
+            for arg in args[0]:
+                kwarg = {}
                 for i, a in enumerate(arg):  # get keyword arguments
                     if isinstance(a, dict) and len(a.keys()) == 1:
                         kwarg = kwarg | arg.pop(i)
@@ -61,6 +60,32 @@ class Ingr(KeyPrinting):
 
     def __str__(self):
         return self._table()
+
+    def __call__(self):
+        return self._ingr
+
+    def __getitem__(self, item):
+        if isinstance(item, int):
+            return self._ingr[item]
+        elif isinstance(item, str):
+            index = self._get_index_from_name(item)
+            return self._ingr[index]
+        else:
+            mes = "Item not found."
+            raise self._error(mes)
+
+    @property
+    def ingr(self):
+        return self.as_dict()
+
+    def _get_index_from_name(self, item: str) -> int:
+        values = [i["name"] for i in self._ingr]
+        text, score = process.extractOne(item, values)
+        if score > 50:
+            return values.index(text)
+        else:
+            mes = f"'{item}' not found."
+            raise self._error(mes)
 
     def add(self, mat: Union[Material], qty: Union[int, float, Quantity], keyword: str = None,
             eq_mat=None, mat_id=None):
@@ -134,7 +159,7 @@ class Ingr(KeyPrinting):
             self._ingr = ingr_equiv_molarity_mass_frac(self._ingr)
 
         else:
-            mes = "Invaid"
+            mes = "Invaid??"
             raise self._error(mes)
 
     def remove(self, mat: Union[int, str]):
@@ -171,16 +196,19 @@ class Ingr(KeyPrinting):
             mat = self.get_mat_index(mat)
             self._ingr[mat] = scale_one(self._ingr[mat], factor)
 
-    def as_dict(self, **kwargs) -> list[dict]:
+    def as_dict(self, save=True) -> list[dict]:
         out = []
-        keys = ["uid", "name"] + list(self.keys_Qty.keys())
+        keys = ["uid", "name", "class_"] + list(self.keys_Qty.keys())
         for ingr in self._ingr:
             ingr_dict = {}
             for k in keys:
                 if k in ingr.keys():
                     value = ingr[k]
                     if isinstance(value, Quantity):
-                        value = value.to(self.keys_Qty[k]["unit"]).magnitude
+                        if save:
+                            value = value.to(self.keys_Qty[k]["unit"]).magnitude
+                        else:
+                            value = str(value.to(self.keys_Qty[k]["unit"]))
                     ingr_dict[k] = value
 
             out.append(ingr_dict)
@@ -258,15 +286,27 @@ class Ingr(KeyPrinting):
 
         return names.index(closest_name)
 
+    def _loading(self, list_ingr: list[dict]):
+        """Loading a data back into Ingr from Mongodb document"""
+        for ingr in list_ingr:
+            ingr_dict = {}
+            for k, v in ingr.items():
+                if k in self.keys_Qty:
+                    ingr_dict[k] = v * Unit(self.keys_Qty[k]["unit"])
+                else:
+                    ingr_dict[k] = v
+
+            self._ingr.append(ingr_dict)
+
 
 class Process(KeyPrinting, BaseModel, _error=ProcessError):
-    _class = "Process"
+    class_ = "Process"
     keys = Process_keys
 
     def __init__(
             self,
             name: str,
-            ingr: Ingr,
+            ingr,
             procedure: str,
             cond: list[Cond],
             prop: list[Prop] = None,
@@ -291,10 +331,7 @@ class Process(KeyPrinting, BaseModel, _error=ProcessError):
         :param last_modified_date: Last date the node was modified.
         :param created_date: Date it was created.
         """
-        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
-
-        self._ingr = None
-        self.ingr = ingr
+        super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
         self._procedure = None
         self.procedure = procedure
@@ -308,13 +345,10 @@ class Process(KeyPrinting, BaseModel, _error=ProcessError):
         self._cond = None
         self.cond = cond
 
-    @property
-    def ingr(self):
-        return self._ingr
-
-    @ingr.setter
-    def ingr(self, ingr):
-        self._ingr = ingr
+        if isinstance(ingr, Ingr):
+            self.ingr = ingr
+        else:
+            self.ingr = Ingr(ingr)
 
     @property
     def procedure(self):
@@ -330,6 +364,7 @@ class Process(KeyPrinting, BaseModel, _error=ProcessError):
 
     @prop.setter
     def prop(self, prop):
+        prop = loading_with_units(prop, Prop)
         self._prop = prop
 
     @property
@@ -346,4 +381,5 @@ class Process(KeyPrinting, BaseModel, _error=ProcessError):
 
     @cond.setter
     def cond(self, cond):
+        cond = loading_with_units(cond, Cond)
         self._cond = cond

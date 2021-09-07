@@ -15,7 +15,7 @@ class GroupError(CRIPTError):
 
 
 class Group(BaseModel, _error=GroupError):
-    _class = "Group"
+    class_ = "Group"
 
     def __init__(
             self,
@@ -49,7 +49,7 @@ class Group(BaseModel, _error=GroupError):
         :param created_date: Date it was created.
         """
 
-        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
+        super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
         self._email = None
         self.email = email

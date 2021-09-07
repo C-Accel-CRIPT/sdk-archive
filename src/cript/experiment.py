@@ -14,7 +14,7 @@ class ExperimentError(CRIPTError):
 
 
 class Experiment(BaseModel, _error=ExperimentError):
-    _class = "Experiment"
+    class_ = "Experiment"
 
     def __init__(
         self,
@@ -32,7 +32,7 @@ class Experiment(BaseModel, _error=ExperimentError):
 
         :param notes: Any miscellaneous notes related to the user.
         """
-        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
+        super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
         self._funding = None
         self.funding = funding

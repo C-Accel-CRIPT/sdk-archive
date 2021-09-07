@@ -7,6 +7,7 @@ from bson import ObjectId
 
 from . import Cond, CRIPTError, Path
 from .base import BaseModel
+from .doc_tools import loading_with_units
 from .utils.serializable import Serializable
 from .utils.printing import KeyPrinting
 from .keys.data import data_keys
@@ -20,7 +21,7 @@ class DataError(CRIPTError):
 class File(Serializable):
     def __init__(
             self,
-            path: Union[str, Path],
+            path: Union[str, Path] = None,
             # labels: str = None,
             # units: str = None,
             descr: str = None,
@@ -34,7 +35,7 @@ class File(Serializable):
         :param descr: description
         :param ext: file extension
         """
-        if not isinstance(path, Path):
+        if path is not None and not isinstance(path, Path):
             path = Path(path)
 
         self._path = None
@@ -99,20 +100,24 @@ class File(Serializable):
 
 class Data(KeyPrinting, BaseModel, _error=DataError):
     keys = data_keys
-    _class = "Data"
+    class_ = "Data"
 
     def __init__(
             self,
-            _type: str,
+            type_: str,
             file: File = None,
             sample_prep: str = None,
             calibration: File = None,
             equipment: File = None,
             cond: Union[list[Cond], Cond] = None,
             name: str = None,
-            notes: str = None
+            notes: str = None,
+            **kwargs
     ):
-        super().__init__(name=name, _class=self._class, notes=notes)
+        super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
+
+        self._type_ = None
+        self.type_ = type_
 
         self._file = None
         self.file = file
@@ -130,11 +135,20 @@ class Data(KeyPrinting, BaseModel, _error=DataError):
         self.cond = cond
 
     @property
+    def type_(self):
+        return self._type_
+
+    @type_.setter
+    def type_(self, type_):
+        self._type_ = type_
+
+    @property
     def file(self):
         return self._file
 
     @file.setter
     def file(self, file):
+        file = self.loading_with_file(file)
         self._file = file
         
     @property
@@ -151,6 +165,7 @@ class Data(KeyPrinting, BaseModel, _error=DataError):
 
     @calibration.setter
     def calibration(self, calibration):
+        calibration = self.loading_with_file(calibration)
         self._calibration = calibration
 
     @property
@@ -159,6 +174,7 @@ class Data(KeyPrinting, BaseModel, _error=DataError):
 
     @equipment.setter
     def equipment(self, equipment):
+        equipment = self.loading_with_file(equipment)
         self._equipment = equipment
 
     @property
@@ -167,4 +183,18 @@ class Data(KeyPrinting, BaseModel, _error=DataError):
 
     @cond.setter
     def cond(self, cond):
+        cond = loading_with_units(cond, Cond)
         self._cond = cond
+
+    def loading_with_file(self, obj):
+        if isinstance(obj, dict):
+            obj = File(**obj)
+        elif isinstance(obj, File):
+            pass
+        elif obj is None:
+            pass
+        else:
+            mes = "Invalid File object."
+            raise self._error(mes)
+
+        return obj

@@ -3,20 +3,19 @@ Database Connection
 
 """
 import sys
-from datetime import datetime
 from typing import Union
 
 from pymongo import MongoClient, errors
 from bson import ObjectId
 from jsonpatch import JsonPatch
-from gridfs import GridFS
 
-from cript.utils.validator.type_check import *
-from .utils.database_tools import *
 from . import CRIPTError
-from .base import CriptTypes, load
+from .base import CriptTypes
+from .doc_tools import load
 from .user import User
-from .data import File
+from .utils.external_database_code import FilesInOut
+from .utils.validator.type_check import *
+from .utils.database_tools import *
 
 
 class CriptDBError(CRIPTError):
@@ -190,109 +189,12 @@ class CriptDB(CriptTypes):
         return obj.uid
 
     def _do_save(self, obj):
-        # create document from python object
-        doc = self._create_doc(obj)
-
-        # select collection based on class type
+        """
+        create document, save document and put generated uid back into object
+        """
+        doc = obj.create_doc()
         coll = self.db[obj.class_]
-
-        # save document and put generated uid back into object
         obj.uid = str(coll.insert_one(doc).inserted_id)
-
-    def _create_doc(self, obj):
-        """
-        Converts a CRIPT node into document for upload to mongoDB
-        """
-        # add time stamps
-        self._set_time_stamps(obj)
-
-        # check for incomplete object references
-        self._obj_reference_check(obj)
-
-        # convert to dictionary
-        doc = obj.as_dict(save=True)
-
-        # remove empty id
-        doc["_id"] = doc.pop("uid")
-
-        # remove any unused attributes
-        doc = obj.dict_remove_none(doc)
-        return doc
-
-    @staticmethod
-    def _set_time_stamps(obj):
-        """
-        Adds time stamps to CRIPT node.
-        """
-        now = datetime.utcnow()
-        if obj.created_date is None:
-            obj.created_date = now
-
-        obj.last_modified_date = now
-
-    def _obj_reference_check(self, obj):
-        """
-        a reference my not have both uid and name, so this will find the document and add it.
-        """
-        ref_keys = [k.strip("_") for k in vars(obj) if k[:3] == "_c_"]
-
-        for key in ref_keys:
-            value = getattr(obj, key)
-            if value is None:
-                continue
-            elif isinstance(value, list):
-                new_value = []
-                for item in value:
-                    if isinstance(item, dict):
-                        new_value.append(item)
-                    elif isinstance(item, str):  # if string look up and get the extra details
-                        coll = self.db[key[2:].capitalize()]
-                        result = coll.find_one({"_id": ObjectId(item)})
-                        if result:
-                            node = load(result)
-                            new_value.append(node.reference())
-                        else:
-                            msg = f"'{item}' in '{key}' not found in database."
-                            raise self._error(msg)
-                    else:
-                        msg = f"'{item}' in '{key}' is an invalid object type."
-                        raise self._error(msg)
-
-                setattr(obj, key, "_clear")
-                setattr(obj, key, new_value)
-
-    def _doc_reference_check(self, doc: dict) -> dict:
-        """
-        a reference my not have both uid and name, so this will find the document and add it.
-        """
-        ref_keys = [k for k in doc.keys() if k[:2] == "c_"]
-
-        for key in ref_keys:
-            value = doc[key]
-            if value is None:
-                continue
-            elif isinstance(value, list):
-                new_value = []
-                for item in value:
-                    if isinstance(item, dict):
-                        new_value.append(item)
-                    elif isinstance(item, str):  # if string look up and get the extra details
-                        coll_name = key[2:].capitalize()
-                        coll = self.db[coll_name]
-                        result = coll.find_one({"_id": ObjectId(item)})
-                        if result:
-                            node = load(result)
-                            new_value.append(node.reference())
-                        else:
-                            msg = f"'{item}' in '{key}' not found in database."
-                            raise self._error(msg)
-                    else:
-                        msg = f"'{item}' in '{key}' is an invalid object type."
-                        raise self._error(msg)
-
-                doc[key] = new_value
-
-        return doc
 
     def _pre_save_checks(self, obj, parent_obj):
         """
@@ -362,7 +264,7 @@ class CriptDB(CriptTypes):
         elif obj.class_ == "Data":
             parent_obj_types = ["Experiment"]
             self._parent_obj_check(obj, parent_obj, parent_obj_types)
-            obj = self._save_file(obj)
+            obj = FilesInOut.put(obj)
 
         elif obj.class_ == "Inventory":
             parent_obj_types = ["Group", "Collection"]
@@ -396,21 +298,6 @@ class CriptDB(CriptTypes):
 
         msg = f"Saving a {obj.class_} requires a parent_obj to be {parent_obj_types}."
         raise self._error(msg)
-
-    def _save_file(self, obj):
-        file_storage = GridFS(self.db)
-
-        keys_of_files = [k.lstrip("_") for k, v in vars(obj).items() if isinstance(v, File)]
-        for key in keys_of_files:
-            file = obj.__getattribute__(key)
-            if file.uid is None:
-                with open(file.path, 'rb') as f:
-                    contents = f.read()
-                file.uid = file_storage.put(contents)
-                file.path = None  # clear path - we don't need users personal file path
-            else:
-                mes = "update file not setup yet"
-                raise self._error(mes)
 
     def _post_save_checks(self, obj, parent_obj):
         """
@@ -743,7 +630,7 @@ class CriptDB(CriptTypes):
         old_doc = self._get_doc_from_obj(obj)
 
         # create new doc
-        new_doc = self._create_doc(obj)
+        new_doc = obj.create_doc()
 
         # get differences
         patch = self._create_json_patch(old_doc, new_doc)

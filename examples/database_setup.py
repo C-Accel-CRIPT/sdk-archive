@@ -392,13 +392,13 @@ db.save(mat_solution, [expt, inventory])
 # Generate node
 process = Process(
     name="Anionic of Styrene",
-    ingr=Ingr(
+    ingr=[
         [expt.get("SecBuLi solution 1.4M cHex"), 0.17 * Unit("mol"), "initiator", {"mat_id": "secBuLi"}],
         [expt.get("toluene"), 10 * Unit("ml"), "solvent"],
         [expt.get("styrene"), 0.455 * Unit("g"), "monomer"],
         [expt.get("1BuOH"), 5, "quench", {"eq_mat": "secBuLi"}],
         [expt.get("MeOH"), 100 * Unit("ml"), "workup"]
-    ),
+    ],
     procedure="In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
               "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
               "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
@@ -426,7 +426,7 @@ nmr1h_path = tutorial.tutorial_data_part2["polystyrene_1hnmr"]["path"]
 
 sec_data = Data(
     name="Crude SEC of polystyrene",
-    _type="sec_trace",
+    type_="sec_trace",
     file=File(sec_data_path),
     sample_prep="5 mg of polymer in 1 ml of THF, filtered 0.45um pores.",
     cond=[
@@ -440,7 +440,7 @@ sec_data = Data(
 
 nmr_data = Data(
     name="Crude 1H NMR of polystyrene",
-    _type="nmr_h1",
+    type_="nmr_h1",
     file=File(nmr1h_path),
     cond=[
         Cond("temp", 25 * Unit("degC")),

@@ -4,7 +4,8 @@ from functools import wraps
 import builtins
 import warnings
 # from inspect import getmembers, isclass
-from cript import CRIPTError
+
+from ... import CRIPTError
 
 builtin_types = {getattr(builtins, d).__name__: getattr(builtins, d) for d in dir(builtins) if isinstance(getattr(builtins, d), type) and "Error" not in getattr(builtins, d).__name__ and "Warning" not in getattr(builtins, d).__name__}
 cript_types = None

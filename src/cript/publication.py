@@ -3,12 +3,12 @@ Publications
 
 """
 
-from .base import BaseModel
+from .base import BaseModel, BaseReference
 
 
 class Publication(BaseModel):
 
-    _class = "Publication"
+    class_ = "Publication"
 
     def __init__(
             self,
@@ -52,7 +52,7 @@ class Publication(BaseModel):
         :param last_modified_date: Last date the node was modified.
         :param created_date: Date it was created.
         """
-        super().__init__(name=title, _class=self._class, notes=notes)
+        super().__init__(name=title, class_=self.class_, notes=notes)
 
         self._title = None
         self.title = title

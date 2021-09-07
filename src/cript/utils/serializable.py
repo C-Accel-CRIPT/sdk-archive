@@ -16,6 +16,33 @@ class Serializable(ABC):
     def __str__(self):
         return dumps(self.dict_remove_none(self.dict_cleanup(self.as_dict(save=False))), indent=2, sort_keys=False)
 
+    def create_doc(self):
+        """
+        Converts a CRIPT node into document for upload to mongoDB
+        """
+        # add time stamps
+        self._set_time_stamps()
+
+        # convert to dictionary
+        doc = self.as_dict(save=True)
+
+        # remove empty id
+        doc["_id"] = doc.pop("uid")
+
+        # remove any unused attributes
+        doc = self.dict_remove_none(doc)
+        return doc
+
+    def _set_time_stamps(self):
+        """
+        Adds time stamps to CRIPT node.
+        """
+        now = datetime.utcnow()
+        if self.created_date is None:
+            self.created_date = now
+
+        self.last_modified_date = now
+
     def as_dict(self, **kwargs) -> dict:
         """Convert and return object as dictionary."""
         keys = {k.lstrip("_") for k in vars(self) if "__" not in k}
@@ -122,9 +149,9 @@ class SerializableSub(Serializable, ABC):
                 except Exception:
                     pass
                 if uncer is not None:
-                    new_value = value.split(" ", 1)
+                    new_uncer = uncer.split(" ", 1)
                     try:
-                        value = float(new_value[0]) * Unit(new_value[1])
+                        uncer = float(new_uncer[0]) * Unit(new_uncer[1])
                     except Exception:
                         pass
 
@@ -135,6 +162,6 @@ class SerializableSub(Serializable, ABC):
                     if value is not None:
                         value = value * Unit(unit_)
                         if uncer is not None:
-                            value = value * Unit(unit_)
+                            uncer = uncer * Unit(unit_)
 
         return key, value, uncer

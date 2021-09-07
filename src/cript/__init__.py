@@ -1,7 +1,7 @@
 import pkg_resources
 
 __all__ = [
-    "VERSION", "__version__", "__short_version__", "Unit", "load", "CriptDB",
+    "VERSION", "__version__", "__short_version__", "Unit", "load", "export", "CriptDB",
     "User", "Group", "Collection", "Publication", "Experiment", "Material", "Process", "Data",
     "Inventory", "Simulation", "Cond", "Prop", "Ingr", "Iden", "Path", "File", "tutorial"
 ]
@@ -36,6 +36,7 @@ class CRIPTWarning(Warning):
 
 # Core CRIPT objects (order important)
 from .base import *
+from .doc_tools import *
 from .cond import *
 from .prop import *
 from .user import *

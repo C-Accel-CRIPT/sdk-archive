@@ -3,10 +3,10 @@ Material Node
 
 """
 from typing import Union
-from difflib import SequenceMatcher
 
 from . import CRIPTError, Cond, Prop
 from .base import BaseModel, BaseReference
+from .doc_tools import loading_with_units
 from .utils.serializable import Serializable
 from .utils.external_database_code import GetMaterialID
 from .utils.validator.type_check import type_check_property, type_check
@@ -186,7 +186,7 @@ class Iden(Serializable):
 
 class Material(KeyPrinting, BaseModel, _error=MaterialError):
     keys = keywords_material_p | keywords_material
-    _class = "Material"
+    class_ = "Material"
 
     def __init__(
             self,
@@ -248,7 +248,7 @@ class Material(KeyPrinting, BaseModel, _error=MaterialError):
         if name is None:
             name = self._name_from_identifier()
 
-        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
+        super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
     @property
     def iden(self):
@@ -287,12 +287,7 @@ class Material(KeyPrinting, BaseModel, _error=MaterialError):
     @prop.setter
     @type_check((list[Prop], Prop, None))
     def prop(self, prop):
-        if isinstance(prop, list):
-            for i, p in enumerate(prop):
-                if isinstance(p, dict):
-                    prop[i] = Prop(**p, _loading=True)
-        elif isinstance(prop, Prop):
-            prop = [prop]
+        prop = loading_with_units(prop, Prop)
         self._prop = prop
 
     @property
@@ -329,12 +324,7 @@ class Material(KeyPrinting, BaseModel, _error=MaterialError):
     @storage.setter
     @type_check((list[Cond], Cond, None))
     def storage(self, storage):
-        if isinstance(storage, list):
-            for i, s in enumerate(storage):
-                if isinstance(s, dict):
-                    storage[i] = Cond(**s, _loading=True)
-        elif isinstance(storage, Cond):
-            storage = [Cond]
+        storage = loading_with_units(storage, Cond)
         self._storage = storage
 
     @property
@@ -364,4 +354,3 @@ class Material(KeyPrinting, BaseModel, _error=MaterialError):
     def _get_mat_id(self, target: str) -> int:
         """given a string (likely chemical name) find mat_id."""
         return GetMaterialID.get_id(target, self)
-

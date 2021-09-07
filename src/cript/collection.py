@@ -13,7 +13,7 @@ class CollectionError(CRIPTError):
 
 
 class Collection(BaseModel, _error=CollectionError):
-    _class = "Collection"
+    class_ = "Collection"
 
     def __init__(
         self,
@@ -39,7 +39,7 @@ class Collection(BaseModel, _error=CollectionError):
         :param last_modified_date: Last date the node was modified.
         :param created_date: Date it was created.
         """
-        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
+        super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
         self.c_experiment = BaseReference("Experiment", c_experiment, self._error)
         self.c_collection = BaseReference("Collection", c_collection, self._error)

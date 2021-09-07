@@ -1,15 +1,15 @@
 """
 base:
 
-Contains BaseModel, BaseReference, and load
+Contains base classes CriptTypes and BaseReference
 
 """
 from abc import ABC
 from typing import Union
 from datetime import datetime
 
-from bson import ObjectId
 from fuzzywuzzy import process
+from bson import ObjectId
 
 from . import __version__, CRIPTError
 from .utils.serializable import Serializable
@@ -24,159 +24,6 @@ class CriptTypes:
     def _init_(cls):
         from . import cript_types
         cls.cript_types = cript_types
-
-
-class BaseModel(Serializable, CriptTypes, ABC):
-    _error = CRIPTError
-
-    def __init__(
-        self,
-        name: str,
-        _class: str = None,
-        notes: str = None,
-
-        uid: Union[str, ObjectId] = None,
-        model_version: str = None,
-        version_control=None,
-        last_modified_date: datetime = None,
-        created_date: datetime = None
-    ):
-        """
-        :param name: Descriptive name
-
-        :param notes: Any miscellaneous notes related to the user.
-        :param _class: class of node.
-        :param uid: The unique ID of the material.
-        :param model_version: Version of CRIPT data model.
-        :param version_control: Link to version control node.
-        :param last_modified_date: Last date the node was modified.
-        :param created_date: Date it was created.
-        """
-
-        self._name = None
-        self.name = name
-
-        self._notes = None
-        self.notes = notes
-
-        self._class_ = None
-        self.class_ = _class
-
-        self._uid = None
-        self.uid = uid
-
-        if model_version is None:
-            self._model_version = __version__
-        else:
-            self._model_version = model_version
-        self._version_control = version_control
-
-        self._last_modified_date = None
-        self.last_modified_date = last_modified_date
-
-        self._created_date = None
-        self.created_date = created_date
-
-    def __init_subclass__(cls, **kwargs):
-        if "_error" in kwargs.keys():
-            cls._error = kwargs["_error"]
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    @type_check_property
-    def name(self, name):
-        self._name = name
-
-    @property
-    def notes(self):
-        return self._notes
-
-    @notes.setter
-    @type_check_property
-    def notes(self, notes):
-        self._notes = notes
-
-    @property
-    def uid(self):
-        return self._uid
-
-    @uid.setter
-    def uid(self, uid):
-        if uid is None:
-            pass
-        elif type(uid) is ObjectId:
-            uid = str(uid)
-        else:
-            if not id_type_check_bool(uid):
-                mes = f"{uid} is invalid uid."
-                raise self._error(mes)
-        self._uid = uid
-
-    @property
-    def class_(self):
-        return self._class_
-
-    @class_.setter
-    def class_(self, class_):
-        self._class_ = class_
-
-    @property
-    def model_version(self):
-        return self._model_version
-
-    @property
-    def version_control(self):
-        return self._version_control
-
-    @property
-    def last_modified_date(self):
-        return self._last_modified_date
-
-    @last_modified_date.setter
-    def last_modified_date(self, last_modified_date):
-        self._last_modified_date = last_modified_date
-
-    @property
-    def created_date(self):
-        return self._created_date
-
-    @created_date.setter
-    def created_date(self, created_date):
-        self._created_date = created_date
-
-    def reference(self) -> dict:
-        """
-        From a filled out node, create reference dictionary.
-        :return:
-        """
-        ddict = self.as_dict(save=False)
-        return self.create_reference(ddict)
-
-    @staticmethod
-    def create_reference(ddict) -> dict:
-        """
-        Gives reference dictionary from dictionary.
-        * This method may be overwritten in inheritance.
-        """
-        keys = ["uid", "name"]
-        if "_id" in ddict.keys():
-            ddict["uid"] = ddict.pop("_id")
-
-        if not all(k in ddict.keys() and ddict[k] is not None for k in keys):
-            if ddict["uid"] is None and ddict["name"] is not None:
-                mes = f"'{ddict['name']}' needs to be saved before it can generate a reference."
-            else:
-                mes = f"{ddict} is missing one or more of the following keys()"
-            raise CRIPTError(mes)
-
-        out = {}
-        for key in keys:
-            out[key] = ddict[key]
-
-        return out
 
 
 class BaseReference(CriptTypes):
@@ -341,23 +188,154 @@ class BaseReference(CriptTypes):
         return self._reference
 
 
-class Load:
-    """Given a document directly from the database convert it into a CRIPT object."""
-    cript_types = None
+class BaseModel(Serializable, CriptTypes, ABC):
+    _error = CRIPTError
 
-    def __call__(self, ddict):
-        if self.cript_types is None:
-            load._init_()
+    def __init__(
+            self,
+            name: str,
+            class_: str = None,
+            notes: str = None,
+
+            uid: Union[str, ObjectId] = None,
+            model_version: str = None,
+            version_control=None,
+            last_modified_date: datetime = None,
+            created_date: datetime = None
+    ):
+        """
+        :param name: Descriptive name
+
+        :param notes: Any miscellaneous notes related to the user.
+        :param class_: class of node.
+        :param uid: The unique ID of the material.
+        :param model_version: Version of CRIPT data model.
+        :param version_control: Link to version control node.
+        :param last_modified_date: Last date the node was modified.
+        :param created_date: Date it was created.
+        """
+
+        self._name = None
+        self.name = name
+
+        self._notes = None
+        self.notes = notes
+
+        self._class_ = None
+        self.class_ = class_
+
+        self._uid = None
+        self.uid = uid
+
+        if model_version is None:
+            self._model_version = __version__
+        else:
+            self._model_version = model_version
+        self._version_control = version_control
+
+        self._last_modified_date = None
+        self.last_modified_date = last_modified_date
+
+        self._created_date = None
+        self.created_date = created_date
+
+    def __init_subclass__(cls, **kwargs):
+        if "_error" in kwargs.keys():
+            cls._error = kwargs["_error"]
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    @type_check_property
+    def name(self, name):
+        self._name = name
+
+    @property
+    def notes(self):
+        return self._notes
+
+    @notes.setter
+    @type_check_property
+    def notes(self, notes):
+        self._notes = notes
+
+    @property
+    def uid(self):
+        return self._uid
+
+    @uid.setter
+    def uid(self, uid):
+        if uid is None:
+            pass
+        elif type(uid) is ObjectId:
+            uid = str(uid)
+        else:
+            if not id_type_check_bool(uid):
+                mes = f"{uid} is invalid uid."
+                raise self._error(mes)
+        self._uid = uid
+
+    @property
+    def class_(self):
+        return self._class_
+
+    @class_.setter
+    def class_(self, class_):
+        self._class_ = class_
+
+    @property
+    def model_version(self):
+        return self._model_version
+
+    @property
+    def version_control(self):
+        return self._version_control
+
+    @property
+    def last_modified_date(self):
+        return self._last_modified_date
+
+    @last_modified_date.setter
+    def last_modified_date(self, last_modified_date):
+        self._last_modified_date = last_modified_date
+
+    @property
+    def created_date(self):
+        return self._created_date
+
+    @created_date.setter
+    def created_date(self, created_date):
+        self._created_date = created_date
+
+    def reference(self) -> dict:
+        """
+        From a filled out node, create reference dictionary.
+        :return:
+        """
+        ddict = self.as_dict(save=False)
+        return self.create_reference(ddict)
+
+    @staticmethod
+    def create_reference(ddict) -> dict:
+        """
+        Gives reference dictionary from dictionary.
+        * This method may be overwritten in inheritance.
+        """
+        keys = ["uid", "name", "class_"]
         if "_id" in ddict.keys():
-            ddict["uid"] = str(ddict.pop("_id"))
-        class_ = ddict.pop("class_")
-        obj = self.cript_types[class_](**ddict)
-        return obj
+            ddict["uid"] = ddict.pop("_id")
 
-    @classmethod
-    def _init_(cls):
-        from . import cript_types
-        cls.cript_types = cript_types
+        if not all(k in ddict.keys() and ddict[k] is not None for k in keys):
+            if ddict["uid"] is None and ddict["name"] is not None:
+                mes = f"'{ddict['name']}' needs to be saved before it can generate a reference."
+            else:
+                mes = f"{ddict} is missing one or more of the following [{keys}]"
+            raise CRIPTError(mes)
 
+        out = {}
+        for key in keys:
+            out[key] = ddict[key]
 
-load = Load()
+        return out

@@ -1,17 +1,18 @@
 """
 
 """
-
+from os.path import join
 from abc import ABC
 import sys
 from difflib import SequenceMatcher
 from typing import Union
 from warnings import warn
 
+from gridfs import GridFS
 from bson import ObjectId
 from fuzzywuzzy import process, fuzz
 
-from .. import CRIPTError
+from .. import CRIPTError, Path
 
 
 class GetObject(ABC):
@@ -145,6 +146,9 @@ class GetMaterial(GetObject, ABC):
         :param op:
         :return: scores are from 0 - 100
         """
+        if len(values) == 0:
+            return "", 0
+
         if op == 0:
             text, score = process.extractOne(target, values)
         elif op == 1:
@@ -203,21 +207,23 @@ class GetMaterial(GetObject, ABC):
         :param op:  True for require, False for reject
         :return:
         """
-        removed = 0
         initial_length = len(values)
         if isinstance(require, str):
             require = [require]
         if isinstance(require, list):
             for i in require:
+                remove = []
                 for x in values:
                     if op:
                         if i not in x:  # requires i to stay in set
-                            values.remove(x)
-                            removed += 1
+                            remove.append(x)
                     else:
                         if i in x:  # removes x from set if has i
-                            values.remove(x)
-                            removed += 1
+                            remove.append(x)
+
+                for ii in remove:
+                    values.remove(ii)
+
         else:
             mes = f"Invalid type"
             raise TypeError(mes)
@@ -257,3 +263,66 @@ class GetMaterialID(GetMaterial):
         else:
             mes = f"'{target}' not found or wasn't close enough to material name."
             raise cls._error(mes)
+
+
+class FilesInOut(GetObject):
+    _file_storage = None
+    _cript_type_file = None
+
+    @classmethod
+    def put(cls, obj):
+        """obj is Data node, will save to database and put uid for file in object."""
+        cls._get_file_storage()
+
+        keys_of_files = [k.lstrip("_") for k, v in vars(obj).items() if isinstance(v, cls._cript_type_file)]
+        for key in keys_of_files:
+            file = obj.__getattribute__(key)
+            if file.uid is None:
+                with open(file.path, 'rb') as f:
+                    contents = f.read()
+                file.uid = cls._file_storage.put(contents)
+                file.path = None  # clear path - we don't need users personal file path
+            else:
+                mes = "update file not setup yet"
+                raise cls._error(mes)
+
+        return obj
+
+    @classmethod
+    def get(cls, obj):
+        """
+        Obj is Data node, return [[file_name.ext, file],...]
+        """
+        cls._get_file_storage()
+
+        files = []
+        ref_files = [v for v in vars(obj).values() if isinstance(v, cls._cript_type_file)]
+        for ref in ref_files:
+            if ref.uid is not None:
+                files.append([Path(ref.file_name + ref.ext), cls._file_storage.get(ref.uid)])
+
+        return files
+
+    @classmethod
+    def get_and_save(cls, obj, folder_path):
+        files = cls.get(obj)
+        for file in files:
+            file_path = Path(join(folder_path, file[0]))
+            with open(file_path, 'wb') as f:
+                f.write(file[1].read())
+
+    @classmethod
+    def _get_file_storage(cls):
+        """
+        Checks for database and file storage
+        """
+        cls._get_database()
+        if cls._file_storage is None:
+            cls._file_storage = GridFS(cls._cript_database.db)
+        if cls._cript_type_file is None:
+            cls._get_cript_type_file()
+
+    @classmethod
+    def _get_cript_type_file(cls):
+        from .. import File
+        cls._cript_type_file = File

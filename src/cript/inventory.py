@@ -14,7 +14,7 @@ class InventoryError(CRIPTError):
 
 
 class Inventory(BaseModel, _error=InventoryError):
-    _class = "Inventory"
+    class_ = "Inventory"
 
     def __init__(
         self,
@@ -36,7 +36,7 @@ class Inventory(BaseModel, _error=InventoryError):
         :param last_modified_date: Last date the node was modified.
         :param created_date: Date it was created.
         """
-        super().__init__(name=name, _class=self._class, notes=notes, **kwargs)
+        super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
         self.c_material = BaseReference("Material", c_material, self._error)
 
