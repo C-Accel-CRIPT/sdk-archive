@@ -1,5 +1,5 @@
 """
-
+Tools for loading and exporting mongodb documents
 """
 from os import mkdir
 from os.path import join
@@ -15,7 +15,7 @@ from .utils.validator.type_check import id_type_check_bool
 class Load(CriptTypes):
     """Given a document directly from the database convert it into a CRIPT object."""
 
-    def __call__(self, ddict):
+    def __call__(self, ddict: dict):
         if "_id" in ddict.keys():
             ddict["uid"] = str(ddict.pop("_id"))
         class_ = ddict.pop("class_")

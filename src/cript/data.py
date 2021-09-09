@@ -9,7 +9,7 @@ from . import Cond, CRIPTError, Path
 from .base import BaseModel
 from .doc_tools import loading_with_units
 from .utils.serializable import Serializable
-from .utils.printing import KeyPrinting
+from .utils.printing import TablePrinting
 from .keys.data import data_keys
 
 
@@ -98,7 +98,7 @@ class File(Serializable):
         self._uid = uid
 
 
-class Data(KeyPrinting, BaseModel, _error=DataError):
+class Data(TablePrinting, BaseModel, _error=DataError):
     keys = data_keys
     class_ = "Data"
 

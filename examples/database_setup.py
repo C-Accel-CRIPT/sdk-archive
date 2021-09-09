@@ -372,7 +372,7 @@ mat_solution = Material(
     name="SecBuLi solution 1.4M cHex",
     iden=[mat_cHex, mat_sBuLi],
     prop=[
-        Prop(key="phase", value="liquid"),
+        Prop(key="phase", value="solution"),
         Prop(key="density", value=0.769 * Unit("g/ml"),
              cond=Cond(key="pres", value=1 * Unit("bar"))
              ),
@@ -393,10 +393,10 @@ db.save(mat_solution, [expt, inventory])
 process = Process(
     name="Anionic of Styrene",
     ingr=[
-        [expt.get("SecBuLi solution 1.4M cHex"), 0.17 * Unit("mol"), "initiator", {"mat_id": "secBuLi"}],
+        [expt.get("SecBuLi solution 1.4M cHex"), 0.017 * Unit("ml"), "initiator", {"mat_id": "secBuLi"}],
         [expt.get("toluene"), 10 * Unit("ml"), "solvent"],
         [expt.get("styrene"), 0.455 * Unit("g"), "monomer"],
-        [expt.get("1BuOH"), 5, "quench", {"eq_mat": "secBuLi"}],
+        [expt.get("1BuOH"), 5, "quench", {"eq_mat": "SecBuLi solution"}],
         [expt.get("MeOH"), 100 * Unit("ml"), "workup"]
     ],
     procedure="In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "

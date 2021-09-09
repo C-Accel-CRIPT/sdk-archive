@@ -11,7 +11,7 @@ from .doc_tools import load
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.validator.cond import cond_keys_check
 from .utils.serializable import SerializableSub
-from .utils.printing import KeyPrinting
+from .utils.printing import TablePrinting
 
 
 class CondError(CRIPTError):
@@ -19,7 +19,7 @@ class CondError(CRIPTError):
         super().__init__(*msg)
 
 
-class Cond(SerializableSub, KeyPrinting, CriptTypes):
+class Cond(SerializableSub, TablePrinting, CriptTypes):
     keys = None
     _error = CondError
 

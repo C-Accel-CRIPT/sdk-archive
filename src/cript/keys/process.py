@@ -13,13 +13,13 @@ Qty_keys = {
         "unit": "g",
         "descr": "mass"
     },
-    "vol": {
+    "volume": {
         "type": float,
         "range": [0, float_limit],
         "unit": "ml",
         "descr": "volume"
     },
-    "pres": {
+    "pressure": {
         "type": float,
         "range": [0, float_limit],
         "unit": "kPa",
@@ -28,10 +28,13 @@ Qty_keys = {
     "mole": {
         "type": float,
         "range": [0, float_limit],
-        "unit": "mole",
+        "unit": "mmole",
         "descr": "mole"
-    },
-    "equiv": {
+    }
+}
+
+Rel_Qty_keys = {
+    "equivalence": {
         "type": float,
         "range": [0, float_limit],
         "unit": "",
@@ -43,7 +46,7 @@ Qty_keys = {
         "unit": "M",
         "descr": "molarity"
     },
-    "mass_frac": {
+    "mass_fraction": {
         "type": float,
         "range": [0, 1],
         "unit": "",

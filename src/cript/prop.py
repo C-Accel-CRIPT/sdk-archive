@@ -7,7 +7,7 @@ from .doc_tools import loading_with_units
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.validator.prop import prop_keys_check
 from .utils.serializable import SerializableSub
-from .utils.printing import KeyPrinting
+from .utils.printing import TablePrinting
 
 
 class CondError(CRIPTError):
@@ -15,7 +15,7 @@ class CondError(CRIPTError):
         super().__init__(*msg)
 
 
-class Prop(SerializableSub, KeyPrinting):
+class Prop(SerializableSub, TablePrinting):
     keys_molecule = None
     keys_polymer = None
     keys_rxn = None

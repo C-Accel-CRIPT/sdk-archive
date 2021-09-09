@@ -10,7 +10,7 @@ from .doc_tools import loading_with_units
 from .utils.serializable import Serializable
 from .utils.external_database_code import GetMaterialID
 from .utils.validator.type_check import type_check_property, type_check
-from .utils.printing import KeyPrinting
+from .utils.printing import TablePrinting
 from .keys.material import *
 
 
@@ -184,7 +184,7 @@ class Iden(Serializable):
         self._inchi_key = inchi_key
 
 
-class Material(KeyPrinting, BaseModel, _error=MaterialError):
+class Material(TablePrinting, BaseModel, _error=MaterialError):
     keys = keywords_material_p | keywords_material
     class_ = "Material"
 

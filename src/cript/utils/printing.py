@@ -4,28 +4,76 @@ QUANTITY_LENGTH = 10
 
 # limits of printout length
 label_length = {
-    "keys": 16,
-    "method": 25,
-    "cond": 22,
-    "required": 20,
-    "type": 22,
-    "range": 25,
-    "unit": 12,
-    "descr": 50,
-    "names": 30,
-    "mass": QUANTITY_LENGTH,
-    "vol": QUANTITY_LENGTH,
-    "pres": QUANTITY_LENGTH,
-    "mole": QUANTITY_LENGTH,
-    "equiv": QUANTITY_LENGTH,
-    "molarity": QUANTITY_LENGTH,
-    "mass_frac": QUANTITY_LENGTH
+    "keys": {
+        "length": 16,
+        "short": "k"
+    },
+    "method": {
+        "length": 25,
+        "short": "method"
+    },
+    "cond": {
+        "length": 22,
+        "short": "condition"
+    },
+    "required": {
+        "length": 20,
+        "short": "requ."
+    },
+    "type": {
+        "length": 22,
+        "short": "type"
+    },
+    "range": {
+        "length": 25,
+        "short": "range"
+    },
+    "unit": {
+        "length": 12,
+        "short": "unit"
+    },
+    "description":{
+        "length": 50,
+        "short": "descr"
+    },
+    "names": {
+        "length": 30,
+        "short": "names"
+    },
+    "mass": {
+        "length": QUANTITY_LENGTH,
+        "short": "mass"
+    },
+    "volume": {
+        "length": QUANTITY_LENGTH,
+        "short": "vol"
+    },
+    "pressure": {
+        "length": QUANTITY_LENGTH,
+        "short": "pres"
+    },
+    "mole": {
+        "length": QUANTITY_LENGTH,
+        "short": "mol"
+    },
+    "equiv": {
+        "length": QUANTITY_LENGTH,
+        "short": "pres"
+    },
+    "molarity": {
+        "length": QUANTITY_LENGTH,
+        "short": "M"
+    },
+    "mass_fraction": {
+        "length": QUANTITY_LENGTH,
+        "short": "mass_frac"
+    }
 }
 
 window = 150
 
 
-class KeyPrinting(ABC):
+class TablePrinting(ABC):
     """
     Prints key tables out.
     """
@@ -62,13 +110,13 @@ class KeyPrinting(ABC):
             headers.insert(0, "keys")
             row_format = ""
             for i in headers:
-                row_format = row_format + KeyPrinting._label_length(i)
+                row_format = row_format + TablePrinting._label_length(i)
             text_out = row_format.format(*headers)
             text_out = text_out + "\n" + "-" * window
             for k, v in ddict.items():
                 entries = [str(i) for i in list(v.values())]
                 for i, (entry, header) in enumerate(zip(entries, headers[1:])):
-                    entries[i] = KeyPrinting._length_limit(header, entry)
+                    entries[i] = TablePrinting._length_limit(header, entry)
                 text_out = text_out + "\n" + row_format.format(k, *entries)
             text_out = text_out + "\n"
 
@@ -77,14 +125,14 @@ class KeyPrinting(ABC):
     @staticmethod
     def _label_length(label: str) -> str:
         if label in label_length.keys():
-            return "{:<" + str(label_length[label]) + "}"
+            return "{:<" + str(label_length[label]["length"]) + "}"
         else:
             return "{:<30}"
 
     @staticmethod
     def _length_limit(label: str, entry) -> str:
         if label in label_length.keys():
-            length_limit = label_length[label]
+            length_limit = label_length[label]["length"]
             if len(entry) > length_limit:
                 return entry[0:length_limit-5] + "..."
 

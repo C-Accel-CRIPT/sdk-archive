@@ -35,7 +35,12 @@ class GetObject(ABC):
         elif isinstance(uid, list):
             uid = [ObjectId(u) for u in uid]
 
-        return list(coll.find({"_id": {"$in": uid}}))
+        obj = list(coll.find({"_id": {"$in": uid}}))
+        if obj is not []:
+            return obj
+        else:
+            mes = f"uid: {uid} not found in database (collection: {node})."
+            raise cls._error(mes)
 
     @classmethod
     def _get_database(cls):
