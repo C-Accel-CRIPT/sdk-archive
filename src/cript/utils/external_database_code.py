@@ -10,7 +10,6 @@ from warnings import warn
 
 from gridfs import GridFS
 from bson import ObjectId
-from fuzzywuzzy import process, fuzz
 
 from .. import CRIPTError, Path
 
@@ -143,7 +142,7 @@ class GetMaterial(GetObject, ABC):
             return best_match_index
 
     @staticmethod
-    def _get_score(target: str, values: set[str], op: int = 5) -> tuple[str, int]:
+    def _get_score(target: str, values: set[str], op: int = 0) -> tuple[str, int]:
         """
 
         :param target:
@@ -153,26 +152,10 @@ class GetMaterial(GetObject, ABC):
         """
         if len(values) == 0:
             return "", 0
+        if None in values:
+            values.remove(None)
 
         if op == 0:
-            text, score = process.extractOne(target, values)
-        elif op == 1:
-            scores = {v: fuzz.ratio(target, v) for v in values}
-            text = max(scores, key=scores.get)
-            score = scores[text]
-        elif op == 2:
-            scores = {v: fuzz.partial_ratio(target, v)for v in values}
-            text = max(scores, key=scores.get)
-            score = scores[text]
-        elif op == 3:
-            scores = {v: fuzz.token_set_ratio(target, v) for v in values}
-            text = max(scores, key=scores.get)
-            score = scores[text]
-        elif op == 4:
-            scores = {v: fuzz.token_sort_ratio(target, v) for v in values}
-            text = max(scores, key=scores.get)
-            score = scores[text]
-        elif op == 5:
             scores = {v: SequenceMatcher(None, target, v).ratio() * 100 for v in values}
             text = max(scores, key=scores.get)
             score = scores[text]
@@ -187,19 +170,30 @@ class GetMaterial(GetObject, ABC):
         """ Returns a set of all idens """
         out = set()
         out.add(mat["name"])
-        for iden in mat["iden"].values():
+        for iden in mat["iden"]:
             out.update(cls._get_set_of_values_from_iden(iden))
         return out
 
-    @staticmethod
-    def _get_set_of_values_from_iden(iden: dict) -> set[str]:
+    @classmethod
+    def _get_set_of_values_from_iden(cls, iden: dict, skip: list[str] = None) -> set[str]:
+        if skip is None:
+            skip = ["mat_id"]
+
         out = set()
-        for v in iden.values():
-            if isinstance(v, list):
+        for k, v in iden.items():
+            if k in skip:
+                continue
+
+            if isinstance(v, dict):
+                continue
+                # for mat in v:
+                #     out.update(cls._get_set_of_values(self._get_one_mat(mat["uid"])))
+            elif isinstance(v, list):
                 for i in v:
                     out.add(i)
             else:
                 out.add(v)
+
         return out
 
     @staticmethod
@@ -219,6 +213,9 @@ class GetMaterial(GetObject, ABC):
             for i in require:
                 remove = []
                 for x in values:
+                    if not isinstance(x, str):
+                        continue
+
                     if op:
                         if i not in x:  # requires i to stay in set
                             remove.append(x)
@@ -252,16 +249,16 @@ class GetMaterialID(GetMaterial):
     """For Material."""
 
     @classmethod
-    def get_id(cls, target, material):
+    def get_id(cls, target, material) -> int:
         scores = []
-        for _id, mat_ref in material.iden.items():
-            mat = cls._get_one_mat(mat_ref["uid"])
-            values = cls._get_set_of_values(mat)
+        for mat in material.iden:
+            mat_dict = cls._get_one_mat(mat.ref_material["uid"])
+            values = cls._get_set_of_values(mat_dict)
             r = cls._get_score(target, values)[1]
             if r > 95:
-                return _id
+                return mat.mat_id
             else:
-                scores.append([_id, r])
+                scores.append([mat.mat_id, r])
 
         if max_ := max([i[1] for i in scores]) > 0.75:
             return [i[0] for i in scores if i[1] == max_][0]

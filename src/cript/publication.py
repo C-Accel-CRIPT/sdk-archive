@@ -3,16 +3,25 @@ Publications
 
 """
 
-from .base import BaseModel, BaseReference
+from . import CRIPTError
+from .base import BaseModel, BaseSlot
+from .utils.validator.type_check import type_check_property
+from .utils.class_tools import freeze_class
 
 
-class Publication(BaseModel):
+class PublicationError(CRIPTError):
+    pass
+
+
+@freeze_class
+class Publication(BaseModel, _error=PublicationError):
 
     class_ = "Publication"
 
     def __init__(
             self,
             title: str,
+            name: str = None,
             authors: list[str] = None,
             journal: str = None,
             publisher: str = None,
@@ -25,7 +34,9 @@ class Publication(BaseModel):
             arxiv_id: str = None,
             PMID: str = None,
             website: str = None,
-            notes: str = None
+            notes: str = None,
+            c_collection=None,
+            **kwargs
     ):
         """
 
@@ -52,7 +63,7 @@ class Publication(BaseModel):
         :param last_modified_date: Last date the node was modified.
         :param created_date: Date it was created.
         """
-        super().__init__(name=title, class_=self.class_, notes=notes)
+        super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
         self._title = None
         self.title = title
@@ -93,11 +104,14 @@ class Publication(BaseModel):
         self._website = None
         self.website = website
 
+        self._c_collection = BaseSlot("Collection", c_collection, self._error)
+
     @property
     def title(self):
         return self._title
 
     @title.setter
+    @type_check_property
     def title(self, title):
         self._title = title
 
@@ -106,6 +120,7 @@ class Publication(BaseModel):
         return self._authors
 
     @authors.setter
+    @type_check_property
     def authors(self, authors):
         self._authors = authors
 
@@ -114,6 +129,7 @@ class Publication(BaseModel):
         return self._journal
 
     @journal.setter
+    @type_check_property
     def journal(self, journal):
         self._journal = journal
 
@@ -122,6 +138,7 @@ class Publication(BaseModel):
         return self._publisher
 
     @publisher.setter
+    @type_check_property
     def publisher(self, publisher):
         self._publisher = publisher
 
@@ -130,6 +147,7 @@ class Publication(BaseModel):
         return self._year
 
     @year.setter
+    @type_check_property
     def year(self, year):
         self._year = year
 
@@ -138,6 +156,7 @@ class Publication(BaseModel):
         return self._volume
 
     @volume.setter
+    @type_check_property
     def volume(self, volume):
         self._volume = volume
 
@@ -146,6 +165,7 @@ class Publication(BaseModel):
         return self._issue
 
     @issue.setter
+    @type_check_property
     def issue(self, issue):
         self._issue = issue
 
@@ -154,6 +174,7 @@ class Publication(BaseModel):
         return self._pages
 
     @pages.setter
+    @type_check_property
     def pages(self, pages):
         self._pages = pages
 
@@ -162,6 +183,7 @@ class Publication(BaseModel):
         return self._doi
 
     @doi.setter
+    @type_check_property
     def doi(self, doi):
         self._doi = doi
 
@@ -170,6 +192,7 @@ class Publication(BaseModel):
         return self._issn
 
     @issn.setter
+    @type_check_property
     def issn(self, issn):
         self._issn = issn
 
@@ -177,7 +200,8 @@ class Publication(BaseModel):
     def arxiv_id(self):
         return self._arxiv_id
 
-    @doi.setter
+    @arxiv_id.setter
+    @type_check_property
     def arxiv_id(self, arxiv_id):
         self._arxiv_id = arxiv_id
 
@@ -186,6 +210,7 @@ class Publication(BaseModel):
         return self._PMID
 
     @PMID.setter
+    @type_check_property
     def PMID(self, PMID):
         self._PMID = PMID
 
@@ -194,8 +219,15 @@ class Publication(BaseModel):
         return self._website
 
     @website.setter
+    @type_check_property
     def website(self, website):
         self._website = website
 
+    @property
+    def c_collection(self):
+        return self._c_collection
 
+    @c_collection.setter
+    def c_collection(self, *args):
+        self._base_slot_block()
 

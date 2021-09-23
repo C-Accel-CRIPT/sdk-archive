@@ -1,0 +1,3 @@
+recursive-include cript *.csv
+recursive-include cript *.xlsx
+recursive-include cript *.zip

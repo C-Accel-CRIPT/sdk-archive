@@ -123,7 +123,7 @@ def type_check_property(func):
 
             # converter to builtin types, if needed
             if arg_type_op in builtin_types.values():
-                pass
+                arg_type_op = {"0": arg_type_op}
             elif type(arg_type_op) is _UnionGenericAlias:
                 # unions and optionals
                 arg_type_op = parse_generic_type(str(arg_type_op))
@@ -131,8 +131,9 @@ def type_check_property(func):
                 arg_type_op = parse_generic_alias_type(str(arg_type_op))
             else:
                 raise KeyError
+            arg_type_op = arg_type_op | {"-1": None}
 
-            # get arg type tree
+                # get arg type tree
             if args[1] is None:
                 arg_type = {None: ""}
             else:

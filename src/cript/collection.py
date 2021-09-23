@@ -4,14 +4,15 @@ Collection Node
 """
 
 from . import CRIPTError
-from .base import BaseModel, BaseReference
+from .base import BaseModel, BaseSlot
+from .utils.class_tools import freeze_class
 
 
 class CollectionError(CRIPTError):
-    def __init__(self, *msg):
-        super().__init__(*msg)
+    pass
 
 
+@freeze_class
 class Collection(BaseModel, _error=CollectionError):
     class_ = "Collection"
 
@@ -41,6 +42,30 @@ class Collection(BaseModel, _error=CollectionError):
         """
         super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
-        self.c_experiment = BaseReference("Experiment", c_experiment, self._error)
-        self.c_collection = BaseReference("Collection", c_collection, self._error)
-        self.c_inventory = BaseReference("Inventory", c_inventory, self._error)
+        self._c_experiment = BaseSlot("Experiment", c_experiment, self._error)
+        self._c_collection = BaseSlot("Collection", c_collection, self._error)
+        self._c_inventory = BaseSlot("Inventory", c_inventory, self._error)
+
+    @property
+    def c_experiment(self):
+        return self._c_experiment
+
+    @c_experiment.setter
+    def c_experiment(self, *args):
+        self._base_slot_block()
+
+    @property
+    def c_collection(self):
+        return self._c_collection
+
+    @c_collection.setter
+    def c_collection(self, *args):
+        self._base_slot_block()
+
+    @property
+    def c_inventory(self):
+        return self._c_inventory
+
+    @c_inventory.setter
+    def c_inventory(self, *args):
+        self._base_slot_block()

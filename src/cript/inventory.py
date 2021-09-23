@@ -4,15 +4,16 @@ Inventory Node
 """
 
 from . import CRIPTError
-from .base import BaseModel, BaseReference
+from .base import BaseModel, BaseSlot
 from .utils.external_database_code import GetMaterial
+from .utils.class_tools import freeze_class
 
 
 class InventoryError(CRIPTError):
-    def __init__(self, *msg):
-        super().__init__(*msg)
+    pass
 
 
+@freeze_class
 class Inventory(BaseModel, _error=InventoryError):
     class_ = "Inventory"
 
@@ -38,7 +39,15 @@ class Inventory(BaseModel, _error=InventoryError):
         """
         super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
-        self.c_material = BaseReference("Material", c_material, self._error)
+        self._c_material = BaseSlot("Material", c_material, self._error)
+
+    @property
+    def c_material(self):
+        return self._c_material
+
+    @c_material.setter
+    def c_material(self, *args):
+        self._base_slot_block()
 
     def get(self, target):
         return GetMaterial.get(target, self.c_material())

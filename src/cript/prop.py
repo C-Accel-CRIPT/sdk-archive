@@ -1,20 +1,21 @@
 from typing import Union
 
 from . import Quantity, CRIPTError
-from .base import BaseReference
+from .base import BaseSlot
 from .cond import Cond
 from .doc_tools import loading_with_units
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.validator.prop import prop_keys_check
 from .utils.serializable import SerializableSub
 from .utils.printing import TablePrinting
+from .utils.class_tools import freeze_class
 
 
 class CondError(CRIPTError):
-    def __init__(self, *msg):
-        super().__init__(*msg)
+    pass
 
 
+@freeze_class
 class Prop(SerializableSub, TablePrinting):
     keys_molecule = None
     keys_polymer = None
@@ -25,10 +26,10 @@ class Prop(SerializableSub, TablePrinting):
     def __init__(
             self,
             key: str,
-            value: Union[float, int, str, Quantity],
-            uncer: Union[float, int, Quantity] = None,
+            value,
+            uncer=None,
             method: str = None,
-            mat_id: Union[str, int] = "0",
+            mat_id: int = 0,
             component: str = None,
             c_data=None,
             cond: Union[list[Cond], Cond] = None,
@@ -69,8 +70,7 @@ class Prop(SerializableSub, TablePrinting):
         self._cond = None
         self.cond = cond
 
-        self._c_data = None
-        self.c_data = BaseReference("Data", c_data, self._error)
+        self._c_data = BaseSlot("Data", c_data, self._error)
 
     @property
     def mat_id(self):
@@ -78,13 +78,7 @@ class Prop(SerializableSub, TablePrinting):
 
     @mat_id.setter
     def mat_id(self, mat_id):
-        if isinstance(mat_id, int):
-            mat_id = str(mat_id)
-        if isinstance(mat_id, str):
-            self._mat_id = mat_id
-        else:
-            mes = "Invalid mat_id type."
-            self._error(mes)
+        self._mat_id = mat_id
 
     @property
     def key(self):
@@ -100,7 +94,6 @@ class Prop(SerializableSub, TablePrinting):
         return self._value
 
     @value.setter
-    @type_check_property
     def value(self, value):
         self._value = value
 
@@ -109,7 +102,6 @@ class Prop(SerializableSub, TablePrinting):
         return self._uncer
 
     @uncer.setter
-    @type_check_property
     def uncer(self, uncer):
         self._uncer = uncer
 
@@ -140,6 +132,14 @@ class Prop(SerializableSub, TablePrinting):
     def cond(self, cond):
         cond = loading_with_units(cond, Cond)
         self._cond = cond
+
+    @property
+    def c_data(self):
+        return self._c_data
+
+    @c_data.setter
+    def c_data(self, *args):
+        self._base_reference_block()
 
     @classmethod
     def _init_(cls):

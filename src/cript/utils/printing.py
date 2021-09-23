@@ -82,6 +82,7 @@ class TablePrinting(ABC):
     @classmethod
     def key_table(cls):
         text = cls.to_table(cls.keys)
+        text += "\nAdd '+' to the front of custom keys."
         print(text)
 
     @staticmethod

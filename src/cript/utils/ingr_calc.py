@@ -395,6 +395,10 @@ class IngredientCalculator:
         index = self._get_mat_index(item)
         return self._ingr[index]
 
+    def __iter__(self):
+        for ingr in self._ingr:
+            yield ingr
+
     def _init_with_args(self, *args):
         if args:
             for arg in args[0]:
@@ -406,7 +410,7 @@ class IngredientCalculator:
 
                 try:
                     self.add(*arg, **kwarg)
-                except TypeError as e:
+                except KeyError as e:
                     warn(f"Material skipped: '{arg}'. {e}")
 
     def add(self, mat: dict, equivalence: list[Union[float, int], Union[int, str]] = None):
@@ -417,7 +421,11 @@ class IngredientCalculator:
         """
         if equivalence is not None:
             index = self._get_mat_index(equivalence[1])
-            mat["mole"] = self._ingr[index]["mole"] * equivalence[0]
+            if "mole" in self._ingr[index].keys():
+                mat["mole"] = self._ingr[index]["mole"] * equivalence[0]
+            else:
+                mes = f"The equivalence material({self._ingr[index]['name']}) has no moles."
+                raise self._error(mes)
 
         self._ingr.append(self._q_calc.calc_mass_volume_mole(mat))
         self._ingr = self._r_calc.calc_equiv_molarity_mass_fraction(self._ingr)

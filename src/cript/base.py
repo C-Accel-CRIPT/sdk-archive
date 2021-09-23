@@ -26,7 +26,7 @@ class CriptTypes:
         cls.cript_types = cript_types
 
 
-class BaseReference(CriptTypes):
+class BaseSlot(CriptTypes):
     _error = None
 
     def __init__(self, node: str, objs=None, _error=CRIPTError):
@@ -62,9 +62,18 @@ class BaseReference(CriptTypes):
         elif isinstance(item, str):
             index = self._get_index_from_name(item)
             return self._reference[index]
+        elif isinstance(item, slice):
+            return [self._reference[i] for i in range(*item.indices(len(self._reference)))]
         else:
             mes = "Item not found."
             raise self._error(mes)
+
+    def __len__(self):
+        return len(self._reference)
+
+    def __iter__(self):
+        for ref in self._reference:
+            yield ref
 
     def _get_index_from_name(self, item: str) -> int:
         values = [i["name"] for i in self._reference]
@@ -112,7 +121,8 @@ class BaseReference(CriptTypes):
         if "_id" in obj.keys():
             return self.cript_types[self._node].create_reference(obj)
         elif "uid" in obj.keys():
-            return obj
+            ref_fun = getattr(self.cript_types[obj["class_"]], "create_reference")
+            return ref_fun(obj)
         else:
             mes = f"Invalid reference object for '{self._node}'. '{obj}'"
             raise self._error(mes)
@@ -339,3 +349,7 @@ class BaseModel(Serializable, CriptTypes, ABC):
             out[key] = ddict[key]
 
         return out
+
+    @staticmethod
+    def _base_slot_block():
+        raise AttributeError("Use '.add()' or .remove() to modify.")

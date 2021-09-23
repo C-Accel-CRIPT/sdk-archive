@@ -1,19 +1,19 @@
-from .. import Path
+from cript import Path
 
 __all__ = ["tutorial_data_part2"]
 
 tutorial_path = Path(__file__).parent
 tutorial_data_part2 = {
     "polystyrene_sec": {
-        "path": Path(r"supporting_files/data/Polystyrene_SEC.csv"),
+        "path": Path(r"../tutorial/Polystyrene_SEC.csv"),
         "descr": ""
     },
     "polystyrene_1hnmr": {
-        "path": Path(r"supporting_files/data/Polystyrene_1HNMR.zip"),
+        "path": Path(r"../tutorial/Polystyrene_1HNMR.zip"),
         "descr": ""
     },
     "sec_calibration_curve": {
-        "path": Path(r"supporting_files/data/sec_calibration_curve.xlsx"),
+        "path": Path(r"../tutorial/sec_calibration_curve.xlsx"),
         "descr": ""
     },
 

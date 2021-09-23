@@ -11,18 +11,21 @@ setup(
     author_email='dylanwal@mit.edu',
     description='CRIPT (A Community Resource for Innovation in Polymer Technology)',
     classifiers=[
-                  "Programming Language :: Python :: 3",
+                  "Programming Language :: Python :: 3.9",
                   "Operating System :: OS Independent",
               ],
     package_dir={"": "src"},
     py_modules=["cript"],
     packages=find_packages(where="src"),
+    package_data={
+        "": ["*.xlsx", "*.zip", "*.csv"]
+    },
+    python_requires=">=3.9",
     install_requires=[
         "pymongo[srv]>=3.11",
         "pint>=0.17",
-        "bson>=0.5",
         "jsonpatch>=1.32",
         "fuzzywuzzy>=0.18.0",
-        "python-Levenshtein>=0.12.2"
+        "rxnpy>=0.0.1"
     ]
 )

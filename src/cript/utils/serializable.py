@@ -3,6 +3,7 @@ from datetime import datetime
 from bson import ObjectId
 from json import dumps
 from typing import Union
+from pathlib import Path
 
 from .. import Quantity, Unit
 
@@ -123,6 +124,8 @@ class SerializableSub(Serializable, ABC):
             value = self.__getattribute__(k)
             if isinstance(value, Quantity):
                 value = self._to_dict_units(value, **kwargs)
+            elif isinstance(value, Path):
+                value = str(value)
             else:
                 value = self._to_dict(value, **kwargs)
             attr[k] = value

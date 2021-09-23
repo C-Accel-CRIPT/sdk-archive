@@ -4,16 +4,17 @@ User Node
 """
 
 from . import CRIPTError
-from .base import BaseModel, BaseReference
+from .base import BaseModel, BaseSlot
 from .utils.validator.type_check import type_check_property
 from .utils.validator.user import email_format_check, phone_format_check, orcid_format_check
+from .utils.class_tools import freeze_class
 
 
 class UserError(CRIPTError):
-    def __init__(self, *msg):
-        super().__init__(*msg)
+    pass
 
 
+@freeze_class
 class User(BaseModel, _error=UserError):
     class_ = "User"
 
@@ -78,8 +79,8 @@ class User(BaseModel, _error=UserError):
         self._position = None
         self.position = position
 
-        self.c_group = BaseReference("Group", c_group, _error=self._error)
-        self.c_publication = BaseReference("Publication", c_publication, _error=self._error)
+        self._c_group = BaseSlot("Group", c_group, _error=self._error)
+        self._c_publication = BaseSlot("Publication", c_publication, _error=self._error)
 
     @property
     def email(self):
@@ -146,3 +147,19 @@ class User(BaseModel, _error=UserError):
     @type_check_property
     def position(self, position):
         self._position = position
+
+    @property
+    def c_group(self):
+        return self._c_group
+
+    @c_group.setter
+    def c_group(self, *arg):
+        self._base_slot_block()
+
+    @property
+    def c_publication(self):
+        return self._c_publication
+
+    @c_publication.setter
+    def c_publication(self, *arg):
+        self._base_slot_block()

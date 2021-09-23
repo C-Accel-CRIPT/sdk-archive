@@ -6,19 +6,20 @@ Condition Keywords
 from typing import Union
 
 from . import Quantity, CRIPTError
-from .base import CriptTypes
+from .base import CriptTypes, BaseSlot
 from .doc_tools import load
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.validator.cond import cond_keys_check
 from .utils.serializable import SerializableSub
 from .utils.printing import TablePrinting
+from .utils.class_tools import freeze_class
 
 
 class CondError(CRIPTError):
-    def __init__(self, *msg):
-        super().__init__(*msg)
+    pass
 
 
+@freeze_class
 class Cond(SerializableSub, TablePrinting, CriptTypes):
     keys = None
     _error = CondError
@@ -26,17 +27,17 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
     def __init__(
             self,
             key: str,
-            value=None,
+            value,
             uncer: Union[float, int, Quantity] = None,
-            data_uid: str = None,
+            c_data=None,
             _loading: bool = False
     ):
         """
 
-        :param key:
-        :param value:
-        :param uncer:
-        :param data_uid:
+        :param key: Unique key to define what the condition is. See Cond.key_table() for official list.
+        :param value: numerical, text or material
+        :param uncer: uncertainty
+        :param data_uid: Referance to data node.
         """
         if _loading:
             key, value, uncer = self._loading(key, value, uncer)
@@ -50,8 +51,7 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
         self._uncer = None
         self.uncer = uncer
 
-        self._data_uid = None
-        self.data_uid = data_uid
+        self._c_data = BaseSlot("Data", c_data, self._error)
 
     @property
     def key(self):
@@ -89,13 +89,12 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
         self._uncer = uncer
 
     @property
-    def data_uid(self):
-        return self._data_uid
+    def c_data(self):
+        return self._c_data
 
-    @data_uid.setter
-    @type_check_property
-    def data_uid(self, data_uid):
-        self._data_uid = data_uid
+    @c_data.setter
+    def c_data(self, *args):
+        self._base_reference_block()
 
     @classmethod
     def _init_(cls):

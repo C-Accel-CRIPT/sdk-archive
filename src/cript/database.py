@@ -341,6 +341,7 @@ class CriptDB(CriptTypes):
             self._parent_obj_set(obj, parent_obj)
 
         elif obj.class_ == "Process":
+            self._experiment_add_ingr(obj, parent_obj)
             self._parent_obj_set(obj, parent_obj)
 
         elif obj.class_ == "Data":
@@ -357,6 +358,14 @@ class CriptDB(CriptTypes):
             attr = getattr(parent_obj, attr_name)
             attr.add(obj)
             self.update(parent_obj)
+
+    def _experiment_add_ingr(self, process, expt):
+        mat_uids = [mat["uid"] for mat in expt.c_material]
+        for ingr in process.ingr:
+            if ingr["uid"] not in mat_uids:
+                expt.c_material.add(ingr)
+                if self.op_print:
+                    print(f"{ingr['name']} was add to {expt.name}")
 
     @login_check
     def view(self, obj, query: dict = None, num_results: int = 50):
@@ -436,7 +445,7 @@ class CriptDB(CriptTypes):
         """
         Search the full collection
         """
-        coll = self.db[obj._class]
+        coll = self.db[obj.class_]
         if len(query.keys()) == 1:
             # search whole collection
             result = list(coll.find({}, limit=num_results))

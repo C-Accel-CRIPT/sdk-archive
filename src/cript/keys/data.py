@@ -22,11 +22,11 @@ data_keys = {
         "z_unit": "",
         "descr": "Generic 3D object",
     },
-    "tensor": {
-        "labels": [],
-        "units": [],
-        "descr": "Generic nD object",
-    },
+    # "tensor": {
+    #     "labels": [],
+    #     "units": [],
+    #     "descr": "Generic nD object",
+    # },
 
     # 2D data
     "rxn_conv": {

@@ -1,6 +1,7 @@
 from cript import *
 
 # Connect to database
+
 db_username = "DW_cript"
 db_password = "YXMaoE1"
 db_project = "cript_testing"
@@ -55,7 +56,7 @@ expt = Experiment("Anionic Polymerization of Styrene with SecBuLi")
 db.save(expt, collection)
 
 inventory = Inventory("Tutorial Materials")
-db.save(inventory, collection)
+db.save(inventory, new_group)
 
 mat_water = Material(
     iden=Iden(
@@ -360,7 +361,7 @@ mat_sBuLi = Material(
     prop=[Prop(key="molar_mass", value=64.06 * Unit("g/mol"), method="prescribed")
           ])
 
-db.save(mat_styrene, [expt, inventory])
+db.save(mat_styrene, [inventory])
 db.save(mat_toluene, [expt, inventory])
 db.save(mat_thf, [expt, inventory])
 db.save(mat_nBuOH, [expt, inventory])
@@ -395,7 +396,7 @@ process = Process(
     ingr=[
         [expt.get("SecBuLi solution 1.4M cHex"), 0.017 * Unit("ml"), "initiator", {"mat_id": "secBuLi"}],
         [expt.get("toluene"), 10 * Unit("ml"), "solvent"],
-        [expt.get("styrene"), 0.455 * Unit("g"), "monomer"],
+        [inventory.get("styrene"), 0.455 * Unit("g"), "monomer"],
         [expt.get("1BuOH"), 5, "quench", {"eq_mat": "SecBuLi solution"}],
         [expt.get("MeOH"), 100 * Unit("ml"), "workup"]
     ],
@@ -419,10 +420,10 @@ db.save(process, expt)
 
 ###########################################################
 
-
-sec_data_path = tutorial.tutorial_data_part2["polystyrene_sec"]["path"]
-cal_path = tutorial.tutorial_data_part2["sec_calibration_curve"]["path"]
-nmr1h_path = tutorial.tutorial_data_part2["polystyrene_1hnmr"]["path"]
+from cript.tutorial import tutorial_data_part2
+sec_data_path = tutorial_data_part2["polystyrene_sec"]["path"]
+cal_path = tutorial_data_part2["sec_calibration_curve"]["path"]
+nmr1h_path = tutorial_data_part2["polystyrene_1hnmr"]["path"]
 
 sec_data = Data(
     name="Crude SEC of polystyrene",

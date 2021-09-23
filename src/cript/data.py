@@ -8,17 +8,18 @@ from bson import ObjectId
 from . import Cond, CRIPTError, Path
 from .base import BaseModel
 from .doc_tools import loading_with_units
-from .utils.serializable import Serializable
+from .utils.serializable import SerializableSub
 from .utils.printing import TablePrinting
 from .keys.data import data_keys
+from .utils.class_tools import freeze_class
 
 
 class DataError(CRIPTError):
-    def __init__(self, *msg):
-        super().__init__(*msg)
+    pass
 
 
-class File(Serializable):
+@freeze_class
+class File(SerializableSub):
     def __init__(
             self,
             path: Union[str, Path] = None,
@@ -98,6 +99,8 @@ class File(Serializable):
         self._uid = uid
 
 
+
+@freeze_class
 class Data(TablePrinting, BaseModel, _error=DataError):
     keys = data_keys
     class_ = "Data"
@@ -114,6 +117,17 @@ class Data(TablePrinting, BaseModel, _error=DataError):
             notes: str = None,
             **kwargs
     ):
+        """
+
+        :param type_: See Data.key_table()
+        :param file: Raw data file. See help(File.__init__)
+        :param sample_prep: Text write up of how sample was prepared.
+        :param calibration: Calibration file. See help(File.__init__)
+        :param equipment: Equipment file. See help(File.__init__)
+        :param cond: Condition. See help(Cond.__init__) and Cond.key_table()
+        :param name: The user-defined name for the process.
+        :param notes: Any miscellaneous notes related to the user.
+        """
         super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
         self._type_ = None

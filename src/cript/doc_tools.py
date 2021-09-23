@@ -48,6 +48,7 @@ class Export(CriptTypes):
     def __call__(self, obj, path=None, depth: int = 0, op_files: bool = True) -> list[Path]:
         """
         depth=4 from user get most of database
+        :param obj: Node, document (dict), uid ; list or single obj
         """
         if path is None:
             path = self.default_path
@@ -64,7 +65,10 @@ class Export(CriptTypes):
         for level in range(depth+1):
             uids = {}
             for ob in obj:
+                if isinstance(ob, dict) and "created_date" in ob.keys():
+                    ob = load(ob)
                 if isinstance(ob, dict) and "class_" in ob.keys():
+                    ob = GetObject.get_from_uid(ob["class_"], ob["uid"])[0]
                     ob = load(ob)
                 if not hasattr(ob, "create_doc"):
                     mes = "Invalid object for export."

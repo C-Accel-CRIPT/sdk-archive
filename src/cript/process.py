@@ -15,18 +15,18 @@ from .utils.printing import TablePrinting
 from .utils.ingr_calc import IngredientCalculator
 from .utils.external_database_code import GetObject
 from .keys.process import Process_keys, Ingr_keys
+from .utils.class_tools import freeze_class
 
 
 class ProcessError(CRIPTError):
-    def __init__(self, *msg):
-        super().__init__(*msg)
+    pass
 
 
 class IngrError(CRIPTError):
-    def __init__(self, *msg):
-        super().__init__(*msg)
+    pass
 
 
+@freeze_class
 class Ingr(IngredientCalculator, TablePrinting):
     keys = Ingr_keys
     _error = IngrError
@@ -51,7 +51,7 @@ class Ingr(IngredientCalculator, TablePrinting):
         return self.as_dict()
 
     def add(self, mat: Union[Material], qty: Union[int, float, Quantity], keyword: str = None,
-            eq_mat=None, mat_id=None):
+            eq_mat=None, mat_id=None, method: str = None):
         """
         Adds mat to Ingr and performs calculations for the other quantities.
         :param mat:
@@ -59,9 +59,10 @@ class Ingr(IngredientCalculator, TablePrinting):
         :param keyword:
         :param eq_mat:
         :param mat_id:
+        :param method: used to select proper from specific method; example "nmr" vs "sec"
         :return:
         """
-        new_ingr = self._get_material_data(mat, mat_id)
+        new_ingr = self._get_material_data(mat, mat_id, method)
         new_ingr.update(self._get_keyword(keyword))
         if eq_mat:
             equivalence = [qty, eq_mat]
@@ -70,13 +71,13 @@ class Ingr(IngredientCalculator, TablePrinting):
             equivalence = None
         super().add(new_ingr, equivalence)
 
-    def _get_material_data(self, mat: Union[dict, Material], mat_id) -> dict:
+    def _get_material_data(self, mat: Union[dict, Material], mat_id, method) -> dict:
         """
         Gets data for material.
         """
         mat = self._pre_checks_for_material(mat)
         mat_data = mat.reference()
-        prop_data = self._get_mat_prop(mat, mat_id)
+        prop_data = self._get_mat_prop(mat, mat_id, method)
         return mat_data | prop_data
 
     def _pre_checks_for_material(self, mat):
@@ -106,8 +107,9 @@ class Ingr(IngredientCalculator, TablePrinting):
 
         return True
 
-    def _get_mat_prop(self, mat, mat_id=None) -> dict:
-        mat_prop = self._get_prop_from_mat_id(mat, ["phase", "molar_mass", "m_n", "molar_conc", "density"])
+    def _get_mat_prop(self, mat, mat_id, method) -> dict:
+        mat_prop = self._get_prop_from_mat_id(mat, ["phase", "molar_mass", "m_n", "molar_conc", "density", "m_n"],
+                                              method=method)
         if mat_id is not None:
             if isinstance(mat_id, str):
                 if mat_id.isdigit():
@@ -120,7 +122,8 @@ class Ingr(IngredientCalculator, TablePrinting):
                 mes = "Invalid mat_id."
                 raise self._error(mes)
             # this can add or overwrite bulk props
-            mat_prop_2 = self._get_prop_from_mat_id(mat, ["molar_mass", "m_n", "molar_conc", "density"], mat_id)
+            mat_prop_2 = self._get_prop_from_mat_id(mat, ["molar_mass", "m_n", "molar_conc", "density", "m_n"],
+                                                    mat_id, method)
             if mat_prop_2 == {}:
                 mes = f"'mat_id' for {mat.name} found no properties to assist with ingredient calculations."
                 warn(mes)
@@ -130,12 +133,32 @@ class Ingr(IngredientCalculator, TablePrinting):
         return mat_prop
 
     @staticmethod
-    def _get_prop_from_mat_id(mat: Material, prop: list[str], mat_id: str = "0") -> dict:
+    def _get_prop_from_mat_id(mat: Material, prop: list[str], mat_id: int = 0, method: str = None) -> dict:
+        warn_mes = None
         out = {}
-        mat_props = [[p.key, p.value] for p in mat.prop if p.mat_id == mat_id]
+        mat_props = [[p.key, p.value, p.method] for p in mat.prop if p.mat_id == mat_id]
         for p in mat_props:
             if p[0] in prop:
-                out[p[0]] = p[1]
+                if p[0] in out.keys():
+                    if method is not None:
+                        if p[3] == method:
+                            out[p[0]] = p[1]
+                        else:
+                            for pp in mat.prop:
+                                if pp.mat_id == mat_id and pp.value == out[p[0]]:
+                                    if pp.method == method:
+                                        warn_mes = None
+                                    else:
+                                        warn_mes = f"'{p[0]}' determined from {method} does not exist for {mat.name}."
+                    else:
+                        warn_mes = f"'{p[0]}' has two or more values found for {mat.name}. {p[0]}={out[p[0]]} " \
+                                   f"used for calculations. Add 'method' to get specify a specific '{p[0]}'."
+                else:
+                    out[p[0]] = p[1]
+
+        if warn_mes is not None:
+            warn(warn_mes)
+
         return out
 
     def _get_keyword(self, keyword: str) -> dict:
@@ -193,6 +216,7 @@ class Ingr(IngredientCalculator, TablePrinting):
             self.add(ingr["uid"], qty, keyword=keyword, mat_id=mat_id)
 
 
+@freeze_class
 class Process(TablePrinting, BaseModel, _error=ProcessError):
     class_ = "Process"
     keys = Process_keys
@@ -202,7 +226,7 @@ class Process(TablePrinting, BaseModel, _error=ProcessError):
             name: str,
             ingr,
             procedure: str,
-            cond: list[Cond],
+            cond: list[Cond] = None,
             prop: list[Prop] = None,
             keywords: list[str] = None,
             notes: str = None,
@@ -210,12 +234,12 @@ class Process(TablePrinting, BaseModel, _error=ProcessError):
     ):
         """
 
-        :param name: The name of the user.
-        :param ingr:
-        :param procedure:
-        :param cond:
-        :param prop:
-        :param keywords:
+        :param name: The user-defined name for the process.
+        :param ingr: See help(Ingr.__init__)
+        :param procedure: Text write up of procedure
+        :param cond: Condition. See help(Cond.__init__) and Cond.key_table()
+        :param prop: Property. See help(Prop.__init__) and Prop.key_table()
+        :param keywords: See Process.key_table()
         :param notes: Any miscellaneous notes related to the user.
 
         :param _class: class of node.

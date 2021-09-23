@@ -5,31 +5,31 @@ Material Node
 from typing import Union
 
 from . import CRIPTError, Cond, Prop
-from .base import BaseModel, BaseReference
+from .base import BaseModel, BaseSlot
 from .doc_tools import loading_with_units
 from .utils.serializable import Serializable
 from .utils.external_database_code import GetMaterialID
 from .utils.validator.type_check import type_check_property, type_check
 from .utils.printing import TablePrinting
 from .keys.material import *
+from .utils.class_tools import freeze_class
 
 
 class MaterialError(CRIPTError):
-    def __init__(self, *msg):
-        super().__init__(*msg)
+    pass
 
 
 class IdenError(CRIPTError):
-    def __init__(self, *msg):
-        super().__init__(*msg)
+    pass
 
 
+@freeze_class
 class Iden(Serializable):
     _error = IdenError
 
     def __init__(
             self,
-            c_material: Union[str, "Material"] = None,
+            ref_material=None,
             name: str = None,
             names: list[str] = None,
             cas: str = None,
@@ -39,7 +39,8 @@ class Iden(Serializable):
             chem_repeat: str = None,
             pubchem_cid: str = None,
             inchi: str = None,
-            inchi_key: str = None
+            inchi_key: str = None,
+            mat_id: int = None
     ):
         """
         :param name: preferred name
@@ -53,8 +54,20 @@ class Iden(Serializable):
         :param inchi: IUPAC International Chemical Identifier
         :param inchi_key: a hashed version of the full InChI
         """
+        self._mat_id = None
+        self.mat_id = mat_id
 
         self._name = None
+        self._names = None
+
+        if ref_material is not None:
+            self._ref_material = None
+            self.ref_material = ref_material
+            name = self.ref_material["name"]
+            self.name = name
+            self.names = name
+            return
+
         self.name = name
 
         # adding name to names
@@ -64,7 +77,6 @@ class Iden(Serializable):
             if name not in names:
                 names.append(name)
 
-        self._names = None
         self.names = names
 
         self._cas = None
@@ -90,8 +102,6 @@ class Iden(Serializable):
 
         self._inchi_key = None
         self.inchi_key = inchi_key
-
-        self.c_material = BaseReference("Material", c_material, self._error)
 
     @property
     def name(self):
@@ -183,17 +193,114 @@ class Iden(Serializable):
     def inchi_key(self, inchi_key):
         self._inchi_key = inchi_key
 
+    @property
+    def mat_id(self):
+        return self._mat_id
 
+    @mat_id.setter
+    @type_check_property
+    def mat_id(self, mat_id):
+        self._mat_id = mat_id
+
+    @property
+    def ref_material(self):
+        return self._ref_material
+
+    @ref_material.setter
+    def ref_material(self, material):
+        if isinstance(material, dict) and "uid" in material.keys():
+            pass
+        elif isinstance(material, Material):
+            material = material.reference()
+        else:
+            mes = f"Invalid material type. {material}"
+            raise self._error(mes)
+
+        self._ref_material = material
+
+
+class IdenSlot:
+    _error = None
+
+    def __init__(self, idens=None, _error=CRIPTError):
+        self._idens = []
+
+        if idens is not None:
+            self.add(idens)
+
+    def __str__(self):
+        return "".join([str(iden) for iden in self._idens])
+
+    def __repr__(self):
+        return "".join([repr(iden) for iden in self._idens])
+
+    def __call__(self):
+        return self._idens
+
+    def __getitem__(self, item):
+        if isinstance(item, int):
+            return self._idens[item]
+        elif isinstance(item, slice):
+            return [self._idens[i] for i in range(*item.indices(len(self._idens)))]
+        else:
+            mes = "Item not found."
+            raise self._error(mes)
+
+    def __len__(self):
+        return len(self._idens)
+
+    def __iter__(self):
+        for iden in self._idens:
+            yield iden
+
+    def add(self, idens):
+        if not isinstance(idens, list):
+            idens = [idens]
+
+        for iden in idens:
+            if isinstance(iden, Iden):
+                iden.mat_id = len(self._idens) + 1
+                self._idens.append(iden)
+            elif isinstance(iden, dict):
+                if "mat_id" not in iden.keys():
+                    iden["mat_id"] = len(self._idens) + 1
+                self._idens.append(Iden(**iden))
+            elif isinstance(iden, Material):
+                iden = Iden(ref_material=iden)
+                iden.mat_id = len(self._idens) + 1
+                self._idens.append(iden)
+            else:
+                mes = f"Invalid object type for Iden. '{iden}'"
+                raise self._error(mes)
+
+    def remove(self, idens):
+        if not isinstance(idens, list):
+            idens = [idens]
+
+        for iden in idens:
+            if isinstance(iden, int) and iden < len(self._idens):
+                del self._idens[iden]
+            else:
+                mes = f"Invalid object type for Iden. '{iden}'"
+                raise self._error(mes)
+
+    def as_dict(self, **kwags) -> list:
+        """ Returns list of references for serialization."""
+        return [iden.as_dict(**kwags) for iden in self._idens]
+
+
+@freeze_class
 class Material(TablePrinting, BaseModel, _error=MaterialError):
     keys = keywords_material_p | keywords_material
     class_ = "Material"
 
     def __init__(
             self,
-            iden: "Union[list[Iden], Iden, list[Material], Material]",
+            iden,
             name: str = None,
             prop: Union[list[Prop], Prop] = None,
             c_process=None,
+            c_parent_material=None,
             keywords: list[str] = None,
             source: str = None,
             lot_number: str = None,
@@ -203,7 +310,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
             **kwargs
     ):
         """
-        :param iden:
+        :param iden: See help(Iden.__init__) for details
 
         :param name: The name of the user. (automatic populated from identifier if not given)
         :param prop: properties
@@ -222,8 +329,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         :param created_date: Date it was created.
         """
 
-        self._iden = None
-        self.iden = iden
+        self._iden = IdenSlot(iden, _error=self._error)
 
         self._prop = None
         self.prop = prop
@@ -243,7 +349,8 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         self._hazard = None
         self.hazard = hazard
 
-        self.c_process = BaseReference("Process", c_process, self._error)
+        self._c_process = BaseSlot("Process", c_process, self._error)
+        self._c_parent_material = BaseSlot("Material", c_parent_material, self._error)
 
         if name is None:
             name = self._name_from_identifier()
@@ -255,30 +362,8 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         return self._iden
 
     @iden.setter
-    @type_check((list[Iden], Iden, dict, "self", "list[self]"))
-    def iden(self, obj):
-        ddict = dict()
-
-        if isinstance(obj, dict):
-            ddict = obj
-        elif isinstance(obj, Iden):
-            ddict["1"] = obj.as_dict()
-        elif isinstance(obj, Material):
-            ddict["1"] = obj.reference
-        elif isinstance(obj, list):
-            for i, iden in enumerate(obj):
-                if isinstance(iden, Iden):
-                    ddict[f"{i+1}"] = iden.as_dict()
-                elif isinstance(iden, Material):
-                    ddict[f"{i+1}"] = iden.reference()
-                else:
-                    mes = "Invalid Identifier provided."
-                    raise self._error(mes)
-        else:
-            mes = "Invalid Identifier provided."
-            raise self._error(mes)
-
-        self._iden = ddict
+    def iden(self, *args):
+        self._base_slot_block()
 
     @property
     def prop(self):
@@ -336,18 +421,34 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
     def hazard(self, hazard):
         self._hazard = hazard
 
+    @property
+    def c_process(self):
+        return self._c_process
+
+    @c_process.setter
+    def c_process(self, *args):
+        self._base_slot_block()
+
+    @property
+    def c_parent_material(self):
+        return self._c_parent_material
+
+    @c_parent_material.setter
+    def c_parent_material(self, *args):
+        self._base_slot_block()
+
     def _name_from_identifier(self):
         """
         Will generate a name from identifiers.
         :return:
         """
-        keys = self.iden.keys()
-        if len(keys) == 1:
-            name = self.iden["1"]["name"]
+        if len(self.iden) == 1:
+            name = self.iden[0].name
         else:
             name = ""
-            for key in keys:
-                name = name + "." + self.iden[key]["name"]
+            for iden in self.iden:
+                name += iden.name + "."
+            name = name[:-1]
 
         return name
 

@@ -19,7 +19,8 @@ def login_check(func):
                 else:
                     raise AttributeError
             except AttributeError:
-                raise CRIPTError("Login before trying to save. To login type: cript.CriptDB.user = 'your user id' ")
+                raise CRIPTError("Login before trying to work with the database. To login type: cript.CriptDB.user = "
+                                 "'your user id' ")
 
             value = func(*args, **kwargs)
 

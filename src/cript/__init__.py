@@ -3,7 +3,7 @@ import pkg_resources
 __all__ = [
     "VERSION", "__version__", "__short_version__", "Unit", "load", "export", "CriptDB",
     "User", "Group", "Collection", "Publication", "Experiment", "Material", "Process", "Data",
-    "Inventory", "Simulation", "Cond", "Prop", "Ingr", "Iden", "Path", "File", "tutorial"
+    "Inventory", "Simulation", "Cond", "Prop", "Ingr", "Iden", "Path", "File"
 ]
 
 # single-sourcing the package version

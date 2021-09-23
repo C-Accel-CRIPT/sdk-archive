@@ -4,16 +4,17 @@ Group Node
 """
 
 from . import CRIPTError
-from .base import BaseModel, BaseReference
+from .base import BaseModel, BaseSlot
 from .utils.validator.type_check import type_check_property
 from .utils.validator.user import email_format_check
+from .utils.class_tools import freeze_class
 
 
 class GroupError(CRIPTError):
-    def __init__(self, *msg):
-        super().__init__(*msg)
+    pass
 
 
+@freeze_class
 class Group(BaseModel, _error=GroupError):
     class_ = "Group"
 
@@ -57,11 +58,11 @@ class Group(BaseModel, _error=GroupError):
         self._website = None
         self.website = website
 
-        self.c_owner = BaseReference("User", c_owner)
-        self.c_group = BaseReference("Group", c_group)
-        self.c_publication = BaseReference("Publication", c_publication, self._error)
-        self.c_collection = BaseReference("Collection", c_collection, self._error)
-        self.c_inventory = BaseReference("Inventory", c_inventory, self._error)
+        self._c_owner = BaseSlot("User", c_owner, self._error)
+        self._c_group = BaseSlot("Group", c_group, self._error)
+        self._c_publication = BaseSlot("Publication", c_publication, self._error)
+        self._c_collection = BaseSlot("Collection", c_collection, self._error)
+        self._c_inventory = BaseSlot("Inventory", c_inventory, self._error)
 
     @property
     def email(self):
@@ -81,3 +82,43 @@ class Group(BaseModel, _error=GroupError):
     @type_check_property
     def website(self, website):
         self._website = website
+        
+    @property
+    def c_owner(self):
+        return self._c_owner
+
+    @c_owner.setter
+    def c_owner(self, *args):
+        self._base_slot_block()
+
+    @property
+    def c_group(self):
+        return self._c_group
+
+    @c_group.setter
+    def c_group(self, *args):
+        self._base_slot_block()
+
+    @property
+    def c_publication(self):
+        return self._c_publication
+
+    @c_publication.setter
+    def c_publication(self, *args):
+        self._base_slot_block()
+
+    @property
+    def c_collection(self):
+        return self._c_collection
+
+    @c_collection.setter
+    def c_collection(self, *args):
+        self._base_slot_block()
+
+    @property
+    def c_inventory(self):
+        return self._c_inventory
+
+    @c_inventory.setter
+    def c_inventory(self, *args):
+        self._base_slot_block()
