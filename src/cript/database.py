@@ -8,6 +8,7 @@ from typing import Union
 from pymongo import MongoClient, errors
 from bson import ObjectId
 from jsonpatch import JsonPatch
+import certifi
 
 from . import CRIPTError
 from .base import CriptTypes
@@ -25,9 +26,14 @@ class CriptDBError(CRIPTError):
 
 class CriptDB(CriptTypes):
     cript_types = None
-    instances = 0
+    _instance = None
     user_update = 0
     _error = CriptDBError
+
+    def __new__(cls, *args, **kwargs):
+        if CriptDB._instance is None:
+            CriptDB._instance = super().__new__(cls)
+        return CriptDB._instance
 
     def __init__(self,
                  db_username: str,
@@ -45,19 +51,16 @@ class CriptDB(CriptTypes):
         :param user: user node
         :param op_print: True to get printouts from database commands
         """
-
-        if CriptDB.instances > 0:
-            raise Exception("Connection to CRIPT database already exists. Can't start a second one.")
-        CriptDB.instances += 1
-
         self.db_username = db_username
         self.db_password = db_password
         self.db_project = db_project
         self.db_database = db_database
+        self.cluser_address = "cluster0.ekf91.mongodb.net"
 
         try:
             self.client = MongoClient(
-                f"mongodb+srv://{db_username}:{db_password}@cluster0.ekf91.mongodb.net/{db_project}?retryWrites=true&w=majority")
+                f"mongodb+srv://{self.db_username}:{self.db_password}@{self.cluser_address}/"
+                f"{self.db_project}?retryWrites=true&w=majority", tlsCAFile=certifi.where())
             self.client.server_info()  # test database connection
         except errors.ServerSelectionTimeoutError:
             msg = "Connection to database failed.\n\n"
