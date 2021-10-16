@@ -108,7 +108,7 @@ class Ingr(IngredientCalculator, TablePrinting):
         return True
 
     def _get_mat_prop(self, mat, mat_id, method) -> dict:
-        mat_prop = self._get_prop_from_mat_id(mat, ["phase", "molar_mass", "m_n", "molar_conc", "density", "m_n"],
+        mat_prop = self._get_prop_from_mat_id(mat, ["phase", "molar_mass", "m_n", "conc_molar", "density", "m_n"],
                                               method=method)
         if mat_id is not None:
             if isinstance(mat_id, str):
@@ -122,7 +122,7 @@ class Ingr(IngredientCalculator, TablePrinting):
                 mes = "Invalid mat_id."
                 raise self._error(mes)
             # this can add or overwrite bulk props
-            mat_prop_2 = self._get_prop_from_mat_id(mat, ["molar_mass", "m_n", "molar_conc", "density", "m_n"],
+            mat_prop_2 = self._get_prop_from_mat_id(mat, ["molar_mass", "m_n", "conc_molar", "density", "m_n"],
                                                     mat_id, method)
             if mat_prop_2 == {}:
                 mes = f"'mat_id' for {mat.name} found no properties to assist with ingredient calculations."

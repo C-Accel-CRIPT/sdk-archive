@@ -1,6 +1,6 @@
 from typing import Union
 
-from . import Quantity, CRIPTError
+from . import CRIPTError
 from .base import BaseSlot
 from .cond import Cond
 from .doc_tools import loading_with_units
@@ -17,8 +17,7 @@ class CondError(CRIPTError):
 
 @freeze_class
 class Prop(SerializableSub, TablePrinting):
-    keys_molecule = None
-    keys_polymer = None
+    keys_material = None
     keys_rxn = None
     keys = None
     _error = CondError
@@ -143,25 +142,24 @@ class Prop(SerializableSub, TablePrinting):
 
     @classmethod
     def _init_(cls):
-        from .keys.prop import prop_keys_mat, prop_keys_poly, prop_keys_rxn
-        cls.keys_molecule = prop_keys_mat
-        cls.keys_polymer = prop_keys_poly
+        from .keys.prop import prop_keys_mat, prop_keys_rxn
+        cls.keys_material = prop_keys_mat
         cls.keys_rxn = prop_keys_rxn
-        cls.keys = cls.keys_molecule | cls.keys_polymer | cls.keys_rxn
+        cls.keys = cls.keys_material | cls.keys_rxn
 
     @classmethod
-    def key_table(cls):
-        print("\nMolecular Properties")
-        print("-" * 20)
-        text = cls.to_table(cls.keys_molecule)
-        print(text)
+    def key_table(cls, _type: str = "html"):
+        if _type == "html":
+            cls.open_html("property_keys_materials.html")
+            cls.open_html("property_keys_reaction.html")
 
-        print("\nPolymer Properties")
-        print("-" * 18)
-        text = cls.to_table(cls.keys_polymer)
-        print(text)
+        elif _type == "console":
+            print("\nMolecular Properties")
+            print("-" * 20)
+            text = cls.to_table(cls.keys_material)
+            print(text)
 
-        print("\nReaction Properties")
-        print("-" * 19)
-        text = cls.to_table(cls.keys_rxn)
-        print(text)
+            print("\nReaction Properties")
+            print("-" * 19)
+            text = cls.to_table(cls.keys_rxn)
+            print(text)

@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import os
+from .. import Path
 
 QUANTITY_LENGTH = 10
 
@@ -78,6 +80,11 @@ class TablePrinting(ABC):
     Prints key tables out.
     """
     keys = None
+
+    @staticmethod
+    def open_html(html_name):
+        _path = (Path(__file__).parent / Path(r"../keys/html_versions/") / Path(f"{html_name}")).resolve()
+        os.system(fr"start {_path}")
 
     @classmethod
     def key_table(cls):

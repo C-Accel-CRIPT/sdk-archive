@@ -26,7 +26,7 @@ class QuantityCalculator:
 
             # will be used for calculations
         "density": Quantity,
-        "molar_conc": Quantity,
+        "conc_molar": Quantity,
         "molar_mass": Quantity,
 
         other key-value pairs will be ignored
@@ -58,8 +58,8 @@ class QuantityCalculator:
                 mat["mole"] = mole
 
         elif "mole" in mat.keys():
-            if "molar_conc" in mat.keys():
-                volume = self._mole_to_volume(mat["mole"], mat["molar_conc"])
+            if "conc_molar" in mat.keys():
+                volume = self._mole_to_volume(mat["mole"], mat["conc_molar"])
                 self._approx_same_in_dict(mat, volume, "volume")
                 mat["volume"] = volume
             if "molar_mass" in mat.keys():
@@ -72,8 +72,8 @@ class QuantityCalculator:
                 mat["volume"] = volume
 
         elif "volume" in mat.keys():
-            if "molar_conc" in mat.keys():
-                mole = self._vol_to_mole_conc(mat["volume"], mat["molar_conc"])
+            if "conc_molar" in mat.keys():
+                mole = self._vol_to_mole_conc(mat["volume"], mat["conc_molar"])
                 self._approx_same_in_dict(mat, mole, "mole")
                 mat["mole"] = mole
             elif "density" in mat.keys():
@@ -202,7 +202,7 @@ class QuantityCalculator:
     @classmethod
     def _init_(cls):
         from cript.keys.prop import prop_keys_mat
-        calc_names = ["density", "molar_conc", "molar_mass"]
+        calc_names = ["density", "conc_molar", "molar_mass"]
         cls.keys_calc = {k: prop_keys_mat[k] for k in calc_names}
         cls.keys = cls.keys_qty | cls.keys_rel | cls.keys_calc
 
@@ -282,9 +282,9 @@ class RelativeCalculator:
                         base = index
                 elif "equivalence" in i.keys() and i["equivalence"] == 1:
                     base = index
-                else:
-                    if fall_back_base is None:
-                        fall_back_base = index
+
+                if fall_back_base is None:
+                    fall_back_base = index
 
         if base is None:
             base = fall_back_base
@@ -577,7 +577,7 @@ class IngredientCalculator:
 #         "volume": 0.0172 * Unit("ml"),
 #         "molar_mass": 64.06 * Unit("g/mol"),
 #         "density": 0.768 * Unit("g/ml"),
-#         "molar_conc": 1.3 * Unit("M")
+#         "conc_molar": 1.3 * Unit("M")
 #     })
 #     calc.add({
 #         "name": "styrene",

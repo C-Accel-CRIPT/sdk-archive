@@ -130,7 +130,6 @@ if __name__ == '__main__':
     _dict = [
         [cond_keys, "condition_keys"],
         [prop_keys_rxn, "property_keys_reaction"],
-        [prop_keys_poly, "property_keys_polymers"],
         [prop_keys_mat, "property_keys_materials"],
         [keys_methods, "method_keys"],
         [data_keys, "data_keys"],

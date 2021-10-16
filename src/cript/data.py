@@ -65,7 +65,7 @@ class File(SerializableSub):
     @path.setter
     def path(self, path):
         self._path = path
-        
+
     @property
     def descr(self):
         return self._descr
@@ -77,7 +77,7 @@ class File(SerializableSub):
     @property
     def file_name(self):
         return self._file_name
-    
+
     @file_name.setter
     def file_name(self, file_name):
         self._file_name = file_name
@@ -93,11 +93,10 @@ class File(SerializableSub):
     @property
     def uid(self):
         return self._uid
-    
+
     @uid.setter
     def uid(self, uid):
         self._uid = uid
-
 
 
 @freeze_class
@@ -135,7 +134,7 @@ class Data(TablePrinting, BaseModel, _error=DataError):
 
         self._file = None
         self.file = file
-        
+
         self._sample_prep = None
         self.sample_prep = sample_prep
 
@@ -164,7 +163,7 @@ class Data(TablePrinting, BaseModel, _error=DataError):
     def file(self, file):
         file = self.loading_with_file(file)
         self._file = file
-        
+
     @property
     def sample_prep(self):
         return self._sample_prep

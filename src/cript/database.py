@@ -15,7 +15,7 @@ from .base import CriptTypes
 from .doc_tools import load
 from .user import User
 from .utils.external_database_code import FilesInOut
-from .utils.validator.type_check import *
+from .utils.validator.type_check import id_type_check, type_check_property, id_type_check_bool
 from .utils.database_tools import *
 
 
@@ -99,7 +99,7 @@ class CriptDB(CriptTypes):
         if user is None:
             self._user = user
             if self.op_print:
-                print(f"Not yet logged in.")
+                print("Not yet logged in.")
             return
 
         elif isinstance(user, str) and "@" in user:
@@ -148,7 +148,7 @@ class CriptDB(CriptTypes):
         return load(doc)
 
     @login_check
-    def save(self, obj, parent_obj=None):
+    def save(self, obj, parent_obj=None, data_file=False):
         """
         Saves item to database
 
@@ -177,7 +177,7 @@ class CriptDB(CriptTypes):
         # pre - checks
         if isinstance(parent_obj, dict):
             parent_obj = load(parent_obj)
-        self._pre_save_checks(obj, parent_obj)
+        self._pre_save_checks(obj, parent_obj, data_file)
 
         # save to database
         self._do_save(obj)
@@ -199,7 +199,7 @@ class CriptDB(CriptTypes):
         coll = self.db[obj.class_]
         obj.uid = str(coll.insert_one(doc).inserted_id)
 
-    def _pre_save_checks(self, obj, parent_obj):
+    def _pre_save_checks(self, obj, parent_obj,data_file):
         """
         This function checks the database for conflicts.
         """
@@ -267,7 +267,8 @@ class CriptDB(CriptTypes):
         elif obj.class_ == "Data":
             parent_obj_types = ["Experiment"]
             self._parent_obj_check(obj, parent_obj, parent_obj_types)
-            obj = FilesInOut.put(obj)
+            if data_file:
+                obj = FilesInOut.put(obj)
 
         elif obj.class_ == "Inventory":
             parent_obj_types = ["Group", "Collection"]

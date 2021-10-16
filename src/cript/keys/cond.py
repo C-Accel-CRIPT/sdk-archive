@@ -4,7 +4,7 @@ Official Control language support by CRIPT.
 """
 
 from .. import cript_types
-from . import float_limit, str_limit
+from . import float_limit, str_limit, degC_lower_limit
 
 
 cond_keys = {
@@ -16,7 +16,7 @@ cond_keys = {
     },
     "temp": {
         "type": cript_types["Quantity"],
-        "range": [-273.15, float_limit],
+        "range": [degC_lower_limit, float_limit],
         "unit": "degC",
         "descr": "Temperature"
     },
@@ -48,7 +48,7 @@ cond_keys = {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
         "unit": "nm",
-        "descr": "wave length of light"
+        "descr": "max wave length of light"
     },
     "stirring": {
         "type": float,

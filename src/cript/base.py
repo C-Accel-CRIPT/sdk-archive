@@ -8,8 +8,8 @@ from abc import ABC
 from typing import Union
 from datetime import datetime
 
-from fuzzywuzzy import process
 from bson import ObjectId
+import difflib
 
 from . import __version__, CRIPTError
 from .utils.serializable import Serializable
@@ -77,7 +77,7 @@ class BaseSlot(CriptTypes):
 
     def _get_index_from_name(self, item: str) -> int:
         values = [i["name"] for i in self._reference]
-        text, score = process.extractOne(item, values)
+        text, score = difflib.get_close_matches(item, values, n=1, cutoff=0.8)
         if score > 50:
             return values.index(text)
         else:
