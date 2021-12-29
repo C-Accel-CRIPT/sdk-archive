@@ -1,3 +1,8 @@
+"""
+Official Control language support by CRIPT.
+For Data Node
+
+"""
 
 data_keys = {
     # 1D generic - Generics should only be used when specific key does not exist

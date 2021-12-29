@@ -1,9 +1,12 @@
 """
-base:
-
-Contains base classes CriptTypes and BaseReference
+Class
+-----
+CriptTypes
+Base Model
+ReferenceList
 
 """
+
 from abc import ABC
 from typing import Union
 from datetime import datetime
@@ -12,218 +15,59 @@ from bson import ObjectId
 import difflib
 
 from . import __version__, CRIPTError
-from .utils.serializable import Serializable
-from .utils.validator.type_check import type_check_property, id_type_check_bool
-from .utils.external_database_code import GetObject
+from .utils import GetObject, Serializable
+from .validator import id_type_check_bool, type_check
 
 
 class CriptTypes:
+    """ CRIPT Types
+
+    This class is to provide access to cript_types after they have been initiated.
+    """
     cript_types = None
 
     @classmethod
     def _init_(cls):
+        """ Will be called at the end of __init__ """
         from . import cript_types
         cls.cript_types = cript_types
 
 
-class BaseSlot(CriptTypes):
-    _error = None
-
-    def __init__(self, node: str, objs=None, _error=CRIPTError):
-        """
-        Base Object for CRIPT references.
-        Key methods:
-            Add
-            Remove
-
-        References are callable and index-able
-
-        :param node: Type of cript node. "User", "Group", etc.
-        :param objs: objects will be passed to self.add()
-        :param _error:
-        """
-        self._reference = []
-        self._uids = []
-        self._node = node
-        self._error = _error
-
-        if objs is not None:
-            self.add(objs)
-
-    def __repr__(self):
-        return repr(self._reference)
-
-    def __call__(self):
-        return self._reference
-
-    def __getitem__(self, item):
-        if isinstance(item, int):
-            return self._reference[item]
-        elif isinstance(item, str):
-            index = self._get_index_from_name(item)
-            return self._reference[index]
-        elif isinstance(item, slice):
-            return [self._reference[i] for i in range(*item.indices(len(self._reference)))]
-        else:
-            mes = "Item not found."
-            raise self._error(mes)
-
-    def __len__(self):
-        return len(self._reference)
-
-    def __iter__(self):
-        for ref in self._reference:
-            yield ref
-
-    def _get_index_from_name(self, item: str) -> int:
-        values = [i["name"] for i in self._reference]
-        text, score = difflib.get_close_matches(item, values, n=1, cutoff=0.8)
-        if score > 50:
-            return values.index(text)
-        else:
-            mes = f"'{item}' not found."
-            raise self._error(mes)
-
-    def add(self, objs):
-        """
-        Adds object to reference list.
-        Accepted objects:
-            dict from database
-            dict which is already a reference
-            CRIPT object (CRIPT type)
-            uid (str)
-        """
-        if not isinstance(objs, list):
-            objs = [objs]
-
-        for obj in objs:
-            if isinstance(obj, dict):
-                ref = self._obj_is_dict(obj)
-            elif isinstance(obj, str) and id_type_check_bool(obj):
-                ref = self._obj_is_uid(obj)
-            elif isinstance(obj, self.cript_types[self._node]):
-                ref = self._obj_is_cript_node(obj)
-            else:
-                mes = f"Invalid reference object type for '{self._node}'. '{obj}'"
-                raise self._error(mes)
-
-            if ref["uid"] not in self._uids:
-                self._reference.append(ref)
-                self._uids.append(ref["uid"])
-            else:
-                mes = f"Reference already in list for '{self._node}'.'{obj}'"
-                raise self._error(mes)
-
-    def _obj_is_dict(self, obj: dict) -> dict:
-        """
-        Happens when passing node from cript.view() or is a reference already
-        """
-        if "_id" in obj.keys():
-            return self.cript_types[self._node].create_reference(obj)
-        elif "uid" in obj.keys():
-            ref_fun = getattr(self.cript_types[obj["class_"]], "create_reference")
-            return ref_fun(obj)
-        else:
-            mes = f"Invalid reference object for '{self._node}'. '{obj}'"
-            raise self._error(mes)
-
-    def _obj_is_uid(self, obj: str) -> dict:
-        """
-        User may give just id as string
-        """
-        obj = GetObject.get_from_uid(self._node, obj)
-        return self.cript_types[self._node].create_reference(obj[0])
-
-    @staticmethod
-    def _obj_is_cript_node(obj) -> dict:
-        """
-        User may give a CRIPT node
-        """
-        return obj.reference()
-
-    def remove(self, objs):
-        """
-        Removes object from reference list.
-        Accepted objects:
-            dict from database
-            dict which is already a reference
-            CRIPT object (CRIPT type)
-            uid (str)
-            name (str)
-            position in _reference list (int)
-        """
-        if not isinstance(objs, list):
-            objs = [objs]
-
-        remove = []
-        for obj in objs:
-            if isinstance(obj, dict):
-                remove.append(obj["uid"])
-            elif isinstance(obj, str) and id_type_check_bool(obj):
-                remove.append(obj)
-            elif isinstance(obj, str):
-                remove.append(self._remove_by_name(obj))
-            elif isinstance(obj, self.cript_types[self._node]):
-                remove.append(obj.uid)
-            elif isinstance(obj, int):
-                remove.append(self._uids[obj])
-            else:
-                mes = f"Invalid remove object type for '{self._node}'. '{obj}'"
-                raise self._error(mes)
-
-        for r in remove:
-            if r in self._uids:
-                self._remove_reference(r)
-                self._uids.remove(r)
-            else:
-                mes = f"{r} not in list, so it can't be removed from '{self._node}'."
-                raise self._error(mes)
-
-    def _remove_by_name(self, name: str):
-        for i in self._reference:
-            if i["name"] == name:
-                return i["uid"]
-
-        else:
-            mes = f"{name} not found in '{self._node}'."
-            raise self._error(mes)
-
-    def _remove_reference(self, remove: str):
-        for i in self._reference:
-            if i["uid"] == remove:
-                self._reference.remove(i)
-
-    def as_dict(self, **kwags) -> list:
-        """ Returns list of references for serialization."""
-        return self._reference
-
-
 class BaseModel(Serializable, CriptTypes, ABC):
+    """
+
+    Parameters
+    ----------
+     name: str
+        Descriptive user defined name
+    notes: str
+        Any miscellaneous notes related to the user.
+    class_: str
+        class of node.
+    uid: str
+        The unique ID of the material.
+    model_version: str
+        Version of CRIPT data model.
+    version_control: str
+        Link to version control node.
+    last_modified_date: datetime
+        Last date the node was modified.
+    created_date: datetime
+        Date it was created.
+    """
     _error = CRIPTError
 
     def __init__(
             self,
             name: str,
-            class_: str = None,
             notes: str = None,
-
+            class_: str = None,
             uid: Union[str, ObjectId] = None,
             model_version: str = None,
             version_control=None,
             last_modified_date: datetime = None,
             created_date: datetime = None
     ):
-        """
-        :param name: Descriptive name
-
-        :param notes: Any miscellaneous notes related to the user.
-        :param class_: class of node.
-        :param uid: The unique ID of the material.
-        :param model_version: Version of CRIPT data model.
-        :param version_control: Link to version control node.
-        :param last_modified_date: Last date the node was modified.
-        :param created_date: Date it was created.
-        """
 
         self._name = None
         self.name = name
@@ -258,7 +102,7 @@ class BaseModel(Serializable, CriptTypes, ABC):
         return self._name
 
     @name.setter
-    @type_check_property
+    @type_check(str)
     def name(self, name):
         self._name = name
 
@@ -267,7 +111,7 @@ class BaseModel(Serializable, CriptTypes, ABC):
         return self._notes
 
     @notes.setter
-    @type_check_property
+    @type_check(str)
     def notes(self, notes):
         self._notes = notes
 
@@ -322,16 +166,21 @@ class BaseModel(Serializable, CriptTypes, ABC):
     def reference(self) -> dict:
         """
         From a filled out node, create reference dictionary.
-        :return:
+
         """
         ddict = self.as_dict(save=False)
         return self.create_reference(ddict)
 
     @staticmethod
     def create_reference(ddict) -> dict:
-        """
+        """ create_reference
+
         Gives reference dictionary from dictionary.
+
+        Note
+        ----
         * This method may be overwritten in inheritance.
+
         """
         keys = ["uid", "name", "class_"]
         if "_id" in ddict.keys():
@@ -351,5 +200,325 @@ class BaseModel(Serializable, CriptTypes, ABC):
         return out
 
     @staticmethod
-    def _base_slot_block():
+    def _base_reference_block():
+        """ _base_reference_block
+
+        This is to block a user from directly trying to modify a reference list without going through the
+        ReferenceList class.
+
+        """
         raise AttributeError("Use '.add()' or .remove() to modify.")
+
+
+class ReferenceList(CriptTypes):
+    """ Reference List
+
+    The ReferenceList creates, and formats references. It also makes references callable and index-able.
+
+    Attributes
+    ----------
+    _reference: list[dict]
+        List of references
+    _uids: List[str]
+        List of uids (same as objs as _reference)
+    _node: str
+        Name of names that are stored in the reference list (used for type checking)
+
+    Methods
+    -------
+    add(item)
+        Adds item to reference list
+    remove(item)
+        Removes item from reference list
+
+    """
+
+    _error = None
+
+    def __init__(self, node: str, objs=None, _error=CRIPTError):
+        """
+        Parameters
+        ----------
+        node: str
+            Type of cript node. "User", "Group", etc.
+        objs:
+            objects will be passed to self.add()
+        _error:
+            error class of parent node
+        """
+        self._reference = []
+        self._uids = []
+        self._node = node
+        self._error = _error
+
+        if objs is not None:
+            self.add(objs)
+
+    def __repr__(self):
+        return repr(self._reference)
+
+    def __call__(self):
+        return self._reference
+
+    def __getitem__(self, item):
+        if isinstance(item, int):
+            return self._reference[item]
+        elif isinstance(item, str):
+            index = self._get_index_from_name(item)
+            return self._reference[index]
+        elif isinstance(item, slice):
+            return [self._reference[i] for i in range(*item.indices(len(self._reference)))]
+        else:
+            mes = "Item not found."
+            raise self._error(mes)
+
+    def __len__(self):
+        return len(self._reference)
+
+    def __iter__(self):
+        for ref in self._reference:
+            yield ref
+
+    def _get_index_from_name(self, item: str) -> int:
+        """
+
+        Given a item name, return item index in list.
+        This matching is done with difflib, so slight typing errors wont result in errors.
+
+        Parameters
+        ----------
+        item: str
+            name of item you are trying to find
+
+        Returns
+        -------
+        index: int
+            index of item in self._reference list
+
+        Raises
+        ------
+        Exception
+            If item name not found.
+
+        """
+        values = [i["name"] for i in self._reference]
+        text, score = difflib.get_close_matches(item, values, n=1, cutoff=0.8)
+        if score > 50:
+            return values.index(text)
+        else:
+            mes = f"'{item}' not found."
+            raise self._error(mes)
+
+    def add(self, objs):
+        """ Add
+
+        Adds object to reference list.
+
+        Parameters
+        ----------
+        objs:
+            object that you want to add to the list
+            Accepted objects:
+                dict from database
+                dict which is already a reference
+                CRIPT object (CRIPT type)
+                uid (str)
+
+        Raises
+        -------
+        Exception
+            If invalid object is provided. An object that does not lead to a valid reference.
+
+        """
+        if not isinstance(objs, list):
+            objs = [objs]
+
+        for obj in objs:
+            # given an obj get reference dictionary
+            if isinstance(obj, dict):
+                ref = self._obj_is_dict(obj)
+            elif isinstance(obj, str) and id_type_check_bool(obj):
+                ref = self._obj_is_uid(obj)
+            elif isinstance(obj, self.cript_types[self._node]):
+                ref = self._obj_is_cript_node(obj)
+            else:
+                mes = f"Invalid reference object type for '{self._node}'. '{obj}'"
+                raise self._error(mes)
+
+            # check if reference s not already in list, and add it.
+            if ref["uid"] not in self._uids:
+                self._reference.append(ref)
+                self._uids.append(ref["uid"])
+            else:
+                mes = f"Reference already in list for '{self._node}'.'{obj}'"
+                raise self._error(mes)
+
+    def _obj_is_dict(self, obj: dict) -> dict:
+        """ Object is dictionary
+
+        Given a dictionary (JSON of a CRIPT node) get reference dictionary
+        Happens when passing node from cript.view() or is a reference already
+
+        Parameters
+        ----------
+        obj: dict
+            CRIPT node in dictionary format
+
+        Returns
+        -------
+        reference
+            Returns reference dictionary
+
+        Raises
+        -------
+        Exception
+            If invalid dictionary provided
+
+        """
+        if "_id" in obj.keys():
+            return self.cript_types[self._node].create_reference(obj)
+        elif "uid" in obj.keys():
+            ref_fun = getattr(self.cript_types[obj["class_"]], "create_reference")
+            return ref_fun(obj)
+        else:
+            mes = f"Invalid reference object for '{self._node}'. '{obj}'"
+            raise self._error(mes)
+
+    def _obj_is_uid(self, obj: str) -> dict:
+        """ Object is uid
+
+        User may give just uid, in which we need to go get the node from the database.
+
+        Parameters
+        ----------
+        obj: str
+            CRIPT database uid
+
+        Returns
+        -------
+        reference
+            Returns reference dictionary
+
+        """
+        obj = GetObject.get_from_uid(self._node, obj)
+        return self.cript_types[self._node].create_reference(obj[0])
+
+    @staticmethod
+    def _obj_is_cript_node(obj: BaseModel) -> dict:
+        """ Object is CRIPT node
+
+        Call reference method which can be found in BaseModel class if not overwritten.
+
+        Parameters
+        ----------
+        obj: BaseModel
+            CRIPT Node
+
+        Returns
+        -------
+        reference
+            Returns reference dictionary
+
+        """
+        return obj.reference()
+
+    def remove(self, objs):
+        """ Remove
+
+        Removes object from reference list.
+
+        Parameters
+        ----------
+        objs:
+            object that you want to remove to the list
+            Accepted objects:
+                dict from database
+                dict which is already a reference
+                CRIPT object (CRIPT type)
+                uid (str)
+                name (str)
+                position in _reference list (int)
+
+        Raises
+        -------
+        Exception
+            If invalid object is provided. An object that does not lead to a valid removal.
+            If the object is not in the list.
+
+        """
+        if not isinstance(objs, list):
+            objs = [objs]
+
+        # converter all objects into a list of uids
+        remove = []  # list of uids
+        for obj in objs:
+            if isinstance(obj, dict):
+                remove.append(obj["uid"])
+            elif isinstance(obj, str) and id_type_check_bool(obj):
+                remove.append(obj)
+            elif isinstance(obj, str):
+                remove.append(self._remove_by_name(obj))
+            elif isinstance(obj, self.cript_types[self._node]):
+                remove.append(obj.uid)
+            elif isinstance(obj, int):
+                remove.append(self._uids[obj])
+            else:
+                mes = f"Invalid remove object type for '{self._node}'. '{obj}'"
+                raise self._error(mes)
+
+        # loop through 'remove list' to remove objs
+        for r in remove:
+            if r in self._uids:
+                self._remove_reference(r)
+                self._uids.remove(r)
+            else:
+                mes = f"{r} not in list, so it can't be removed from '{self._node}'."
+                raise self._error(mes)
+
+    def _remove_by_name(self, name: str) -> str:
+        """ Remove by name
+
+        Given a name, determine which reference it corresponds to and return uid
+
+        Parameters
+        ----------
+        name: str
+            name of reference to be removed
+
+        Returns
+        -------
+        uid: str
+            Returns uid to be added to removal list
+
+        Raises
+        -------
+        Exception
+            If name not found in references.
+
+        """
+        for i in self._reference:
+            if i["name"] == name:
+                return i["uid"]
+
+        else:
+            mes = f"{name} not found in '{self._node}'."
+            raise self._error(mes)
+
+    def _remove_reference(self, remove: str):
+        """ Remove reference
+
+        Given a list of uids, remove them from self._references.
+
+        Parameters
+        ----------
+        remove: str
+            uid of reference to be removed
+
+        """
+        for i in self._reference:
+            if i["uid"] == remove:
+                self._reference.remove(i)
+
+    def as_dict(self, **kwags) -> list:
+        """ Returns list of references for serialization."""
+        return self._reference

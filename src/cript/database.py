@@ -2,6 +2,7 @@
 Database Connection
 
 """
+
 import sys
 from typing import Union
 
@@ -12,11 +13,8 @@ import certifi
 
 from . import CRIPTError
 from .base import CriptTypes
-from .doc_tools import load
 from .user import User
-from .utils.external_database_code import FilesInOut
-from .utils.validator.type_check import id_type_check, type_check_property, id_type_check_bool
-from .utils.database_tools import *
+from .utils import id_type_check, type_check_property, id_type_check_bool, FilesInOut, load, login_check
 
 
 class CriptDBError(CRIPTError):

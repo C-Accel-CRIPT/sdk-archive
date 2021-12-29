@@ -1,14 +1,15 @@
+"""
+Property Object
+
+"""
+
 from typing import Union
 
 from . import CRIPTError
-from .base import BaseSlot
+from .base import ReferenceList
 from .cond import Cond
-from .doc_tools import loading_with_units
-from .utils.validator.type_check import type_check_property, type_check
-from .utils.validator.prop import prop_keys_check
-from .utils.serializable import SerializableSub
-from .utils.printing import TablePrinting
-from .utils.class_tools import freeze_class
+from .utils import loading_with_units, SerializableSub, TablePrinting, freeze_class
+from .validator import type_check, prop_keys_check
 
 
 class CondError(CRIPTError):
@@ -69,7 +70,7 @@ class Prop(SerializableSub, TablePrinting):
         self._cond = None
         self.cond = cond
 
-        self._c_data = BaseSlot("Data", c_data, self._error)
+        self._c_data = ReferenceList("Data", c_data, self._error)
 
     @property
     def mat_id(self):
@@ -84,7 +85,7 @@ class Prop(SerializableSub, TablePrinting):
         return self._key
 
     @key.setter
-    @type_check_property
+    @type_check(str)
     def key(self, key):
         self._key = key
 
@@ -109,7 +110,7 @@ class Prop(SerializableSub, TablePrinting):
         return self._component
 
     @component.setter
-    @type_check_property
+    @type_check(str)
     def component(self, component):
         self._component = component
 
@@ -118,7 +119,7 @@ class Prop(SerializableSub, TablePrinting):
         return self._method
 
     @method.setter
-    @type_check_property
+    @type_check(str)
     def method(self, method):
         self._method = method
 
@@ -127,7 +128,7 @@ class Prop(SerializableSub, TablePrinting):
         return self._cond
 
     @cond.setter
-    @type_check((list[Cond], Cond, None))
+    @type_check([list[Cond], Cond])
     def cond(self, cond):
         cond = loading_with_units(cond, Cond)
         self._cond = cond

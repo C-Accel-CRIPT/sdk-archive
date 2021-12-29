@@ -4,9 +4,8 @@ Inventory Node
 """
 
 from . import CRIPTError
-from .base import BaseModel, BaseSlot
-from .utils.external_database_code import GetMaterial
-from .utils.class_tools import freeze_class
+from .base import BaseModel, ReferenceList
+from .utils import freeze_class, GetMaterial
 
 
 class InventoryError(CRIPTError):
@@ -15,31 +14,28 @@ class InventoryError(CRIPTError):
 
 @freeze_class
 class Inventory(BaseModel, _error=InventoryError):
+    """ Inventory Node
+
+
+       Attributes
+       ----------
+       base_attributes:
+
+       c_material: Material node
+           Materials used in this experiment
+       """
     class_ = "Inventory"
 
     def __init__(
         self,
         name: str,
-        c_material: list = None,
+        c_material=None,
         notes: str = None,
         **kwargs
     ):
-        """
-
-        :param name: The name of the collection.
-
-        :param notes: Any miscellaneous notes related to the user.
-
-        :param _class: class of node.
-        :param uid: The unique ID of the material.
-        :param model_version: Version of CRIPT data model.
-        :param version_control: Link to version control node.
-        :param last_modified_date: Last date the node was modified.
-        :param created_date: Date it was created.
-        """
         super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
-        self._c_material = BaseSlot("Material", c_material, self._error)
+        self._c_material = ReferenceList("Material", c_material, self._error)
 
     @property
     def c_material(self):
@@ -47,7 +43,8 @@ class Inventory(BaseModel, _error=InventoryError):
 
     @c_material.setter
     def c_material(self, *args):
-        self._base_slot_block()
+        self._base_reference_block()
 
     def get(self, target):
+        """ Given a target (chemical name, cas number or some other identity) find material node."""
         return GetMaterial.get(target, self.c_material())

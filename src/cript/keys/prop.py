@@ -1,9 +1,12 @@
 """
-Property Keywords
+Official Control language support by CRIPT.
+For Property node
 
 """
+
 from .. import cript_types
 from . import float_limit, str_limit, degC_lower_limit
+
 
 prop_keys_rxn = {
     "conv": {

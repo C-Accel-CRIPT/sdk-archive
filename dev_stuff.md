@@ -7,11 +7,6 @@
 * Group vs. Collection need to be explained
 
 
-
-# Future To Do
-* Add log in security
-
-
 ## Minor To Do
 * Expand Keys
     * Tough keys:

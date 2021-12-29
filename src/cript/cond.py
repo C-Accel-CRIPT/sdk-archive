@@ -1,26 +1,34 @@
 """
-Condition Keywords
+Condition Object
 
 """
 
 from typing import Union
 
 from . import Quantity, CRIPTError
-from .base import CriptTypes, BaseSlot
-from .doc_tools import load
-from .utils.validator.type_check import type_check_property, type_check
-from .utils.validator.cond import cond_keys_check
-from .utils.serializable import SerializableSub
-from .utils.printing import TablePrinting
-from .utils.class_tools import freeze_class
+from .base import CriptTypes, ReferenceList
+from .utils import load, SerializableSub, TablePrinting, freeze_class
+from validator import type_check, cond_keys_check
 
 
 class CondError(CRIPTError):
     pass
 
 
+"""
+
+:param key: Unique key to define what the condition is. See Cond.key_table() for official list.
+:param value: numerical, text or material
+:param uncer: uncertainty
+:param data_uid: Referance to data node.
+"""
 @freeze_class
 class Cond(SerializableSub, TablePrinting, CriptTypes):
+    """
+
+
+
+    """
     keys = None
     _error = CondError
 
@@ -32,13 +40,6 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
             c_data=None,
             _loading: bool = False
     ):
-        """
-
-        :param key: Unique key to define what the condition is. See Cond.key_table() for official list.
-        :param value: numerical, text or material
-        :param uncer: uncertainty
-        :param data_uid: Referance to data node.
-        """
         if _loading:
             key, value, uncer = self._loading(key, value, uncer)
 
@@ -51,7 +52,7 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
         self._uncer = None
         self.uncer = uncer
 
-        self._c_data = BaseSlot("Data", c_data, self._error)
+        self._c_data = ReferenceList("Data", c_data, self._error)
 
     @property
     def key(self):
@@ -59,7 +60,7 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
 
     @key.setter
     @cond_keys_check
-    @type_check_property
+    @type_check(str)
     def key(self, key):
         self._key = key
 
@@ -84,7 +85,7 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
 
     @uncer.setter
     @cond_keys_check
-    @type_check_property
+    @type_check([int, float, Quantity])
     def uncer(self, uncer):
         self._uncer = uncer
 

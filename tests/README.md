@@ -35,7 +35,7 @@ Run this in the terminal:
 
 `py -m build`
 
-`twine upload dist/*`
+`(Don't do yet!)twine upload dist/*` 
 
 ## To creating/update badges:
 

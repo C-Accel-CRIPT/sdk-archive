@@ -1,12 +1,15 @@
 """
-Keywords for material node.
+Official Control language support by CRIPT.
+For material node
 
 """
 
+
 keywords_material_p = {
-    # ** General structure terms **
+    # General structure terms
     'thermoset': 'a cross-linked polymer',
-    'thermoplastic': 'a polymer that becomes pliable at elevated temperature adn solidifies upon cooling to room temperature',
+    'thermoplastic': 'a polymer that becomes pliable at elevated temperature adn solidifies upon '
+                     'cooling to room temperature',
     'semicrystalline': 'a polymer that does exhibit some crystalline structure',
     'elastomer': 'a cross-linked polymer with a glass transition well below room temperature',
     'amorphous': 'a polymer that does not exhibit any crystalline structure',
@@ -23,7 +26,8 @@ keywords_material_p = {
     'atactic': 'a polymer with substituent having a random distribution of stereoconfiguration',
 
     'regio_regular': 'a polymer with one positional isomer; all head-to-tail or tail-to-tail and head-to-head',
-    'regio_irregular': 'a polymer with more than one positional isomer; mixture of head-to-tail, tail-to-tail, and head-to-head',
+    'regio_irregular': 'a polymer with more than one positional isomer; mixture of head-to-tail, tail-to-tail, '
+                       'and head-to-head',
 
     'linear': 'a polymer with a single line of repeat units',
     'star': 'a polymer with 3 or more arms originating from a single point',
@@ -38,7 +42,7 @@ keywords_material_p = {
     'polymer_blend': 'a material with two or more composed of two or more polymers',
     'composite': 'a material with two or more components',
 
-    # ** polymer types: **
+    # polymer types
     'polyolefins': 'a polymer with [$]CC(R)[$] structure and the locally surrounding is C and H',
     'polystyrenes': 'a polymer with [$]CC(c1ccccc1)[$] structure',
     'polyphenylenes': 'a polymer with [$]c1cccc(c1)[$] structure',
@@ -67,7 +71,7 @@ keywords_material_p = {
 }
 
 keywords_material = {
-    # ** monomer types: **
+    # monomer types
     'olefin': 'a chemical with one double bond and is locally surrounded by only C and H',
     'diene': 'a chemical with two or more double bonds',
     'styrene': 'a chemical with C=C-(c1ccccc1) structure',
@@ -102,10 +106,8 @@ keywords_material = {
     'diamines': 'a chemical with two or more -NH2 groups',
     'diacid chloride': 'a chemical with two or more -COCl groups',
 
-    # ** other **
+    # other
     'filler': 'a substance that is added to resins',
     'matrix': 'a substance for binding and holding reinforcements together',
 
 }
-
-

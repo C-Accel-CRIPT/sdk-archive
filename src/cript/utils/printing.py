@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 import os
 from .. import Path
 
@@ -34,7 +34,7 @@ label_length = {
         "length": 12,
         "short": "unit"
     },
-    "description":{
+    "description": {
         "length": 50,
         "short": "descr"
     },

@@ -9,13 +9,9 @@ from . import Unit, Quantity, CRIPTError
 from .base import BaseModel
 from .cond import Cond
 from .prop import Prop
-from .doc_tools import load, loading_with_units
 from .material import Material
-from .utils.printing import TablePrinting
-from .utils.ingr_calc import IngredientCalculator
-from .utils.external_database_code import GetObject
+from .utils import TablePrinting, IngredientCalculator, GetObject, freeze_class, load, loading_with_units
 from .keys.process import Process_keys, Ingr_keys
-from .utils.class_tools import freeze_class
 
 
 class ProcessError(CRIPTError):
@@ -28,6 +24,16 @@ class IngrError(CRIPTError):
 
 @freeze_class
 class Ingr(IngredientCalculator, TablePrinting):
+    """
+    Adds mat to Ingr and performs calculations for the other quantities.
+    :param mat:
+    :param qty:
+    :param keyword:
+    :param eq_mat:
+    :param mat_id:
+    :param method: used to select proper from specific method; example "nmr" vs "sec"
+    :return:
+    """
     keys = Ingr_keys
     _error = IngrError
 
@@ -52,16 +58,7 @@ class Ingr(IngredientCalculator, TablePrinting):
 
     def add(self, mat: Union[Material], qty: Union[int, float, Quantity], keyword: str = None,
             eq_mat=None, mat_id=None, method: str = None):
-        """
-        Adds mat to Ingr and performs calculations for the other quantities.
-        :param mat:
-        :param qty:
-        :param keyword:
-        :param eq_mat:
-        :param mat_id:
-        :param method: used to select proper from specific method; example "nmr" vs "sec"
-        :return:
-        """
+
         new_ingr = self._get_material_data(mat, mat_id, method)
         new_ingr.update(self._get_keyword(keyword))
         if eq_mat:

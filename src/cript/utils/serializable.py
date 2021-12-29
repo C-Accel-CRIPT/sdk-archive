@@ -9,7 +9,7 @@ from .. import Quantity, Unit
 
 
 class Serializable(ABC):
-    """Base abstract class for a serializable object."""
+    """Class for a serializable objects."""
 
     def __repr__(self):
         return dumps(self.dict_cleanup(self.as_dict(save=False)), indent=2, sort_keys=False)
@@ -22,10 +22,10 @@ class Serializable(ABC):
         Converts a CRIPT node into document for upload to mongoDB
         """
         # add time stamps
-        self._set_time_stamps()
+        self._add_time_stamps()
 
         # convert to dictionary
-        doc = self.as_dict(save=True)
+        doc = self.as_dict(save=True)  # save = True is for SerializableSub to remove units.
 
         # remove empty id
         doc["_id"] = doc.pop("uid")
@@ -34,10 +34,8 @@ class Serializable(ABC):
         doc = self.dict_remove_none(doc)
         return doc
 
-    def _set_time_stamps(self):
-        """
-        Adds time stamps to CRIPT node.
-        """
+    def _add_time_stamps(self):
+        """ Add time stamps to CRIPT node. """
         now = datetime.utcnow()
         if self.created_date is None:
             self.created_date = now
@@ -45,7 +43,7 @@ class Serializable(ABC):
         self.last_modified_date = now
 
     def as_dict(self, **kwargs) -> dict:
-        """Convert and return object as dictionary."""
+        """return object as dictionary"""
         keys = {k.lstrip("_") for k in vars(self) if "__" not in k}
 
         attr = dict()
@@ -88,7 +86,7 @@ class Serializable(ABC):
 
     @staticmethod
     def dict_cleanup(ddict: dict) -> dict:
-        """Converts any datetime objects to strings"""
+        """Converts any non-bson objects into strings"""
         attr = dict()
         for k, v in ddict.items():
             value = Serializable._loop_through(v)
@@ -113,7 +111,7 @@ class Serializable(ABC):
 
 
 class SerializableSub(Serializable, ABC):
-    """ Used with Prop and Cond. """
+    """ Serialization used with Prop and Cond. """
 
     def as_dict(self, **kwargs) -> dict:
         """Convert and return object as dictionary."""
@@ -144,7 +142,7 @@ class SerializableSub(Serializable, ABC):
 
     def _loading(self, key, value, uncer):
         """ Loading from database; will add units back to numbers"""
-        if "+" in key:
+        if "+" in key:  # custom number
             if value is not None:
                 new_value = value.split(" ", 1)
                 try:

@@ -17,5 +17,3 @@ class Simulation(BaseModel):
             **kwargs
     ):
         super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
-
-

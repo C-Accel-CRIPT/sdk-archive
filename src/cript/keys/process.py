@@ -1,9 +1,10 @@
 """
-Keywords for Process node
+Official Control language support by CRIPT.
+For Process node
 
 """
 
-from . import float_limit, str_limit
+from . import float_limit
 
 
 Qty_keys = {
@@ -68,7 +69,7 @@ Ingr_keys = {
 }
 
 Process_keys = {
-    # ** chemical transformations **
+    # chemical transformations
     'polymerization': 'a chemical reaction that convert monomer(s) to a polymer',
     'kinetics': 'an experiment were multiple data points are take over a span of time',
     'chain_growth': 'chain growth polymerization',
@@ -87,7 +88,8 @@ Process_keys = {
     'anionic': 'anionic addition polymerization',
     'cationic': 'cationic polymerization',
     'insertion': 'coordination insertion polymerization',
-    'lewis-pairs': 'a polymerization that employs a Lewis acid and a Lewis base to activate/initiate the polymerization',
+    'lewis-pairs': 'a polymerization that employs a Lewis acid and a Lewis base to activate/initiate '
+                   'the polymerization',
     'group-transfer': 'a polymerization that proceeds through the repetitive Michael addition',
 
     'bulk': 'bulk polymerization',
@@ -96,7 +98,7 @@ Process_keys = {
     'solution': 'solution polymerization',
     'interfacial': 'interfacial polymerization',
 
-    # ** physical transformations **
+    # physical transformations
     'reactive_processing': '',
     'extrusion': '',
     'blow_molding': '',

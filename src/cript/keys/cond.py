@@ -1,10 +1,11 @@
 """
 Official Control language support by CRIPT.
+For Cond Node
 
 """
 
 from .. import cript_types
-from . import float_limit, str_limit, degC_lower_limit
+from . import float_limit, degC_lower_limit
 
 
 cond_keys = {

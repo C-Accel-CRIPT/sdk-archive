@@ -5,14 +5,10 @@ Material Node
 from typing import Union
 
 from . import CRIPTError, Cond, Prop
-from .base import BaseModel, BaseSlot
-from .doc_tools import loading_with_units
-from .utils.serializable import Serializable
-from .utils.external_database_code import GetMaterialID
-from .utils.validator.type_check import type_check_property, type_check
-from .utils.printing import TablePrinting
+from .base import BaseModel, ReferenceList
+from .utils import GetMaterialID, Serializable, TablePrinting, freeze_class, loading_with_units
+from .validator import type_check
 from .keys.material import *
-from .utils.class_tools import freeze_class
 
 
 class MaterialError(CRIPTError):
@@ -25,11 +21,44 @@ class IdenError(CRIPTError):
 
 @freeze_class
 class Iden(Serializable):
+    """
+
+    Parameters
+    ----------
+    name: str
+        preferred name
+    names: list[str]
+        additional names, abbreviations, short hands for the material
+    cas: str
+        CAS number
+    bigsmiles: str
+        bigSMILES Line Notation
+    smiles: str
+        simplified molecular-input line-entry system (SMILES)
+    chem_formula: str
+        chemical formula
+    chem_repeat: str
+        chemical formula of repeating unit
+    pubchem_cid: str
+        PubChem CID
+    inchi: str
+        IUPAC International Chemical Identifier
+    inchi_key: str
+        a hashed version of the full InChI
+    mat_id: int
+        Local id for associating properties with a material
+        Assigned automatically when added to Material Node.
+        0 = whole mixture
+        1+ = individual component
+    ref_material:
+
+
+    """
+
     _error = IdenError
 
     def __init__(
             self,
-            ref_material=None,
             name: str = None,
             names: list[str] = None,
             cas: str = None,
@@ -40,20 +69,10 @@ class Iden(Serializable):
             pubchem_cid: str = None,
             inchi: str = None,
             inchi_key: str = None,
-            mat_id: int = None
+            mat_id: int = None,
+            ref_material=None
     ):
-        """
-        :param name: preferred name
-        :param names: additional names, abbreviations, short hands for the material
-        :param cas: CAS number
-        :param bigsmiles: bigSMILES Line Notation
-        :param smiles: simplified molecular-input line-entry system
-        :param chem_formula: chemical formula
-        :param chem_repeat: chemical formula of repeating unit
-        :param pubchem_cid: PubChem CID
-        :param inchi: IUPAC International Chemical Identifier
-        :param inchi_key: a hashed version of the full InChI
-        """
+
         self._mat_id = None
         self.mat_id = mat_id
 
@@ -65,7 +84,6 @@ class Iden(Serializable):
             self.ref_material = ref_material
             name = self.ref_material["name"]
             self.name = name
-            self.names = name
             return
 
         self.name = name
@@ -108,7 +126,7 @@ class Iden(Serializable):
         return self._name
 
     @name.setter
-    @type_check_property
+    @type_check(str)
     def name(self, name):
         self._name = name
 
@@ -117,7 +135,7 @@ class Iden(Serializable):
         return self._names
 
     @names.setter
-    @type_check_property
+    @type_check([str, list[str]])
     def names(self, names):
         self._names = names
 
@@ -126,7 +144,7 @@ class Iden(Serializable):
         return self._cas
 
     @cas.setter
-    @type_check_property
+    @type_check(str)
     def cas(self, cas):
         self._cas = cas
 
@@ -135,7 +153,7 @@ class Iden(Serializable):
         return self._bigsmiles
 
     @bigsmiles.setter
-    @type_check_property
+    @type_check(str)
     def bigsmiles(self, bigsmiles):
         self._bigsmiles = bigsmiles
 
@@ -144,7 +162,7 @@ class Iden(Serializable):
         return self._smiles
 
     @smiles.setter
-    @type_check_property
+    @type_check(str)
     def smiles(self, smiles):
         self._smiles = smiles
 
@@ -153,7 +171,7 @@ class Iden(Serializable):
         return self._chem_formula
 
     @chem_formula.setter
-    @type_check_property
+    @type_check(str)
     def chem_formula(self, chem_formula):
         self._chem_formula = chem_formula
 
@@ -162,7 +180,7 @@ class Iden(Serializable):
         return self._chem_repeat
 
     @chem_repeat.setter
-    @type_check_property
+    @type_check(str)
     def chem_repeat(self, chem_repeat):
         self._chem_repeat = chem_repeat
 
@@ -171,7 +189,7 @@ class Iden(Serializable):
         return self._pubchem_cid
 
     @pubchem_cid.setter
-    @type_check_property
+    @type_check(str)
     def pubchem_cid(self, pubchem_cid):
         self._pubchem_cid = pubchem_cid
 
@@ -180,7 +198,7 @@ class Iden(Serializable):
         return self._inchi
 
     @inchi.setter
-    @type_check_property
+    @type_check(str)
     def inchi(self, inchi):
         self._inchi = inchi
 
@@ -189,7 +207,7 @@ class Iden(Serializable):
         return self._inchi_key
 
     @inchi_key.setter
-    @type_check_property
+    @type_check(str)
     def inchi_key(self, inchi_key):
         self._inchi_key = inchi_key
 
@@ -198,7 +216,6 @@ class Iden(Serializable):
         return self._mat_id
 
     @mat_id.setter
-    @type_check_property
     def mat_id(self, mat_id):
         self._mat_id = mat_id
 
@@ -219,10 +236,35 @@ class Iden(Serializable):
         self._ref_material = material
 
 
-class IdenSlot:
+class IdenList:
+    """ Identifiers List
+
+    The Identifier List creates, and manages identifiers in the Material Node.
+
+    Attributes
+    ----------
+    _idens: list[dict]
+        List of Iden objects
+
+    Methods
+    -------
+    add(item)
+        Adds item to reference list
+    remove(item)
+        Removes item from reference list
+
+    """
     _error = None
 
     def __init__(self, idens=None, _error=CRIPTError):
+        """
+        Parameters
+        ----------
+        idens:
+            objects will be passed to self.add()
+        _error:
+            error class of parent node
+        """
         self._idens = []
 
         if idens is not None:
@@ -254,6 +296,24 @@ class IdenSlot:
             yield iden
 
     def add(self, idens):
+        """ Add
+
+        Adds object to reference list.
+
+        Parameters
+        ----------
+        idens:
+            idens that you want to add to the list
+            Accepted objects:
+                Iden class
+                Material node (will be converted to Iden automatically)
+
+        Raises
+        -------
+        Exception
+            If invalid object is provided. An object that does not lead to a valid reference.
+
+        """
         if not isinstance(idens, list):
             idens = [idens]
 
@@ -274,6 +334,24 @@ class IdenSlot:
                 raise self._error(mes)
 
     def remove(self, idens):
+        """ Remove
+
+        Removes object from reference list.
+
+        Parameters
+        ----------
+        idens:
+            object that you want to remove to the list
+            Accepted objects:
+                position in _reference list (int)
+
+        Raises
+        -------
+        Exception
+            If invalid object is provided. An object that does not lead to a valid removal.
+            If the object is not in the list.
+
+        """
         if not isinstance(idens, list):
             idens = [idens]
 
@@ -281,7 +359,7 @@ class IdenSlot:
             if isinstance(iden, int) and iden < len(self._idens):
                 del self._idens[iden]
             else:
-                mes = f"Invalid object type for Iden. '{iden}'"
+                mes = f"Invalid object provide, only index accepted."
                 raise self._error(mes)
 
     def as_dict(self, **kwags) -> list:
@@ -291,6 +369,30 @@ class IdenSlot:
 
 @freeze_class
 class Material(TablePrinting, BaseModel, _error=MaterialError):
+    """
+
+    Parameters
+    ----------
+    base_attributes:
+        See CRIPT BaseModel
+    iden: Iden
+        See help(Iden) for details
+    name: str
+        The name of the user. (automatically populated from identifier if not given)
+    prop: list[Prop], Prop
+        properties
+    keywords:
+
+    source:
+
+    lot_number:
+
+    storage:
+
+    hazard:
+
+    """
+
     keys = keywords_material_p | keywords_material
     class_ = "Material"
 
@@ -309,27 +411,8 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
             notes: str = None,
             **kwargs
     ):
-        """
-        :param iden: See help(Iden.__init__) for details
 
-        :param name: The name of the user. (automatic populated from identifier if not given)
-        :param prop: properties
-        :param keywords:
-        :param source:
-        :param lot_number:
-        :param storage:
-        :param hazard:
-
-        :param notes: Any miscellaneous notes related to the user.
-        :param _class: class of node.
-        :param uid: The unique ID of the material.
-        :param model_version: Version of CRIPT data model.
-        :param version_control: Link to version control node.
-        :param last_modified_date: Last date the node was modified.
-        :param created_date: Date it was created.
-        """
-
-        self._iden = IdenSlot(iden, _error=self._error)
+        self._iden = IdenList(iden, _error=self._error)
 
         self._prop = None
         self.prop = prop
@@ -349,8 +432,8 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         self._hazard = None
         self.hazard = hazard
 
-        self._c_process = BaseSlot("Process", c_process, self._error)
-        self._c_parent_material = BaseSlot("Material", c_parent_material, self._error)
+        self._c_process = ReferenceList("Process", c_process, self._error)
+        self._c_parent_material = ReferenceList("Material", c_parent_material, self._error)
 
         if name is None:
             name = self._name_from_identifier()
@@ -363,14 +446,14 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
 
     @iden.setter
     def iden(self, *args):
-        self._base_slot_block()
+        self._base_reference_block()
 
     @property
     def prop(self):
         return self._prop
 
     @prop.setter
-    @type_check((list[Prop], Prop, None))
+    @type_check([list[Prop], Prop])
     def prop(self, prop):
         prop = loading_with_units(prop, Prop)
         self._prop = prop
@@ -380,7 +463,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         return self._keywords
 
     @keywords.setter
-    @type_check_property
+    @type_check(str)
     def keywords(self, keywords):
         self._keywords = keywords
 
@@ -389,7 +472,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         return self._source
 
     @source.setter
-    @type_check_property
+    @type_check(str)
     def source(self, source):
         self._source = source
 
@@ -398,7 +481,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         return self._lot_number
 
     @lot_number.setter
-    @type_check_property
+    @type_check(str)
     def lot_number(self, lot_number):
         self._lot_number = lot_number
 
@@ -407,7 +490,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         return self._storage
 
     @storage.setter
-    @type_check((list[Cond], Cond, None))
+    @type_check([list[Cond], Cond])
     def storage(self, storage):
         storage = loading_with_units(storage, Cond)
         self._storage = storage
@@ -417,7 +500,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         return self._hazard
 
     @hazard.setter
-    @type_check_property
+    @type_check(str)
     def hazard(self, hazard):
         self._hazard = hazard
 
@@ -427,7 +510,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
 
     @c_process.setter
     def c_process(self, *args):
-        self._base_slot_block()
+        self._base_reference_block()
 
     @property
     def c_parent_material(self):
@@ -435,16 +518,13 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
 
     @c_parent_material.setter
     def c_parent_material(self, *args):
-        self._base_slot_block()
+        self._base_reference_block()
 
     def _name_from_identifier(self):
-        """
-        Will generate a name from identifiers.
-        :return:
-        """
-        if len(self.iden) == 1:
+        """ Will generate a name from identifiers."""
+        if len(self.iden) == 1:  # single component
             name = self.iden[0].name
-        else:
+        else:  # mixture, concatenate names
             name = ""
             for iden in self.iden:
                 name += iden.name + "."
@@ -453,5 +533,5 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         return name
 
     def _get_mat_id(self, target: str) -> int:
-        """given a string (likely chemical name) find mat_id."""
+        """ Given a target (chemical name, cas number or some other identity) find material id. """
         return GetMaterialID.get_id(target, self)

@@ -2,25 +2,66 @@
 Publications
 
 """
+from typing import Union
 
 from . import CRIPTError
-from .base import BaseModel, BaseSlot
-from .utils.validator.type_check import type_check_property
-from .utils.class_tools import freeze_class
+from .base import BaseModel, ReferenceList
+from .utils import freeze_class
+from .validator import type_check
 
 
 class PublicationError(CRIPTError):
+    """ Errors from the Publication Node
+
+    """
     pass
 
 
 @freeze_class
 class Publication(BaseModel, _error=PublicationError):
+    """ Publication Node
+
+
+        Attributes
+        ----------
+        base_attributes:
+            See help(BaseModel)
+        title: str
+            Title of publication
+        authors: list[str]
+            List of authors [First name middle initial or name, Last name].
+        journal: str
+            Journal of the publication
+        publisher: str
+            Publisher of publication
+        year: int
+            Year of publication
+        volume: int
+            Volume of publication
+        issue: int
+            Issue of publication
+        pages: int, list[int]
+            Pages of publication [start page, end page]
+        doi: str
+            DOI: digital object identifier
+        issn: str
+            ISSN: international standard serial number
+        arxiv_id: str
+            arXiv identifier
+        pmid: str
+            PMID: PubMed ID
+        website: str
+            website where the publication can be accessed
+        c_collection: Collection node
+            CRIPT collection owned by the group
+    """
 
     class_ = "Publication"
 
     def __init__(
             self,
             title: str,
+            doi: str,
             name: str = None,
             authors: list[str] = None,
             journal: str = None,
@@ -28,41 +69,19 @@ class Publication(BaseModel, _error=PublicationError):
             year: int = None,
             volume: int = None,
             issue: int = None,
-            pages: str = None,
-            doi: str = None,
+            pages: Union[int, list[int]] = None,
             issn: str = None,
             arxiv_id: str = None,
-            PMID: str = None,
+            pmid: str = None,
             website: str = None,
+            funding: str = None,
             notes: str = None,
             c_collection=None,
             **kwargs
     ):
-        """
+        if name is None:
+            name = title
 
-        :param title: Title of publications.
-
-        :param authors: List of authors [Last name, First name middle intial or name].
-        :param journal:
-        :param publisher:
-        :param year:
-        :param volume:
-        :param issue:
-        :param pages:
-        :param doi: DOI: digital object identifier.
-        :param issn: ISSN: international standard serial number.
-        :param arxiv_id: arXiv identifier.
-        :param PMID: PubMed ID.
-        :param website: The personal website of the user.
-        :param notes: Any miscellaneous notes related to the user.
-
-        :param _class: class of node.
-        :param uid: The unique ID of the material.
-        :param model_version: Version of CRIPT data model.
-        :param version_control: Link to version control node.
-        :param last_modified_date: Last date the node was modified.
-        :param created_date: Date it was created.
-        """
         super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
         self._title = None
@@ -98,20 +117,23 @@ class Publication(BaseModel, _error=PublicationError):
         self._arxiv_id = None
         self.arxiv_id = arxiv_id
 
-        self._PMID = None
-        self.PMID = PMID
+        self._pmid = None
+        self.pmid = pmid
 
         self._website = None
         self.website = website
 
-        self._c_collection = BaseSlot("Collection", c_collection, self._error)
+        self._funding = None
+        self.funding = funding
+
+        self._c_collection = ReferenceList("Collection", c_collection, self._error)
 
     @property
     def title(self):
         return self._title
 
     @title.setter
-    @type_check_property
+    @type_check(str)
     def title(self, title):
         self._title = title
 
@@ -120,7 +142,7 @@ class Publication(BaseModel, _error=PublicationError):
         return self._authors
 
     @authors.setter
-    @type_check_property
+    @type_check([str, list[str]])
     def authors(self, authors):
         self._authors = authors
 
@@ -129,7 +151,7 @@ class Publication(BaseModel, _error=PublicationError):
         return self._journal
 
     @journal.setter
-    @type_check_property
+    @type_check(str)
     def journal(self, journal):
         self._journal = journal
 
@@ -138,7 +160,7 @@ class Publication(BaseModel, _error=PublicationError):
         return self._publisher
 
     @publisher.setter
-    @type_check_property
+    @type_check(str)
     def publisher(self, publisher):
         self._publisher = publisher
 
@@ -147,7 +169,7 @@ class Publication(BaseModel, _error=PublicationError):
         return self._year
 
     @year.setter
-    @type_check_property
+    @type_check(int)
     def year(self, year):
         self._year = year
 
@@ -156,7 +178,7 @@ class Publication(BaseModel, _error=PublicationError):
         return self._volume
 
     @volume.setter
-    @type_check_property
+    @type_check(int)
     def volume(self, volume):
         self._volume = volume
 
@@ -165,7 +187,7 @@ class Publication(BaseModel, _error=PublicationError):
         return self._issue
 
     @issue.setter
-    @type_check_property
+    @type_check(int)
     def issue(self, issue):
         self._issue = issue
 
@@ -174,7 +196,7 @@ class Publication(BaseModel, _error=PublicationError):
         return self._pages
 
     @pages.setter
-    @type_check_property
+    @type_check([int, list[int]])
     def pages(self, pages):
         self._pages = pages
 
@@ -183,7 +205,7 @@ class Publication(BaseModel, _error=PublicationError):
         return self._doi
 
     @doi.setter
-    @type_check_property
+    @type_check(str)
     def doi(self, doi):
         self._doi = doi
 
@@ -192,7 +214,7 @@ class Publication(BaseModel, _error=PublicationError):
         return self._issn
 
     @issn.setter
-    @type_check_property
+    @type_check(str)
     def issn(self, issn):
         self._issn = issn
 
@@ -201,27 +223,36 @@ class Publication(BaseModel, _error=PublicationError):
         return self._arxiv_id
 
     @arxiv_id.setter
-    @type_check_property
+    @type_check(str)
     def arxiv_id(self, arxiv_id):
         self._arxiv_id = arxiv_id
 
     @property
-    def PMID(self):
-        return self._PMID
+    def pmid(self):
+        return self._pmid
 
-    @PMID.setter
-    @type_check_property
-    def PMID(self, PMID):
-        self._PMID = PMID
+    @pmid.setter
+    @type_check(str)
+    def pmid(self, pmid):
+        self._pmid = pmid
 
     @property
     def website(self):
         return self._website
 
     @website.setter
-    @type_check_property
+    @type_check(str)
     def website(self, website):
         self._website = website
+
+    @property
+    def funding(self):
+        return self._funding
+
+    @funding.setter
+    @type_check(str)
+    def funding(self, funding):
+        self._funding = funding
 
     @property
     def c_collection(self):
@@ -229,5 +260,4 @@ class Publication(BaseModel, _error=PublicationError):
 
     @c_collection.setter
     def c_collection(self, *args):
-        self._base_slot_block()
-
+        self._base_reference_block()
