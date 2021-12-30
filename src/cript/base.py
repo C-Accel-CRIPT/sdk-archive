@@ -23,37 +23,45 @@ class CriptTypes:
     """ CRIPT Types
 
     This class is to provide access to cript_types after they have been initiated.
+
+    Attributes
+    ----------
+    cript_types: dict[str, node]
+        dictionary of CRIPT types
+
     """
     cript_types = None
 
     @classmethod
     def _init_(cls):
-        """ Will be called at the end of __init__ """
+        """ Will be called at the end of cript.__init__ """
         from . import cript_types
         cls.cript_types = cript_types
 
 
 class BaseModel(Serializable, CriptTypes, ABC):
-    """
+    """ Base Model
 
-    Parameters
+    Attributes common to all nodes in CRIPT.
+
+    Attributes
     ----------
-     name: str
-        Descriptive user defined name
+    name: str
+        descriptive user defined label
     notes: str
-        Any miscellaneous notes related to the user.
+        miscellaneous information
     class_: str
-        class of node.
+        class of node
     uid: str
-        The unique ID of the material.
+        unique ID of the material
     model_version: str
-        Version of CRIPT data model.
+        version of CRIPT data model
     version_control: str
-        Link to version control node.
+        link to version control node
     last_modified_date: datetime
-        Last date the node was modified.
+        last date the node was modified
     created_date: datetime
-        Date it was created.
+        date it was created
     """
     _error = CRIPTError
 
@@ -164,10 +172,7 @@ class BaseModel(Serializable, CriptTypes, ABC):
         self._created_date = created_date
 
     def reference(self) -> dict:
-        """
-        From a filled out node, create reference dictionary.
-
-        """
+        """ create reference dictionary for the node """
         ddict = self.as_dict(save=False)
         return self.create_reference(ddict)
 

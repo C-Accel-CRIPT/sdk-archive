@@ -18,6 +18,11 @@ u = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
 Unit = u.Unit
 Quantity = u.Quantity
 
+# General Limits
+float_limit = 1.79E308  # max of float64 can represent
+str_limit = 500
+degC_lower_limit = -273.15
+
 
 class CRIPTError(Exception):
 
@@ -33,7 +38,7 @@ class CRIPTWarning(Warning):
 
 # Core CRIPT objects (order important)
 from .base import *
-from .utils import load, export
+from .load_export import load, export
 from .cond import *
 from .prop import *
 from .user import *

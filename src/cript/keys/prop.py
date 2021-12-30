@@ -4,11 +4,10 @@ For Property node
 
 """
 
-from .. import cript_types
-from . import float_limit, str_limit, degC_lower_limit
+from .. import cript_types, float_limit, str_limit, degC_lower_limit
 
 
-prop_keys_rxn = {
+property_process_keys = {
     "conv": {
         "type": float,
         "range": [0, 1.2],
@@ -71,7 +70,7 @@ prop_keys_rxn = {
     },
 }
 
-prop_keys_mat = {
+property_material_keys = {
     "color": {
         "type": str,
         "range": [0, str_limit],
@@ -584,7 +583,7 @@ prop_keys_mat = {
     },
 }
 
-keys_methods = {
+method_keys = {
     'prescribed': 'a value that can be defined, (Ex. calculating MW from molecular formula)',
     'comp': 'computation or simulation',
     'nmr': 'nuclear magnetic resonance',

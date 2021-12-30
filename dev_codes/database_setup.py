@@ -1,13 +1,7 @@
 from cript import *
 
 # Connect to database
-
-db_username = "DW_cript"
-db_password = "YXMaoE1"
-db_project = "cript_testing"
-db_database = "test"
-
-db = CriptDB(db_username, db_password, db_project, db_database)
+db = CriptDB(port=27017, database="testing")
 
 # Generate your User node
 user_node = User(

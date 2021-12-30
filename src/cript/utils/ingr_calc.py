@@ -2,8 +2,56 @@ from typing import Union
 from warnings import warn
 from difflib import SequenceMatcher
 
-from .. import Quantity, Unit
-from ..keys.process import Qty_keys, Rel_Qty_keys
+from .. import Quantity, Unit, float_limit
+
+
+quantity_keys = {
+    "mass": {
+        "type": float,
+        "range": [0, float_limit],
+        "unit": "g",
+        "descr": "mass"
+    },
+    "volume": {
+        "type": float,
+        "range": [0, float_limit],
+        "unit": "ml",
+        "descr": "volume"
+    },
+    "pressure": {
+        "type": float,
+        "range": [0, float_limit],
+        "unit": "kPa",
+        "descr": "pressure"
+    },
+    "mole": {
+        "type": float,
+        "range": [0, float_limit],
+        "unit": "mmole",
+        "descr": "mole"
+    }
+}
+
+relative_quantity_keys = {
+    "equivalence": {
+        "type": float,
+        "range": [0, float_limit],
+        "unit": "",
+        "descr": "equivalence"
+    },
+    "molarity": {
+        "type": float,
+        "range": [0, float_limit],
+        "unit": "M",
+        "descr": "molarity"
+    },
+    "mass_fraction": {
+        "type": float,
+        "range": [0, 1],
+        "unit": "",
+        "descr": "mass fraction"
+    }
+}
 
 
 class IngrCalculatorError(Exception):
@@ -33,8 +81,8 @@ class QuantityCalculator:
     }
     """
     keys_calc = None
-    keys_qty = Qty_keys
-    keys_rel = Rel_Qty_keys
+    keys_qty = quantity_keys
+    keys_rel = relative_quantity_keys
     keys = None
     _error = IngrCalculatorError
 
@@ -201,9 +249,9 @@ class QuantityCalculator:
 
     @classmethod
     def _init_(cls):
-        from cript.keys.prop import prop_keys_mat
+        from cript.keys.prop import property_material_keys
         calc_names = ["density", "conc_molar", "molar_mass"]
-        cls.keys_calc = {k: prop_keys_mat[k] for k in calc_names}
+        cls.keys_calc = {k: property_material_keys[k] for k in calc_names}
         cls.keys = cls.keys_qty | cls.keys_rel | cls.keys_calc
 
 

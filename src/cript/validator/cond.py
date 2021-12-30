@@ -3,7 +3,7 @@ from difflib import get_close_matches
 
 from pint.errors import DimensionalityError
 
-from ... import CRIPTError, Quantity
+from .. import CRIPTError, Quantity
 
 
 def cond_keys_check(func):

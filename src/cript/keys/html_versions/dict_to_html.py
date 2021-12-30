@@ -129,14 +129,14 @@ if __name__ == '__main__':
 
     _dict = [
         [cond_keys, "condition_keys"],
-        [prop_keys_rxn, "property_keys_reaction"],
-        [prop_keys_mat, "property_keys_materials"],
-        [keys_methods, "method_keys"],
+        [property_process_keys, "property_keys_reaction"],
+        [property_material_keys, "property_keys_materials"],
+        [method_keys, "method_keys"],
         [data_keys, "data_keys"],
         [keywords_material_p | keywords_material, "material_keys"],
-        [Qty_keys | Rel_Qty_keys, "quantity_keys"],
-        [Ingr_keys, "ingredient_keys"],
-        [Process_keys, "process_keys"],
+        [quantity_keys | relative_quantity_keys, "quantity_keys"],
+        [ingredient_keywords, "ingredient_keys"],
+        [process_keywords, "process_keys"],
     ]
 
     for _ddict in _dict:

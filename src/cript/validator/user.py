@@ -2,7 +2,7 @@
 import re
 from functools import wraps
 
-from ... import CRIPTError
+from .. import CRIPTError
 
 
 _error = CRIPTError

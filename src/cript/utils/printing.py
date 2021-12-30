@@ -1,6 +1,7 @@
 from abc import ABC
 import os
-from .. import Path
+from pathlib import Path
+
 
 QUANTITY_LENGTH = 10
 

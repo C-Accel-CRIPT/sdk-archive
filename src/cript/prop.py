@@ -7,8 +7,9 @@ from typing import Union
 
 from . import CRIPTError
 from .base import ReferenceList
+from .load_export import loading_with_units
 from .cond import Cond
-from .utils import loading_with_units, SerializableSub, TablePrinting, freeze_class
+from .utils import SerializableSub, TablePrinting, freeze_class
 from .validator import type_check, prop_keys_check
 
 
@@ -143,10 +144,10 @@ class Prop(SerializableSub, TablePrinting):
 
     @classmethod
     def _init_(cls):
-        from .keys.prop import prop_keys_mat, prop_keys_rxn
-        cls.keys_material = prop_keys_mat
-        cls.keys_rxn = prop_keys_rxn
-        cls.keys = cls.keys_material | cls.keys_rxn
+        from .keys.prop import property_material_keys, property_process_keys
+        cls.keys_material = property_material_keys
+        cls.keys_process = property_process_keys
+        cls.keys = {**cls.keys_material, **cls.keys_process}
 
     @classmethod
     def key_table(cls, _type: str = "html"):

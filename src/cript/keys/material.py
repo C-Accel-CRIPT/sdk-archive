@@ -5,7 +5,7 @@ For material node
 """
 
 
-keywords_material_p = {
+material_keywords = {
     # General structure terms
     'thermoset': 'a cross-linked polymer',
     'thermoplastic': 'a polymer that becomes pliable at elevated temperature adn solidifies upon '
@@ -68,9 +68,7 @@ keywords_material_p = {
     'polysulfoxides': 'a polymer with R-S(=O)-R within the backbone',
     'polythiophenes': 'a polymer with C=C1=CC=CS1 5 member ring within the backbone',
     'polyphosphazenes': 'a polymer with R-P(R)(R)=N-R within the backbone',
-}
 
-keywords_material = {
     # monomer types
     'olefin': 'a chemical with one double bond and is locally surrounded by only C and H',
     'diene': 'a chemical with two or more double bonds',

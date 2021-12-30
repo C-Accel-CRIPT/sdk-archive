@@ -4,10 +4,12 @@ Data node
 """
 from typing import Union
 from bson import ObjectId
+from pathlib import Path
 
-from . import Cond, CRIPTError, Path
+from . import Cond, CRIPTError
 from .base import BaseModel
-from .utils import SerializableSub, TablePrinting, loading_with_units, freeze_class
+from .load_export import loading_with_units
+from .utils import SerializableSub, TablePrinting, freeze_class
 from .keys.data import data_keys
 
 

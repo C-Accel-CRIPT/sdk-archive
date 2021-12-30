@@ -81,7 +81,7 @@ def _get_arg_options(type_options: TYPE_OPTION_IN, args: Any, func) -> TYPE_OPTI
         else:
             raise TypeChecker(f"Invalid 'type' passed to {func.__name__}. Invalid '{type_op}'. ")
 
-    options.append([None])
+    options.append([type(None)])
     return options
 
 

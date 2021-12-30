@@ -13,8 +13,10 @@ import certifi
 
 from . import CRIPTError
 from .base import CriptTypes
+from .load_export import load
 from .user import User
-from .utils import id_type_check, type_check_property, id_type_check_bool, FilesInOut, load, login_check
+from .utils import FilesInOut, login_check
+from .validator import id_type_check, type_check, id_type_check_bool
 
 
 class CriptDBError(CRIPTError):
@@ -29,57 +31,66 @@ class CriptDB(CriptTypes):
     _error = CriptDBError
 
     def __new__(cls, *args, **kwargs):
+        """ Singleton: Prevent multiple database connection to be made. """
         if CriptDB._instance is None:
             CriptDB._instance = super().__new__(cls)
         return CriptDB._instance
 
     def __init__(self,
-                 db_username: str,
-                 db_password: str,
-                 db_project: str,
-                 db_database: str,
+                 database: str,
+                 db_username: str = None,
+                 db_password: str = None,
+                 project: str = None,
+                 cluster_address: str = None,
+                 port: int = None,
                  user: Union[str, User] = None,
                  op_print: bool = True):
         """
-        This class handles all communication with MongoDB.
-        :param db_username: mongoDB username
-        :param db_password: mongoDB password
-        :param db_project: mongoDB project
-        :param db_database: name of database on mongoDB
-        :param user: user node
-        :param op_print: True to get printouts from database commands
+
+        Parameters
+        ----------
+        db_username
+        db_password
+        project
+        database
+        cluster_address
+        port
+        user
+        op_print
+
         """
-        self.db_username = db_username
-        self.db_password = db_password
-        self.db_project = db_project
-        self.db_database = db_database
-        self.cluser_address = "cluster0.ekf91.mongodb.net"
 
         try:
-            self.client = MongoClient(
-                f"mongodb+srv://{self.db_username}:{self.db_password}@{self.cluser_address}/"
-                f"{self.db_project}?retryWrites=true&w=majority", tlsCAFile=certifi.where())
-            self.client.server_info()  # test database connection
+            if port is not None:
+                self.client = MongoClient(port=port, serverSelectionTimeoutMS=300)
+            else:
+                host = f"mongodb+srv://{db_username}:{db_password}@{cluster_address}/{project}?retryWrites=true&w" \
+                       f"=majority "
+                self.client = MongoClient(host, tlsCAFile=certifi.where())
+
+            # test database connection
+            self.client.server_info()
         except errors.ServerSelectionTimeoutError:
             msg = "Connection to database failed.\n\n"
             raise self._error(msg)
 
         self.op_print = op_print
         if self.op_print:
-            print(f"Connection to database '{db_database}' successful.")
+            print(f"Connection to database '{database}' successful.")
 
-        self.db = self.client[db_database]
+        self.database_name = database
+        self.db = self.client[database]
         self.db_collections = self.db.list_collection_names()
 
         self._user = None
         self.user = user
 
     def __repr__(self):
-        return f"\nYou are connected to: {self.db_database}" \
+        return f"\nYou are connected to: {self.database_name}" \
                f"\n\tLogged in as: {self.user}"
 
     def __str__(self):
-        return f"\nYou are connected to: {self.db_database}" \
+        return f"\nYou are connected to: {self.database_name}" \
                f"\n\tLogged in as: {self.user}"
 
     @property
@@ -87,7 +98,7 @@ class CriptDB(CriptTypes):
         return self._user
 
     @user.setter
-    @type_check_property
+    @type_check([str, User])
     def user(self, user):
         """
         Takes str(email or uid) and will find User node, or you can provide user node

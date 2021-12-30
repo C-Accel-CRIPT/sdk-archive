@@ -4,59 +4,8 @@ For Process node
 
 """
 
-from . import float_limit
 
-
-Qty_keys = {
-    "mass": {
-        "type": float,
-        "range": [0, float_limit],
-        "unit": "g",
-        "descr": "mass"
-    },
-    "volume": {
-        "type": float,
-        "range": [0, float_limit],
-        "unit": "ml",
-        "descr": "volume"
-    },
-    "pressure": {
-        "type": float,
-        "range": [0, float_limit],
-        "unit": "kPa",
-        "descr": "pressure"
-    },
-    "mole": {
-        "type": float,
-        "range": [0, float_limit],
-        "unit": "mmole",
-        "descr": "mole"
-    }
-}
-
-Rel_Qty_keys = {
-    "equivalence": {
-        "type": float,
-        "range": [0, float_limit],
-        "unit": "",
-        "descr": "equivalence"
-    },
-    "molarity": {
-        "type": float,
-        "range": [0, float_limit],
-        "unit": "M",
-        "descr": "molarity"
-    },
-    "mass_fraction": {
-        "type": float,
-        "range": [0, 1],
-        "unit": "",
-        "descr": "mass fraction"
-    }
-}
-
-
-Ingr_keys = {
+ingredient_keywords = {
     'monomer': 'the major chemical to be incorporated into a repeating unit of a polymer',
     'polymer': 'a chemical that consists of a large number of similar units bonded together',
     'initiator': 'a chemical which starts the growth of a polymer',
@@ -68,7 +17,7 @@ Ingr_keys = {
     'workup': 'a chemical used in the purification or isolation of a polymer',
 }
 
-Process_keys = {
+process_keywords = {
     # chemical transformations
     'polymerization': 'a chemical reaction that convert monomer(s) to a polymer',
     'kinetics': 'an experiment were multiple data points are take over a span of time',

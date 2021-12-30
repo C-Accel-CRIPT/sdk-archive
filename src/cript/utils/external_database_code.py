@@ -7,11 +7,12 @@ import sys
 from difflib import SequenceMatcher
 from typing import Union
 from warnings import warn
+from pathlib import Path
 
 from gridfs import GridFS
 from bson import ObjectId
 
-from .. import CRIPTError, Path
+from .. import CRIPTError
 
 
 class GetObject(ABC):

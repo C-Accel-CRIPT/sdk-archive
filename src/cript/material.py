@@ -6,9 +6,10 @@ from typing import Union
 
 from . import CRIPTError, Cond, Prop
 from .base import BaseModel, ReferenceList
-from .utils import GetMaterialID, Serializable, TablePrinting, freeze_class, loading_with_units
+from .load_export import loading_with_units
+from .utils import GetMaterialID, Serializable, TablePrinting, freeze_class
 from .validator import type_check
-from .keys.material import *
+from .keys.material import material_keywords
 
 
 class MaterialError(CRIPTError):
@@ -393,7 +394,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
 
     """
 
-    keys = keywords_material_p | keywords_material
+    keys = material_keywords
     class_ = "Material"
 
     def __init__(

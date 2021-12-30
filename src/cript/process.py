@@ -7,11 +7,12 @@ from warnings import warn
 
 from . import Unit, Quantity, CRIPTError
 from .base import BaseModel
+from .load_export import load, loading_with_units
 from .cond import Cond
 from .prop import Prop
 from .material import Material
-from .utils import TablePrinting, IngredientCalculator, GetObject, freeze_class, load, loading_with_units
-from .keys.process import Process_keys, Ingr_keys
+from .utils import TablePrinting, IngredientCalculator, GetObject, freeze_class
+from .keys.process import process_keywords, ingredient_keywords
 
 
 class ProcessError(CRIPTError):
@@ -34,7 +35,7 @@ class Ingr(IngredientCalculator, TablePrinting):
     :param method: used to select proper from specific method; example "nmr" vs "sec"
     :return:
     """
-    keys = Ingr_keys
+    keys = ingredient_keywords
     _error = IngrError
 
     def __init__(self, *args):
@@ -216,7 +217,7 @@ class Ingr(IngredientCalculator, TablePrinting):
 @freeze_class
 class Process(TablePrinting, BaseModel, _error=ProcessError):
     class_ = "Process"
-    keys = Process_keys
+    keys = process_keywords
 
     def __init__(
             self,
