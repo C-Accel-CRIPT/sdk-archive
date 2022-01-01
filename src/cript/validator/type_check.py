@@ -20,13 +20,18 @@ def type_check(*type_options: TYPE_OPTION_IN):
     def _type_check_decorator(func):
         @wraps(func)
         def _type_check(*args, **kwargs):
-            _type_check_loop(args, type_options, func)
+            type_check_loop(args, type_options, func.__name__)
             return func(*args, **kwargs)
         return _type_check
     return _type_check_decorator
 
 
-def _type_check_loop(args: Any, type_options, func):
+def type_check_loop(args: Any, type_options, func_name: str):
+    if not isinstance(type_options, (tuple, list)):
+        type_options = [type_options]
+    if not isinstance(args, (tuple, list)):
+        args = [args]
+
     # skip first arg is "self" is the first argument.
     first_arg_self = _is_class_check(args[0])
     if first_arg_self:
@@ -37,12 +42,12 @@ def _type_check_loop(args: Any, type_options, func):
     # loop through arguments and check them
     for i, arg in enumerate(args[slice_]):
         arg_type = _get_arg_type(arg)
-        arg_options = _get_arg_options(type_options[i], args, func)
+        arg_options = _get_arg_options(type_options[i], args, func_name)
 
         if not _do_check(arg_type, arg_options):
-            mes = f"Expected {arg_options} but got {arg_type} for: {func.__name__}."
+            mes = f"Expected {arg_options} but got {arg_type} for: {func_name}."
             if hasattr(args[0], '_error'):
-                raise args._error(mes)
+                raise args[0]._error(mes)
             else:
                 raise TypeError(mes)
 
@@ -63,7 +68,7 @@ def _get_arg_type(arg: Any) -> list[type]:
     return [type(arg)]
 
 
-def _get_arg_options(type_options: TYPE_OPTION_IN, args: Any, func) -> TYPE_OPTION_INTERNAL:
+def _get_arg_options(type_options: TYPE_OPTION_IN, args: Any, func_name: str) -> TYPE_OPTION_INTERNAL:
     """ Convert arg_options into type list. """
     if not isinstance(type_options, list):
         type_options = [type_options]
@@ -79,7 +84,7 @@ def _get_arg_options(type_options: TYPE_OPTION_IN, args: Any, func) -> TYPE_OPTI
         elif isinstance(type_op, type):
             options.append([type_op])
         else:
-            raise TypeChecker(f"Invalid 'type' passed to {func.__name__}. Invalid '{type_op}'. ")
+            raise TypeChecker(f"Invalid 'type' passed to {func_name}. Invalid '{type_op}'. ")
 
     options.append([type(None)])
     return options

@@ -5,11 +5,11 @@ Material Node
 from typing import Union
 
 from . import CRIPTError, Cond, Prop
-from .base import BaseModel, ReferenceList
+from .base import BaseModel, ReferenceList, CriptTypes
 from .load_export import loading_with_units
 from .utils import GetMaterialID, Serializable, TablePrinting, freeze_class
-from .validator import type_check
-from .keys.material import material_keywords
+from .validator import type_check, type_check_loop
+from .keys.material import material_keywords, identifier_keys
 
 
 class MaterialError(CRIPTError):
@@ -20,197 +20,120 @@ class IdenError(CRIPTError):
     pass
 
 
-@freeze_class
-class Iden(Serializable):
-    """
+def get_property(prop, type_, validator):
+    key = f"_{prop}"
 
-    Parameters
-    ----------
-    name: str
-        preferred name
-    names: list[str]
-        additional names, abbreviations, short hands for the material
-    cas: str
-        CAS number
-    bigsmiles: str
-        bigSMILES Line Notation
-    smiles: str
-        simplified molecular-input line-entry system (SMILES)
-    chem_formula: str
-        chemical formula
-    chem_repeat: str
-        chemical formula of repeating unit
-    pubchem_cid: str
-        PubChem CID
-    inchi: str
-        IUPAC International Chemical Identifier
-    inchi_key: str
-        a hashed version of the full InChI
-    mat_id: int
-        Local id for associating properties with a material
-        Assigned automatically when added to Material Node.
-        0 = whole mixture
-        1+ = individual component
-    ref_material:
+    def get_(self):
+        return getattr(self, key)
+
+    def set_(self, value):
+        type_check_loop((self, value), type_, prop)
+        if validator is not None:
+            value = validator(value)
+        setattr(self, key, value)
+
+    def del_(self):
+        delattr(self, key)
+
+    return property(get_, set_, del_)
 
 
-    """
+def Iden(**kwargs):
+    @freeze_class
+    class _Iden(__Iden):
+        """ Identifiers
 
+
+
+            Attributes
+            ----------
+            Attributes are dynamically created.
+
+            mat_id: int
+                Local id for associating properties with a material
+                Assigned automatically when added to Material Node.
+                0 = whole mixture
+                1+ = individual component
+            ref_material:
+                An already defined material.
+
+            Notes
+            -----
+            * Attributes are generated at run time.
+            * 'keys' has the official list of identifiers
+            * Custom identifiers are allowed with a "+" add at the front
+
+            """
+        def __init__(self, **_kwargs):
+            super_kwargs = {}
+            if "mat_id" in _kwargs:
+                super_kwargs["mat_id"] = _kwargs.pop("matid")
+            if "ref_material" in _kwargs:
+                super_kwargs["ref_material"] = _kwargs.pop("ref_material")
+
+            # set
+            for k_, v_ in _kwargs.items():
+                setattr(self, "_" + k_, None)
+                setattr(self, k_, v_)
+
+            super().__init__(**super_kwargs)
+
+    # Add properties to Iden class
+    for k, v in kwargs.items():
+        if k in identifier_keys:  # official attributes
+            prop_ = get_property(k, identifier_keys[k]["type"], identifier_keys[k]["validator"])
+            setattr(_Iden, k, prop_)
+
+        elif k.startswith("+"):  # custom attributes
+            setattr(_Iden, k, v)
+
+        elif k in ["mat_id", "ref_material"]:  # skip built-in attrinutes
+            pass
+
+        else:
+            raise IdenError(f" {k} is not an official identifier. Add '+' if for custom identifiers.")
+
+    return _Iden(**kwargs)
+
+
+class __Iden(Serializable):
     _error = IdenError
+    keys = identifier_keys
 
     def __init__(
             self,
-            name: str = None,
-            names: list[str] = None,
-            cas: str = None,
-            bigsmiles: str = None,
-            smiles: str = None,
-            chem_formula: str = None,
-            chem_repeat: str = None,
-            pubchem_cid: str = None,
-            inchi: str = None,
-            inchi_key: str = None,
             mat_id: int = None,
-            ref_material=None
+            ref_material=None,
     ):
 
         self._mat_id = None
         self.mat_id = mat_id
 
-        self._name = None
-        self._names = None
-
         if ref_material is not None:
             self._ref_material = None
             self.ref_material = ref_material
-            name = self.ref_material["name"]
-            self.name = name
+            self._name = None
+            self.name = self.ref_material["name"]
             return
 
-        self.name = name
+        self._name_stuff()
 
-        # adding name to names
-        if names is None:
-            names = [name]
-        elif isinstance(names, list):
-            if name not in names:
-                names.append(name)
+        if not hasattr(self, "name"):
+            raise self._error("Insufficient identifiers provided. 'name' or 'reference material' must be provided at a "
+                              "minimum.")
 
-        self.names = names
+    def _name_stuff(self):
+        # adding name to names (if its not already included)
+        if hasattr(self, "name"):
+            if hasattr(self, "names") and self.name not in self.names:
+                self.names.append(self.name)
+            if not hasattr(self, "names"):
+                setattr(self, "names", [self.name])
+            return
 
-        self._cas = None
-        self.cas = cas
-
-        self._bigsmiles = None
-        self.bigsmiles = bigsmiles
-
-        self._smiles = None
-        self.smiles = smiles
-
-        self._chem_formula = None
-        self.chem_formula = chem_formula
-
-        self._chem_repeat = None
-        self.chem_repeat = chem_repeat
-
-        self._pubchem_cid = None
-        self.pubchem_cid = pubchem_cid
-
-        self._inchi = None
-        self.inchi = inchi
-
-        self._inchi_key = None
-        self.inchi_key = inchi_key
-
-    @property
-    def name(self):
-        return self._name
-
-    @name.setter
-    @type_check(str)
-    def name(self, name):
-        self._name = name
-
-    @property
-    def names(self):
-        return self._names
-
-    @names.setter
-    @type_check([str, list[str]])
-    def names(self, names):
-        self._names = names
-
-    @property
-    def cas(self):
-        return self._cas
-
-    @cas.setter
-    @type_check(str)
-    def cas(self, cas):
-        self._cas = cas
-
-    @property
-    def bigsmiles(self):
-        return self._bigsmiles
-
-    @bigsmiles.setter
-    @type_check(str)
-    def bigsmiles(self, bigsmiles):
-        self._bigsmiles = bigsmiles
-
-    @property
-    def smiles(self):
-        return self._smiles
-
-    @smiles.setter
-    @type_check(str)
-    def smiles(self, smiles):
-        self._smiles = smiles
-
-    @property
-    def chem_formula(self):
-        return self._chem_formula
-
-    @chem_formula.setter
-    @type_check(str)
-    def chem_formula(self, chem_formula):
-        self._chem_formula = chem_formula
-
-    @property
-    def chem_repeat(self):
-        return self._chem_repeat
-
-    @chem_repeat.setter
-    @type_check(str)
-    def chem_repeat(self, chem_repeat):
-        self._chem_repeat = chem_repeat
-
-    @property
-    def pubchem_cid(self):
-        return self._pubchem_cid
-
-    @pubchem_cid.setter
-    @type_check(str)
-    def pubchem_cid(self, pubchem_cid):
-        self._pubchem_cid = pubchem_cid
-
-    @property
-    def inchi(self):
-        return self._inchi
-
-    @inchi.setter
-    @type_check(str)
-    def inchi(self, inchi):
-        self._inchi = inchi
-
-    @property
-    def inchi_key(self):
-        return self._inchi_key
-
-    @inchi_key.setter
-    @type_check(str)
-    def inchi_key(self, inchi_key):
-        self._inchi_key = inchi_key
+        # defining name from names
+        if hasattr(self, "names") and not hasattr(self, "name"):
+            setattr(self, "name", self.names[0])
 
     @property
     def mat_id(self):
@@ -237,7 +160,7 @@ class Iden(Serializable):
         self._ref_material = material
 
 
-class IdenList:
+class IdenList(CriptTypes):
     """ Identifiers List
 
     The Identifier List creates, and manages identifiers in the Material Node.
@@ -319,14 +242,14 @@ class IdenList:
             idens = [idens]
 
         for iden in idens:
-            if isinstance(iden, Iden):
+            if isinstance(iden, self.cript_types["__Iden"]):
                 iden.mat_id = len(self._idens) + 1
                 self._idens.append(iden)
             elif isinstance(iden, dict):
                 if "mat_id" not in iden.keys():
                     iden["mat_id"] = len(self._idens) + 1
                 self._idens.append(Iden(**iden))
-            elif isinstance(iden, Material):
+            elif isinstance(iden, self.cript_types["Material"]):
                 iden = Iden(ref_material=iden)
                 iden.mat_id = len(self._idens) + 1
                 self._idens.append(iden)

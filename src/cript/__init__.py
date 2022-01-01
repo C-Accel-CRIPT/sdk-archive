@@ -1,14 +1,13 @@
 import pkg_resources
 
 __all__ = [
-    "VERSION", "__version__", "__short_version__", "Unit", "load", "export", "CriptDB",
-    "User", "Group", "Collection", "Publication", "Experiment", "Material", "Process", "Data",
-    "Inventory", "Simulation", "Cond", "Prop", "Ingr", "Iden", "Path", "File"
+     "Unit", "load", "export", "CriptDB", "User", "Group", "Collection", "Publication", "Experiment",
+     "Material", "Process", "Data", "Inventory", "Simulation", "Cond", "Prop", "Ingr", "Iden", "Path", "File"
 ]
 
 # single-sourcing the package version
 __version__ = pkg_resources.require("cript")[0].version
-VERSION = __version__
+VERSION = 1
 __short_version__ = __version__.rpartition(".")[0]
 
 
@@ -37,24 +36,24 @@ class CRIPTWarning(Warning):
 
 
 # Core CRIPT objects (order important)
-from .base import *
 from .load_export import load, export
-from .cond import *
-from .prop import *
-from .user import *
-from .group import *
-from .publication import *
-from .collection import *
-from .experiment import *
-from .inventory import *
-from .data import *
-from .material import *
-from .process import *
-from .simulation import *
-from .database import *
+from .cond import Cond
+from .prop import Prop
+from .user import User
+from .group import Group
+from .publication import Publication
+from .collection import Collection
+from .experiment import Experiment
+from .inventory import Inventory
+from .data import Data, File
+from .material import Iden, Material, __Iden
+from .process import Ingr, Process
+from .simulation import Simulation
+from .database import CriptDB
 
 # Get CRIPT types in a dict
 from inspect import getmembers, isclass
+import sys
 cript_types = {pair[0]: pair[1] for pair in getmembers(sys.modules[__name__], isclass) if "cript." in str(pair[1])}
 cript_types["Unit"] = Unit
 cript_types["Quantity"] = Quantity

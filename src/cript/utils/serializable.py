@@ -1,6 +1,6 @@
 from abc import ABC
 from datetime import datetime
-from bson import ObjectId
+from bson import _BUILT_IN_TYPES
 from json import dumps
 from typing import Union
 from pathlib import Path
@@ -100,12 +100,14 @@ class Serializable(ABC):
             return [Serializable._loop_through(i) for i in obj]
         elif isinstance(obj, dict):
             return Serializable.dict_cleanup(obj)
-        elif isinstance(obj, datetime):
+        elif not type(obj) in _BUILT_IN_TYPES:
             return str(obj)
-        elif isinstance(obj, ObjectId):
-            return str(obj)
-        elif isinstance(obj, Quantity):
-            return str(obj)
+        # elif isinstance(obj, datetime):
+        #     return str(obj)
+        # elif isinstance(obj, ObjectId):
+        #     return str(obj)
+        # elif isinstance(obj, Quantity):
+        #     return str(obj)
         else:
             return obj
 
