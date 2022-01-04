@@ -1,69 +1,14 @@
-"""
-Tools for loading and exporting mongodb documents
-"""
-
 from os import mkdir
 from os.path import join
 from json import dump
 import time
 from pathlib import Path
 
-from . import CRIPTError, Unit
-from .base import CriptTypes
-from .utils import GetObject, FilesInOut
-from .validator import id_type_check_bool
-
-
-class Load(CriptTypes):
-    """ Load
-
-    Given a document (dictionary) from the database convert it into a CRIPT object.
-
-    """
-
-    def __call__(self, ddict: dict):
-        """ Load
-
-        Parameters
-        ----------
-        ddict: dict
-            dictionary (JSON) you want to turn back into CRIPT node
-
-        Returns
-        -------
-        obj:
-            CRIPT Node
-        """
-        if "_id" in ddict.keys():
-            ddict["uid"] = str(ddict.pop("_id"))
-        class_ = ddict.pop("class_")
-        obj = self.cript_types[class_](**ddict)
-        return obj
-
-
-load = Load()
-
-
-def loading_with_units(obj, type_):
-    """
-
-    Parameters
-    ----------
-    obj
-    type_
-
-    Returns
-    -------
-
-    """
-    if isinstance(obj, list):
-        for i, s in enumerate(obj):
-            if isinstance(s, dict):
-                obj[i] = type_(**s, _loading=True)
-    elif isinstance(obj, type_):
-        obj = [obj]
-
-    return obj
+from .. import CRIPTError, Unit
+from ..primary_nodes.base import CriptTypes
+from ..utils import GetObject, FilesInOut
+from ..validator import id_type_check_bool
+from .load import load
 
 
 class Export(CriptTypes):

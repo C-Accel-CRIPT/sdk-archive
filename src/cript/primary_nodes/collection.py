@@ -3,9 +3,9 @@ Collection Node
 
 """
 
-from . import CRIPTError
+from .. import CRIPTError
+from ..utils import freeze_class
 from .base import BaseModel, ReferenceList
-from .utils import freeze_class
 
 
 class CollectionError(CRIPTError):

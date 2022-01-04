@@ -5,31 +5,37 @@ Condition Object
 
 from typing import Union
 
-from . import Quantity, CRIPTError
-from .base import CriptTypes, ReferenceList
-from .load_export import load
-from .utils import SerializableSub, TablePrinting, freeze_class
-from .validator import type_check, cond_keys_check
+from .. import Quantity, CRIPTError
+from ..primary_nodes.base import CriptTypes, ReferenceList
+from .load import load
+from ..utils import SerializableSub, TablePrinting, freeze_class
+from ..validator import type_check, cond_keys_check
 
 
 class CondError(CRIPTError):
     pass
 
 
-"""
-
-:param key: Unique key to define what the condition is. See Cond.key_table() for official list.
-:param value: numerical, text or material
-:param uncer: uncertainty
-:param data_uid: Referance to data node.
-"""
 @freeze_class
 class Cond(SerializableSub, TablePrinting, CriptTypes):
+    """ Condition
+
+    Conditions are environmental variables.
+
+    Attributes
+    ----------
+    key: str
+        Yields
+        See Cond.key_table() for official list.
+    value: Any
+        piece of information or quantity
+    uncer: Any
+        uncertainty in quantity
+    c_data: Data
+        CRIPT Data associate with the property
+
     """
 
-
-
-    """
     keys = None
     _error = CondError
 
@@ -39,8 +45,9 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
             value,
             uncer: Union[float, int, Quantity] = None,
             c_data=None,
-            _loading: bool = False
+            _loading: bool = False  # need for loading a file from the data base
     ):
+
         if _loading:
             key, value, uncer = self._loading(key, value, uncer)
 
@@ -101,5 +108,5 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
     @classmethod
     def _init_(cls):
         CriptTypes._init_()
-        from .keys.cond import cond_keys
+        from ..keys.cond import cond_keys
         cls.keys = cond_keys

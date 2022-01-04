@@ -12,9 +12,9 @@ from jsonpatch import JsonPatch
 import certifi
 
 from . import CRIPTError
-from .base import CriptTypes
-from .load_export import load
-from .user import User
+from .primary_nodes.base import CriptTypes
+from .primary_nodes.user import User
+from .secondary_nodes.load import load
 from .utils import FilesInOut, login_check
 from .validator import id_type_check, type_check, id_type_check_bool
 

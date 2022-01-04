@@ -3,10 +3,10 @@ Group Node
 
 """
 
-from . import CRIPTError
+from .. import CRIPTError
+from ..utils import freeze_class
+from ..validator import email_format_check, type_check
 from .base import BaseModel, ReferenceList
-from .utils import freeze_class
-from .validator import email_format_check, type_check
 
 
 class GroupError(CRIPTError):

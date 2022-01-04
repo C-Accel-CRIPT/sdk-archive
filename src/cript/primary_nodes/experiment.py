@@ -3,10 +3,10 @@ Experiment Node
 
 """
 
-from . import CRIPTError
+from .. import CRIPTError
+from ..utils import freeze_class, GetMaterial
+from ..validator import type_check
 from .base import BaseModel, ReferenceList
-from .utils import freeze_class, GetMaterial
-from .validator import type_check
 
 
 class ExperimentError(CRIPTError):
@@ -20,21 +20,23 @@ class ExperimentError(CRIPTError):
 class Experiment(BaseModel, _error=ExperimentError):
     """ Experiment Node
 
+    Grouping of all associated material, process, simulation, data nodes
 
-        Attributes
-        ----------
-        base_attributes:
-            See CRIPT BaseModel
-        c_material: Material node
-            CRIPT Materials used in this experiment
-        c_process: Process node
-            CRIPT Process nodes associated with this experiment
-        c_simulation: Simulation node
-            CRIPT Simulation node associated with this experiment
-        c_data: Data node
-            CRIPT Data nodes associated with this experiment
-        funding: str
-            Funding source for experiment
+    Attributes
+    ----------
+    base_attributes:
+        See CRIPT BaseModel
+    c_material: Material node
+        CRIPT Materials used in this experiment
+    c_process: Process node
+        CRIPT Process nodes associated with this experiment
+    c_simulation: Simulation node
+        CRIPT Simulation node associated with this experiment
+    c_data: Data node
+        CRIPT Data nodes associated with this experiment
+    funding: str
+        Funding source for experiment
+
     """
 
     class_ = "Experiment"

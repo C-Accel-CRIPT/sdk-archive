@@ -5,12 +5,11 @@ Property Object
 
 from typing import Union
 
-from . import CRIPTError
-from .base import ReferenceList
-from .load_export import loading_with_units
+from .. import CRIPTError
+from ..primary_nodes.base import ReferenceList
 from .cond import Cond
-from .utils import SerializableSub, TablePrinting, freeze_class
-from .validator import type_check, prop_keys_check
+from ..utils import SerializableSub, TablePrinting, freeze_class, loading_with_units
+from ..validator import type_check, prop_keys_check
 
 
 class CondError(CRIPTError):
@@ -19,6 +18,33 @@ class CondError(CRIPTError):
 
 @freeze_class
 class Prop(SerializableSub, TablePrinting):
+    """ Properties
+
+    Properties are qualities or traits that belonging to a node.
+
+    Attributes
+    ----------
+    key: str
+        type of property
+        See Prop.key_table() for official list.
+    value: Any
+        piece of information or quantity
+    uncer: Any
+        uncertainty in quantity
+    method: str
+        approach or source of property data
+    mat_id: int
+        identifier that is associate with the property
+        0 = whole mixture
+        1+ = individual component
+    component: str
+        specific chemical structure associate with the property
+    c_data: Data
+        CRIPT Data associate with the property
+    cond: Cond
+        conditions that the property was taken under
+
+    """
     keys_material = None
     keys_rxn = None
     keys = None
@@ -34,19 +60,8 @@ class Prop(SerializableSub, TablePrinting):
             component: str = None,
             c_data=None,
             cond: Union[list[Cond], Cond] = None,
-            _loading: bool = False
+            _loading: bool = False  # need for loading a file from the data base
     ):
-        """
-
-        :param mat_id: mat_id=0 is for bulk (default)
-        :param key:
-        :param value:
-        :param uncer:
-        :param component:
-        :param method:
-        :param c_data:
-        :param cond:
-        """
         if _loading:
             key, value, uncer = self._loading(key, value, uncer)
 
@@ -130,8 +145,8 @@ class Prop(SerializableSub, TablePrinting):
 
     @cond.setter
     @type_check([list[Cond], Cond])
+    @loading_with_units(Cond)
     def cond(self, cond):
-        cond = loading_with_units(cond, Cond)
         self._cond = cond
 
     @property
@@ -144,13 +159,15 @@ class Prop(SerializableSub, TablePrinting):
 
     @classmethod
     def _init_(cls):
-        from .keys.prop import property_material_keys, property_process_keys
+        """ Load key table after objects have been initiated. Called at the end of __init__.py """
+        from ..keys.prop import property_material_keys, property_process_keys
         cls.keys_material = property_material_keys
         cls.keys_process = property_process_keys
         cls.keys = {**cls.keys_material, **cls.keys_process}
 
     @classmethod
     def key_table(cls, _type: str = "html"):
+        """ Prints or opens html of official property keys. """
         if _type == "html":
             cls.open_html("property_keys_materials.html")
             cls.open_html("property_keys_reaction.html")

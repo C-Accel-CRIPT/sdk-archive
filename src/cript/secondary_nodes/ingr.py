@@ -1,22 +1,11 @@
-"""
-Process Node
-
-"""
 from typing import Union
 from warnings import warn
 
-from . import Unit, Quantity, CRIPTError
-from .base import BaseModel
-from .load_export import load, loading_with_units
-from .cond import Cond
-from .prop import Prop
-from .material import Material
-from .utils import TablePrinting, IngredientCalculator, GetObject, freeze_class
-from .keys.process import process_keywords, ingredient_keywords
-
-
-class ProcessError(CRIPTError):
-    pass
+from .. import Unit, Quantity, CRIPTError
+from ..secondary_nodes.load import load
+from ..primary_nodes.material import Material
+from ..utils import TablePrinting, IngredientCalculator, GetObject, freeze_class
+from ..keys.process import ingredient_keywords
 
 
 class IngrError(CRIPTError):
@@ -212,90 +201,3 @@ class Ingr(IngredientCalculator, TablePrinting):
                 raise self._error(mes)
 
             self.add(ingr["uid"], qty, keyword=keyword, mat_id=mat_id)
-
-
-@freeze_class
-class Process(TablePrinting, BaseModel, _error=ProcessError):
-    class_ = "Process"
-    keys = process_keywords
-
-    def __init__(
-            self,
-            name: str,
-            ingr,
-            procedure: str,
-            cond: list[Cond] = None,
-            prop: list[Prop] = None,
-            keywords: list[str] = None,
-            notes: str = None,
-            **kwargs
-    ):
-        """
-
-        :param name: The user-defined name for the process.
-        :param ingr: See help(Ingr.__init__)
-        :param procedure: Text write up of procedure
-        :param cond: Condition. See help(Cond.__init__) and Cond.key_table()
-        :param prop: Property. See help(Prop.__init__) and Prop.key_table()
-        :param keywords: See Process.key_table()
-        :param notes: Any miscellaneous notes related to the user.
-
-        :param _class: class of node.
-        :param uid: The unique ID of the material.
-        :param model_version: Version of CRIPT data model.
-        :param version_control: Link to version control node.
-        :param last_modified_date: Last date the node was modified.
-        :param created_date: Date it was created.
-        """
-        super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
-
-        self._procedure = None
-        self.procedure = procedure
-
-        self._prop = None
-        self.prop = prop
-
-        self._keywords = None
-        self.keywords = keywords
-
-        self._cond = None
-        self.cond = cond
-
-        if isinstance(ingr, Ingr):
-            self.ingr = ingr
-        else:
-            self.ingr = Ingr(ingr)
-
-    @property
-    def procedure(self):
-        return self._procedure
-
-    @procedure.setter
-    def procedure(self, procedure):
-        self._procedure = procedure
-
-    @property
-    def prop(self):
-        return self._prop
-
-    @prop.setter
-    def prop(self, prop):
-        prop = loading_with_units(prop, Prop)
-        self._prop = prop
-
-    @property
-    def keywords(self):
-        return self._keywords
-
-    @keywords.setter
-    def keywords(self, keywords):
-        self._keywords = keywords
-
-    @property
-    def cond(self):
-        return self._cond
-
-    @cond.setter
-    def cond(self, cond):
-        cond = loading_with_units(cond, Cond)
-        self._cond = cond

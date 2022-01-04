@@ -4,10 +4,10 @@ Publications
 """
 from typing import Union
 
-from . import CRIPTError
+from .. import CRIPTError
+from ..utils import freeze_class
+from ..validator import type_check
 from .base import BaseModel, ReferenceList
-from .utils import freeze_class
-from .validator import type_check
 
 
 class PublicationError(CRIPTError):
@@ -22,38 +22,38 @@ class Publication(BaseModel, _error=PublicationError):
     """ Publication Node
 
 
-        Attributes
-        ----------
-        base_attributes:
-            See help(BaseModel)
-        title: str
-            Title of publication
-        authors: list[str]
-            List of authors [First name middle initial or name, Last name].
-        journal: str
-            Journal of the publication
-        publisher: str
-            Publisher of publication
-        year: int
-            Year of publication
-        volume: int
-            Volume of publication
-        issue: int
-            Issue of publication
-        pages: int, list[int]
-            Pages of publication [start page, end page]
-        doi: str
-            DOI: digital object identifier
-        issn: str
-            ISSN: international standard serial number
-        arxiv_id: str
-            arXiv identifier
-        pmid: str
-            PMID: PubMed ID
-        website: str
-            website where the publication can be accessed
-        c_collection: Collection node
-            CRIPT collection owned by the group
+    Attributes
+    ----------
+    base_attributes:
+        See help(BaseModel)
+    title: str
+        Title of publication
+    authors: list[str]
+        List of authors [First name middle initial or name, Last name].
+    journal: str
+        Journal of the publication
+    publisher: str
+        Publisher of publication
+    year: int
+        Year of publication
+    volume: int
+        Volume of publication
+    issue: int
+        Issue of publication
+    pages: int, list[int]
+        Pages of publication [start page, end page]
+    doi: str
+        DOI: digital object identifier
+    issn: str
+        ISSN: international standard serial number
+    arxiv_id: str
+        arXiv identifier
+    pmid: str
+        PMID: PubMed ID
+    website: str
+        website where the publication can be accessed
+    c_collection: Collection node
+        CRIPT collection owned by the group
     """
 
     class_ = "Publication"

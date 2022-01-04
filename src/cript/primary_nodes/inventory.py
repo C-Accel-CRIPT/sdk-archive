@@ -3,9 +3,9 @@ Inventory Node
 
 """
 
-from . import CRIPTError
+from .. import CRIPTError
+from ..utils import freeze_class, GetMaterial
 from .base import BaseModel, ReferenceList
-from .utils import freeze_class, GetMaterial
 
 
 class InventoryError(CRIPTError):
@@ -16,14 +16,15 @@ class InventoryError(CRIPTError):
 class Inventory(BaseModel, _error=InventoryError):
     """ Inventory Node
 
+    Groouping of Material nodes
 
-       Attributes
-       ----------
-       base_attributes:
+    Attributes
+    ----------
+    base_attributes:
 
-       c_material: Material node
-           Materials used in this experiment
-       """
+    c_material: Material node
+        Materials used in this experiment
+    """
     class_ = "Inventory"
 
     def __init__(

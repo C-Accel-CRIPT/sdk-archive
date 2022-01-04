@@ -14,8 +14,8 @@ __short_version__ = __version__.rpartition(".")[0]
 # Units
 import pint
 u = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
-Unit = u.Unit
-Quantity = u.Quantity
+U = Unit = u.Unit
+Q = Quantity = u.Quantity
 
 # General Limits
 float_limit = 1.79E308  # max of float64 can represent
@@ -36,19 +36,25 @@ class CRIPTWarning(Warning):
 
 
 # Core CRIPT objects (order important)
-from .load_export import load, export
-from .cond import Cond
-from .prop import Prop
-from .user import User
-from .group import Group
-from .publication import Publication
-from .collection import Collection
-from .experiment import Experiment
-from .inventory import Inventory
-from .data import Data, File
-from .material import Iden, Material, __Iden
-from .process import Ingr, Process
-from .simulation import Simulation
+from .secondary_nodes.load import load
+from .secondary_nodes.export import export
+from .secondary_nodes.cond import Cond
+from .secondary_nodes.prop import Prop
+from .primary_nodes.user import User
+from .primary_nodes.group import Group
+from .primary_nodes.publication import Publication
+from .primary_nodes.collection import Collection
+from .primary_nodes.experiment import Experiment
+from .primary_nodes.inventory import Inventory
+from .secondary_nodes.hazard import Hazard
+from .secondary_nodes.spec import Spec
+from .secondary_nodes.iden import Iden
+from .primary_nodes.material import Material
+from .secondary_nodes.ingr import Ingr
+from .primary_nodes.process import Process
+from .primary_nodes.simulation import Simulation
+from .secondary_nodes.file import File
+from .primary_nodes.data import Data
 from .database import CriptDB
 
 # Get CRIPT types in a dict

@@ -14,9 +14,9 @@ from datetime import datetime
 from bson import ObjectId
 import difflib
 
-from . import __version__, CRIPTError
-from .utils import GetObject, Serializable
-from .validator import id_type_check_bool, type_check
+from .. import __version__, CRIPTError
+from ..utils import GetObject, Serializable, loading_with_datetime
+from ..validator import id_type_check_bool, type_check
 
 
 class CriptTypes:
@@ -35,7 +35,7 @@ class CriptTypes:
     @classmethod
     def _init_(cls):
         """ Will be called at the end of cript.__init__ """
-        from . import cript_types
+        from .. import cript_types
         cls.cript_types = cript_types
 
 
@@ -160,6 +160,8 @@ class BaseModel(Serializable, CriptTypes, ABC):
         return self._last_modified_date
 
     @last_modified_date.setter
+    @type_check(datetime)
+    @loading_with_datetime
     def last_modified_date(self, last_modified_date):
         self._last_modified_date = last_modified_date
 
@@ -168,6 +170,8 @@ class BaseModel(Serializable, CriptTypes, ABC):
         return self._created_date
 
     @created_date.setter
+    @type_check(datetime)
+    @loading_with_datetime
     def created_date(self, created_date):
         self._created_date = created_date
 
@@ -228,6 +232,9 @@ class ReferenceList(CriptTypes):
         List of uids (same as objs as _reference)
     _node: str
         Name of names that are stored in the reference list (used for type checking)
+    limit: int
+        maximum number of reference allowed
+        default is 10000
 
     Methods
     -------
@@ -240,7 +247,7 @@ class ReferenceList(CriptTypes):
 
     _error = None
 
-    def __init__(self, node: str, objs=None, _error=CRIPTError):
+    def __init__(self, node: str, objs=None, _error=CRIPTError, limit: int = 10000):
         """
         Parameters
         ----------
@@ -250,11 +257,16 @@ class ReferenceList(CriptTypes):
             objects will be passed to self.add()
         _error:
             error class of parent node
+        limit: int
+            maximum number of reference allowed
+            default is 10000
         """
         self._reference = []
         self._uids = []
         self._node = node
         self._error = _error
+        self.limit = limit
+        self.count = 0
 
         if objs is not None:
             self.add(objs)
@@ -337,6 +349,11 @@ class ReferenceList(CriptTypes):
         """
         if not isinstance(objs, list):
             objs = [objs]
+        if self.count + len(objs) > self.limit:
+            raise self._error(f"Attempting to exceed the limit of {self._node} that can be contained.\n "
+                              f"Current amount: {self.count}\n"
+                              f"Attempting to add: {len(objs)}\n"
+                              f"Limit: {self.limit}")
 
         for obj in objs:
             # given an obj get reference dictionary
@@ -354,6 +371,7 @@ class ReferenceList(CriptTypes):
             if ref["uid"] not in self._uids:
                 self._reference.append(ref)
                 self._uids.append(ref["uid"])
+                self.count += 1
             else:
                 mes = f"Reference already in list for '{self._node}'.'{obj}'"
                 raise self._error(mes)
@@ -476,6 +494,7 @@ class ReferenceList(CriptTypes):
             if r in self._uids:
                 self._remove_reference(r)
                 self._uids.remove(r)
+                self.count -= 1
             else:
                 mes = f"{r} not in list, so it can't be removed from '{self._node}'."
                 raise self._error(mes)
