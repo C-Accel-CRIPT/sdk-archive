@@ -4,9 +4,9 @@ Data node
 """
 from typing import Union
 
-from .. import Cond, CRIPTError
+from .. import Cond, CRIPTError, Unit
 from ..secondary_nodes.file import File
-from ..utils import TablePrinting, freeze_class, convert_to_list, loading_with_units
+from ..utils import TablePrinting, freeze_class, convert_to_list, loading_with_units, str_to_unit
 from ..validator import type_check
 from ..keys.data import data_keys
 from .base import BaseModel
@@ -20,14 +20,30 @@ class DataError(CRIPTError):
 class Data(TablePrinting, BaseModel, _error=DataError):
     """
 
-    :param type_: See Data.key_table()
-    :param file: Raw data file. See help(File.__init__)
-    :param sample_prep: Text write up of how sample was prepared.
-    :param calibration: Calibration file. See help(File.__init__)
-    :param equipment: Equipment file. See help(File.__init__)
-    :param cond: Condition. See help(Cond.__init__) and Cond.key_table()
-    :param name: The user-defined name for the process.
-    :param notes: Any miscellaneous notes related to the user.
+    Parameters
+    ----------
+    type_: str
+        data type
+        see Data.key_table()
+    labels: list[str]
+        axis labels
+        see Data.key_table()
+    units: list[Unit]
+        axis units
+        see Data.key_table()
+    file: File
+        raw data file.
+        see help(File.__init__)
+    sample_prep: list[str]
+        sample preparation steps
+    calibration: File
+        calibration file
+        see help(File.__init__)
+    equipment: list[str]
+        equipment used to take data
+    cond: list[Cond]
+        equipment settings or environmental variables for data collection
+
     """
 
     keys = data_keys
@@ -36,20 +52,27 @@ class Data(TablePrinting, BaseModel, _error=DataError):
     def __init__(
             self,
             type_: str,
+            labels: list[str] = None,
+            units: Union[list[Unit], list[str]] = None,
             file: File = None,
-            sample_prep: str = None,
+            sample_prep: Union[list[str], str] = None,
             calibration: File = None,
-            equipment: File = None,
+            equipment: Union[list[str], str] = None,
             cond: Union[list[Cond], Cond] = None,
             name: str = None,
             notes: str = None,
             **kwargs
     ):
-
         super().__init__(name=name, class_=self.class_, notes=notes, **kwargs)
 
         self._type_ = None
         self.type_ = type_
+
+        self._labels = None
+        self.labels = labels
+
+        self._units = None
+        self.units = units
 
         self._file = None
         self.file = file
@@ -71,14 +94,35 @@ class Data(TablePrinting, BaseModel, _error=DataError):
         return self._type_
 
     @type_.setter
+    @type_check(str)
     def type_(self, type_):
         self._type_ = type_
+
+    @property
+    def labels(self):
+        return self._labels
+
+    @labels.setter
+    @type_check(list[str])
+    def labels(self, labels):
+        self._labels = labels
+
+    @property
+    def units(self):
+        return self._units
+
+    @units.setter
+    @type_check(list[Unit])
+    @str_to_unit
+    def units(self, units):
+        self._units = units
 
     @property
     def file(self):
         return self._file
 
     @file.setter
+    @type_check(File)
     def file(self, file):
         file = self.loading_with_file(file)
         self._file = file
@@ -88,6 +132,7 @@ class Data(TablePrinting, BaseModel, _error=DataError):
         return self._sample_prep
 
     @sample_prep.setter
+    @type_check(list[str])
     def sample_prep(self, sample_prep):
         self._sample_prep = sample_prep
 
@@ -96,6 +141,7 @@ class Data(TablePrinting, BaseModel, _error=DataError):
         return self._calibration
 
     @calibration.setter
+    @type_check(File)
     def calibration(self, calibration):
         calibration = self.loading_with_file(calibration)
         self._calibration = calibration
@@ -105,8 +151,8 @@ class Data(TablePrinting, BaseModel, _error=DataError):
         return self._equipment
 
     @equipment.setter
+    @type_check(list[str])
     def equipment(self, equipment):
-        equipment = self.loading_with_file(equipment)
         self._equipment = equipment
 
     @property

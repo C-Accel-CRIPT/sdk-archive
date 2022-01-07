@@ -1,5 +1,5 @@
 from typing import Union
-from warnings import warn
+import warnings
 from difflib import SequenceMatcher
 
 from .. import Quantity, Unit, float_limit
@@ -54,6 +54,14 @@ relative_quantity_keys = {
 }
 
 
+def custom_formatwarning(msg, *args, **kwargs):
+    # ignore everything except the message
+    return "Warning: " + str(msg) + '\n'
+
+
+warnings.formatwarning = custom_formatwarning
+
+
 class IngrCalculatorError(Exception):
     def __init__(self, *msg):
         super().__init__(*msg)
@@ -63,9 +71,6 @@ class QuantityCalculator:
     """
     Material data structure:
     {
-            # required
-        "name": str,
-
             # provide one of these
         "mass": Quantity,
         "volume": Quantity,
@@ -261,9 +266,6 @@ class RelativeCalculator:
     """
     Material data structure:
     {
-            # required
-        "name": str,
-
             # provide  these
         "mass": Quantity,
         "volume": Quantity,
@@ -349,7 +351,7 @@ class RelativeCalculator:
         total_volume, mat_skipped = self._get_total_volume(mats, default)
 
         for i_, i in enumerate(mats):
-            if "mole" in i.keys() and i["name"] not in mat_skipped:
+            if "mole" in i.keys() and i["mat"]["name"] not in mat_skipped:
                 mats[i_]["molarity"] = i["mole"] / total_volume
 
         return mats
@@ -360,17 +362,17 @@ class RelativeCalculator:
         for i in mats:
             if "keyword" in i.keys():
                 if i["keyword"] in ["workup", "quench"]:
-                    mat_skipped.append(i['name'])
+                    mat_skipped.append(i["mat"]['name'])
                     continue
             if "volume" in i.keys():
                 total_volume += i["volume"]
             elif default:
                 if "mass" in i.keys():
                     total_volume += i["mass"] / self.default_density
-                    warn(f"Default density used for '{i['name']}' when calculating molarity.")
+                    warnings.warn(f"Default density used for '{i['mat']['name']}' when calculating molarity.")
             else:
-                mat_skipped.append(i['name'])
-                warn(f"'{i['name']}' not included in molarity calculation.")
+                mat_skipped.append(i["mat"]['name'])
+                warnings.warn(f"'{i['mat']['name']}' not included in molarity calculation.")
 
         return total_volume, mat_skipped
 
@@ -384,7 +386,7 @@ class RelativeCalculator:
         total_mass, mat_skipped = self._get_total_mass(mats, default)
         
         for i_, i in enumerate(mats):
-            if "mass" in i.keys() and i["name"] not in mat_skipped:
+            if "mass" in i.keys() and i["mat"]["name"] not in mat_skipped:
                 mats[i_]["mass_fraction"] = i["mass"] / total_mass
     
         return mats
@@ -393,23 +395,66 @@ class RelativeCalculator:
         total_mass = 0
         mat_skipped = []
         for i in mats:
-            if i["keyword"] in ["workup", "quench"]:
-                mat_skipped.append(i['name'])
+            if "keyword" in i.keys() and i["keyword"] in ["workup", "quench"]:
+                mat_skipped.append(i["mat"]['name'])
                 continue
             if "mass" in i.keys():
                 total_mass += i["mass"]
             elif default:
                 if "volume" in i.keys():
                     total_mass += i["volume"] * self.default_density
-                    warn(f"Default density used for '{i['name']}' when calculating mass fraction.")
+                    warnings.warn(f"Default density used for '{i['mat']['name']}' when calculating mass fraction.")
             else:
-                mat_skipped.append(i['name'])
-                warn(f"'{i['name']}' not included in mass fraction calculation.")
+                mat_skipped.append(i['mat']['name'])
+                warnings.warn(f"'{i['mat']['name']}' not included in mass fraction calculation.")
 
         return total_mass, mat_skipped
 
 
 class IngredientCalculator:
+    """ IngredientCalculator
+
+    Attributes
+    ----------
+    _ingr: list[dict]
+        List of ingredients, ingredients are dictionaries.
+        Example ingredient dictionary:
+        {
+                # required
+            "mat": {name: str},
+
+                # provide some or all of these (un-provided quantities will tried to be calculated)
+            "mass": Quantity,
+            "volume": Quantity,
+            "mole": Quantity,
+            "pressure": Quantity,
+
+                # these will be calculated
+            "equivalence": Quantity,
+            "molarity": Quantity,
+            "mass_fraction": Quantity,
+
+                # will be used for calculations if provided
+            "density": Quantity
+            "conc_molar": Quantity
+            "molar_mass": Quantity
+            "keywords": str   # used to calculate base
+
+            other key-value pairs will be ignored
+        }
+
+    Methods
+    -------
+    add:
+        add material to ingredients
+    remove:
+        remove material from ingredients
+    scale:
+        scale all materials
+    scale_one:
+        scale one material
+
+    """
     _error = IngrCalculatorError
     _label_length = 12
 
@@ -459,29 +504,42 @@ class IngredientCalculator:
                 try:
                     self.add(*arg, **kwarg)
                 except KeyError as e:
-                    warn(f"Material skipped: '{arg}'. {e}")
+                    warnings.warn(f"Material skipped: '{arg}'. {e}")
 
     def add(self, mat: dict, equivalence: list[Union[float, int], Union[int, str]] = None):
-        """
+        """ Add
+
         Adds mat to Ingr and performs calculations for the other quantities.
-        :param mat:
-        :param equivalence: [equivalence, "material"] "material" is the equivalence is in respect to
+
+        Parameters:
+        ----------
+        mat: dict
+            material to be added
+        equivalence: [equivalence, "material"]
+            "material" is the equivalence is in respect to
         """
         if equivalence is not None:
             index = self._get_mat_index(equivalence[1])
             if "mole" in self._ingr[index].keys():
                 mat["mole"] = self._ingr[index]["mole"] * equivalence[0]
             else:
-                mes = f"The equivalence material({self._ingr[index]['name']}) has no moles."
+                mes = f"The equivalence material({self._ingr[index]['mat']['name']}) has no moles."
                 raise self._error(mes)
 
         self._ingr.append(self._q_calc.calc_mass_volume_mole(mat))
         self._ingr = self._r_calc.calc_equiv_molarity_mass_fraction(self._ingr)
 
     def remove(self, mat: Union[int, str]):
-        """
+        """ Remove
+
         Removes mat from ingr
-        :param mat: material to be removed
+
+        Parameters
+        ----------
+        mat: int, str
+            material to be removed
+            accepts index or name of material
+
         """
         if isinstance(mat, int) and mat <= len(self._ingr):
             del self._ingr[mat]
@@ -495,18 +553,33 @@ class IngredientCalculator:
         self._ingr = self._r_calc.calc_equiv_molarity_mass_fraction(self._ingr)
 
     def scale(self, factor: Union[int, float]):
-        """
-        Scales all ingredients' mass, volume, moles by a factor.
-        :param factor: scale factor
+        """ Scale
+
+        Scales all ingredients by a factor.
+        Specifically, mass, volume, moles are scaled.
+
+        Parameters
+        ----------
+        factor: int, float
+            scale factor
+
         """
         for i in range(len(self._ingr)):
             self._ingr[i] = self._q_calc.scale(self._ingr[i], factor)
 
     def scale_one(self, mat: Union[int, str], factor: Union[int, float]):
-        """
+        """ Scale One
+
         Scales one ingredient's mass, volume, moles by a factor.
-        :param mat: material to be scaled
-        :param factor: scale factor
+
+        Parameters
+        ----------
+        mat: int, str
+            material to be scaled
+            accepts index or name of material
+        factor: int, float
+            scale factor
+
         """
         index = self._get_mat_index(mat)
 
@@ -514,11 +587,12 @@ class IngredientCalculator:
         self._ingr = self._r_calc.calc_equiv_molarity_mass_fraction(self._ingr)
 
     def _get_mat_index(self, target: Union[str, int]):
+        """ Determines index of material by matching on text similarity. """
         if isinstance(target, int):
             if target <= len(self._ingr):
                 return target
 
-        possible_names = [i["name"] for i in self._ingr]
+        possible_names = [i['mat']["name"] for i in self._ingr]
         scores = {v: SequenceMatcher(None, target, v).ratio() * 100 for v in possible_names}
         best_match = max(scores, key=scores.get)
         best_score = scores[best_match]
@@ -535,6 +609,7 @@ class IngredientCalculator:
         if len(self._ingr) == 0:
             return "No ingredients."
 
+        # create header line
         headers, units = self._table_headers()
         headers.insert(0, "#")
         units.insert(0, "")
@@ -551,6 +626,8 @@ class IngredientCalculator:
                         value = self.sig_figs(v.to(u).m)
                     elif isinstance(v, Quantity):
                         value = self.sig_figs(v.to_base_units().m)
+                    elif k == "mat":
+                        value = ingr["mat"]["name"]
                     else:
                         value = str(v)
                     entries.append(self._length_limit_header(value))
@@ -604,11 +681,17 @@ class IngredientCalculator:
 
     @staticmethod
     def sig_figs(number: float, significant_figures: int = 3) -> str:
-        """
+        """ significant digits
+
         Given a number return a string rounded to the desired significant digits.
-        :param number:
-        :param significant_figures:
-        :return:
+
+        Parameters
+        ----------
+        number: float
+            number to be reduced to desired significant digits
+        significant_figures: int
+            number of significant digits
+
         """
         try:
             return '{:g}'.format(float('{:.{p}g}'.format(number, p=significant_figures)))
@@ -617,30 +700,29 @@ class IngredientCalculator:
 
 
 # if __name__ == "__main__":
-#     from cript import Quantity, Unit
-#     from cript.keys.process import Qty_keys, Rel_Qty_keys
+#     from cript import Quantity, Unit, float_limit
 #     calc = IngredientCalculator()
 #     calc.add({
-#         "name": "secbuLi",
+#         "mat": {"name": "secbuLi"},
 #         "volume": 0.0172 * Unit("ml"),
 #         "molar_mass": 64.06 * Unit("g/mol"),
 #         "density": 0.768 * Unit("g/ml"),
 #         "conc_molar": 1.3 * Unit("M")
 #     })
 #     calc.add({
-#         "name": "styrene",
+#         "mat": {"name": "styrene"},
 #         "mass": 0.455 * Unit("g"),
 #         "molar_mass": 104.15 * Unit("g/mol"),
 #         "density": 0.909 * Unit("g/ml")
 #     })
 #     calc.add({
-#         "name": "toluene",
+#         "mat": {"name": "toluene"},
 #         "volume": 10 * Unit("ml"),
 #         "molar_mass": 92.141 * Unit("g/mol"),
 #         "density": 0.87 * Unit("g/ml")
 #     })
 #     calc.add({
-#         "name": "THF",
+#         "mat": {"name": "THF"},
 #         "mole": 45.545 * Unit("mmol"),
 #         "molar_mass": 72.107 * Unit("g/mol"),
 #         "density": .8876 * Unit("g/ml"),

@@ -4,7 +4,8 @@ from warnings import warn
 from .. import Unit, Quantity, CRIPTError
 from ..secondary_nodes.load import load
 from ..primary_nodes.material import Material
-from ..utils import TablePrinting, IngredientCalculator, GetObject, freeze_class
+from ..utils import TablePrinting, IngredientCalculator, freeze_class
+from ..mongodb import GetObject
 from ..keys.process import ingredient_keywords
 
 
@@ -14,26 +15,29 @@ class IngrError(CRIPTError):
 
 @freeze_class
 class Ingr(IngredientCalculator, TablePrinting):
-    """
-    Adds mat to Ingr and performs calculations for the other quantities.
-    :param mat:
-    :param qty:
-    :param keyword:
-    :param eq_mat:
-    :param mat_id:
-    :param method: used to select proper from specific method; example "nmr" vs "sec"
-    :return:
+    """ Ingredients
+
+    Attributes
+    ----------
+    self._ingr: list[dict]
+
+
+    Methods
+    -------
+    add:
+        add material to ingredients
+    remove:
+        remove material from ingredients
+    scale:
+        scale all materials
+    scale_one:
+        scale one material
+
     """
     keys = ingredient_keywords
     _error = IngrError
 
     def __init__(self, *args):
-        """
-        Functions: add, remove, scale, scale_one
-        __init__ calls add
-
-        :param see add function
-        """
         super().__init__()
 
         if all([isinstance(i, dict) for i in args[0]]):  # loading from doc
@@ -46,8 +50,29 @@ class Ingr(IngredientCalculator, TablePrinting):
     def ingr(self):
         return self.as_dict()
 
-    def add(self, mat: Union[Material], qty: Union[int, float, Quantity], keyword: str = None,
+    def add(self, mat: Material, qty: Union[int, float, Quantity], keyword: str = None,
             eq_mat=None, mat_id=None, method: str = None):
+        """ Add
+
+        Adds material to ingredients
+
+        Parameters
+        ----------
+        mat: Material
+            material to be added
+        qty: Quantity, int, float
+            Quantity of material added
+        keyword: str
+            material type
+            see 'Ingr.keys()' for list
+        eq_mat: Material, name, int
+            Material you want to equate to
+        mat_id: Material, name, int
+            identifier that you want to specify quantity to
+        method: str
+            specify method you want properties from
+
+        """
 
         new_ingr = self._get_material_data(mat, mat_id, method)
         new_ingr.update(self._get_keyword(keyword))
@@ -59,18 +84,15 @@ class Ingr(IngredientCalculator, TablePrinting):
         super().add(new_ingr, equivalence)
 
     def _get_material_data(self, mat: Union[dict, Material], mat_id, method) -> dict:
-        """
-        Gets data for material.
-        """
+        """ Gets data for material."""
         mat = self._pre_checks_for_material(mat)
         mat_data = mat.reference()
         prop_data = self._get_mat_prop(mat, mat_id, method)
-        return mat_data | prop_data
+        prop_data["mat"] = mat_data
+        return prop_data
 
     def _pre_checks_for_material(self, mat):
-        """
-        Check if Material is valid input type and loads material if needed.
-        """
+        """Check if Material is valid input type and loads material if needed."""
         if isinstance(mat, Material):
             pass
         elif isinstance(mat, dict) and "_id" in mat.keys() and isinstance(node := load(mat), Material):
@@ -85,9 +107,7 @@ class Ingr(IngredientCalculator, TablePrinting):
         return mat
 
     def _material_in_list_check(self, mat: Material) -> bool:
-        """
-        Check if Material already added to self._ingr.
-        """
+        """ Check if Material already added to self._ingr. """
         if mat.uid in [i["uid"] for i in self._ingr]:
             mes = f"'{mat.name}' is already an ingredient."
             raise self._error(mes)
@@ -115,7 +135,7 @@ class Ingr(IngredientCalculator, TablePrinting):
                 mes = f"'mat_id' for {mat.name} found no properties to assist with ingredient calculations."
                 warn(mes)
             else:
-                mat_prop = mat_prop | mat_prop_2 | {"mat_id": mat_id}
+                mat_prop = {**mat_prop, **mat_prop_2, "mat_id": mat_id}
 
         return mat_prop
 
@@ -149,9 +169,7 @@ class Ingr(IngredientCalculator, TablePrinting):
         return out
 
     def _get_keyword(self, keyword: str) -> dict:
-        """
-        Returns keyword if valid.
-        """
+        """ Returns keyword if valid. """
         if keyword in self.keys.keys():
             return {"keyword": keyword}
         elif keyword is None:
@@ -161,9 +179,7 @@ class Ingr(IngredientCalculator, TablePrinting):
             raise self._error(mes)
 
     def as_dict(self, save=True) -> list[dict]:
-        """
-        Only saves absolute quantities (mass, vol, mole, pres) and NOT relative quantities.
-        """
+        """ Only saves absolute quantities (mass, vol, mole, pres) and NOT relative quantities."""
         out = []
         keys = ["uid", "name", "class_", "keyword", "mat_id"] + list(self._q_calc.keys_qty.keys())
         for ingr in self._ingr:
@@ -183,7 +199,7 @@ class Ingr(IngredientCalculator, TablePrinting):
         return out
 
     def _loading(self, ingrs: list[dict]):
-        """Loading a data back into Ingr from Mongodb document"""
+        """ Loading a data back into Ingr from dict. """
         for ingr in ingrs:
             keyword = None
             mat_id = None

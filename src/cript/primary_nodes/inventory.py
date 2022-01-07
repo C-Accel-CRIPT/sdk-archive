@@ -4,7 +4,8 @@ Inventory Node
 """
 
 from .. import CRIPTError
-from ..utils import freeze_class, GetMaterial
+from ..utils import freeze_class
+from ..mongodb import GetMaterial
 from .base import BaseModel, ReferenceList
 
 

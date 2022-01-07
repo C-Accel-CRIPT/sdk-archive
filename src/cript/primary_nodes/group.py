@@ -67,7 +67,7 @@ class Group(BaseModel, _error=GroupError):
         self._website = None
         self.website = website
 
-        self._c_owner = ReferenceList("User", c_owner, self._error)
+        self._c_owner = ReferenceList("User", c_owner, self._error, limit=1)
         self._c_group = ReferenceList("Group", c_group, self._error)
         self._c_publication = ReferenceList("Publication", c_publication, self._error)
         self._c_collection = ReferenceList("Collection", c_collection, self._error)

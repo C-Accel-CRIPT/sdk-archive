@@ -9,7 +9,8 @@ from .base import BaseModel
 from ..secondary_nodes.cond import Cond
 from ..secondary_nodes.prop import Prop
 from ..secondary_nodes.ingr import Ingr
-from ..utils import TablePrinting, freeze_class, loading_with_units
+from ..utils import TablePrinting, freeze_class, loading_with_units, convert_to_list
+from ..validator import type_check
 from ..keys.process import process_keywords
 
 
@@ -21,21 +22,29 @@ class ProcessError(CRIPTError):
 class Process(TablePrinting, BaseModel, _error=ProcessError):
     """ Process
 
-
+    A process is anything that results in a change in identity or property
 
     Attributes
     ----------
     base_attributes:
         See CRIPT BaseModel
-    ingr:
-        See help(Ingr.__init__)
-    procedure:
-        Text write up of procedure
-    cond:
-
-    prop:
-
-    keywords:
+    ingr: Ingr
+        ingredients
+        See help(Ingr)
+    procedure: list[str]
+        a series of actions conducted
+        array can allow for discretization of steps.
+    equipment: list[str]
+        equipment used in the process
+    cond: list[Cond]
+        process conditions
+        see help(Cond)
+    prop: list[Prop]
+        process properties
+        see help(Prop)
+    keywords: list[str]
+        words that classify the process
+        see `Process.key_table()`
 
     """
     class_ = "Process"
@@ -45,10 +54,11 @@ class Process(TablePrinting, BaseModel, _error=ProcessError):
             self,
             name: str,
             ingr,
-            procedure: str,
-            cond: Union[Cond, list[Cond]] = None,
-            prop: Union[Prop, list[Prop]] = None,
-            keywords: list[str] = None,
+            procedure: Union[list[str], str],
+            equipment: Union[list[str], str],
+            cond: Union[list[Cond], Cond] = None,
+            prop: Union[list[Prop], Prop] = None,
+            keywords: Union[list[str], str] = None,
             notes: str = None,
             **kwargs
     ):
@@ -57,6 +67,9 @@ class Process(TablePrinting, BaseModel, _error=ProcessError):
 
         self._procedure = None
         self.procedure = procedure
+
+        self._equipment = None
+        self.equipment = equipment
 
         self._prop = None
         self.prop = prop
@@ -77,14 +90,28 @@ class Process(TablePrinting, BaseModel, _error=ProcessError):
         return self._procedure
 
     @procedure.setter
+    @type_check(list[str])
+    @convert_to_list
     def procedure(self, procedure):
         self._procedure = procedure
+
+    @property
+    def equipment(self):
+        return self._equipment
+
+    @equipment.setter
+    @type_check(list[str])
+    @convert_to_list
+    def equipment(self, equipment):
+        self._equipment = equipment
 
     @property
     def prop(self):
         return self._prop
 
     @prop.setter
+    @type_check(list[Prop])
+    @convert_to_list
     @loading_with_units(Prop)
     def prop(self, prop):
         self._prop = prop
@@ -94,6 +121,8 @@ class Process(TablePrinting, BaseModel, _error=ProcessError):
         return self._keywords
 
     @keywords.setter
+    @type_check(list[str])
+    @convert_to_list
     def keywords(self, keywords):
         self._keywords = keywords
 
@@ -102,6 +131,8 @@ class Process(TablePrinting, BaseModel, _error=ProcessError):
         return self._cond
 
     @cond.setter
+    @type_check(list[Cond])
+    @convert_to_list
     @loading_with_units(Cond)
     def cond(self, cond):
         self._cond = cond

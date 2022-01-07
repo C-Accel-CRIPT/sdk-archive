@@ -15,8 +15,9 @@ from bson import ObjectId
 import difflib
 
 from .. import __version__, CRIPTError
-from ..utils import GetObject, Serializable, loading_with_datetime
+from ..utils import Serializable, loading_with_datetime, str_to_ObjectId
 from ..validator import id_type_check_bool, type_check
+from ..mongodb import GetObject
 
 
 class CriptTypes:
@@ -52,11 +53,11 @@ class BaseModel(Serializable, CriptTypes, ABC):
         miscellaneous information
     class_: str
         class of node
-    uid: str
+    uid: ObjectId
         unique ID of the material
     model_version: str
         version of CRIPT data model
-    version_control: str
+    version_control: ObjectId
         link to version control node
     last_modified_date: datetime
         last date the node was modified
@@ -72,7 +73,7 @@ class BaseModel(Serializable, CriptTypes, ABC):
             class_: str = None,
             uid: Union[str, ObjectId] = None,
             model_version: str = None,
-            version_control=None,
+            version_control: Union[str, ObjectId] = None,
             last_modified_date: datetime = None,
             created_date: datetime = None
     ):
@@ -128,15 +129,9 @@ class BaseModel(Serializable, CriptTypes, ABC):
         return self._uid
 
     @uid.setter
+    @type_check(ObjectId)
+    @str_to_ObjectId
     def uid(self, uid):
-        if uid is None:
-            pass
-        elif type(uid) is ObjectId:
-            uid = str(uid)
-        else:
-            if not id_type_check_bool(uid):
-                mes = f"{uid} is invalid uid."
-                raise self._error(mes)
         self._uid = uid
 
     @property
@@ -144,6 +139,7 @@ class BaseModel(Serializable, CriptTypes, ABC):
         return self._class_
 
     @class_.setter
+    @type_check(str)
     def class_(self, class_):
         self._class_ = class_
 

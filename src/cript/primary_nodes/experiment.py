@@ -2,9 +2,11 @@
 Experiment Node
 
 """
+from typing import Union
 
 from .. import CRIPTError
-from ..utils import freeze_class, GetMaterial
+from ..utils import freeze_class, convert_to_list
+from ..mongodb import GetMaterial
 from ..validator import type_check
 from .base import BaseModel, ReferenceList
 
@@ -34,7 +36,7 @@ class Experiment(BaseModel, _error=ExperimentError):
         CRIPT Simulation node associated with this experiment
     c_data: Data node
         CRIPT Data nodes associated with this experiment
-    funding: str
+    funding: list[str]
         Funding source for experiment
 
     """
@@ -48,7 +50,7 @@ class Experiment(BaseModel, _error=ExperimentError):
         c_process=None,
         c_simulation=None,
         c_data=None,
-        funding: str = None,
+        funding: Union[list[str], str] = None,
         notes: str = None,
         **kwargs
     ):
@@ -67,7 +69,8 @@ class Experiment(BaseModel, _error=ExperimentError):
         return self._funding
 
     @funding.setter
-    @type_check(str)
+    @type_check(list[str])
+    @convert_to_list
     def funding(self, funding):
         self._funding = funding
 

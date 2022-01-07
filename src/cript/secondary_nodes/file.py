@@ -2,32 +2,42 @@ from typing import Union
 from bson import ObjectId
 from pathlib import Path
 
+from .. import CRIPTError
+from ..utils import SerializableSub, freeze_class, str_to_path
+from ..validator import type_check
 
-from ..utils import SerializableSub, freeze_class
+
+class FileError(CRIPTError):
+    pass
 
 
 @freeze_class
 class File(SerializableSub):
-    """
+    """ File
 
-    :param path: file path
-    :param descr: description
-    :param ext: file extension
-    """
+    Links to raw data file
 
+    Parameters
+    ----------
+    path: Path
+        file path
+    descr: str
+        description (automatically extracted)
+    file_name: str
+        file name
+    ext: str
+        file extension (automatically extracted)
+    uid: ObjectId
+        Id to location of file
+    """
     def __init__(
             self,
-            path: Union[str, Path] = None,
-            # labels: str = None,
-            # units: str = None,
+            path: Union[Path, str],
             descr: str = None,
             file_name: str = None,
             ext: str = None,
-            uid: Union[str, ObjectId] = None
+            uid: Union[ObjectId, str] = None
     ):
-
-        if path is not None and not isinstance(path, Path):
-            path = Path(path)
 
         self._path = None
         self.path = path
@@ -53,6 +63,8 @@ class File(SerializableSub):
         return self._path
 
     @path.setter
+    @type_check(Path)
+    @str_to_path
     def path(self, path):
         self._path = path
 
@@ -61,6 +73,7 @@ class File(SerializableSub):
         return self._descr
 
     @descr.setter
+    @type_check(str)
     def descr(self, descr):
         self._descr = descr
 
@@ -69,6 +82,7 @@ class File(SerializableSub):
         return self._file_name
 
     @file_name.setter
+    @type_check(str)
     def file_name(self, file_name):
         self._file_name = file_name
 
@@ -77,6 +91,7 @@ class File(SerializableSub):
         return self._ext
 
     @ext.setter
+    @type_check(str)
     def ext(self, ext):
         self._ext = ext
 
@@ -85,5 +100,11 @@ class File(SerializableSub):
         return self._uid
 
     @uid.setter
+    @type_check(ObjectId)
     def uid(self, uid):
         self._uid = uid
+
+    def check_file(self):
+        """ check that file exists. """
+        if not self.path.isfile():
+            raise self._errror(f"File not found. path:{self.path} ")

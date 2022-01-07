@@ -6,9 +6,9 @@ from pathlib import Path
 
 from .. import CRIPTError, Unit
 from ..primary_nodes.base import CriptTypes
-from ..utils import GetObject, FilesInOut
 from ..validator import id_type_check_bool
 from .load import load
+from ..mongodb import GetObject, FilesInOut
 
 
 class Export(CriptTypes):

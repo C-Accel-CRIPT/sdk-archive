@@ -9,7 +9,8 @@ from ..secondary_nodes.spec import Spec
 from ..secondary_nodes.iden import Iden, IdenList
 from ..secondary_nodes.prop import Prop
 from ..secondary_nodes.load import load
-from ..utils import GetMaterialID, TablePrinting, freeze_class, convert_to_list, loading_with_units
+from ..utils import TablePrinting, freeze_class, convert_to_list, loading_with_units
+from ..mongodb import GetMaterialID
 from ..validator import type_check
 from ..keys.material import material_keywords
 from .base import BaseModel, ReferenceList
@@ -46,8 +47,9 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         process that produced the material
     c_material_copy: Material
         materials that this is a copy of
-    c_material_parent: List[Material]
+    c_material_parent: Material
         material that are parents of this material
+
     """
 
     keys = material_keywords

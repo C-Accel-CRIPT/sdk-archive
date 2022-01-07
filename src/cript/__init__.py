@@ -1,7 +1,7 @@
 import pkg_resources
 
 __all__ = [
-     "Unit", "load", "export", "CriptDB", "User", "Group", "Collection", "Publication", "Experiment",
+     "Unit", "U", "load", "export", "CriptDB", "User", "Group", "Collection", "Publication", "Experiment",
      "Material", "Process", "Data", "Inventory", "Simulation", "Cond", "Prop", "Ingr", "Iden", "Path", "File"
 ]
 
@@ -21,6 +21,7 @@ Q = Quantity = u.Quantity
 float_limit = 1.79E308  # max of float64 can represent
 str_limit = 500
 degC_lower_limit = -273.15
+text_encoding = "UTF-8"
 
 
 class CRIPTError(Exception):
@@ -55,7 +56,7 @@ from .primary_nodes.process import Process
 from .primary_nodes.simulation import Simulation
 from .secondary_nodes.file import File
 from .primary_nodes.data import Data
-from .database import CriptDB
+from .mongodb.database import CriptDB
 
 # Get CRIPT types in a dict
 from inspect import getmembers, isclass
