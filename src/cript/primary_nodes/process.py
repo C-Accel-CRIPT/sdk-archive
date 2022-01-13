@@ -15,6 +15,7 @@ from ..keys.process import process_keywords
 
 
 class ProcessError(CRIPTError):
+    """Process Error"""
     pass
 
 
@@ -22,13 +23,14 @@ class ProcessError(CRIPTError):
 class Process(TablePrinting, BaseModel, _error=ProcessError):
     """ Process
 
-    A process is anything that results in a change in identity or property
+    The Process node contains a list of ingredients, quantities, and procedure information for a material
+    transformation. Examples of a process are chemical reactions, separations, extrusions, etc.
 
     Attributes
     ----------
     base_attributes:
         See CRIPT BaseModel
-    ingr: Ingr
+    ingr: list[Ingr]
         ingredients
         See help(Ingr)
     procedure: list[str]

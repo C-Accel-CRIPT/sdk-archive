@@ -55,6 +55,6 @@ process_keywords = {
     'curing': '',
     'forming': '',
     'coating': '',
-    'annealing': '',
-    'sol_annealing': ''
+    'annealing_thermo': 'annealing with temperature',
+    'annealing_sol': 'annealing with solvent vapor'
 }

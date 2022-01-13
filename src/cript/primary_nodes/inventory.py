@@ -23,7 +23,7 @@ class Inventory(BaseModel, _error=InventoryError):
     ----------
     base_attributes:
 
-    c_material: Material node
+    c_material: list[Material]
         Materials used in this experiment
     """
     class_ = "Inventory"

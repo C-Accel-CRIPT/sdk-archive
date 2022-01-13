@@ -13,12 +13,16 @@ from .base import BaseModel
 
 
 class DataError(CRIPTError):
+    """ Data Node Error"""
     pass
 
 
 @freeze_class
 class Data(TablePrinting, BaseModel, _error=DataError):
-    """
+    """ Data
+
+    The Data node contains the meta-data for any raw data file. Examples of raw data include everything from NMR
+    spectra to stress-strain curves to a temperature vs. time of a chemical reaction.
 
     Parameters
     ----------

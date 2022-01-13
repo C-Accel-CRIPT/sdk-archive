@@ -52,7 +52,7 @@ class Publication(BaseModel, _error=PublicationError):
         PMID: PubMed ID
     website: str
         website where the publication can be accessed
-    c_collection: Collection node
+    c_collection: list[Collection]
         CRIPT collection owned by the group
     """
 

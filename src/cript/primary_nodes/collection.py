@@ -24,11 +24,11 @@ class Collection(BaseModel, _error=CollectionError):
         ----------
         base_attributes:
             see CRIPT BaseModel
-        c_collection: Collection node
+        c_collection: list[Collection]
             Parent CRIPT collections
-        c_experiment: Experiment node
+        c_experiment: list[Experiment]
             CRIPT experiments that relates to the collection
-        c_inventory: Inventory node
+        c_inventory: list[Inventory]
             CRIPT inventory associate with the collection
     """
 

@@ -82,7 +82,7 @@ property_material_keys = {
         "names": []
     },
     "color_RGB": {
-        "type": list[float],
+        "type": list[int],
         "range": [0, 255],
         "unit": None,
         "method": [],

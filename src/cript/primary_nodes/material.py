@@ -17,6 +17,7 @@ from .base import BaseModel, ReferenceList
 
 
 class MaterialError(CRIPTError):
+    """ Material Error """
     pass
 
 
@@ -28,13 +29,13 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
     ----------
     base_attributes:
         see CRIPT BaseModel
-    iden: Iden
+    iden: list[Iden]
         material identity
         see `help(Iden)`
     name: str
         name of the material
         (automatically populated from identifier if not given)
-    prop: list[Prop], Prop
+    prop: list[Prop]
         material properties
         see `help(Prop)`
     spec: Spec
@@ -45,9 +46,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         see `Material.key_table()`
     c_process: Process
         process that produced the material
-    c_material_copy: Material
-        materials that this is a copy of
-    c_material_parent: Material
+    c_material_parent: list[Material]
         material that are parents of this material
 
     """
@@ -70,9 +69,6 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
     ):
         if iden is None and c_material_copy is None:
             raise self._error("'iden' or 'c_matreial_copy' is required parameters.")
-        if c_material_copy is not None:
-            iden, prop, spec, keywords, name, notes = self._do_copy(c_material_copy)
-            self._c_material_copy = ReferenceList("Material", c_material_copy, self._error, limit=1)
 
         self._iden = IdenList(iden, _error=self._error)
 
@@ -138,14 +134,6 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
 
     @c_process.setter
     def c_process(self, *args):
-        self._base_reference_block()
-
-    @property
-    def c_material_copy(self):
-        return self._c_material_copy
-
-    @c_material_copy.setter
-    def c_material_copy(self, *args):
         self._base_reference_block()
 
     @property

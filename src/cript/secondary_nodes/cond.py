@@ -31,7 +31,7 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
         piece of information or quantity
     uncer: Any
         uncertainty in quantity
-    c_data: Data
+    c_data: list[Data]
         CRIPT Data associate with the property
 
     """

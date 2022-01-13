@@ -36,6 +36,8 @@ class Hazard(Serializable):
         storage classification
     protective_equipment: list[str]
         protective equipment
+
+
     Notes
     -----
     * GHS = Globally Harmonized System

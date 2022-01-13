@@ -10,9 +10,7 @@ from .base import BaseModel, ReferenceList
 
 
 class UserError(CRIPTError):
-    """ Errors from the User Node
-
-    """
+    """ User Node Error """
     pass
 
 
@@ -42,9 +40,9 @@ class User(BaseModel, _error=UserError):
             personal website of the user
         twitter: str
             Twitter handle of the user
-        c_group: Group node
+        c_group: list[Group]
             CRIPT group you belong to
-        c_publication: Publication nodes
+        c_publication: list[Publication]
             CRIPT publication authored by the user
         """
 

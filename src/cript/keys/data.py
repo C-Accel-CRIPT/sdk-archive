@@ -11,27 +11,27 @@ Notes
 """
 
 data_keys = {
-    # generic - Generics should only be used when specific key does not exist
-    "vector": {
-        "labels": [None],
-        "units": [None],
-        "descr": "Generic 1D object",
-    },
-    "matrix": {
-        "labels": [None, None],
-        "units": [None, None],
-        "descr": "Generic 2D object",
-    },
-    "tensor3": {
-        "labels": [None, None, None],
-        "units": [None, None, None],
-        "descr": "Generic 3D object",
-    },
-    "tensor": {
-        "labels": None,
-        "units": None,
-        "descr": "Generic nD object",
-    },
+    # generic - (here  just as a template)
+    # "vector": {
+    #     "labels": [None],
+    #     "units": [None],
+    #     "descr": "Generic 1D object",
+    # },
+    # "matrix": {
+    #     "labels": [None, None],
+    #     "units": [None, None],
+    #     "descr": "Generic 2D object",
+    # },
+    # "tensor3": {
+    #     "labels": [None, None, None],
+    #     "units": [None, None, None],
+    #     "descr": "Generic 3D object",
+    # },
+    # "tensor": {
+    #     "labels": None,
+    #     "units": None,
+    #     "descr": "Generic nD object",
+    # },
 
     # 2D data
     ###################################################################################################################

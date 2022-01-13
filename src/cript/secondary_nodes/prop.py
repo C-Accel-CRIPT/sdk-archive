@@ -39,9 +39,9 @@ class Prop(SerializableSub, TablePrinting):
         1+ = individual component
     component: str
         specific chemical structure associate with the property
-    c_data: Data
+    c_data: list[Data]
         CRIPT Data associate with the property
-    cond: Cond
+    cond: list[Cond]
         conditions that the property was taken under
 
     """
@@ -54,8 +54,8 @@ class Prop(SerializableSub, TablePrinting):
             self,
             key: str,
             value,
+            method: str,
             uncer=None,
-            method: str = None,
             mat_id: int = 0,
             component: str = None,
             c_data=None,

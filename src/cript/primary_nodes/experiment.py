@@ -28,13 +28,13 @@ class Experiment(BaseModel, _error=ExperimentError):
     ----------
     base_attributes:
         See CRIPT BaseModel
-    c_material: Material node
+    c_material: list[Material]
         CRIPT Materials used in this experiment
-    c_process: Process node
+    c_process: list[Process]
         CRIPT Process nodes associated with this experiment
-    c_simulation: Simulation node
+    c_simulation: list[Simulation]
         CRIPT Simulation node associated with this experiment
-    c_data: Data node
+    c_data: list[Data]
         CRIPT Data nodes associated with this experiment
     funding: list[str]
         Funding source for experiment

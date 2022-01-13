@@ -34,13 +34,13 @@ class Group(BaseModel, _error=GroupError):
             website of the group
         c_owner: User node
             CRIPT user that owns the group
-        c_group: Group node
+        c_group: list[Group node]
             Parent CRIPT groups
-        c_collection: Collection node
+        c_collection: list[Collection]
             CRIPT collection owned by the group
-        c_publication: Publication node
+        c_publication: list[Publication]
             CRIPT publication owned by the group
-        c_inventory: Inventory node
+        c_inventory: list[Inventory]
             CRIPT inventory owned by the group
     """
 
