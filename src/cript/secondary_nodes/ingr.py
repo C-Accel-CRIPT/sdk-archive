@@ -6,7 +6,7 @@ from ..secondary_nodes.load import load
 from ..primary_nodes.material import Material
 from ..utils import TablePrinting, IngredientCalculator, freeze_class
 from ..mongodb import GetObject
-from ..keys.process import ingredient_keywords
+from ..keys.ingr import ingredient_keywords
 
 
 class IngrError(CRIPTError):

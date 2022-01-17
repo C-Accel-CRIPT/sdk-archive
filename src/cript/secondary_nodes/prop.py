@@ -9,7 +9,8 @@ from .. import CRIPTError
 from ..primary_nodes.base import ReferenceList
 from .cond import Cond
 from ..utils import SerializableSub, TablePrinting, freeze_class, loading_with_units
-from ..validator import type_check, prop_keys_check
+from ..validator import type_check, keys_check, value_check
+from ..keys.methods import method_keys
 
 
 class CondError(CRIPTError):
@@ -24,7 +25,7 @@ class Prop(SerializableSub, TablePrinting):
 
     Attributes
     ----------
-    key: str
+    key: str (has keys)
         type of property
         See Prop.key_table() for official list.
     value: Any
@@ -101,6 +102,7 @@ class Prop(SerializableSub, TablePrinting):
         return self._key
 
     @key.setter
+    @keys_check
     @type_check(str)
     def key(self, key):
         self._key = key
@@ -110,6 +112,7 @@ class Prop(SerializableSub, TablePrinting):
         return self._value
 
     @value.setter
+    @value_check
     def value(self, value):
         self._value = value
 
@@ -118,6 +121,7 @@ class Prop(SerializableSub, TablePrinting):
         return self._uncer
 
     @uncer.setter
+    @value_check
     def uncer(self, uncer):
         self._uncer = uncer
 
@@ -135,6 +139,7 @@ class Prop(SerializableSub, TablePrinting):
         return self._method
 
     @method.setter
+    @keys_check(method_keys)
     @type_check(str)
     def method(self, method):
         self._method = method

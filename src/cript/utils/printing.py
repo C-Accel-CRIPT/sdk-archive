@@ -2,6 +2,7 @@ from abc import ABC
 import os
 from pathlib import Path
 
+from cript.keys.html_versions.dict_to_html import generate_html, save_html
 
 QUANTITY_LENGTH = 10
 
@@ -82,16 +83,21 @@ class TablePrinting(ABC):
     """
     keys = None
 
-    @staticmethod
-    def open_html(html_name):
-        _path = (Path(__file__).parent / Path(r"../keys/html_versions/") / Path(f"{html_name}")).resolve()
-        os.system(fr"start {_path}")
+    @classmethod
+    def _open_html(cls):
+        html = generate_html(cls.keys)
+        path = (Path(__file__).parent / Path(r"../keys/html_versions/") / Path(f"temp.html")).resolve()
+        save_html(html, path=path)
+        os.system(fr"start {path}")
 
     @classmethod
-    def key_table(cls):
-        text = cls.to_table(cls.keys)
-        text += "\nAdd '+' to the front of custom keys."
-        print(text)
+    def key_table(cls, html=True, terminal=True):
+        if html:
+            cls._open_html()
+        if terminal:
+            text = cls.to_table(cls.keys)
+            text += "\nAdd '+' to the front of custom keys."
+            print(text)
 
     @staticmethod
     def to_table(ddict: dict) -> str:

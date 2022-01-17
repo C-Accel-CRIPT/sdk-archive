@@ -7,7 +7,7 @@ from typing import Union
 from .. import Cond, CRIPTError, Unit
 from ..secondary_nodes.file import File
 from ..utils import TablePrinting, freeze_class, convert_to_list, loading_with_units, str_to_unit
-from ..validator import type_check
+from ..validator import type_check, keys_check
 from ..keys.data import data_keys
 from .base import BaseModel
 
@@ -26,7 +26,7 @@ class Data(TablePrinting, BaseModel, _error=DataError):
 
     Parameters
     ----------
-    type_: str
+    type_: str (has keys)
         data type
         see Data.key_table()
     labels: list[str]
@@ -98,8 +98,14 @@ class Data(TablePrinting, BaseModel, _error=DataError):
         return self._type_
 
     @type_.setter
+    @keys_check
     @type_check(str)
     def type_(self, type_):
+        # set labels and units
+        if not type_.startswith(("plus", "+")):
+            self.labels = self.keys[type_]["labels"]
+            self.units = self.keys[type_]["units"]
+
         self._type_ = type_
 
     @property

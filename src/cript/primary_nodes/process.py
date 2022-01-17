@@ -10,7 +10,7 @@ from ..secondary_nodes.cond import Cond
 from ..secondary_nodes.prop import Prop
 from ..secondary_nodes.ingr import Ingr
 from ..utils import TablePrinting, freeze_class, loading_with_units, convert_to_list
-from ..validator import type_check
+from ..validator import type_check, keys_check
 from ..keys.process import process_keywords
 
 
@@ -44,7 +44,7 @@ class Process(TablePrinting, BaseModel, _error=ProcessError):
     prop: list[Prop]
         process properties
         see help(Prop)
-    keywords: list[str]
+    keywords: list[str]  (has keys)
         words that classify the process
         see `Process.key_table()`
 
@@ -123,6 +123,7 @@ class Process(TablePrinting, BaseModel, _error=ProcessError):
         return self._keywords
 
     @keywords.setter
+    @keys_check
     @type_check(list[str])
     @convert_to_list
     def keywords(self, keywords):

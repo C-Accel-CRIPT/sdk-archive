@@ -9,7 +9,7 @@ from .. import Quantity, CRIPTError
 from ..primary_nodes.base import CriptTypes, ReferenceList
 from .load import load
 from ..utils import SerializableSub, TablePrinting, freeze_class
-from ..validator import type_check, cond_keys_check
+from ..validator import type_check, keys_check, value_check
 
 
 class CondError(CRIPTError):
@@ -24,8 +24,7 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
 
     Attributes
     ----------
-    key: str
-        Yields
+    key: str (has keys)
         See Cond.key_table() for official list.
     value: Any
         piece of information or quantity
@@ -67,7 +66,7 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
         return self._key
 
     @key.setter
-    @cond_keys_check
+    @keys_check
     @type_check(str)
     def key(self, key):
         self._key = key
@@ -77,7 +76,7 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
         return self._value
 
     @value.setter
-    @cond_keys_check
+    @value_check
     def value(self, value):
         if isinstance(value, self.cript_types["Material"]):
             value = value.reference()
@@ -92,7 +91,7 @@ class Cond(SerializableSub, TablePrinting, CriptTypes):
         return self._uncer
 
     @uncer.setter
-    @cond_keys_check
+    @value_check
     @type_check([int, float, Quantity])
     def uncer(self, uncer):
         self._uncer = uncer

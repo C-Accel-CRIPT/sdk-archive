@@ -11,7 +11,7 @@ from ..secondary_nodes.prop import Prop
 from ..secondary_nodes.load import load
 from ..utils import TablePrinting, freeze_class, convert_to_list, loading_with_units
 from ..mongodb import GetMaterialID
-from ..validator import type_check
+from ..validator import type_check, keys_check
 from ..keys.material import material_keywords
 from .base import BaseModel, ReferenceList
 
@@ -41,7 +41,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
     spec: Spec
         material specification
         see `help(Spec)`
-    keywords: list[str]
+    keywords: list[str]  (has keys)
         words that classify the material
         see `Material.key_table()`
     c_process: Process
@@ -114,6 +114,7 @@ class Material(TablePrinting, BaseModel, _error=MaterialError):
         return self._keywords
 
     @keywords.setter
+    @keys_check
     @type_check(list[str])
     @convert_to_list
     def keywords(self, keywords):

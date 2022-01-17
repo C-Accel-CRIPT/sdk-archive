@@ -1,13 +1,16 @@
 
+* check required attributes
+* source (computer, processed, experiment)
+* update tutorials
+* ingr, mass, mole vol (one must be filled check)
+* update process procedure section
+* add logging
 
-* Prop keys switch "methods" to "method"
-* add version at bottom
+## To Do
+* version control
+  
+* populate database
 
-# Main To Do
-* Group vs. Collection need to be explained
-
-
-## Minor To Do
 * Expand Keys
     * Tough keys:
         * Rate constants - how to handle
@@ -17,5 +20,13 @@
     * branching
     * tran/cis
     
-    
 * File -- can remain string
+  
+* Generate docs with sphinx
+    https://www.sphinx-doc.org/en/master/usage/extensions/napoleon.html
+
+* numpy and pandas support?
+
+* add API support
+
+* add more tutorials

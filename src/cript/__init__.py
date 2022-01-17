@@ -1,4 +1,5 @@
 import pkg_resources
+import os
 
 __all__ = [
      "Unit", "U", "load", "export", "CriptDB", "User", "Group", "Collection", "Publication", "Experiment",
@@ -13,7 +14,10 @@ __short_version__ = __version__.rpartition(".")[0]
 
 # Units
 import pint
-u = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
+
+current_path = os.path.dirname(os.path.realpath(__file__))
+u = pint.UnitRegistry(autoconvert_offset_to_baseunit=True, filename=os.path.join(current_path, "utils\\units.txt"))
+
 U = Unit = u.Unit
 Q = Quantity = u.Quantity
 
