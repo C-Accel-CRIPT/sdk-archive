@@ -4,7 +4,7 @@ For Property node
 
 """
 
-from .. import cript_types, float_limit, str_limit, degC_lower_limit
+from .. import cript_types, float_limit, str_limit
 
 
 property_process_keys = {
@@ -12,6 +12,7 @@ property_process_keys = {
         "type": float,
         "range": [0, 1.2],
         "unit": "",
+        "unit_prefer": "",
         "method": ["nmr", "sec"],
         "cond": ["mat_uid"],
         "required": [],
@@ -22,6 +23,7 @@ property_process_keys = {
         "type": float,
         "range": [0, float_limit],
         "unit": "",
+        "unit_prefer": "",
         "method": ["nmr", "sec"],
         "cond": [],
         "required": [],
@@ -32,6 +34,7 @@ property_process_keys = {
         "type": float,
         "range": [0, float_limit],
         "unit": "",
+        "unit_prefer": "",
         "method": ["nmr", "sec"],
         "cond": [],
         "required": ["mat_id"],
@@ -42,6 +45,7 @@ property_process_keys = {
         "type": float,
         "range": [0, 1.2],
         "unit": "",
+        "unit_prefer": "",
         "method": ["nmr", "sec"],
         "cond": [],
         "required": ["mat_id"],
@@ -51,7 +55,8 @@ property_process_keys = {
     "yield_mass": {
         "type": float,
         "range": [0, float_limit],
-        "unit": "g",
+        "unit": "kg",
+        "unit_prefer": "g",
         "method": ["scale"],
         "cond": [],
         "required": ["mat_id"],
@@ -62,6 +67,7 @@ property_process_keys = {
         "type": float,
         "range": [-float_limit, float_limit],
         "unit": "",
+        "unit_prefer": "",
         "method": [],
         "cond": [],
         "required": ["mat_id"],
@@ -75,6 +81,7 @@ property_material_keys = {
         "type": str,
         "range": [0, str_limit],
         "unit": None,
+        "unit_prefer": None,
         "method": ["visual"],
         "cond": [],
         "required": [],
@@ -85,6 +92,7 @@ property_material_keys = {
         "type": list[int],
         "range": [0, 255],
         "unit": None,
+        "unit_prefer": None,
         "method": [],
         "cond": [],
         "required": [],
@@ -94,7 +102,8 @@ property_material_keys = {
     "conc_mass": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "g/ml",
+        "unit": "kilogram / meter ** 3",
+        "unit_prefer": "g/ml",
         "method": [],
         "cond": [],
         "required": ["mat_id"],
@@ -104,7 +113,8 @@ property_material_keys = {
     "conc_molar": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "M",
+        "unit": "mole / meter ** 3",
+        "unit_prefer": "M",
         "method": [],
         "cond": [],
         "required": ["mat_id"],
@@ -114,7 +124,8 @@ property_material_keys = {
     "conc_number": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "1/ml",
+        "unit": "1 / meter ** 3",
+        "unit_prefer": "1/ml",
         "method": [],
         "cond": [],
         "required": ["mat_id"],
@@ -125,6 +136,7 @@ property_material_keys = {
         "type": float,
         "range": [0, float_limit],
         "unit": "",
+        "unit_prefer": "",
         "method": [],
         "cond": [],
         "required": ["mat_id"],
@@ -134,7 +146,8 @@ property_material_keys = {
     "contact_angle": {
         "type": cript_types["Quantity"],
         "range": [0, 360],
-        "unit": "deg",
+        "unit": "radian",
+        "unit_prefer": "deg",
         "method": [],
         "cond": [],
         "required": [],
@@ -142,30 +155,32 @@ property_material_keys = {
         "names": []
     },
     "crys_frac": {
-            "type": float,
-            "range": [0, 1.2],
-            "unit": "",
-            'methods': ['dsc'],
-            "cond": [],
-            "required": [],
-            'descr': 'Fraction of crystallinity by weight',
-            "names": ["fraction crystallinity by weight"]
+        "type": float,
+        "range": [0, 1.2],
+        "unit": "",
+        "unit_prefer": "",
+        'methods': ['dsc'],
+        "cond": [],
+        "required": [],
+        'descr': 'Fraction of crystallinity by weight',
+        "names": ["fraction crystallinity by weight"]
         },
     "density": {
         "type": cript_types["Quantity"],
         "range": [0, 23],  # Osmium is densest element at 22 g/cm^3
-        "unit": "g/ml",
+        "unit": "kilogram / meter ** 3",
+        "unit_prefer": "g/ml",
         "method": [],
         "cond": ["pres", "temp"],
         "required": [],
-        "descr": "quantity of mass per unit volume",
+        "descr": "quantity of mass per unit_prefer volume",
         "names": ["specific mass"]
     },
-
     "enth_crys": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "J/mol",
+        "unit": "kilogram * meter ** 2 / mole / second ** 2",
+        "unit_prefer": "J/mol",
         'methods': ['dsc'],
         "cond": [],
         "required": [],
@@ -175,7 +190,8 @@ property_material_keys = {
     "entr_crys": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "J/mol/K",
+        "unit": "kilogram * meter ** 2 / kelvin / mole / second ** 2",
+        "unit_prefer": "J/mol/K",
         'methods': ['dsc'],
         "cond": [],
         "required": [],
@@ -185,7 +201,8 @@ property_material_keys = {
     "heat_combustion_molar": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "J/mol",
+        "unit": "kilogram * meter ** 2 / mole / second ** 2",
+        "unit_prefer": "J/mol",
         "method": [],
         "cond": [],
         "required": [],
@@ -195,7 +212,8 @@ property_material_keys = {
     "heat_combustion_mass": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "J/g",
+        "unit": "meter ** 2 / second ** 2",
+        "unit_prefer": "J/g",
         "method": [],
         "cond": [],
         "required": [],
@@ -205,7 +223,8 @@ property_material_keys = {
     "heat_combustion_volume": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "J/ml",
+        "unit": "kilogram / meter / second ** 2",
+        "unit_prefer": "J/ml",
         "method": [],
         "cond": [],
         "required": [],
@@ -215,7 +234,8 @@ property_material_keys = {
     "heat_vaporization_molar": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "J/mol",
+        "unit": "kilogram * meter ** 2 / mole / second ** 2",
+        "unit_prefer": "J/mol",
         "method": [],
         "cond": [],
         "required": [],
@@ -226,7 +246,8 @@ property_material_keys = {
     "heat_vaporization_mass": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "J/g",
+        "unit": "meter ** 2 / second ** 2",
+        "unit_prefer": "J/g",
         "method": [],
         "cond": [],
         "required": [],
@@ -237,29 +258,32 @@ property_material_keys = {
     "heat_capacity_pres": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "J/mol/K",
+        "unit": "kilogram * meter ** 2 / kelvin / mole / second ** 2",
+        "unit_prefer": "J/mol/K",
         'methods': ['calorimetry', 'dsc'],
         "cond": [],
         "required": [],
-        'descr': 'The amount of heat needed to be supplied to a given mole (based on repeat unit) to produce a '
+        'descr': 'The amount of heat needed to be supplied to a given mole (based on repeat unit_prefer) to produce a '
                  'change in temperature at constant pressure',
         "names": ["molar heat capacity constant pressure"]
     },
     "heat_capacity_vol": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "J/mol/K",
+        "unit": "kilogram * meter ** 2 / kelvin / mole / second ** 2",
+        "unit_prefer": "J/mol/K",
         'methods': ['calorimetry', 'dsc'],
         "cond": [],
         "required": [],
-        'descr': 'The amount of heat needed to be supplied to a given mole (based on repeat unit) to produce a '
+        'descr': 'The amount of heat needed to be supplied to a given mole (based on repeat unit_prefer) to produce a '
                  'change in temperature at constant volume',
         "names": ["molar heat capacity constant volume"]
     },
     "magnetic_sus_mass": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "m**3/kg",
+        "unit": "meter ** 3 / kilogram",
+        "unit_prefer": "m**3/kg",
         "method": [],
         "cond": ["temp", "pres"],
         "required": [],
@@ -269,7 +293,8 @@ property_material_keys = {
     "magnetic_sus_molar": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "m**3/mol",
+        "unit": "meter ** 3 / mole",
+        "unit_prefer": "m**3/mol",
         "method": [],
         "cond": ["temp", "pres"],
         "required": [],
@@ -280,6 +305,7 @@ property_material_keys = {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
         "unit": "",
+        "unit_prefer": "",
         "method": [],
         "cond": ["temp", "pres"],
         "required": [],
@@ -289,7 +315,8 @@ property_material_keys = {
     "molar_mass": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "g/mol",
+        "unit": "kilogram / mole",
+        "unit_prefer": "g/mol",
         "method": ["prescribed"],
         "cond": [],
         "required": [],
@@ -301,6 +328,7 @@ property_material_keys = {
         "type": cript_types["Quantity"],
         "range": [1, float_limit],
         "unit": "",
+        "unit_prefer": "",
         'methods': ['nmr', 'sec', 'maldi'],
         "cond": [],
         "required": [],
@@ -310,7 +338,8 @@ property_material_keys = {
     "mw_kurtosis": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "g/mol",
+        "unit": "kilogram / mole",
+        "unit_prefer": "g/mol",
         'methods': ['nmr', 'sec', 'maldi'],
         "cond": [],
         "required": [],
@@ -321,7 +350,8 @@ property_material_keys = {
     "mw_n": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "g/mol",
+        "unit": "kilogram / mole",
+        "unit_prefer": "g/mol",
         'methods': ['nmr', 'sec', 'maldi', 'osmtic_pres'],
         "cond": [],
         "required": [],
@@ -331,7 +361,8 @@ property_material_keys = {
     "mw_skew": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "g/mol",
+        "unit": "kilogram / mole",
+        "unit_prefer": "g/mol",
         'methods': ['nmr', 'sec', 'maldi'],
         "cond": [],
         "required": [],
@@ -342,7 +373,8 @@ property_material_keys = {
     "mw_std_dev": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "g/mol",
+        "unit": "kilogram / mole",
+        "unit_prefer": "g/mol",
         'methods': ['nmr', 'sec', 'maldi'],
         "cond": [],
         "required": [],
@@ -353,7 +385,8 @@ property_material_keys = {
     "mw_v": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "g/mol",
+        "unit": "kilogram / mole",
+        "unit_prefer": "g/mol",
         'methods': ['viscometer'],
         "cond": [],
         "required": [],
@@ -363,7 +396,8 @@ property_material_keys = {
     "mw_var": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "g/mol",
+        "unit": "kilogram / mole",
+        "unit_prefer": "g/mol",
         'methods': ['nmr', 'sec', 'maldi'],
         "cond": [],
         "required": [],
@@ -374,7 +408,8 @@ property_material_keys = {
     "mw_w": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "g/mol",
+        "unit": "kilogram / mole",
+        "unit_prefer": "g/mol",
         'methods': ['nmr', 'sec', 'maldi', 'ls'],
         "cond": [],
         "required": [],
@@ -384,7 +419,8 @@ property_material_keys = {
     "mw_z": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "g/mol",
+        "unit": "kilogram / mole",
+        "unit_prefer": "g/mol",
         'methods': ['nmr', 'sec', 'maldi', 'osmtic_pres'],
         "cond": [],
         "required": [],
@@ -395,6 +431,7 @@ property_material_keys = {
         "type": str,
         "range": [],
         "unit": None,
+        "unit_prefer": None,
         "method": [],
         "cond": [],
         "required": [],
@@ -405,6 +442,7 @@ property_material_keys = {
         "type": str,
         "range": ["gas", "liquid", "solution", "suspension", "plasma"],
         "unit": None,
+        "unit_prefer": None,
         "method": ["visual"],
         "cond": ["pres", "temp"],
         "required": [],
@@ -415,6 +453,7 @@ property_material_keys = {
         "type": float,
         "range": [-float_limit, float_limit],
         "unit": None,
+        "unit_prefer": None,
         "method": [],
         "cond": [],
         "required": [],
@@ -425,6 +464,7 @@ property_material_keys = {
         "type": float,
         "range": [-float_limit, float_limit],
         "unit": None,
+        "unit_prefer": None,
         "method": [],
         "cond": [],
         "required": [],
@@ -435,6 +475,7 @@ property_material_keys = {
         "type": float,
         "range": [0, float_limit],
         "unit": "",
+        "unit_prefer": "",
         'method': [],
         "cond": ["temp"],
         "required": [],
@@ -444,7 +485,8 @@ property_material_keys = {
     "solubility": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "g/ml",
+        "unit": "kilogram / meter ** 3",
+        "unit_prefer": "g/ml",
         'method': [],
         "cond": ["temp", "solvent"],
         "required": [],
@@ -454,7 +496,8 @@ property_material_keys = {
     "surface_tension": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "J/m**2",
+        "unit": "kilogram / second ** 2",
+        "unit_prefer": "J/m**2",
         'method': [],
         "cond": ["temp", "pres"],
         "required": [],
@@ -463,8 +506,9 @@ property_material_keys = {
     },
     "temp_autoignition": {
         "type": cript_types["Quantity"],
-        "range": [degC_lower_limit, float_limit],
-        "unit": "degC",
+        "range": [0, float_limit],
+        "unit": "kelvin",
+        "unit_prefer": "degC",
         "method": [],
         "cond": ["pres"],
         "required": [],
@@ -473,8 +517,9 @@ property_material_keys = {
     },
     "temp_boil": {
         "type": cript_types["Quantity"],
-        "range": [degC_lower_limit, float_limit],
-        "unit": "degC",
+        "range": [0, float_limit],
+        "unit": "kelvin",
+        "unit_prefer": "degC",
         "method": [],
         "cond": ["pres"],
         "required": [],
@@ -483,8 +528,9 @@ property_material_keys = {
     },
     "temp_flash": {
         "type": cript_types["Quantity"],
-        "range": [degC_lower_limit, float_limit],
-        "unit": "degC",
+        "range": [0, float_limit],
+        "unit": "kelvin",
+        "unit_prefer": "degC",
         "method": [],
         "cond": [],
         "required": [],
@@ -493,8 +539,9 @@ property_material_keys = {
     },
     "temp_melt": {
         "type": cript_types["Quantity"],
-        "range": [degC_lower_limit, float_limit],
-        "unit": "degC",
+        "range": [0, float_limit],
+        "unit": "kelvin",
+        "unit_prefer": "degC",
         "method": ["dsc"],
         "cond": ["pres"],
         "required": [],
@@ -503,8 +550,9 @@ property_material_keys = {
     },
     "temp_glass": {
         "type": cript_types["Quantity"],
-        "range": [degC_lower_limit, float_limit],
-        "unit": "degC",
+        "range": [0, float_limit],
+        "unit": "kelvin",
+        "unit_prefer": "degC",
         'methods': ['dsc'],
         "cond": [],
         "required": [],
@@ -514,7 +562,8 @@ property_material_keys = {
     "therm_cond": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "W/m/k",
+        "unit": "kelvin / meter / second",
+        "unit_prefer": "W/m/k",
         'methods': [],
         "cond": [],
         "required": [],
@@ -524,7 +573,8 @@ property_material_keys = {
     "therm_diff": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "m**2/s",
+        "unit": "meter ** 2 / second",
+        "unit_prefer": "m**2/s",
         'methods': ['calorimetry', 'dsc'],
         "cond": [],
         "required": [],
@@ -534,7 +584,8 @@ property_material_keys = {
     "therm_expand_l": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "1/k",
+        "unit": "1 / kelvin",
+        "unit_prefer": "1 / kelvin",
         'methods': [],
         "cond": [],
         "required": [],
@@ -544,7 +595,8 @@ property_material_keys = {
     "therm_expand_v": {
         "type": cript_types["Quantity"],
         "range": [-float_limit, float_limit],
-        "unit": "1/k",
+        "unit": "1 / kelvin",
+        "unit_prefer": "1 / kelvin",
         'methods': [],
         "cond": [],
         "required": [],
@@ -554,7 +606,8 @@ property_material_keys = {
     "vapor_pres": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "kPa",
+        "unit": "kilogram / meter / second ** 2",
+        "unit_prefer": "kPa",
         "method": [],
         "cond": ["temp"],
         "required": [],
@@ -564,7 +617,8 @@ property_material_keys = {
     "viscosity_dynamic": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "Pa*s",
+        "unit": "kilogram / meter / second",
+        "unit_prefer": "Pa*s",
         "method": [],
         "cond": ["temp"],
         "required": [],
@@ -574,7 +628,8 @@ property_material_keys = {
     "viscosity_kinematic": {
         "type": cript_types["Quantity"],
         "range": [0, float_limit],
-        "unit": "cSt",
+        "unit": "meter ** 2 / second",
+        "unit_prefer": "cSt",
         "method": [],
         "cond": ["temp"],
         "required": [],

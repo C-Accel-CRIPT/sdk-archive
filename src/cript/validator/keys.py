@@ -14,6 +14,13 @@ class SupportsKeyCheck(Protocol):
     value: Any = None
 
 
+class TempClass:
+    keys = None
+
+    def __init__(self, keys):
+        self.keys = keys
+
+
 def keys_check(keys: dict = None):
     """ Key checks
 
@@ -27,8 +34,7 @@ def keys_check(keys: dict = None):
     """
     # build key table object if keys passed in.
     if keys is not None:
-        obj = SupportsKeyCheck()
-        obj.keys = keys
+        obj = TempClass(keys)
     else:
         obj = None
 

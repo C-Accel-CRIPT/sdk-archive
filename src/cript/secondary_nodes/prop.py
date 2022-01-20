@@ -38,7 +38,7 @@ class Prop(SerializableSub, TablePrinting):
         identifier that is associate with the property
         0 = whole mixture
         1+ = individual component
-    component: str
+    structure: str
         specific chemical structure associate with the property
     c_data: list[Data]
         CRIPT Data associate with the property
@@ -58,7 +58,7 @@ class Prop(SerializableSub, TablePrinting):
             method: str,
             uncer=None,
             mat_id: int = 0,
-            component: str = None,
+            structure: str = None,
             c_data=None,
             cond: Union[list[Cond], Cond] = None,
             _loading: bool = False  # need for loading a file from the data base
@@ -78,8 +78,8 @@ class Prop(SerializableSub, TablePrinting):
         self._uncer = None
         self.uncer = uncer
 
-        self._component = None
-        self.component = component
+        self._structure = None
+        self.structure = structure
 
         self._method = None
         self.method = method
@@ -126,13 +126,13 @@ class Prop(SerializableSub, TablePrinting):
         self._uncer = uncer
 
     @property
-    def component(self):
-        return self._component
+    def structure(self):
+        return self._structure
 
-    @component.setter
+    @structure.setter
     @type_check(str)
-    def component(self, component):
-        self._component = component
+    def structure(self, structure):
+        self._structure = structure
 
     @property
     def method(self):

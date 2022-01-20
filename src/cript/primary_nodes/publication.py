@@ -61,7 +61,7 @@ class Publication(BaseModel, _error=PublicationError):
     def __init__(
             self,
             title: str,
-            doi: str,
+            doi: str = None,
             name: str = None,
             authors: list[str] = None,
             journal: str = None,
