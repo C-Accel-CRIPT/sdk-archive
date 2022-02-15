@@ -136,7 +136,6 @@ class Data(Base):
         files: list[Union[File, str]] = None,
         sample_prep: Union[str, None] = None,
         notes: Union[str, None] = None,
-        conditions: list = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -148,7 +147,6 @@ class Data(Base):
         self.type = type
         self.sample_prep = sample_prep
         self.notes = notes
-        self.conditions = conditions if conditions else []
         self.public = public
 
         self.print_json()
@@ -160,12 +158,6 @@ class Data(Base):
     @beartype
     def remove_file(self, file: Union[File, int]):
         self._remove_node(file, "files")
-
-    def add_condition(self, condition):
-        self._add_node(condition, "conditions")
-
-    def remove_condition(self, condition):
-        self._remove_node(condition, "conditions")
 
 
 class Condition(Base):
