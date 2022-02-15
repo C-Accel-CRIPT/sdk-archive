@@ -36,4 +36,15 @@ node_classes = [
 ]
 
 
+secondary_node_lists = {
+    "conditions": Condition,
+    "properties": Property,
+    "components": MaterialComponent,
+    "quantities": Quantity,
+    "material_ingredients": MaterialIngredient,
+    "product_ingredients": ProductIngredient,
+    "procedures": Procedure,
+}
+
+
 from .api_connector import API

@@ -10,7 +10,7 @@ from beartype import beartype
 from beartype.typing import Type
 from pprint import pprint
 
-from . import node_classes
+from . import node_classes, secondary_node_lists
 from .nodes import Base
 from .errors import APIAuthError, APIRefreshError, APISaveError, APISearchError
 
@@ -169,11 +169,29 @@ class API:
             node.created_at = created_at
             node.updated_at = updated_at
 
+            self._generate_secondary_nodes(node)
             return node
         else:
             raise APISearchError(
                 f"The specified {node_class.node_name} node was not found."
             )
+
+    @beartype
+    def _generate_secondary_nodes(self, node: Base):
+        """
+        Generate new secondary node objects.
+
+        :param node: The parent node with nested secondary nodes.
+        """
+        for key, value in node.__dict__.items():
+            if isinstance(value, list):
+                node_class = secondary_node_lists.get(key)
+                if node_class:
+                    for i in range(len(value)):
+                        if isinstance(value[i], dict):
+                            secondary_node = node_class(**value[i])
+                            value[i] = secondary_node
+                            self._generate_secondary_nodes(secondary_node)
 
     @beartype
     def search(self, node_class: Type[Base], query: dict = None):

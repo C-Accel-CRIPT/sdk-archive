@@ -199,7 +199,8 @@ class Property(Base):
         value: Union[str, int, float],
         unit: Union[str, None] = None,
         method: Union[str, None] = None,
-        uncertainty: Union[int, float] = None,
+        uncertainty: Union[int, float, None] = None,
+        reference_material: Union[str, None] = None,
         data: list[Union[Data, str]] = None,
         conditions: list[Union[Condition, dict]] = None,
     ):
@@ -208,6 +209,7 @@ class Property(Base):
         self.unit = unit
         self.method = method
         self.uncertainty = uncertainty
+        self.reference_material = reference_material
         self.data = data if data else []
         self.conditions = conditions if conditions else []
 
