@@ -67,7 +67,6 @@ class Base:
             getattr(self, attr_name).append(node)
         else:
             raise AddNodeError(node.node_name, self.node_name)
-        self.print_json()
 
     def _remove_node(self, node, attr):
         """
@@ -85,7 +84,6 @@ class Base:
                 getattr(self, attr).remove(node)
         else:
             raise RemoveNodeError(node.node_name, self.node_name)
-        self.print_json()
 
 
 class Group(Base):
@@ -99,8 +97,6 @@ class Group(Base):
         self.url = url
         self.name = name
         self.users = users
-
-        self.print_json()
 
 
 class File(Base):
@@ -154,8 +150,6 @@ class Data(Base):
         self.notes = notes
         self.public = public
 
-        self.print_json()
-
     @beartype
     def add_file(self, file: Union[File, dict]):
         self._add_node(file, "files")
@@ -181,8 +175,6 @@ class Condition(Base):
         self.value = value
         self.unit = unit
         self.data = data if data else []
-
-        self.print_json()
 
     @beartype
     def add_data(self, data: Union[Data, dict]):
@@ -217,8 +209,6 @@ class Property(Base):
         self.reference_material = reference_material
         self.data = data if data else []
         self.conditions = conditions if conditions else []
-
-        self.print_json()
 
     @beartype
     def add_data(self, data: Union[Data, dict]):
@@ -259,8 +249,6 @@ class Collection(Base):
         self.notes = notes
         self.experiments = experiments if experiments else []
         self.public = public
-
-        self.print_json()
 
     def add_experiment(self, experiment):
         self._add_node(experiment, "experiments")
@@ -306,8 +294,6 @@ class Identity(Base):
         self.inchi_key = inchi_key
         self.public = public
 
-        self.print_json()
-
 
 class MaterialComponent(Base):
     node_type = "secondary"
@@ -317,8 +303,6 @@ class MaterialComponent(Base):
     def __init__(self, identity: Union[Identity, str], component_id: int = 0):
         self.component_id = component_id
         self.identity = identity
-
-        self.print_json()
 
 
 class Material(Base):
@@ -355,8 +339,6 @@ class Material(Base):
         self.properties = properties if properties else []
         self.conditions = conditions if conditions else []
         self.public = public
-
-        self.print_json()
 
     def add_experiment(self, experiment):
         self._add_node(experiment, "experiments")
@@ -404,8 +386,6 @@ class Quantity(Base):
         self.value = value
         self.unit = unit
 
-        self.print_json()
-
 
 class ProductIngredient(Base):
     node_type = "secondary"
@@ -423,8 +403,6 @@ class ProductIngredient(Base):
         self.keyword = keyword
         self.quantity = quantity if quantity else []
         self.method = method
-
-        self.print_json()
 
     @beartype
     def add_quantity(self, quantity: Union[Quantity, dict]):
@@ -451,8 +429,6 @@ class MaterialIngredient(Base):
         self.keyword = keyword
         self.quantity = quantity if quantity else []
         self.method = method
-
-        self.print_json()
 
     @beartype
     def add_quantity(self, quantity: Union[Quantity, dict]):
@@ -483,8 +459,6 @@ class Procedure(Base):
         self.material_ingredients = material_ingredients if material_ingredients else []
         self.properties = properties if properties else []
         self.conditions = conditions if conditions else []
-
-        self.print_json()
 
     @beartype
     def add_ingredient(
@@ -548,8 +522,6 @@ class Process(Base):
         self.procedures = procedures if procedures else []
         self.public = public
 
-        self.print_json()
-
     def add_experiment(self, experiment):
         self._add_node(experiment, "experiments")
 
@@ -594,5 +566,3 @@ class Experiment(Base):
         self.process = process
         self.product = product
         self.public = public
-
-        self.print_json()

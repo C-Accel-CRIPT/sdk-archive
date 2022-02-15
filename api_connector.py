@@ -93,7 +93,7 @@ class API:
                 pprint(response.json())
         else:
             raise APISaveError(
-                "The save() method cannot be called on secondary node such as {node.node_name}"
+                f"The save() method cannot be called on secondary node such as {node.node_name}"
             )
 
     def _create(self, node):
