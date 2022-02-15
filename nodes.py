@@ -1,5 +1,7 @@
 import json
+import copy
 from typing import Union
+
 from beartype import beartype
 
 from .errors import AddNodeError, RemoveNodeError, UnsavedNodeError
@@ -15,38 +17,41 @@ class Base:
         self.created_at = None
         self.updated_at = None
 
-    def __str__(self):
-        return json.dumps(self.to_dict(), indent=4)
-
     def __repr__(self):
-        return json.dumps(self.to_dict(), indent=4)
+        return self._to_json()
+
+    def __str__(self):
+        return self._to_json()
 
     def print_json(self):
-        print(json.dumps(self.to_dict(), indent=4))
+        print(self._to_json())
 
-    def to_dict(self):
+    def _to_json(self):
+        return json.dumps(self._prep_for_upload(), indent=4)
+
+    def _prep_for_upload(self):
         """Convert a node into a dict that can be sent to the API."""
-        node_dict = self.__dict__
-        for key, obj in node_dict.items():
-            # Check if the obj is a node
-            if hasattr(obj, "node_type"):
-                if obj.node_type == "primary":
+        node_dict = copy.deepcopy(self.__dict__)
+        for key, value in node_dict.items():
+            # Check if the value is a node
+            if isinstance(value, Base):
+                if value.node_type == "primary":
                     # Check if primary node has been saved
-                    if obj.url is None:
-                        raise UnsavedNodeError(obj.node_name)
-                    node_dict[key] = obj.url
-                elif obj.node_type == "secondary":
-                    node_dict[key] = obj.to_dict()
-            elif isinstance(obj, list):
-                for i in range(len(obj)):
-                    if hasattr(obj[i], "node_type"):
-                        if obj[i].node_type == "primary":
+                    if value.url is None:
+                        raise UnsavedNodeError(value.node_name)
+                    node_dict[key] = value.url
+                elif value.node_type == "secondary":
+                    node_dict[key] = value._prep_for_upload()
+            elif isinstance(value, list):
+                for i in range(len(value)):
+                    if isinstance(value[i], Base):
+                        if value[i].node_type == "primary":
                             # Check if primary node has been saved
-                            if obj[i].url is None:
-                                raise UnsavedNodeError(obj[i].node_name)
-                            obj[i] = obj[i].url
-                        elif obj[i].node_type == "secondary":
-                            obj[i] = obj[i].to_dict()
+                            if value[i].url is None:
+                                raise UnsavedNodeError(value[i].node_name)
+                            value[i] = value[i].url
+                        elif value[i].node_type == "secondary":
+                            value[i] = value[i]._prep_for_upload()
         return node_dict
 
     def _add_node(self, node, attr_name):
@@ -77,7 +82,7 @@ class Base:
             if node.node_type == "primary":
                 getattr(self, attr).remove(node.url)
             elif node.node_type == "secondary":
-                getattr(self, attr).remove(node.to_dict())
+                getattr(self, attr).remove(node)
         else:
             raise RemoveNodeError(node.node_name, self.node_name)
         self.print_json()

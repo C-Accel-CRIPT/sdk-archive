@@ -87,6 +87,7 @@ class API:
                 response = self._create(node)
             if response.status_code in (200, 201):
                 self._set_node_attributes(node, response.json())
+                self._generate_secondary_nodes(node)
                 node.print_json()
             else:
                 pprint(response.json())
@@ -110,7 +111,7 @@ class API:
             )
         else:
             return self.session.post(
-                url=f"{self.url}/{node.slug}/", data=json.dumps(node.to_dict())
+                url=f"{self.url}/{node.slug}/", data=node._to_json()
             )
 
     def _update(self, node):
@@ -127,7 +128,7 @@ class API:
                 url=node.url, headers=headers, files=node.file, data={}
             )
         else:
-            return self.session.put(url=node.url, data=json.dumps(node.to_dict()))
+            return self.session.put(url=node.url, data=node._to_json())
 
     def _set_node_attributes(self, node, response_json):
         """
@@ -183,12 +184,19 @@ class API:
 
         :param node: The parent node with nested secondary nodes.
         """
-        for key, value in node.__dict__.items():
-            if isinstance(value, list):
+        node_dict = node.__dict__
+        for key, value in node_dict.items():
+            if isinstance(value, dict):
                 node_class = secondary_node_lists.get(key)
                 if node_class:
-                    for i in range(len(value)):
-                        if isinstance(value[i], dict):
+                    secondary_node = node_class(**value[i])
+                    node_dict[key] = secondary_node
+                    self._generate_secondary_nodes(secondary_node)
+            if isinstance(value, list):
+                for i in range(len(value)):
+                    if isinstance(value[i], dict):
+                        node_class = secondary_node_lists.get(key)
+                        if node_class:
                             secondary_node = node_class(**value[i])
                             value[i] = secondary_node
                             self._generate_secondary_nodes(secondary_node)
