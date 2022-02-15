@@ -2,7 +2,6 @@
 CRIPT REST API Connector
 """
 import requests
-import json
 from typing import Union
 from getpass import getpass
 
@@ -32,12 +31,6 @@ class API:
             "Content-Type": "application/json",
         }
 
-        # Test API connection
-        try:
-            self.session.get(self.url)
-        except requests.exceptions.ConnectionError as e:
-            print(e)
-
         # Test API authentication
         response = self.session.get(self.url)
         if response.status_code == 401:
@@ -63,7 +56,6 @@ class API:
             if node.url:
                 response = self.session.get(node.url)
                 self._set_node_attributes(node, response.json())
-                node.print_json()
             else:
                 raise APIRefreshError(
                     "Before you can refresh a node, you must either save it or define it's URL."
@@ -88,7 +80,6 @@ class API:
             if response.status_code in (200, 201):
                 self._set_node_attributes(node, response.json())
                 self._generate_secondary_nodes(node)
-                node.print_json()
             else:
                 pprint(response.json())
         else:
