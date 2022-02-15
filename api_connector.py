@@ -44,7 +44,7 @@ class API:
             raise APIAuthError(response.json()["detail"])
 
         # Print success message
-        print(f"\nConnection to the API was successful.\n")
+        print(f"\nConnection to the API was successful!\n")
 
     def __repr__(self):
         return f"Connected to {self.url}"
@@ -70,13 +70,13 @@ class API:
                 )
         else:
             raise APIRefreshError(
-                f"{node.name} is a secondary node, thus cannot be refreshed."
+                f"{node.node_name} is a secondary node, thus cannot be refreshed."
             )
 
     @beartype
     def save(self, node: Base):
         """
-        Save or update a node in the DB.
+        Create or update a node in the DB.
 
         :param node: The node to be saved.
         """
@@ -92,7 +92,7 @@ class API:
                 pprint(response.json())
         else:
             raise APISaveError(
-                "The save() method cannot be called on secondary node such as {node.name}"
+                "The save() method cannot be called on secondary node such as {node.node_name}"
             )
 
     def _create(self, node):
@@ -137,17 +137,7 @@ class API:
         :param response: The response from an API call.
         """
         for json_key, json_value in response_json.items():
-            attr_value = getattr(node, json_key)
-            if (
-                isinstance(json_value, str)
-                and self.url in json_value
-                and json_key != "url"
-            ):
-                continue
-            elif isinstance(json_value, dict):
-                self._set_node_attributes(attr_value, json_value)
-            else:
-                setattr(node, json_key, json_value)
+            setattr(node, json_key, json_value)
 
     @beartype
     def get(self, url: str):
@@ -171,6 +161,7 @@ class API:
         if response.status_code == 200:
             response_json = response.json()
 
+            # Pop to avoid issues with nodes that don't have these attrs
             created_at = response_json.pop("created_at", None)
             updated_at = response_json.pop("updated_at", None)
 
@@ -180,7 +171,9 @@ class API:
 
             return node
         else:
-            raise APISearchError(f"The specified {node_class.name} node was not found.")
+            raise APISearchError(
+                f"The specified {node_class.node_name} node was not found."
+            )
 
     @beartype
     def search(self, node_class: Type[Base], query: dict = None):
@@ -192,7 +185,7 @@ class API:
         """
         if node_class.node_type == "secondary":
             raise APISearchError(
-                f"{node_class.name} is a secondary node, thus cannot be searched."
+                f"{node_class.node_name} is a secondary node, thus cannot be searched."
             )
         if isinstance(query, dict):
             query_slug = self._generate_query_slug(query)

@@ -33,7 +33,7 @@ class Base:
                 if obj.node_type == "primary":
                     # Check if primary node has been saved
                     if obj.url is None:
-                        raise UnsavedNodeError(obj.name)
+                        raise UnsavedNodeError(obj.node_name)
                     node_dict[key] = obj.url
                 elif obj.node_type == "secondary":
                     node_dict[key] = obj.to_dict()
@@ -43,7 +43,7 @@ class Base:
                         if obj[i].node_type == "primary":
                             # Check if primary node has been saved
                             if obj[i].url is None:
-                                raise UnsavedNodeError(obj[i].name)
+                                raise UnsavedNodeError(obj[i].node_name)
                             obj[i] = obj[i].url
                         elif obj[i].node_type == "secondary":
                             obj[i] = obj[i].to_dict()
@@ -57,11 +57,11 @@ class Base:
         :param attr: The name of the list attribute (e.g., conditions).
         """
         if node.node_type == "primary" and node.url is None:
-            raise UnsavedNodeError(node.name)
+            raise UnsavedNodeError(node.node_name)
         elif hasattr(self, attr_name):
             getattr(self, attr_name).append(node)
         else:
-            raise AddNodeError(node.name, self.name)
+            raise AddNodeError(node.node_name, self.node_name)
         self.print_json()
 
     def _remove_node(self, node, attr):
@@ -79,13 +79,13 @@ class Base:
             elif node.node_type == "secondary":
                 getattr(self, attr).remove(node.to_dict())
         else:
-            raise RemoveNodeError(node.name, self.name)
+            raise RemoveNodeError(node.node_name, self.node_name)
         self.print_json()
 
 
 class Group(Base):
     node_type = "primary"
-    name = "Group"
+    node_name = "Group"
     slug = "group"
 
     @beartype
@@ -124,7 +124,7 @@ class File(Base):
 
 class Data(Base):
     node_type = "primary"
-    name = "Data"
+    node_name = "Data"
     slug = "data"
 
     @beartype
@@ -170,7 +170,7 @@ class Data(Base):
 
 class Condition(Base):
     node_type = "secondary"
-    name = "Condition"
+    node_name = "Condition"
 
     @beartype
     def __init__(
@@ -198,7 +198,7 @@ class Condition(Base):
 
 class Property(Base):
     node_type = "secondary"
-    name = "Property"
+    node_name = "Property"
 
     @beartype
     def __init__(
@@ -240,7 +240,7 @@ class Property(Base):
 
 class Collection(Base):
     node_type = "primary"
-    name = "Collection"
+    node_name = "Collection"
     slug = "collection"
 
     @beartype
@@ -272,7 +272,7 @@ class Collection(Base):
 
 class Identity(Base):
     node_type = "primary"
-    name = "Identity"
+    node_name = "Identity"
     slug = "identity"
 
     @beartype
@@ -312,7 +312,7 @@ class Identity(Base):
 
 class MaterialComponent(Base):
     node_type = "secondary"
-    name = "MaterialComponent"
+    node_name = "MaterialComponent"
 
     @beartype
     def __init__(self, identity: Union[Identity, str], component_id: int = 0):
@@ -324,7 +324,7 @@ class MaterialComponent(Base):
 
 class Material(Base):
     node_type = "primary"
-    name = "Material"
+    node_name = "Material"
     slug = "material"
 
     @beartype
@@ -392,7 +392,7 @@ class Material(Base):
 
 class Quantity(Base):
     node_type = "secondary"
-    name = "Quantity"
+    node_name = "Quantity"
 
     @beartype
     def __init__(
@@ -410,7 +410,7 @@ class Quantity(Base):
 
 class ProductIngredient(Base):
     node_type = "secondary"
-    name = "ProductIngredient"
+    node_name = "ProductIngredient"
 
     @beartype
     def __init__(
@@ -438,7 +438,7 @@ class ProductIngredient(Base):
 
 class MaterialIngredient(Base):
     node_type = "secondary"
-    name = "MaterialIngredient"
+    node_name = "MaterialIngredient"
 
     @beartype
     def __init__(
@@ -466,7 +466,7 @@ class MaterialIngredient(Base):
 
 class Procedure(Base):
     node_type = "secondary"
-    name = "Procedure"
+    node_name = "Procedure"
 
     @beartype
     def __init__(
@@ -524,7 +524,7 @@ class Procedure(Base):
 
 class Process(Base):
     node_type = "primary"
-    name = "Process"
+    node_name = "Process"
     slug = "process"
 
     @beartype
@@ -568,7 +568,7 @@ class Process(Base):
 
 class Experiment(Base):
     node_type = "primary"
-    name = "Experiment"
+    node_name = "Experiment"
     slug = "experiment"
 
     @beartype
