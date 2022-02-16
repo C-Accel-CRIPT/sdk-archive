@@ -28,6 +28,16 @@ class APISaveError(Exception):
         return self.message
 
 
+class APIDeleteError(Exception):
+    """Raised for errors when deleting a node to the database."""
+
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message
+
+
 class APISearchError(Exception):
     """Raised for errors when sending search query."""
 

@@ -99,30 +99,6 @@ class Group(Base):
         self.users = users
 
 
-class File(Base):
-    node_type = "primary"
-    name = "File"
-    slug = "file"
-
-    @beartype
-    def __init__(
-        self,
-        group: Union[Group, str],
-        source: Union[str, None],
-        name: Union[str, None] = None,
-        extension: Union[str, None] = None,
-        public: bool = False,
-        url: Union[str, None] = None,
-    ):
-        super().__init__()
-        self.url = url
-        self.group = group
-        self.source = source
-        self.name = name
-        self.extension = extension
-        self.public = public
-
-
 class Data(Base):
     node_type = "primary"
     node_name = "Data"
@@ -134,7 +110,7 @@ class Data(Base):
         group: Union[Group, str],
         name: str,
         type: str,
-        files: list[Union[File, str]] = None,
+        files: list[str] = None,
         sample_prep: Union[str, None] = None,
         notes: Union[str, None] = None,
         public: bool = False,
@@ -144,19 +120,37 @@ class Data(Base):
         self.url = url
         self.group = group
         self.name = name
-        self.files = files if files else []
+        self.files = files
         self.type = type
         self.sample_prep = sample_prep
         self.notes = notes
         self.public = public
 
-    @beartype
-    def add_file(self, file: Union[File, dict]):
-        self._add_node(file, "files")
+
+class File(Base):
+    node_type = "primary"
+    node_name = "File"
+    slug = "file"
 
     @beartype
-    def remove_file(self, file: Union[File, int]):
-        self._remove_node(file, "files")
+    def __init__(
+        self,
+        group: Union[Group, str],
+        data: Union[Data, str],
+        source: Union[str, None],
+        name: Union[str, None] = None,
+        extension: Union[str, None] = None,
+        public: bool = False,
+        url: Union[str, None] = None,
+    ):
+        super().__init__()
+        self.url = url
+        self.group = group
+        self.data = data
+        self.source = source
+        self.name = name
+        self.extension = extension
+        self.public = public
 
 
 class Condition(Base):

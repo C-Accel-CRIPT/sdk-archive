@@ -11,7 +11,13 @@ from pprint import pprint
 
 from . import node_classes, secondary_node_lists
 from .nodes import Base
-from .errors import APIAuthError, APIRefreshError, APISaveError, APISearchError
+from .errors import (
+    APIAuthError,
+    APIRefreshError,
+    APISaveError,
+    APIDeleteError,
+    APISearchError,
+)
 
 
 class API:
@@ -80,11 +86,12 @@ class API:
             if response.status_code in (200, 201):
                 self._set_node_attributes(node, response.json())
                 self._generate_secondary_nodes(node)
+                print(f"{node.node_name} node has been saved to the database.\n")
             else:
                 pprint(response.json())
         else:
             raise APISaveError(
-                f"The save() method cannot be called on secondary node such as {node.node_name}"
+                f"The save() method cannot be called on secondary nodes such as {node.node_name}"
             )
 
     def _create(self, node):
@@ -95,10 +102,14 @@ class API:
         :return: The HTTP response object.
         """
         if node.slug == "file":
-            headers = {"Authorization": self.session.headers["Authorization"]}
-            file = {"file": open(node.source, "rb")}
+            headers = {"Content-Type": None}
+            file = {"source": open(node.source, "rb")}
+            payload = {"group": node.group.url, "data": node.data.url}
             return self.session.post(
-                url=f"{self.url}/{node.slug}/", headers=headers, files=file, data={}
+                url=f"{self.url}/{node.slug}/",
+                headers=headers,
+                files=file,
+                data=payload,
             )
         else:
             return self.session.post(
@@ -113,11 +124,9 @@ class API:
         :return: The HTTP response object.
         """
         if node.slug == "file":
-            headers = {"Authorization": self.session.headers["Authorization"]}
-            file = {"file": open(node.source, "rb")}
-            return self.session.put(
-                url=node.url, headers=headers, files=node.file, data={}
-            )
+            headers = {"Content-Type": None}
+            payload = {"group": node.group.url, "data": node.data.url}
+            return self.session.put(url=node.url, headers=headers, data=payload)
         else:
             return self.session.put(url=node.url, data=node._to_json())
 
@@ -130,6 +139,37 @@ class API:
         """
         for json_key, json_value in response_json.items():
             setattr(node, json_key, json_value)
+
+    def delete(self, node: Base):
+        """
+        Delete a node locally and in the DB.
+
+        :param node: The node to be deleted.
+        :return: Response message.
+        """
+        if node.node_type == "primary":
+            if node.url:
+                response = self.session.delete(url=node.url)
+                if response.status_code == 204:
+                    print(
+                        f"{node.node_name} node has been deleted from the database.\n"
+                    )
+                    node.url = None
+                    node.created_at = None
+                    node.updated_at = None
+                    # Clear the File node's source field
+                    if "source" in node.__dict__:
+                        node.source = None
+                else:
+                    pprint(response.json())
+            else:
+                raise APIDeleteError(
+                    f"This {node.node_name} node doest not exist in the database."
+                )
+        else:
+            raise APIDeleteError(
+                f"The delete() method cannot be called on secondary nodes such as {node.node_name}"
+            )
 
     @beartype
     def get(self, url: str):
