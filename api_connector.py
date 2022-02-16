@@ -86,7 +86,7 @@ class API:
             if response.status_code in (200, 201):
                 self._set_node_attributes(node, response.json())
                 self._generate_secondary_nodes(node)
-                print(f"{node.node_name} node has been saved to the database.\n")
+                print(f"{node.node_name} node has been saved to the database.")
             else:
                 pprint(response.json())
         else:
@@ -151,15 +151,9 @@ class API:
             if node.url:
                 response = self.session.delete(url=node.url)
                 if response.status_code == 204:
-                    print(
-                        f"{node.node_name} node has been deleted from the database.\n"
-                    )
-                    node.url = None
-                    node.created_at = None
-                    node.updated_at = None
-                    # Clear the File node's source field
-                    if "source" in node.__dict__:
-                        node.source = None
+                    print(f"{node.node_name} node has been deleted from the database.")
+                    # Clear fields to indicate the object has been deleted from DB
+                    node.__dict__.clear()
                 else:
                     pprint(response.json())
             else:
