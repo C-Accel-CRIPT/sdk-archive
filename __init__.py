@@ -10,8 +10,8 @@ from .nodes import (
     Material,
     Quantity,
     MaterialIngredient,
-    ProductIngredient,
-    Procedure,
+    IntermediateIngredient,
+    Step,
     Process,
     Experiment,
 )
@@ -29,8 +29,8 @@ node_classes = [
     Material,
     Quantity,
     MaterialIngredient,
-    ProductIngredient,
-    Procedure,
+    IntermediateIngredient,
+    Step,
     Process,
     Experiment,
 ]
@@ -42,8 +42,8 @@ secondary_node_lists = {
     "components": MaterialComponent,
     "quantities": Quantity,
     "material_ingredients": MaterialIngredient,
-    "product_ingredients": ProductIngredient,
-    "procedures": Procedure,
+    "product_ingredients": IntermediateIngredient,
+    "steps": Step,
 }
 
 

@@ -163,11 +163,19 @@ class Condition(Base):
         key: str,
         value: Union[str, int, float],
         unit: Union[str, None] = None,
+        uncertainty: float = None,
+        uncertainty_type: str = None,
+        set_id: int = None,
+        measurement_id: int = None,
         data: list[Union[Data, str]] = None,
     ):
         self.key = key
         self.value = value
         self.unit = unit
+        self.uncertainty = uncertainty
+        self.uncertainty_type = uncertainty_type
+        self.set_id = set_id
+        self.measurement_id = measurement_id
         self.data = data if data else []
 
     @beartype
@@ -190,8 +198,10 @@ class Property(Base):
         value: Union[str, int, float],
         unit: Union[str, None] = None,
         method: Union[str, None] = None,
-        uncertainty: Union[int, float, None] = None,
         reference_material: Union[str, None] = None,
+        uncertainty: float = None,
+        uncertainty_type: str = None,
+        set_id: int = None,
         data: list[Union[Data, str]] = None,
         conditions: list[Union[Condition, dict]] = None,
     ):
@@ -199,8 +209,10 @@ class Property(Base):
         self.value = value
         self.unit = unit
         self.method = method
-        self.uncertainty = uncertainty
         self.reference_material = reference_material
+        self.uncertainty = uncertainty
+        self.uncertainty_type = uncertainty_type
+        self.set_id = set_id
         self.data = data if data else []
         self.conditions = conditions if conditions else []
 
@@ -232,7 +244,7 @@ class Collection(Base):
         group: Union[Group, str],
         name: str,
         notes: Union[str, None] = None,
-        experiments: list = None,
+        experiments: list[Union[Base, str]] = None,  # Needs more specific type check
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -299,6 +311,44 @@ class MaterialComponent(Base):
         self.identity = identity
 
 
+class Quantity(Base):
+    node_type = "secondary"
+    node_name = "Quantity"
+
+    @beartype
+    def __init__(
+        self,
+        key: str,
+        value: Union[int, float],
+        unit: Union[str, None] = None,
+    ):
+        self.key = key
+        self.value = value
+        self.unit = unit
+
+
+class Specification(Base):
+    node_type = "secondary"
+    node_name = "Specification"
+
+    @beartype
+    def __init__(
+        self,
+        vendor: str = None,
+        lot_number: str = None,
+        storage_location: str = None,
+        quantity: Quantity = None,
+        initial_quantity: Quantity = None,
+        container: str = None,
+    ):
+        self.vendor = vendor
+        self.lot_number = lot_number
+        self.storage_location = storage_location
+        self.quantity = quantity
+        self.initial_quantity = initial_quantity
+        self.container = container
+
+
 class Material(Base):
     node_type = "primary"
     node_name = "Material"
@@ -311,12 +361,11 @@ class Material(Base):
         name: str,
         components: list[Union[MaterialComponent, dict]] = None,
         source: Union[str, None] = None,
-        lot_number: Union[str, None] = None,
         keywords: Union[list[str], None] = None,
         notes: Union[str, None] = None,
-        experiments: list = None,
+        experiments: list[Union[Base, str]] = None,  # Needs more specific type check
+        step: Union[Base, str] = None,  # Needs more specific type check
         properties: list[Union[Property, dict]] = None,
-        conditions: list[Union[Condition, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -326,12 +375,11 @@ class Material(Base):
         self.name = name
         self.components = components if components else []
         self.source = source
-        self.lot_number = lot_number
         self.keywords = keywords
         self.notes = notes
         self.experiments = experiments if experiments else []
+        self.step = step
         self.properties = properties if properties else []
-        self.conditions = conditions if conditions else []
         self.public = public
 
     def add_experiment(self, experiment):
@@ -349,14 +397,6 @@ class Material(Base):
         self._remove_node(component, "components")
 
     @beartype
-    def add_condition(self, condition: Union[Condition, dict]):
-        self._add_node(condition, "conditions")
-
-    @beartype
-    def remove_condition(self, condition: Union[Condition, int]):
-        self._remove_node(condition, "conditions")
-
-    @beartype
     def add_property(self, property: Union[Property, dict]):
         self._add_node(property, "properties")
 
@@ -365,35 +405,19 @@ class Material(Base):
         self._remove_node(property, "properties")
 
 
-class Quantity(Base):
+class IntermediateIngredient(Base):
     node_type = "secondary"
-    node_name = "Quantity"
+    node_name = "IntermediateIngredient"
 
     @beartype
     def __init__(
         self,
-        key: str,
-        value: Union[int, float],
-        unit: Union[str, None] = None,
-    ):
-        self.key = key
-        self.value = value
-        self.unit = unit
-
-
-class ProductIngredient(Base):
-    node_type = "secondary"
-    node_name = "ProductIngredient"
-
-    @beartype
-    def __init__(
-        self,
-        procedure_id: int,
-        keyword: str,
+        ingredient: Union[Base, str],  # Needs more specific type check
+        keyword: str = None,
         quantity: list[Union[Quantity, dict]] = None,
         method: Union[str, None] = None,
     ):
-        self.procedure_id = procedure_id
+        self.ingredient = ingredient
         self.keyword = keyword
         self.quantity = quantity if quantity else []
         self.method = method
@@ -415,7 +439,7 @@ class MaterialIngredient(Base):
     def __init__(
         self,
         ingredient: Union[Material, str],
-        keyword: str,
+        keyword: str = None,
         quantity: list[Union[Quantity, dict]] = None,
         method: Union[str, None] = None,
     ):
@@ -433,21 +457,21 @@ class MaterialIngredient(Base):
         self._remove_node(quantity, "quantity")
 
 
-class Procedure(Base):
-    node_type = "secondary"
-    node_name = "Procedure"
+class Step(Base):
+    node_type = "primary"
+    node_name = "Step"
 
     @beartype
     def __init__(
         self,
-        procedure_id: int,
         description: Union[str, None] = None,
-        product_ingredients: list[Union[ProductIngredient, dict]] = None,
+        product_ingredients: list[Union[IntermediateIngredient, dict]] = None,
         material_ingredients: list[Union[MaterialIngredient, dict]] = None,
         properties: list[Union[Property, dict]] = None,
         conditions: list[Union[Condition, dict]] = None,
+        url: Union[str, None] = None,
     ):
-        self.procedure_id = procedure_id
+        self.url = url
         self.description = description
         self.product_ingredients = product_ingredients if product_ingredients else []
         self.material_ingredients = material_ingredients if material_ingredients else []
@@ -456,18 +480,18 @@ class Procedure(Base):
 
     @beartype
     def add_ingredient(
-        self, ingredient: Union[ProductIngredient, MaterialIngredient, dict]
+        self, ingredient: Union[IntermediateIngredient, MaterialIngredient, dict]
     ):
-        if isinstance(ingredient, ProductIngredient):
+        if isinstance(ingredient, IntermediateIngredient):
             self._add_node(ingredient, "product_ingredients")
         elif isinstance(ingredient, MaterialIngredient):
             self._add_node(ingredient, "material_ingredients")
 
     @beartype
     def remove_ingredient(
-        self, ingredient: Union[ProductIngredient, MaterialIngredient, int]
+        self, ingredient: Union[IntermediateIngredient, MaterialIngredient, int]
     ):
-        if isinstance(ingredient, ProductIngredient):
+        if isinstance(ingredient, IntermediateIngredient):
             self._remove_node(ingredient, "product_ingredients")
         elif isinstance(ingredient, MaterialIngredient):
             self._remove_node(ingredient, "material_ingredients")
@@ -501,8 +525,8 @@ class Process(Base):
         name: str,
         keywords: Union[list[str], None] = None,
         notes: Union[str, None] = None,
-        experiments: list = None,
-        procedures: list[Union[Procedure, dict]] = None,
+        experiments: list[Union[Base, str]] = None,  # Needs more specific type check
+        steps: list[Union[Step, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -513,7 +537,7 @@ class Process(Base):
         self.keywords = keywords
         self.notes = notes
         self.experiments = experiments if experiments else []
-        self.procedures = procedures if procedures else []
+        self.steps = steps if steps else []
         self.public = public
 
     def add_experiment(self, experiment):
@@ -523,12 +547,12 @@ class Process(Base):
         self._remove_node(experiment, "experiments")
 
     @beartype
-    def add_procedure(self, procedure: Union[Procedure, dict]):
-        self._add_node(procedure, "procedures")
+    def add_step(self, step: Union[Step, dict]):
+        self._add_node(step, "steps")
 
     @beartype
-    def remove_procedure(self, procedure: Union[Procedure, int]):
-        self._remove_node(procedure, "procedures")
+    def remove_step(self, step: Union[Step, int]):
+        self._remove_node(step, "steps")
 
 
 class Experiment(Base):
@@ -544,19 +568,21 @@ class Experiment(Base):
         name: str,
         funding: Union[str, None] = None,
         notes: Union[str, None] = None,
-        process: Union[Process, str] = None,
-        product: Union[Material, str] = None,
+        materials: list[Union[Material, str]] = None,
+        processes: list[Union[Process, str]] = None,
+        data: list[Union[Data, str]] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
         super().__init__()
         self.url = url
         self.group = group
+        self.collection = collection
         self.name = name
         self.funding = funding
         self.notes = notes
         self.notes = notes
-        self.collection = collection
-        self.process = process
-        self.product = product
+        self.materials = materials if materials else []
+        self.processes = processes if processes else []
+        self.data = data if data else []
         self.public = public
