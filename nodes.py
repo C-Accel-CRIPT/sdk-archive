@@ -327,28 +327,6 @@ class Quantity(Base):
         self.unit = unit
 
 
-class Specification(Base):
-    node_type = "secondary"
-    node_name = "Specification"
-
-    @beartype
-    def __init__(
-        self,
-        vendor: str = None,
-        lot_number: str = None,
-        storage_location: str = None,
-        quantity: Quantity = None,
-        initial_quantity: Quantity = None,
-        container: str = None,
-    ):
-        self.vendor = vendor
-        self.lot_number = lot_number
-        self.storage_location = storage_location
-        self.quantity = quantity
-        self.initial_quantity = initial_quantity
-        self.container = container
-
-
 class Material(Base):
     node_type = "primary"
     node_name = "Material"
@@ -360,7 +338,8 @@ class Material(Base):
         group: Union[Group, str],
         name: str,
         components: list[Union[MaterialComponent, dict]] = None,
-        source: Union[str, None] = None,
+        vendor: str = None,
+        lot_number: str = None,
         keywords: Union[list[str], None] = None,
         notes: Union[str, None] = None,
         experiments: list[Union[Base, str]] = None,  # Needs more specific type check
@@ -374,7 +353,8 @@ class Material(Base):
         self.group = group
         self.name = name
         self.components = components if components else []
-        self.source = source
+        self.vendor = vendor
+        self.lot_number = lot_number
         self.keywords = keywords
         self.notes = notes
         self.experiments = experiments if experiments else []
