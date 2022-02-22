@@ -233,6 +233,7 @@ class API:
 
         :param node: The node type you want to search.
         :param query: A dictionary defining the query parameters.
+        :return: The JSON response of the query.
         """
         if node_class.node_type == "secondary":
             raise APISearchError(
@@ -246,7 +247,7 @@ class API:
         else:
             raise APISearchError(f"'{query}' is not a valid query.")
 
-        pprint(response.json())
+        return response.json()
 
     def _generate_query_slug(self, query):
         """Generate the query URL slug."""
