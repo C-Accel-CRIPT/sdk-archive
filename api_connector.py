@@ -22,7 +22,7 @@ from .errors import (
 
 class API:
     @beartype
-    def __init__(self, url: str):
+    def __init__(self, url: str, token: str = None):
         """
         Establishes a session with the CRIPT API.
 
@@ -30,7 +30,8 @@ class API:
         """
         self.url = url.rstrip("/")
         self.session = requests.Session()
-        token = getpass("API Token: ")
+        if token is None:
+            token = getpass("API Token: ")
 
         self.session.headers = {
             "Authorization": token,
