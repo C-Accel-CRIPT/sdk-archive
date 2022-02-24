@@ -8,6 +8,7 @@ from .nodes import (
     Identity,
     MaterialComponent,
     Material,
+    Inventory,
     Quantity,
     MaterialIngredient,
     IntermediateIngredient,
@@ -27,6 +28,7 @@ node_classes = [
     Identity,
     MaterialComponent,
     Material,
+    Inventory,
     Quantity,
     MaterialIngredient,
     IntermediateIngredient,
@@ -34,17 +36,6 @@ node_classes = [
     Process,
     Experiment,
 ]
-
-
-secondary_node_lists = {
-    "conditions": Condition,
-    "properties": Property,
-    "components": MaterialComponent,
-    "quantities": Quantity,
-    "material_ingredients": MaterialIngredient,
-    "product_ingredients": IntermediateIngredient,
-    "steps": Step,
-}
 
 
 from .api_connector import API

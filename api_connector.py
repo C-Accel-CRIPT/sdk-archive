@@ -9,7 +9,7 @@ from beartype import beartype
 from beartype.typing import Type
 from pprint import pprint
 
-from . import node_classes, secondary_node_lists
+from . import node_classes
 from .nodes import Base
 from .errors import (
     APIAuthError,
@@ -63,6 +63,7 @@ class API:
             if node.url:
                 response = self.session.get(node.url)
                 self._set_node_attributes(node, response.json())
+                self._generate_nodes(node)
             else:
                 raise APIRefreshError(
                     "Before you can refresh a node, you must either save it or define it's URL."
@@ -86,7 +87,7 @@ class API:
                 response = self._create(node)
             if response.status_code in (200, 201):
                 self._set_node_attributes(node, response.json())
-                self._generate_secondary_nodes(node)
+                self._generate_nodes(node)
                 print(f"{node.node_name} node has been saved to the database.")
             else:
                 pprint(response.json())
@@ -167,67 +168,6 @@ class API:
             )
 
     @beartype
-    def get(self, url: str):
-        """
-        Get the JSON for a node and use it to generated a local node object.
-
-        :param url: The API URL of the node.
-        :return: The generated node object.
-        """
-        # Define node class from URL slug
-        node_slug = url.rstrip("/").rsplit("/")[-2]
-        node_class = None
-        for node_cls in node_classes:
-            if hasattr(node_cls, "slug") and node_cls.slug == node_slug:
-                node_class = node_cls
-
-        if self.url not in url or node_class is None:
-            raise APISearchError("Please enter a valid node URL.")
-
-        response = self.session.get(url)
-        if response.status_code == 200:
-            response_json = response.json()
-
-            # Pop to avoid issues with nodes that don't have these attrs
-            created_at = response_json.pop("created_at", None)
-            updated_at = response_json.pop("updated_at", None)
-
-            node = node_class(**response_json)
-            node.created_at = created_at
-            node.updated_at = updated_at
-
-            self._generate_secondary_nodes(node)
-            return node
-        else:
-            raise APISearchError(
-                f"The specified {node_class.node_name} node was not found."
-            )
-
-    @beartype
-    def _generate_secondary_nodes(self, node: Base):
-        """
-        Generate new secondary node objects.
-
-        :param node: The parent node with nested secondary nodes.
-        """
-        node_dict = node.__dict__
-        for key, value in node_dict.items():
-            if isinstance(value, dict):
-                node_class = secondary_node_lists.get(key)
-                if node_class:
-                    secondary_node = node_class(**value[i])
-                    node_dict[key] = secondary_node
-                    self._generate_secondary_nodes(secondary_node)
-            if isinstance(value, list):
-                for i in range(len(value)):
-                    if isinstance(value[i], dict):
-                        node_class = secondary_node_lists.get(key)
-                        if node_class:
-                            secondary_node = node_class(**value[i])
-                            value[i] = secondary_node
-                            self._generate_secondary_nodes(secondary_node)
-
-    @beartype
     def search(self, node_class: Type[Base], query: dict = None):
         """
         Send a query to the API and print the results.
@@ -256,3 +196,134 @@ class API:
         for key in query:
             slug += f"{key}={query[key]}&"
         return slug
+
+    @beartype
+    def get(self, obj: Union[str, Type[Base]], query: dict = None):
+        """
+        Get the JSON for a node and use it to generated a local node object.
+
+        :param url: The API URL of the node.
+        :return: The generated node object.
+        """
+        # Fetch node from a URL, if defined
+        if isinstance(obj, str):
+            url = obj
+            if self.url not in url:
+                raise APISearchError("Please enter a valid node URL.")
+
+            # Define node class from URL slug
+            node_slug = url.rstrip("/").rsplit("/")[-2]
+            node_class = self._define_node_class(node_slug)
+
+            response = self.session.get(url)
+            if response.status_code == 200:
+                response_json = response.json()
+            else:
+                raise APISearchError(
+                    f"The specified {node_class.node_name} node was not found."
+                )
+
+        # Fetch node from search query, if defined
+        elif issubclass(obj, Base) and query:
+            node_class = obj
+            search_json = self.search(node_class=node_class, query=query)
+
+            count = search_json["count"]
+            if count < 1:
+                raise APISearchError("Your query did not match any existing nodes.")
+            elif count > 1:
+                raise APISearchError("Your query mathced more than one node.")
+            else:
+                response_json = search_json["results"][0]
+
+        else:
+            raise APISearchError(
+                f"Please enter a node URL or a node class with a search query."
+            )
+
+        # Return the local node object if it already exists
+        local_node = self._get_local_primary_node(response_json["url"])
+        if local_node:
+            return local_node
+        else:
+            # Pop then add after node is created
+            created_at = response_json.pop("created_at", None)
+            updated_at = response_json.pop("updated_at", None)
+
+            node = node_class(**response_json)
+            node.created_at = created_at
+            node.updated_at = updated_at
+
+            self._generate_nodes(node)
+            return node
+
+    def _generate_nodes(self, node: Base):
+        """
+        Generate nested node objects within a given node.
+
+        :param node: The parent node.
+        """
+        node_dict = node.__dict__
+        for key, value in node_dict.items():
+            # Skip the url field
+            if key == "url":
+                continue
+            # Generate primary nodes
+            if isinstance(value, str) and self.url in value:
+                local_node = self._get_local_primary_node(value)
+                if local_node:
+                    primary_node = local_node
+                else:
+                    primary_node = self.get(value)
+                node_dict[key] = primary_node
+            # Generate secondary nodes
+            elif isinstance(value, dict):
+                node_class = self._define_node_class(key)
+                secondary_node = node_class(**value[i])
+                node_dict[key] = secondary_node
+                self._generate_nodes(secondary_node)
+            # Handle lists
+            elif isinstance(value, list):
+                for i in range(len(value)):
+                    # Generate primary nodes
+                    if isinstance(value[i], str) and self.url in value[i]:
+                        local_node = self._get_local_primary_node(value[i])
+                        if local_node:
+                            primary_node = local_node
+                        else:
+                            primary_node = self.get(value[i])
+                        value[i] = primary_node
+                    # Generate secondary nodes
+                    elif isinstance(value[i], dict):
+                        node_class = self._define_node_class(key)
+                        secondary_node = node_class(**value[i])
+                        value[i] = secondary_node
+                        self._generate_nodes(secondary_node)
+
+    def _define_node_class(self, key: str):
+        """
+        Find the correct class associated with a given key.
+
+        :param key: The key used to find the correct class.
+        :return: The correct node class.
+        """
+        for node_cls in node_classes:
+            # Use node slug
+            if hasattr(node_cls, "slug") and node_cls.slug == key:
+                return node_cls
+            # Use node list name (e.g., properties)
+            if hasattr(node_cls, "list_name") and node_cls.list_name == key:
+                return node_cls
+        return None
+
+    def _get_local_primary_node(self, url: str):
+        """
+        Use a URL to get a local primary node object, if it exists.
+
+        :param url: The URL to match against existing node objects.
+        :return: The matching object or None.
+        """
+        for instance in Base.__refs__:
+            if hasattr(instance, "url") and url == instance.url:
+                return instance
+        return None

@@ -3,6 +3,8 @@ import copy
 from typing import Union
 
 from beartype import beartype
+from collections import defaultdict
+from weakref import WeakSet
 
 from .errors import AddNodeError, RemoveNodeError, UnsavedNodeError
 
@@ -13,15 +15,20 @@ class Base:
     All nodes inherit from this class.
     """
 
+    __refs__ = WeakSet()  # Set() of all node instances
+
     def __init__(self):
-        self.created_at = None
-        self.updated_at = None
+        self.__refs__.add(self)  # Add instance to __refs__
 
     def __repr__(self):
         return self._to_json()
 
     def __str__(self):
         return self._to_json()
+
+    @classmethod
+    def _get_instances(cls):
+        return cls.__refs__[cls]
 
     def print_json(self):
         print(self._to_json())
@@ -103,6 +110,7 @@ class Data(Base):
     node_type = "primary"
     node_name = "Data"
     slug = "data"
+    list_name = "data"
 
     @beartype
     def __init__(
@@ -124,6 +132,8 @@ class Data(Base):
         self.type = type
         self.sample_prep = sample_prep
         self.notes = notes
+        self.created_at = None
+        self.updated_at = None
         self.public = public
 
 
@@ -131,6 +141,7 @@ class File(Base):
     node_type = "primary"
     node_name = "File"
     slug = "file"
+    list_name = "files"
 
     @beartype
     def __init__(
@@ -150,12 +161,15 @@ class File(Base):
         self.source = source
         self.name = name
         self.extension = extension
+        self.created_at = None
+        self.updated_at = None
         self.public = public
 
 
 class Condition(Base):
     node_type = "secondary"
     node_name = "Condition"
+    list_name = "conditions"
 
     @beartype
     def __init__(
@@ -163,12 +177,13 @@ class Condition(Base):
         key: str,
         value: Union[str, int, float],
         unit: Union[str, None] = None,
-        uncertainty: float = None,
-        uncertainty_type: str = None,
-        set_id: int = None,
-        measurement_id: int = None,
+        uncertainty: Union[float, None] = None,
+        uncertainty_type: Union[str, None] = None,
+        set_id: Union[int, None] = None,
+        measurement_id: Union[int, None] = None,
         data: list[Union[Data, str]] = None,
     ):
+        super().__init__()
         self.key = key
         self.value = value
         self.unit = unit
@@ -190,6 +205,7 @@ class Condition(Base):
 class Property(Base):
     node_type = "secondary"
     node_name = "Property"
+    list_name = "properties"
 
     @beartype
     def __init__(
@@ -199,12 +215,13 @@ class Property(Base):
         unit: Union[str, None] = None,
         method: Union[str, None] = None,
         reference_material: Union[str, None] = None,
-        uncertainty: float = None,
-        uncertainty_type: str = None,
-        set_id: int = None,
+        uncertainty: Union[float, None] = None,
+        uncertainty_type: Union[str, None] = None,
+        set_id: Union[int, None] = None,
         data: list[Union[Data, str]] = None,
         conditions: list[Union[Condition, dict]] = None,
     ):
+        super().__init__()
         self.key = key
         self.value = value
         self.unit = unit
@@ -254,6 +271,8 @@ class Collection(Base):
         self.name = name
         self.notes = notes
         self.experiments = experiments if experiments else []
+        self.created_at = None
+        self.updated_at = None
         self.public = public
 
     def add_experiment(self, experiment):
@@ -298,15 +317,19 @@ class Identity(Base):
         self.pubchem_cid = pubchem_cid
         self.inchi = inchi
         self.inchi_key = inchi_key
+        self.created_at = None
+        self.updated_at = None
         self.public = public
 
 
 class MaterialComponent(Base):
     node_type = "secondary"
     node_name = "MaterialComponent"
+    list_name = "components"
 
     @beartype
     def __init__(self, identity: Union[Identity, str], component_id: int = 0):
+        super().__init__()
         self.component_id = component_id
         self.identity = identity
 
@@ -314,6 +337,7 @@ class MaterialComponent(Base):
 class Quantity(Base):
     node_type = "secondary"
     node_name = "Quantity"
+    list_name = "quantity"
 
     @beartype
     def __init__(
@@ -322,6 +346,7 @@ class Quantity(Base):
         value: Union[int, float],
         unit: Union[str, None] = None,
     ):
+        super().__init__()
         self.key = key
         self.value = value
         self.unit = unit
@@ -331,19 +356,20 @@ class Material(Base):
     node_type = "primary"
     node_name = "Material"
     slug = "material"
+    list_name = "materials"
 
     @beartype
     def __init__(
         self,
         group: Union[Group, str],
         name: str,
-        components: list[Union[MaterialComponent, dict]] = None,
-        vendor: str = None,
-        lot_number: str = None,
+        components: list[Union[MaterialComponent, dict]],
+        vendor: Union[str, None] = None,
+        lot_number: Union[str, None] = None,
         keywords: Union[list[str], None] = None,
         notes: Union[str, None] = None,
         experiments: list[Union[Base, str]] = None,  # Needs more specific type check
-        step: Union[Base, str] = None,  # Needs more specific type check
+        step: Union[Base, str, None] = None,  # Needs more specific type check
         properties: list[Union[Property, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
@@ -352,7 +378,7 @@ class Material(Base):
         self.url = url
         self.group = group
         self.name = name
-        self.components = components if components else []
+        self.components = components
         self.vendor = vendor
         self.lot_number = lot_number
         self.keywords = keywords
@@ -360,6 +386,8 @@ class Material(Base):
         self.experiments = experiments if experiments else []
         self.step = step
         self.properties = properties if properties else []
+        self.created_at = None
+        self.updated_at = None
         self.public = public
 
     def add_experiment(self, experiment):
@@ -385,9 +413,44 @@ class Material(Base):
         self._remove_node(property, "properties")
 
 
+class Inventory(Base):
+    node_type = "primary"
+    node_name = "Inventory"
+    slug = "inventory"
+
+    @beartype
+    def __init__(
+        self,
+        group: Union[Group, str],
+        name: str,
+        materials: list[Union[Material, str]],
+        description: str = None,
+        public: bool = False,
+        url: Union[str, None] = None,
+    ):
+        super().__init__()
+        self.url = url
+        self.group = group
+        self.name = name
+        self.description = description
+        self.materials = materials
+        self.created_at = None
+        self.updated_at = None
+        self.public = public
+
+    @beartype
+    def add_material(self, material: Union[Material, dict]):
+        self._add_node(material, "materials")
+
+    @beartype
+    def remove_material(self, material: Union[Material, int]):
+        self._remove_node(material, "materials")
+
+
 class IntermediateIngredient(Base):
     node_type = "secondary"
     node_name = "IntermediateIngredient"
+    list_name = "intermediate_ingredients"
 
     @beartype
     def __init__(
@@ -397,6 +460,7 @@ class IntermediateIngredient(Base):
         quantity: list[Union[Quantity, dict]] = None,
         method: Union[str, None] = None,
     ):
+        super().__init__()
         self.ingredient = ingredient
         self.keyword = keyword
         self.quantity = quantity if quantity else []
@@ -414,6 +478,7 @@ class IntermediateIngredient(Base):
 class MaterialIngredient(Base):
     node_type = "secondary"
     node_name = "MaterialIngredient"
+    list_name = "material_ingredients"
 
     @beartype
     def __init__(
@@ -423,6 +488,7 @@ class MaterialIngredient(Base):
         quantity: list[Union[Quantity, dict]] = None,
         method: Union[str, None] = None,
     ):
+        super().__init__()
         self.ingredient = ingredient
         self.keyword = keyword
         self.quantity = quantity if quantity else []
@@ -440,23 +506,44 @@ class MaterialIngredient(Base):
 class Step(Base):
     node_type = "primary"
     node_name = "Step"
+    slug = "step"
+    list_name = "steps"
 
     @beartype
     def __init__(
         self,
+        group: Union[Group, str],
+        processes: list[Union[Base, str]] = None,  # Needs more specific type check
         description: Union[str, None] = None,
-        product_ingredients: list[Union[IntermediateIngredient, dict]] = None,
+        intermediate_ingredients: list[Union[IntermediateIngredient, dict]] = None,
         material_ingredients: list[Union[MaterialIngredient, dict]] = None,
+        equipment: list[Union[str, None]] = None,
+        duration: Union[Quantity, dict, None] = None,
+        time_position: Union[Quantity, dict, None] = None,
         properties: list[Union[Property, dict]] = None,
         conditions: list[Union[Condition, dict]] = None,
+        set_id: Union[int, None] = None,
+        public: bool = False,
         url: Union[str, None] = None,
     ):
+        super().__init__()
         self.url = url
+        self.group = group
+        self.processes = processes if processes else []
         self.description = description
-        self.product_ingredients = product_ingredients if product_ingredients else []
+        self.intermediate_ingredients = (
+            intermediate_ingredients if intermediate_ingredients else []
+        )
         self.material_ingredients = material_ingredients if material_ingredients else []
+        self.equipment = equipment
+        self.duration = duration
+        self.time_position = time_position
         self.properties = properties if properties else []
         self.conditions = conditions if conditions else []
+        self.set_id = set_id
+        self.created_at = None
+        self.updated_at = None
+        self.public = public
 
     @beartype
     def add_ingredient(
@@ -497,6 +584,7 @@ class Process(Base):
     node_type = "primary"
     node_name = "Process"
     slug = "process"
+    list_name = "processes"
 
     @beartype
     def __init__(
@@ -506,7 +594,7 @@ class Process(Base):
         keywords: Union[list[str], None] = None,
         notes: Union[str, None] = None,
         experiments: list[Union[Base, str]] = None,  # Needs more specific type check
-        steps: list[Union[Step, dict]] = None,
+        steps: list[Union[Step, str]] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -518,6 +606,8 @@ class Process(Base):
         self.notes = notes
         self.experiments = experiments if experiments else []
         self.steps = steps if steps else []
+        self.created_at = None
+        self.updated_at = None
         self.public = public
 
     def add_experiment(self, experiment):
@@ -539,6 +629,7 @@ class Experiment(Base):
     node_type = "primary"
     node_name = "Experiment"
     slug = "experiment"
+    list_name = "experiments"
 
     @beartype
     def __init__(
@@ -565,4 +656,6 @@ class Experiment(Base):
         self.materials = materials if materials else []
         self.processes = processes if processes else []
         self.data = data if data else []
+        self.created_at = None
+        self.updated_at = None
         self.public = public
