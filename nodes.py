@@ -182,7 +182,10 @@ class Data(Base):
         type: str,
         files: list[str] = None,
         sample_prep: Union[str, None] = None,
+        calibration: Union[str, None] = None,
+        configuration: Union[str, None] = None,
         notes: Union[str, None] = None,
+        experiment: Union[Base, str] = None,
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
@@ -194,7 +197,10 @@ class Data(Base):
         self.files = files
         self.type = type
         self.sample_prep = sample_prep
+        self.calibration = calibration
+        self.configuration = configuration
         self.notes = notes
+        self.experiment = experiment
         self.citations = citations if citations else []
         self.created_at = None
         self.updated_at = None
@@ -286,7 +292,7 @@ class Property(Base):
         value: Union[str, int, float],
         unit: Union[str, None] = None,
         method: Union[str, None] = None,
-        reference_material: Union[str, None] = None,
+        method_description: Union[str, None] = None,
         uncertainty: Union[float, None] = None,
         uncertainty_type: Union[str, None] = None,
         set_id: Union[int, None] = None,
@@ -298,7 +304,7 @@ class Property(Base):
         self.value = value
         self.unit = unit
         self.method = method
-        self.reference_material = reference_material
+        self.method_description = method_description
         self.uncertainty = uncertainty
         self.uncertainty_type = uncertainty_type
         self.set_id = set_id
@@ -334,6 +340,7 @@ class Collection(Base):
         name: str,
         notes: Union[str, None] = None,
         experiments: list[Union[Base, str]] = None,  # Needs more specific type check
+        inventories: list[Union[Base, str]] = None,  # Needs more specific type check
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
@@ -344,6 +351,7 @@ class Collection(Base):
         self.name = name
         self.notes = notes
         self.experiments = experiments if experiments else []
+        self.inventories = inventories if inventories else []
         self.citations = citations if citations else []
         self.created_at = None
         self.updated_at = None
@@ -404,9 +412,9 @@ class Identity(Base):
         self.public = public
 
 
-class MaterialComponent(Base):
+class Component(Base):
     node_type = "secondary"
-    node_name = "MaterialComponent"
+    node_name = "Component"
     list_name = "components"
 
     @beartype
@@ -445,7 +453,7 @@ class Material(Base):
         self,
         group: Union[Group, str],
         name: str,
-        components: list[Union[MaterialComponent, dict]] = None,
+        components: list[Union[Component, dict]] = None,
         vendor: Union[str, None] = None,
         lot_number: Union[str, None] = None,
         keywords: Union[list[str], None] = None,
@@ -481,11 +489,11 @@ class Material(Base):
         self._remove_node(experiment, "experiments")
 
     @beartype
-    def add_component(self, component: Union[MaterialComponent, dict]):
+    def add_component(self, component: Union[Component, dict]):
         self._add_node(component, "components")
 
     @beartype
-    def remove_component(self, component: Union[MaterialComponent, int]):
+    def remove_component(self, component: Union[Component, int]):
         self._remove_node(component, "components")
 
     @beartype
@@ -685,7 +693,7 @@ class Process(Base):
         name: str,
         keywords: Union[list[str], None] = None,
         notes: Union[str, None] = None,
-        experiments: list[Union[Base, str]] = None,  # Needs more specific type check
+        experiment: Union[Base, str] = None,  # Needs more specific type check
         steps: list[Union[Step, str]] = None,
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
@@ -697,18 +705,12 @@ class Process(Base):
         self.name = name
         self.keywords = keywords
         self.notes = notes
-        self.experiments = experiments if experiments else []
+        self.experiment = experiment
         self.steps = steps if steps else []
         self.created_at = None
         self.updated_at = None
         self.citations = citations if citations else []
         self.public = public
-
-    def add_experiment(self, experiment):
-        self._add_node(experiment, "experiments")
-
-    def remove_experiment(self, experiment):
-        self._remove_node(experiment, "experiments")
 
     @beartype
     def add_step(self, step: Union[Step, dict]):
