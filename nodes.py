@@ -180,7 +180,7 @@ class Data(Base):
         group: Union[Group, str],
         name: str,
         type: str,
-        files: list[str] = None,
+        files: list[Union[Base, str]] = None,
         sample_prep: Union[str, None] = None,
         calibration: Union[str, None] = None,
         configuration: Union[str, None] = None,
@@ -205,6 +205,14 @@ class Data(Base):
         self.created_at = None
         self.updated_at = None
         self.public = public
+
+    @beartype
+    def add_file(self, citation: Union[Base, dict]):
+        self._add_node(citation, "files")
+
+    @beartype
+    def remove_file(self, citation: Union[Base, int]):
+        self._remove_node(citation, "files")
 
     @beartype
     def add_citation(self, citation: Union[Citation, dict]):
@@ -613,7 +621,8 @@ class Step(Base):
     def __init__(
         self,
         group: Union[Group, str],
-        processes: list[Union[Base, str]] = None,  # Needs more specific type check
+        process: Union[Base, str],  # Needs more specific type check
+        type: str,
         description: Union[str, None] = None,
         intermediate_ingredients: list[Union[IntermediateIngredient, dict]] = None,
         material_ingredients: list[Union[MaterialIngredient, dict]] = None,
@@ -623,13 +632,15 @@ class Step(Base):
         properties: list[Union[Property, dict]] = None,
         conditions: list[Union[Condition, dict]] = None,
         set_id: Union[int, None] = None,
+        material_products: list[Union[Material, str]] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
         super().__init__()
         self.url = url
         self.group = group
-        self.processes = processes if processes else []
+        self.process = process
+        self.type = type
         self.description = description
         self.intermediate_ingredients = (
             intermediate_ingredients if intermediate_ingredients else []
@@ -641,6 +652,7 @@ class Step(Base):
         self.properties = properties if properties else []
         self.conditions = conditions if conditions else []
         self.set_id = set_id
+        self.material_products = material_products if material_products else []
         self.created_at = None
         self.updated_at = None
         self.public = public
@@ -662,6 +674,14 @@ class Step(Base):
             self._remove_node(ingredient, "product_ingredients")
         elif isinstance(ingredient, MaterialIngredient):
             self._remove_node(ingredient, "material_ingredients")
+
+    @beartype
+    def add_product(self, material: Union[Material, dict]):
+        self._add_node(material, "material_products")
+
+    @beartype
+    def remove_product(self, material: Union[Material, int]):
+        self._remove_node(material, "material_products")
 
     @beartype
     def add_condition(self, condition: Union[Condition, dict]):
