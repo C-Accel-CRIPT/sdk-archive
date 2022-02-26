@@ -154,8 +154,10 @@ class API:
                 response = self.session.delete(url=node.url)
                 if response.status_code == 204:
                     print(f"{node.node_name} node has been deleted from the database.")
-                    # Clear fields to indicate the object has been deleted from DB
-                    node.__dict__.clear()
+                    # Reset fields to indicate the object has been deleted from DB
+                    node.url = None
+                    node.created_at = None
+                    node.updated_at = None
                 else:
                     pprint(response.json())
             else:
