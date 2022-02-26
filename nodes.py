@@ -168,6 +168,78 @@ class Citation(Base):
         self.reference = reference
 
 
+class Collection(Base):
+    node_type = "primary"
+    node_name = "Collection"
+    slug = "collection"
+
+    @beartype
+    def __init__(
+        self,
+        group: Union[Group, str],
+        name: str,
+        notes: Union[str, None] = None,
+        citations: list[Union[Citation, dict]] = None,
+        public: bool = False,
+        url: Union[str, None] = None,
+        experiments=None,
+        inventories=None,
+    ):
+        super().__init__()
+        self.url = url
+        self.group = group
+        self.name = name
+        self.notes = notes
+        self.experiments = experiments if experiments else []
+        self.inventories = inventories if inventories else []
+        self.citations = citations if citations else []
+        self.created_at = None
+        self.updated_at = None
+        self.public = public
+
+    @beartype
+    def add_citation(self, citation: Union[Citation, dict]):
+        self._add_node(citation, "citations")
+
+    @beartype
+    def remove_citation(self, citation: Union[Citation, int]):
+        self._remove_node(citation, "citations")
+
+
+class Experiment(Base):
+    node_type = "primary"
+    node_name = "Experiment"
+    slug = "experiment"
+    list_name = "experiments"
+
+    @beartype
+    def __init__(
+        self,
+        group: Union[Group, str],
+        collection: Union[Collection, str],
+        name: str,
+        funding: Union[str, None] = None,
+        notes: Union[str, None] = None,
+        public: bool = False,
+        url: Union[str, None] = None,
+        processes=None,
+        data=None,
+    ):
+        super().__init__()
+        self.url = url
+        self.group = group
+        self.collection = collection
+        self.name = name
+        self.funding = funding
+        self.notes = notes
+        self.notes = notes
+        self.processes = processes if processes else []
+        self.data = data if data else []
+        self.created_at = None
+        self.updated_at = None
+        self.public = public
+
+
 class Data(Base):
     node_type = "primary"
     node_name = "Data"
@@ -178,6 +250,7 @@ class Data(Base):
     def __init__(
         self,
         group: Union[Group, str],
+        experiment: Union[Base, str],
         name: str,
         type: str,
         files: list[Union[Base, str]] = None,
@@ -185,7 +258,6 @@ class Data(Base):
         calibration: Union[str, None] = None,
         configuration: Union[str, None] = None,
         notes: Union[str, None] = None,
-        experiment: Union[Base, str] = None,
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
@@ -336,50 +408,6 @@ class Property(Base):
         self._remove_node(condition, "conditions")
 
 
-class Collection(Base):
-    node_type = "primary"
-    node_name = "Collection"
-    slug = "collection"
-
-    @beartype
-    def __init__(
-        self,
-        group: Union[Group, str],
-        name: str,
-        notes: Union[str, None] = None,
-        experiments: list[Union[Base, str]] = None,  # Needs more specific type check
-        inventories: list[Union[Base, str]] = None,  # Needs more specific type check
-        citations: list[Union[Citation, dict]] = None,
-        public: bool = False,
-        url: Union[str, None] = None,
-    ):
-        super().__init__()
-        self.url = url
-        self.group = group
-        self.name = name
-        self.notes = notes
-        self.experiments = experiments if experiments else []
-        self.inventories = inventories if inventories else []
-        self.citations = citations if citations else []
-        self.created_at = None
-        self.updated_at = None
-        self.public = public
-
-    def add_experiment(self, experiment):
-        self._add_node(experiment, "experiments")
-
-    def remove_experiment(self, experiment):
-        self._remove_node(experiment, "experiments")
-
-    @beartype
-    def add_citation(self, citation: Union[Citation, dict]):
-        self._add_node(citation, "citations")
-
-    @beartype
-    def remove_citation(self, citation: Union[Citation, int]):
-        self._remove_node(citation, "citations")
-
-
 class Identity(Base):
     node_type = "primary"
     node_name = "Identity"
@@ -466,7 +494,6 @@ class Material(Base):
         lot_number: Union[str, None] = None,
         keywords: Union[list[str], None] = None,
         notes: Union[str, None] = None,
-        experiments: list[Union[Base, str]] = None,  # Needs more specific type check
         step: Union[Base, str, None] = None,  # Needs more specific type check
         properties: list[Union[Property, dict]] = None,
         citations: list[Union[Citation, dict]] = None,
@@ -482,7 +509,6 @@ class Material(Base):
         self.lot_number = lot_number
         self.keywords = keywords
         self.notes = notes
-        self.experiments = experiments if experiments else []
         self.step = step
         self.properties = properties if properties else []
         self.citations = citations if citations else []
@@ -530,6 +556,7 @@ class Inventory(Base):
     def __init__(
         self,
         group: Union[Group, str],
+        collection: Union[Collection, str],
         name: str,
         materials: list[Union[Material, str]],
         description: str = None,
@@ -539,6 +566,7 @@ class Inventory(Base):
         super().__init__()
         self.url = url
         self.group = group
+        self.collection = collection
         self.name = name
         self.description = description
         self.materials = materials
@@ -611,6 +639,47 @@ class MaterialIngredient(Base):
         self._remove_node(quantity, "quantity")
 
 
+class Process(Base):
+    node_type = "primary"
+    node_name = "Process"
+    slug = "process"
+    list_name = "processes"
+
+    @beartype
+    def __init__(
+        self,
+        group: Union[Group, str],
+        experiment: Union[Experiment, str],
+        name: str,
+        keywords: Union[list[str], None] = None,
+        notes: Union[str, None] = None,
+        citations: list[Union[Citation, dict]] = None,
+        public: bool = False,
+        url: Union[str, None] = None,
+        steps=None,
+    ):
+        super().__init__()
+        self.url = url
+        self.group = group
+        self.experiment = experiment
+        self.name = name
+        self.keywords = keywords
+        self.notes = notes
+        self.steps = steps if steps else []
+        self.created_at = None
+        self.updated_at = None
+        self.citations = citations if citations else []
+        self.public = public
+
+    @beartype
+    def add_citation(self, citation: Union[Citation, dict]):
+        self._add_node(citation, "citations")
+
+    @beartype
+    def remove_citation(self, citation: Union[Citation, int]):
+        self._remove_node(citation, "citations")
+
+
 class Step(Base):
     node_type = "primary"
     node_name = "Step"
@@ -621,12 +690,12 @@ class Step(Base):
     def __init__(
         self,
         group: Union[Group, str],
-        process: Union[Base, str],  # Needs more specific type check
+        process: Union[Process, str],
         type: str,
         description: Union[str, None] = None,
         intermediate_ingredients: list[Union[IntermediateIngredient, dict]] = None,
         material_ingredients: list[Union[MaterialIngredient, dict]] = None,
-        equipment: list[Union[str, None]] = None,
+        equipment: Union[list[str], None] = None,
         duration: Union[Quantity, dict, None] = None,
         time_position: Union[Quantity, dict, None] = None,
         properties: list[Union[Property, dict]] = None,
@@ -698,88 +767,3 @@ class Step(Base):
     @beartype
     def remove_property(self, property: Union[Property, int]):
         self._remove_node(property, "properties")
-
-
-class Process(Base):
-    node_type = "primary"
-    node_name = "Process"
-    slug = "process"
-    list_name = "processes"
-
-    @beartype
-    def __init__(
-        self,
-        group: Union[Group, str],
-        name: str,
-        keywords: Union[list[str], None] = None,
-        notes: Union[str, None] = None,
-        experiment: Union[Base, str] = None,  # Needs more specific type check
-        steps: list[Union[Step, str]] = None,
-        citations: list[Union[Citation, dict]] = None,
-        public: bool = False,
-        url: Union[str, None] = None,
-    ):
-        super().__init__()
-        self.url = url
-        self.group = group
-        self.name = name
-        self.keywords = keywords
-        self.notes = notes
-        self.experiment = experiment
-        self.steps = steps if steps else []
-        self.created_at = None
-        self.updated_at = None
-        self.citations = citations if citations else []
-        self.public = public
-
-    @beartype
-    def add_step(self, step: Union[Step, dict]):
-        self._add_node(step, "steps")
-
-    @beartype
-    def remove_step(self, step: Union[Step, int]):
-        self._remove_node(step, "steps")
-
-    @beartype
-    def add_citation(self, citation: Union[Citation, dict]):
-        self._add_node(citation, "citations")
-
-    @beartype
-    def remove_citation(self, citation: Union[Citation, int]):
-        self._remove_node(citation, "citations")
-
-
-class Experiment(Base):
-    node_type = "primary"
-    node_name = "Experiment"
-    slug = "experiment"
-    list_name = "experiments"
-
-    @beartype
-    def __init__(
-        self,
-        group: Union[Group, str],
-        collection: Union[Collection, str],
-        name: str,
-        funding: Union[str, None] = None,
-        notes: Union[str, None] = None,
-        materials: list[Union[Material, str]] = None,
-        processes: list[Union[Process, str]] = None,
-        data: list[Union[Data, str]] = None,
-        public: bool = False,
-        url: Union[str, None] = None,
-    ):
-        super().__init__()
-        self.url = url
-        self.group = group
-        self.collection = collection
-        self.name = name
-        self.funding = funding
-        self.notes = notes
-        self.notes = notes
-        self.materials = materials if materials else []
-        self.processes = processes if processes else []
-        self.data = data if data else []
-        self.created_at = None
-        self.updated_at = None
-        self.public = public
