@@ -106,6 +106,68 @@ class Group(Base):
         self.users = users
 
 
+class Reference(Base):
+    node_type = "primary"
+    node_name = "Reference"
+    slug = "reference"
+
+    @beartype
+    def __init__(
+        self,
+        group: Union[Group, str],
+        title: str,
+        doi: str,
+        authors: Union[list[str], None] = None,
+        journal: Union[str, None] = None,
+        publisher: Union[str, None] = None,
+        year: Union[int, None] = None,
+        volume: Union[int, None] = None,
+        issue: Union[int, None] = None,
+        pages: Union[list[int], None] = None,
+        issn: Union[str, None] = None,
+        arxiv_id: Union[str, None] = None,
+        pmid: Union[int, None] = None,
+        website: Union[str, None] = None,
+        notes: Union[str, None] = None,
+        public: bool = False,
+        url: Union[str, None] = None,
+    ):
+        super().__init__()
+        self.url = url
+        self.group = group
+        self.title = title
+        self.doi = doi
+        self.authors = authors
+        self.journal = journal
+        self.publisher = publisher
+        self.year = year
+        self.volume = volume
+        self.issue = issue
+        self.pages = pages
+        self.issn = issn
+        self.arxiv_id = arxiv_id
+        self.pmid = pmid
+        self.website = website
+        self.notes = notes
+        self.created_at = None
+        self.updated_at = None
+        self.public = public
+
+
+class Citation(Base):
+    node_type = "secondary"
+    node_name = "Citation"
+    list_name = "citations"
+
+    @beartype
+    def __init__(
+        self, reference: Union[Reference, str], method: Union[str, None] = None
+    ):
+        super().__init__()
+        self.method = method
+        self.reference = reference
+
+
 class Data(Base):
     node_type = "primary"
     node_name = "Data"
@@ -121,6 +183,7 @@ class Data(Base):
         files: list[str] = None,
         sample_prep: Union[str, None] = None,
         notes: Union[str, None] = None,
+        citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -132,9 +195,18 @@ class Data(Base):
         self.type = type
         self.sample_prep = sample_prep
         self.notes = notes
+        self.citations = citations if citations else []
         self.created_at = None
         self.updated_at = None
         self.public = public
+
+    @beartype
+    def add_citation(self, citation: Union[Citation, dict]):
+        self._add_node(citation, "citations")
+
+    @beartype
+    def remove_citation(self, citation: Union[Citation, int]):
+        self._remove_node(citation, "citations")
 
 
 class File(Base):
@@ -262,6 +334,7 @@ class Collection(Base):
         name: str,
         notes: Union[str, None] = None,
         experiments: list[Union[Base, str]] = None,  # Needs more specific type check
+        citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -271,6 +344,7 @@ class Collection(Base):
         self.name = name
         self.notes = notes
         self.experiments = experiments if experiments else []
+        self.citations = citations if citations else []
         self.created_at = None
         self.updated_at = None
         self.public = public
@@ -280,6 +354,14 @@ class Collection(Base):
 
     def remove_experiment(self, experiment):
         self._remove_node(experiment, "experiments")
+
+    @beartype
+    def add_citation(self, citation: Union[Citation, dict]):
+        self._add_node(citation, "citations")
+
+    @beartype
+    def remove_citation(self, citation: Union[Citation, int]):
+        self._remove_node(citation, "citations")
 
 
 class Identity(Base):
@@ -363,7 +445,7 @@ class Material(Base):
         self,
         group: Union[Group, str],
         name: str,
-        components: list[Union[MaterialComponent, dict]],
+        components: list[Union[MaterialComponent, dict]] = None,
         vendor: Union[str, None] = None,
         lot_number: Union[str, None] = None,
         keywords: Union[list[str], None] = None,
@@ -371,6 +453,7 @@ class Material(Base):
         experiments: list[Union[Base, str]] = None,  # Needs more specific type check
         step: Union[Base, str, None] = None,  # Needs more specific type check
         properties: list[Union[Property, dict]] = None,
+        citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -378,7 +461,7 @@ class Material(Base):
         self.url = url
         self.group = group
         self.name = name
-        self.components = components
+        self.components = components if components else []
         self.vendor = vendor
         self.lot_number = lot_number
         self.keywords = keywords
@@ -386,6 +469,7 @@ class Material(Base):
         self.experiments = experiments if experiments else []
         self.step = step
         self.properties = properties if properties else []
+        self.citations = citations if citations else []
         self.created_at = None
         self.updated_at = None
         self.public = public
@@ -411,6 +495,14 @@ class Material(Base):
     @beartype
     def remove_property(self, property: Union[Property, int]):
         self._remove_node(property, "properties")
+
+    @beartype
+    def add_citation(self, citation: Union[Citation, dict]):
+        self._add_node(citation, "citations")
+
+    @beartype
+    def remove_citation(self, citation: Union[Citation, int]):
+        self._remove_node(citation, "citations")
 
 
 class Inventory(Base):
@@ -595,6 +687,7 @@ class Process(Base):
         notes: Union[str, None] = None,
         experiments: list[Union[Base, str]] = None,  # Needs more specific type check
         steps: list[Union[Step, str]] = None,
+        citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -608,6 +701,7 @@ class Process(Base):
         self.steps = steps if steps else []
         self.created_at = None
         self.updated_at = None
+        self.citations = citations if citations else []
         self.public = public
 
     def add_experiment(self, experiment):
@@ -623,6 +717,14 @@ class Process(Base):
     @beartype
     def remove_step(self, step: Union[Step, int]):
         self._remove_node(step, "steps")
+
+    @beartype
+    def add_citation(self, citation: Union[Citation, dict]):
+        self._add_node(citation, "citations")
+
+    @beartype
+    def remove_citation(self, citation: Union[Citation, int]):
+        self._remove_node(citation, "citations")
 
 
 class Experiment(Base):

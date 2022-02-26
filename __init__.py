@@ -1,5 +1,7 @@
 from .nodes import (
     Group,
+    Reference,
+    Citation,
     Collection,
     File,
     Data,
@@ -20,6 +22,8 @@ from .nodes import (
 
 node_classes = [
     Group,
+    Reference,
+    Citation,
     Collection,
     File,
     Data,
