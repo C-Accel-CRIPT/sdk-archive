@@ -1,4 +1,5 @@
 from .nodes import (
+    User,
     Group,
     Reference,
     Citation,
@@ -21,6 +22,7 @@ from .nodes import (
 
 
 node_classes = [
+    User,
     Group,
     Reference,
     Citation,
