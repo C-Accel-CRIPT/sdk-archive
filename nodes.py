@@ -25,10 +25,6 @@ class Base:
     def __str__(self):
         return self._to_json()
 
-    @classmethod
-    def _get_instances(cls):
-        return cls.__refs__[cls]
-
     def print_json(self):
         print(self._to_json())
 
