@@ -48,6 +48,16 @@ class APISearchError(Exception):
         return self.message
 
 
+class APIGetError(Exception):
+    """Raised for errors when getting an object from the API."""
+
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message
+
+
 class UnsavedNodeError(Exception):
     """Raised when an attempt is made to add an unsaved node to another node."""
 
