@@ -1,3 +1,4 @@
+import os
 import json
 import copy
 from typing import Union
@@ -316,7 +317,9 @@ class File(Base):
         data: Union[Data, str],
         source: Union[str, None],
         name: Union[str, None] = None,
+        id: Union[int, None] = None,
         extension: Union[str, None] = None,
+        external_source: Union[str, None] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -325,8 +328,13 @@ class File(Base):
         self.group = group
         self.data = data
         self.source = source
-        self.name = name
+        if self.source and os.path.exists(self.source):
+            self.name = os.path.basename(self.source)
+        else:
+            self.name = name
+        self.id = id
         self.extension = extension
+        self.external_source = external_source
         self.created_at = None
         self.updated_at = None
         self.public = public

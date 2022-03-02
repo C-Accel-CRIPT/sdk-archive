@@ -1,7 +1,9 @@
 """
 CRIPT REST API Connector
 """
+import os
 import requests
+import json
 from typing import Union
 from getpass import getpass
 
@@ -82,12 +84,23 @@ class API:
         """
         if node.node_type == "primary":
             if node.url:
-                response = self._update(node)
+                # Update an existing object via PUT
+                response = self.session.put(url=node.url, data=node._to_json())
             else:
-                response = self._create(node)
+                # Create a new object via POST
+                response = self.session.post(
+                    url=f"{self.url}/{node.slug}/", data=node._to_json()
+                )
             if response.status_code in (200, 201):
+                if node.slug == "file":
+                    self._upload_file(response.json()["id"], node.source)
                 self._set_node_attributes(node, response.json())
                 self._generate_nodes(node)
+
+                # Update signed URL for File nodes
+                if node.slug == "file":
+                    self.refresh(node)
+
                 print(f"{node.node_name} node has been saved to the database.")
             else:
                 pprint(response.json())
@@ -95,42 +108,6 @@ class API:
             raise APISaveError(
                 f"The save() method cannot be called on secondary nodes such as {node.node_name}"
             )
-
-    def _create(self, node):
-        """
-        Send a JSON POST request to the API.
-
-        :param node: The node to be created.
-        :return: The HTTP response object.
-        """
-        if node.slug == "file":
-            headers = {"Content-Type": None}
-            file = {"source": open(node.source, "rb")}
-            payload = {"group": node.group.url, "data": node.data.url}
-            return self.session.post(
-                url=f"{self.url}/{node.slug}/",
-                headers=headers,
-                files=file,
-                data=payload,
-            )
-        else:
-            return self.session.post(
-                url=f"{self.url}/{node.slug}/", data=node._to_json()
-            )
-
-    def _update(self, node):
-        """
-        Send a JSON PUT request to the API.
-
-        :param node: The node to be updated.
-        :return: The HTTP response object.
-        """
-        if node.slug == "file":
-            headers = {"Content-Type": None}
-            payload = {"group": node.group.url, "data": node.data.url}
-            return self.session.put(url=node.url, headers=headers, data=payload)
-        else:
-            return self.session.put(url=node.url, data=node._to_json())
 
     def _set_node_attributes(self, node, response_json):
         """
@@ -141,6 +118,34 @@ class API:
         """
         for json_key, json_value in response_json.items():
             setattr(node, json_key, json_value)
+
+    def _upload_file(self, file_id, file_path):
+        """ "
+        Generate a signed URL then upload the file to S3.
+
+        :param node: ID of the File node.
+        """
+        if file_path and os.path.exists(file_path):
+            # Generate signed URL for uploading
+            data = {"action": "upload", "file_id": file_id}
+            response = self.session.post(
+                url=f"{self.url}/signed-url/", data=json.dumps(data)
+            )
+
+            # Upload file
+            if response.status_code == 200:
+                response_json = response.json()
+                url = response_json["url"]
+                data = response_json["fields"]
+                files = {"file": open(file_path, "rb")}
+                response = requests.post(url=url, data=data, files=files)
+
+                print("\nUpload in progress ...\n")
+
+                if response.status_code != 204:
+                    raise APISaveError(f"Unable to upload the file: {response.content}")
+            else:
+                pprint(response.content)
 
     def delete(self, node: Base):
         """
