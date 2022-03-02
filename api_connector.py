@@ -135,15 +135,12 @@ class API:
 
             # Upload file
             if response.status_code == 200:
-                response_json = response.json()
-                url = response_json["url"]
-                data = response_json["fields"]
-                files = {"file": open(file_path, "rb")}
-                response = requests.post(url=url, data=data, files=files)
-
                 print("\nUpload in progress ...\n")
+                url = json.loads(response.content)
+                files = {"file": open(file_path, "rb")}
+                response = requests.put(url=url, files=files)
 
-                if response.status_code != 204:
+                if response.status_code != 200:
                     raise APISaveError(f"Unable to upload the file: {response.content}")
             else:
                 pprint(response.content)
