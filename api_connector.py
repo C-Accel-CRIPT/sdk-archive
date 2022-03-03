@@ -203,12 +203,12 @@ class API:
         return slug
 
     @beartype
-    def get(self, obj: Union[str, Type[Base]], query: dict = None, count: int = 0):
+    def get(self, obj: Union[str, Type[Base]], query: dict = None, counter: int = 0):
         """
         Get the JSON for a node and use it to generated a local node object.
 
         :param url: The API URL of the node.
-        :param count: Cross-method recursion counter.
+        :param counter: Cross-method recursion counter.
         :return: The generated node object.
         """
         # Fetch node from a URL, if defined
@@ -233,7 +233,6 @@ class API:
         elif issubclass(obj, Base) and query:
             node_class = obj
             search_json = self.search(node_class=node_class, query=query)
-
             count = search_json["count"]
             if count < 1:
                 raise APIGetError("Your query did not match any existing nodes.")
@@ -241,7 +240,6 @@ class API:
                 raise APIGetError("Your query mathced more than one node.")
             else:
                 response_json = search_json["results"][0]
-
         else:
             raise APIGetError(
                 f"Please enter a node URL or a node class with a search query."
@@ -260,19 +258,21 @@ class API:
             node.created_at = created_at
             node.updated_at = updated_at
 
-            self._generate_nodes(node, count=count + 1)
+            if counter > 0:
+                counter += 1
+            self._generate_nodes(node, counter=counter)
 
             return node
 
-    def _generate_nodes(self, node: Base, count: int = 0):
+    def _generate_nodes(self, node: Base, counter: int = 0):
         """
         Generate nested node objects within a given node.
 
         :param node: The parent node.
-        :param count: Cross method recursion counter.
+        :param counter: Cross method recursion counter.
         """
         # Limit recursion to one level
-        if count > 1:
+        if counter > 1:
             return
 
         node_dict = node.__dict__
@@ -288,7 +288,7 @@ class API:
                     node_dict[key] = local_node
                 else:
                     try:
-                        node_dict[key] = self.get(value, count=count + 1)
+                        node_dict[key] = self.get(value, counter=counter + 1)
                     except APIGetError:
                         # Leave the URL if node is not viewable
                         pass
@@ -297,7 +297,7 @@ class API:
                 node_class = self._define_node_class(key)
                 secondary_node = node_class(**value[i])
                 node_dict[key] = secondary_node
-                self._generate_nodes(secondary_node, count=count + 1)
+                self._generate_nodes(secondary_node, counter=counter + 1)
             # Handle lists
             elif isinstance(value, list):
                 for i in range(len(value)):
@@ -309,7 +309,7 @@ class API:
                             value[i] = local_node
                         else:
                             try:
-                                value[i] = self.get(value[i], count=count + 1)
+                                value[i] = self.get(value[i], counter=counter + 1)
                             except APIGetError:
                                 # Leave the URL if node is not viewable
                                 pass
@@ -318,7 +318,7 @@ class API:
                         node_class = self._define_node_class(key)
                         secondary_node = node_class(**value[i])
                         value[i] = secondary_node
-                        self._generate_nodes(secondary_node, count=count + 1)
+                        self._generate_nodes(secondary_node, counter=counter + 1)
 
     def _define_node_class(self, key: str):
         """
