@@ -707,6 +707,7 @@ class Step(Base):
         self,
         group: Union[Group, str],
         process: Union[Process, str],
+        step_id: int,
         type: str,
         description: Union[str, None] = None,
         intermediate_ingredients: list[Union[IntermediateIngredient, dict]] = None,
@@ -725,6 +726,7 @@ class Step(Base):
         self.url = url
         self.group = group
         self.process = process
+        self.step_id = step_id
         self.type = type
         self.description = description
         self.intermediate_ingredients = (
