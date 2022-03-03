@@ -208,7 +208,7 @@ class API:
         Get the JSON for a node and use it to generated a local node object.
 
         :param url: The API URL of the node.
-        :param count: Recursion counter to pass to the _generate_nodes() method.
+        :param count: Cross-method recursion counter.
         :return: The generated node object.
         """
         # Fetch node from a URL, if defined
@@ -269,7 +269,7 @@ class API:
         Generate nested node objects within a given node.
 
         :param node: The parent node.
-        :param count: Recursion counter.
+        :param count: Cross method recursion counter.
         """
         # Limit recursion to one level
         if count > 1:
