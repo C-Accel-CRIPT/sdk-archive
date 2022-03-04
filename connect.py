@@ -92,9 +92,13 @@ class API:
                 response = self.session.post(
                     url=f"{self.url}/{node.slug}/", data=node._to_json()
                 )
+
             if response.status_code in (200, 201):
-                if node.slug == "file":
-                    self._upload_file(response.json()["id"], node.source)
+                # Handle new file uploads
+                if node.slug == "file" and os.path.exists(node.source):
+                    file_id = response.json()["url"].rstrip("/").split("/")[-1]
+                    self._upload_file(file_id, node.source)
+
                 self._set_node_attributes(node, response.json())
                 self._generate_nodes(node)
 
@@ -126,13 +130,12 @@ class API:
 
         :param node: ID of the File node.
         """
-        if file_path and os.path.exists(file_path):
-            # Choose multipart or single file upload
-            file_size = os.path.getsize(file_path)
-            if file_size < 655360:
-                self._single_file_upload(file_id, file_path)
-            else:
-                self._multipart_file_upload(file_id, file_path)
+        # Choose multipart or single file upload based on file size
+        file_size = os.path.getsize(file_path)
+        if file_size < 655360:
+            self._single_file_upload(file_id, file_path)
+        else:
+            self._multipart_file_upload(file_id, file_path)
 
     def _single_file_upload(self, file_id, file_path):
         # Generate signed URL for uploading

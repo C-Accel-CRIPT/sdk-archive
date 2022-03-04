@@ -44,4 +44,4 @@ node_classes = [
 ]
 
 
-from .api_connector import API
+from .connect import API

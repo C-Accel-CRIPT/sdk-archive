@@ -315,7 +315,7 @@ class File(Base):
         self,
         group: Union[Group, str],
         data: Union[Data, str],
-        source: Union[str, None],
+        source: str,
         name: Union[str, None] = None,
         id: Union[int, None] = None,
         extension: Union[str, None] = None,
@@ -327,12 +327,9 @@ class File(Base):
         self.url = url
         self.group = group
         self.data = data
-        self.source = source
-        if self.source and os.path.exists(self.source):
-            self.name = os.path.basename(self.source)
-        else:
-            self.name = name
+        self.name = name
         self.id = id
+        self.source = source
         self.extension = extension
         self.external_source = external_source
         self.created_at = None
