@@ -329,10 +329,9 @@ class File(Base):
         self.data = data
         self.source = source
         if self.source and os.path.exists(self.source):
-            self.name - os.path.basename(self.source)
+            self.name = os.path.basename(self.source)
         else:
             self.name = name
-        self.name = name
         self.id = id
         self.extension = extension
         self.external_source = external_source
