@@ -271,8 +271,9 @@ class API:
         """Generate the query URL slug."""
         slug = ""
         for key in query:
-            slug += f"{key}={query[key]}&"
-        return urllib.parse.quote(slug.encode("utf8"))
+            value = urllib.parse.quote(query[key].encode("utf8"))
+            slug += f"{key}={value}&"
+        return slug
 
     @beartype
     def get(self, obj: Union[str, Type[Base]], query: dict = None, counter: int = 0):
