@@ -271,7 +271,9 @@ class API:
         """Generate the query URL slug."""
         slug = ""
         for key in query:
-            value = urllib.parse.quote(query[key].encode("utf8"))
+            value = query[key]
+            if isinstance(value, str):
+                value = urllib.parse.quote(value.encode("utf8"))
             slug += f"{key}={value}&"
         return slug
 
