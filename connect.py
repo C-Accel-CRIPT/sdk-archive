@@ -4,6 +4,7 @@ CRIPT REST API Connector
 import os
 import requests
 import json
+import urllib
 from typing import Union
 from getpass import getpass
 
@@ -271,7 +272,7 @@ class API:
         slug = ""
         for key in query:
             slug += f"{key}={query[key]}&"
-        return slug
+        return urllib.parse.quote(slug.encode("utf8"))
 
     @beartype
     def get(self, obj: Union[str, Type[Base]], query: dict = None, counter: int = 0):
