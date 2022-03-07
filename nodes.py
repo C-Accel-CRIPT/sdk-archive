@@ -26,6 +26,19 @@ class Base:
     def __str__(self):
         return self._to_json()
 
+    def as_dict(self):
+        """
+        Convert a node object to a custom dict.
+
+        :return: The custom dict.
+        """
+        custom_dict = {}
+        for key, value in self.__dict__.items():
+            if "_" == key[0]:
+                key = key.lstrip("_")
+            custom_dict[key] = value
+        return custom_dict
+
     def print_json(self):
         print(self._to_json())
 
@@ -34,7 +47,7 @@ class Base:
 
     def _prep_for_upload(self):
         """Convert a node into a dict that can be sent to the API."""
-        node_dict = copy.deepcopy(self.__dict__)
+        node_dict = copy.deepcopy(self.as_dict())
         for key, value in node_dict.items():
             # Check if the value is a node
             if isinstance(value, Base):
