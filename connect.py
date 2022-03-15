@@ -26,17 +26,21 @@ from .errors import (
 
 class API:
     @beartype
-    def __init__(self, url: str, token: str = None):
+    def __init__(self, url: str = None, token: str = None):
         """
         Establishes a session with the CRIPT API.
 
-        :param url: The API endpoint URL.
+        :param url: The base URL for the relevant CRIPT instance.
+        :param token: The user's API token.
         """
-        self.url = url.rstrip("/")
-        self.session = requests.Session()
+        if url is None:
+            url = input("Base URL: ")
         if token is None:
             token = getpass("API Token: ")
 
+        self.url = url.rstrip("/") + "/api"
+
+        self.session = requests.Session()
         self.session.headers = {
             "Authorization": token,
             "Content-Type": "application/json",
@@ -44,7 +48,9 @@ class API:
 
         # Test API authentication
         response = self.session.get(self.url)
-        if response.status_code == 401:
+        if response.status_code == 404:
+            raise APIAuthError("Please provide a correct base URL.")
+        elif response.status_code == 401:
             raise APIAuthError(response.json()["detail"])
 
         # Print success message
