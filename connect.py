@@ -428,3 +428,32 @@ class API:
             if hasattr(instance, "url") and url == instance.url:
                 return instance
         return None
+
+    def get_keys(self):
+        """
+        Fetch the controlled vocabulary keys.
+
+        :return: A compiled dict of all keys.
+        """
+        slugs = [
+            "data-type",
+            "file-type",
+            "material-property-key",
+            "step-property-key",
+            "condition-key",
+            "quantity-key",
+            "set-type",
+            "uncertainty-type",
+            "step-type",
+            "property-method",
+            "material-keyword",
+            "process-keyword",
+            "ingredient-keyword",
+        ]
+
+        keys_dict = {}
+        for slug in slugs:
+            response = self.session.get(f"{self.url}/option/{slug}/")
+            keys_dict.update({slug: response.json()})
+
+        return keys_dict
