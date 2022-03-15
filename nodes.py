@@ -329,6 +329,7 @@ class File(Base):
         group: Union[Group, str],
         data: Union[Data, str],
         source: str,
+        type: str,
         name: Union[str, None] = None,
         id: Union[int, None] = None,
         extension: Union[str, None] = None,
@@ -340,6 +341,7 @@ class File(Base):
         self.url = url
         self.group = group
         self.data = data
+        self.type = type
         self.name = name
         self.id = id
         self.source = source
@@ -371,6 +373,7 @@ class Condition(Base):
         key: str,
         value: Union[str, int, float],
         unit: Union[str, None] = None,
+        type: Union[str, None] = None,
         uncertainty: Union[float, None] = None,
         uncertainty_type: Union[str, None] = None,
         set_id: Union[int, None] = None,
@@ -381,6 +384,7 @@ class Condition(Base):
         self.key = key
         self.value = value
         self.unit = unit
+        self.type = type
         self.uncertainty = uncertainty
         self.uncertainty_type = uncertainty_type
         self.set_id = set_id
@@ -407,6 +411,7 @@ class Property(Base):
         key: str,
         value: Union[str, int, float],
         unit: Union[str, None] = None,
+        type: Union[str, None] = None,
         method: Union[str, None] = None,
         method_description: Union[str, None] = None,
         uncertainty: Union[float, None] = None,
@@ -419,6 +424,7 @@ class Property(Base):
         self.key = key
         self.value = value
         self.unit = unit
+        self.type = type
         self.method = method
         self.method_description = method_description
         self.uncertainty = uncertainty
@@ -551,12 +557,6 @@ class Material(Base):
         self.created_at = None
         self.updated_at = None
         self.public = public
-
-    def add_experiment(self, experiment):
-        self._add_node(experiment, "experiments")
-
-    def remove_experiment(self, experiment):
-        self._remove_node(experiment, "experiments")
 
     @beartype
     def add_component(self, component: Union[Component, dict]):
@@ -739,6 +739,7 @@ class Step(Base):
         conditions: list[Union[Condition, dict]] = None,
         set_id: Union[int, None] = None,
         material_products: list[Union[Material, str]] = None,
+        dependent_steps: list[Union[Base, str]] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -760,6 +761,7 @@ class Step(Base):
         self.conditions = conditions if conditions else []
         self.set_id = set_id
         self.material_products = material_products if material_products else []
+        self.dependent_steps = dependent_steps if dependent_steps else []
         self.created_at = None
         self.updated_at = None
         self.public = public
@@ -769,7 +771,7 @@ class Step(Base):
         self, ingredient: Union[IntermediateIngredient, MaterialIngredient, dict]
     ):
         if isinstance(ingredient, IntermediateIngredient):
-            self._add_node(ingredient, "product_ingredients")
+            self._add_node(ingredient, "intermediate_ingredients")
         elif isinstance(ingredient, MaterialIngredient):
             self._add_node(ingredient, "material_ingredients")
 
@@ -778,7 +780,7 @@ class Step(Base):
         self, ingredient: Union[IntermediateIngredient, MaterialIngredient, int]
     ):
         if isinstance(ingredient, IntermediateIngredient):
-            self._remove_node(ingredient, "product_ingredients")
+            self._remove_node(ingredient, "intermediate_ingredients")
         elif isinstance(ingredient, MaterialIngredient):
             self._remove_node(ingredient, "material_ingredients")
 
@@ -789,6 +791,14 @@ class Step(Base):
     @beartype
     def remove_product(self, material: Union[Material, int]):
         self._remove_node(material, "material_products")
+
+    @beartype
+    def add_dependent_step(self, step: Union[Base, dict]):
+        self._add_node(step, "dependent_steps")
+
+    @beartype
+    def remove_dependent_step(self, step: Union[Base, int]):
+        self._remove_node(step, "dependent_steps")
 
     @beartype
     def add_condition(self, condition: Union[Condition, dict]):
