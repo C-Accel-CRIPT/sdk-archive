@@ -300,6 +300,14 @@ class Data(Base):
         self.updated_at = None
         self.public = public
 
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = value.strip().lower()
+
     @beartype
     def add_file(self, citation: Union[Base, dict]):
         self._add_node(citation, "files")
@@ -352,6 +360,14 @@ class File(Base):
         self.public = public
 
     @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = value.strip().lower()
+
+    @property
     def source(self):
         return self._source
 
@@ -390,6 +406,30 @@ class Condition(Base):
         self.set_id = set_id
         self.measurement_id = measurement_id
         self.data = data if data else []
+
+    @property
+    def key(self):
+        return self._key
+
+    @key.setter
+    def key(self, value):
+        self._key = value.strip().lower()
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = value.strip().lower()
+
+    @property
+    def uncertainty_type(self):
+        return self._uncertainty_type
+
+    @uncertainty_type.setter
+    def uncertainty_type(self, value):
+        self._uncertainty_type = value.strip().lower()
 
     @beartype
     def add_data(self, data: Union[Data, dict]):
@@ -432,6 +472,38 @@ class Property(Base):
         self.set_id = set_id
         self.data = data if data else []
         self.conditions = conditions if conditions else []
+
+    @property
+    def key(self):
+        return self._key
+
+    @key.setter
+    def key(self, value):
+        self._key = value.strip().lower()
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = value.strip().lower()
+
+    @property
+    def method(self):
+        return self._method
+
+    @type.setter
+    def method(self, value):
+        self._method = value.strip().lower()
+
+    @property
+    def uncertainty_type(self):
+        return self._uncertainty_type
+
+    @uncertainty_type.setter
+    def uncertainty_type(self, value):
+        self._uncertainty_type = value.strip().lower()
 
     @beartype
     def add_data(self, data: Union[Data, dict]):
@@ -519,6 +591,14 @@ class Quantity(Base):
         self.value = value
         self.unit = unit
 
+    @property
+    def key(self):
+        return self._key
+
+    @key.setter
+    def key(self, value):
+        self._key = value.strip().lower()
+
 
 class Material(Base):
     node_type = "primary"
@@ -557,6 +637,16 @@ class Material(Base):
         self.created_at = None
         self.updated_at = None
         self.public = public
+
+    @property
+    def keywords(self):
+        return self._keywords
+
+    @keywords.setter
+    def keywords(self, value):
+        for i in range(len(value)):
+            value[i] = value[i].strip().lower()
+        self._keywords = value
 
     @beartype
     def add_component(self, component: Union[Component, dict]):
@@ -629,14 +719,20 @@ class IntermediateIngredient(Base):
         self,
         ingredient: Union[Base, str],  # Needs more specific type check
         keyword: str = None,
-        quantity: list[Union[Quantity, dict]] = None,
-        method: Union[str, None] = None,
+        quantities: list[Union[Quantity, dict]] = None,
     ):
         super().__init__()
         self.ingredient = ingredient
         self.keyword = keyword
-        self.quantity = quantity if quantity else []
-        self.method = method
+        self.quantities = quantities if quantities else []
+
+    @property
+    def keyword(self):
+        return self._keyword
+
+    @keyword.setter
+    def keyword(self, value):
+        self._keyword = value.strip().lower()
 
     @beartype
     def add_quantity(self, quantity: Union[Quantity, dict]):
@@ -657,14 +753,20 @@ class MaterialIngredient(Base):
         self,
         ingredient: Union[Material, str],
         keyword: str = None,
-        quantity: list[Union[Quantity, dict]] = None,
-        method: Union[str, None] = None,
+        quantities: list[Union[Quantity, dict]] = None,
     ):
         super().__init__()
         self.ingredient = ingredient
         self.keyword = keyword
-        self.quantity = quantity if quantity else []
-        self.method = method
+        self.quantities = quantities if quantities else []
+
+    @property
+    def keyword(self):
+        return self._keyword
+
+    @keyword.setter
+    def keyword(self, value):
+        self._keyword = value.strip().lower()
 
     @beartype
     def add_quantity(self, quantity: Union[Quantity, dict]):
@@ -706,6 +808,16 @@ class Process(Base):
         self.updated_at = None
         self.citations = citations if citations else []
         self.public = public
+
+    @property
+    def keywords(self):
+        return self._keywords
+
+    @keywords.setter
+    def keywords(self, value):
+        for i in range(len(value)):
+            value[i] = value[i].strip().lower()
+        self._keywords = value
 
     @beartype
     def add_citation(self, citation: Union[Citation, dict]):
@@ -765,6 +877,14 @@ class Step(Base):
         self.created_at = None
         self.updated_at = None
         self.public = public
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = value.strip().lower()
 
     @beartype
     def add_ingredient(
