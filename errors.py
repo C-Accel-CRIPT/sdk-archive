@@ -58,6 +58,16 @@ class APIGetError(Exception):
         return self.message
 
 
+class APISessionRequiredError(Exception):
+    """Raised when an active API session is required but not yet established."""
+
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return f"An API session must be established before you can create this node."
+
+
 class UnsavedNodeError(Exception):
     """Raised when an attempt is made to add an unsaved node to another node."""
 
@@ -96,3 +106,49 @@ class RemoveNodeError(Exception):
 
     def __str__(self):
         return f"{self.parent_node_name} nodes do not contain {self.child_node_name} nodes."
+
+
+class InvalidKeyError(Exception):
+    """Raised when a key is used that does not exist."""
+
+    def __init__(self, key, category):
+        self.key = key
+        self.category = category
+
+    def __str__(self):
+        return f"'{self.key}' is not a valid {self.category}."
+
+
+class InvalidValueRangeError(Exception):
+    """Raised when a value falls outside the defined range."""
+
+    def __init__(self, key, value, min, max, unit):
+        self.key = key
+        self.value = value
+        self.min = min
+        self.max = max
+        self.unit = unit
+
+    def __str__(self):
+        return f"{self.key} values must be between {self.min} {self.unit} and {self.max} {self.unit}."
+
+
+class InvalidUnitError(Exception):
+    """Raised when a unit is invalid."""
+
+    def __init__(self, key, unit):
+        self.key = key
+        self.unit = unit
+
+    def __str__(self):
+        return f"'{self.unit}' is not a recognized unit of measure for {self.key}."
+
+
+class RequiredUnitError(Exception):
+    """Raised when a unit is expected but not provided or vice versa."""
+
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message

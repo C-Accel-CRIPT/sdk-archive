@@ -25,6 +25,8 @@ from .errors import (
 
 
 class API:
+    keys = None  # Stores a dictionary of keys and associated parameters
+
     @beartype
     def __init__(self, url: str = None, token: str = None):
         """
@@ -55,6 +57,9 @@ class API:
 
         # Print success message
         print(f"\nConnection to the API was successful!\n")
+
+        # Get key tables from API
+        API.keys = self._get_keys()
 
     def __repr__(self):
         return f"Connected to {self.url}"
@@ -429,7 +434,7 @@ class API:
                 return instance
         return None
 
-    def get_keys(self):
+    def _get_keys(self):
         """
         Fetch the controlled vocabulary keys.
 
