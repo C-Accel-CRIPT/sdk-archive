@@ -25,8 +25,6 @@ from .errors import (
 
 
 class API:
-    keys = None  # Stores a dictionary of keys and associated parameters
-
     @beartype
     def __init__(self, url: str = None, token: str = None):
         """
@@ -55,11 +53,11 @@ class API:
         elif response.status_code == 401:
             raise APIAuthError(response.json()["detail"])
 
+        # Create dict containing all keys
+        API.keys = self._get_keys()
+
         # Print success message
         print(f"\nConnection to the API was successful!\n")
-
-        # Get key tables from API
-        API.keys = self._get_keys()
 
     def __repr__(self):
         return f"Connected to {self.url}"

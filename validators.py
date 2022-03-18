@@ -1,6 +1,7 @@
 from . import pint_ureg
 from .errors import (
     InvalidKeyError,
+    InvalidValueTypeError,
     InvalidValueRangeError,
     InvalidUnitError,
     RequiredUnitError,
@@ -15,21 +16,16 @@ def validate_key(key_name, key_category):
     :param key_name: Name of the key.
     :key_category: Name of the relevant key category.
     """
-    # Skip keys that are not defined
-    if not key_name:
-        return None
-
-    key_name = key_name.strip().lower()
-
-    # Skip validation for custom fields
-    if key_name[0] == "+":
+    # Skip validation for custom and undefined keys
+    if not key_name or key_name[0] == "+":
         return key_name
 
+    key_name = key_name.strip().lower()
     key_parameters = _get_key_parameters(key_name, key_category)
     return key_parameters["name"]
 
 
-def validate_key_value(value, unit, key_name, key_category):
+def validate_value(value, unit, key_name, key_category):
     """
     Validates a key value is within the defined parameters.
 
@@ -41,26 +37,53 @@ def validate_key_value(value, unit, key_name, key_category):
         return value
 
     key_parameters = _get_key_parameters(key_name, key_category)
-    value_range = key_parameters["range"]
-    si_unit = key_parameters["si_unit"]
+    value_range = key_parameters.get("range")
+    value_type = key_parameters.get("value_type")
+    si_unit = key_parameters.get("si_unit")
 
+    if value_type:
+        _validate_value_type(key_name, value, value_type)
     if value_range:
-        min, max = value_range[0], value_range[1]
+        _validate_value_range(key_name, value, value_range, unit, si_unit)
 
-        if si_unit:
-            si_value = _unit_conversion(value, unit, si_unit)
-        else:
-            si_value = value
-
-        if min <= si_value <= max:
-            return value
-        else:
-            raise InvalidValueRangeError(key_name, value, min, max, si_unit)
+    return value
 
 
-def validate_key_unit(unit, key_name, key_category):
+def _validate_value_type(key_name, value, value_type):
+    """Validate that the value is of the expected type."""
+    value_types = {
+        "number": (int, float),
+        "integer": int,
+        "float": float,
+        "string": str,
+        "list[number]": (int, float),
+        "list[integer]": int,
+        "list[float]": float,
+        "list[string]": str,
+    }
+    value_type = value_types[value_type]
+
+    if not isinstance(value, value_type):
+        raise InvalidValueTypeError(key_name)
+
+
+def _validate_value_range(key_name, value, value_range, unit, si_unit):
+    """Validates a value is within the defined range."""
+    min, max = value_range[0], value_range[1]
+
+    # convert to SI units if defined
+    if si_unit:
+        si_value = _unit_conversion(value, unit, si_unit)
+    else:
+        si_value = value
+
+    if not min <= si_value <= max:
+        raise InvalidValueRangeError(key_name, value, min, max, si_unit)
+
+
+def validate_unit(unit, key_name, key_category):
     """
-    Validates a key unit exists and can be converted to SI unit.
+    Validates that the unit exists and can be converted to SI units.
 
     :param key_name: Name of the key.
     :key_category: Name of the relevant key category.
@@ -68,17 +91,19 @@ def validate_key_unit(unit, key_name, key_category):
     key_parameters = _get_key_parameters(key_name, key_category)
     si_unit = key_parameters["si_unit"]
 
-    # Check if unit is required
+    # Check if unit should be defined
+    if not unit and not si_unit:
+        return unit
     if si_unit and not unit:
         raise RequiredUnitError(f"A unit is required for {key_name}.")
     elif unit and not si_unit:
-        raise RequiredUnitError(f"{key_name} does not allow a unit definition.")
+        raise RequiredUnitError(f"A unit is not permitted for {key_name}.")
 
     # Check if unit is valid
     try:
         pint_ureg[unit]
     except:
-        raise InvalidUnitError(key_name, unit)
+        raise InvalidUnitError(f"{unit} is not a recognized unit of measure.")
 
     # Skip further validation for custom fields
     if key_name[0] == "+":
@@ -89,23 +114,23 @@ def validate_key_unit(unit, key_name, key_category):
         _unit_conversion(1, unit, si_unit)
         return unit
     except:
-        raise InvalidUnitError(key_name, unit)
+        raise InvalidUnitError(
+            f"{unit} is not a recognized unit of measure for {key_name}."
+        )
 
 
 def _get_key_parameters(key_name, key_category):
     """Get the parameters for a given key from full keys dictionary."""
     from .connect import API
 
-    all_keys = API.keys
-    key_name = key_name.strip().lower()
-
-    if all_keys:
+    if API.keys:
         # Fetch relevant keys
         if key_category == "property-key":
-            keys = all_keys["material-property-key"] + all_keys["step-property-key"]
+            keys = API.keys["material-property-key"] + API.keys["step-property-key"]
         else:
-            keys = all_keys[key_category]
+            keys = API.keys[key_category]
 
+        key_name = key_name.strip().lower()
         for key in keys:
             if key_name == key["name"]:
                 return key

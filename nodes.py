@@ -7,7 +7,7 @@ from beartype import beartype
 from weakref import WeakSet
 
 from .errors import AddNodeError, RemoveNodeError, UnsavedNodeError
-from .validators import validate_key, validate_key_value, validate_key_unit
+from .validators import validate_key, validate_value, validate_unit
 
 
 class Base:
@@ -418,7 +418,7 @@ class Condition(Base):
 
     @unit.setter
     def unit(self, value):
-        self._unit = validate_key_unit(value, self.key, "condition-key")
+        self._unit = validate_unit(value, self.key, "condition-key")
 
     @property
     def value(self):
@@ -426,7 +426,7 @@ class Condition(Base):
 
     @value.setter
     def value(self, value):
-        self._value = validate_key_value(value, self.unit, self.key, "condition-key")
+        self._value = validate_value(value, self.unit, self.key, "condition-key")
 
     @property
     def type(self):
@@ -500,7 +500,7 @@ class Property(Base):
 
     @value.setter
     def value(self, value):
-        self._value = validate_key_value(value, self.unit, self.key, "property-key")
+        self._value = validate_value(value, self.unit, self.key, "property-key")
 
     @property
     def unit(self):
@@ -508,7 +508,7 @@ class Property(Base):
 
     @unit.setter
     def unit(self, value):
-        self._unit = validate_key_unit(value, self.key, "property-key")
+        self._unit = validate_unit(value, self.key, "property-key")
 
     @property
     def type(self):
@@ -516,8 +516,7 @@ class Property(Base):
 
     @type.setter
     def type(self, value):
-        if value:
-            self._type = validate_key(value, "set-type")
+        self._type = validate_key(value, "set-type")
 
     @property
     def method(self):
@@ -525,8 +524,7 @@ class Property(Base):
 
     @method.setter
     def method(self, value):
-        if value:
-            self._method = validate_key(value, "property-method")
+        self._method = validate_key(value, "property-method")
 
     @property
     def uncertainty_type(self):
@@ -534,8 +532,7 @@ class Property(Base):
 
     @uncertainty_type.setter
     def uncertainty_type(self, value):
-        if value:
-            self._uncertainty_type = validate_key(value, "uncertainty-type")
+        self._uncertainty_type = validate_key(value, "uncertainty-type")
 
     @beartype
     def add_data(self, data: Union[Data, dict]):
@@ -632,20 +629,20 @@ class Quantity(Base):
         self._key = validate_key(value, "quantity-key")
 
     @property
-    def unit(self):
-        return self._unit
-
-    @unit.setter
-    def unit(self, value):
-        self._unit = validate_key_unit(value, self.key, "quantity-key")
-
-    @property
     def value(self):
         return self._value
 
     @value.setter
     def value(self, value):
-        self._value = validate_key_value(value, self.unit, self.key, "quantity-key")
+        self._value = validate_value(value, self.unit, self.key, "quantity-key")
+
+    @property
+    def unit(self):
+        return self._unit
+
+    @unit.setter
+    def unit(self, value):
+        self._unit = validate_unit(value, self.key, "quantity-key")
 
 
 class Material(Base):
@@ -692,8 +689,9 @@ class Material(Base):
 
     @keywords.setter
     def keywords(self, value):
-        for i in range(len(value)):
-            value[i] = validate_key(value[i], "material-keyword")
+        if value:
+            for i in range(len(value)):
+                value[i] = validate_key(value[i], "material-keyword")
         self._keywords = value
 
     @beartype
@@ -863,8 +861,9 @@ class Process(Base):
 
     @keywords.setter
     def keywords(self, value):
-        for i in range(len(value)):
-            value[i] = validate_key(value[i], "process-keyword")
+        if value:
+            for i in range(len(value)):
+                value[i] = validate_key(value[i], "process-keyword")
         self._keywords = value
 
     @beartype

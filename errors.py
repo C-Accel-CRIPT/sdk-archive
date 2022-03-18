@@ -119,6 +119,16 @@ class InvalidKeyError(Exception):
         return f"'{self.key}' is not a valid {self.category}."
 
 
+class InvalidValueTypeError(Exception):
+    """Raised when a value is an incorrect type."""
+
+    def __init__(self, key):
+        self.key = key
+
+    def __str__(self):
+        return f"{self.key} is using an incorrect value type."
+
+
 class InvalidValueRangeError(Exception):
     """Raised when a value falls outside the defined range."""
 
@@ -136,12 +146,11 @@ class InvalidValueRangeError(Exception):
 class InvalidUnitError(Exception):
     """Raised when a unit is invalid."""
 
-    def __init__(self, key, unit):
-        self.key = key
-        self.unit = unit
+    def __init__(self, message):
+        self.message = message
 
     def __str__(self):
-        return f"'{self.unit}' is not a recognized unit of measure for {self.key}."
+        return self.message
 
 
 class RequiredUnitError(Exception):
