@@ -46,18 +46,15 @@ class API:
             "Content-Type": "application/json",
         }
 
-        # Test API authentication
-        response = self.session.get(self.url)
+        # Test API authentication by fetching keys
+        response = self.session.get(f"{self.url}/keys/all/")
+        if response.status_code == 200:
+            API.keys = response.json()
+            print(f"\nConnection to the API was successful!\n")
         if response.status_code == 404:
             raise APIAuthError("Please provide a correct base URL.")
         elif response.status_code == 401:
             raise APIAuthError(response.json()["detail"])
-
-        # Create dict containing all keys
-        API.keys = self._get_keys()
-
-        # Print success message
-        print(f"\nConnection to the API was successful!\n")
 
     def __repr__(self):
         return f"Connected to {self.url}"
@@ -431,32 +428,3 @@ class API:
             if hasattr(instance, "url") and url == instance.url:
                 return instance
         return None
-
-    def _get_keys(self):
-        """
-        Fetch the controlled vocabulary keys.
-
-        :return: A compiled dict of all keys.
-        """
-        slugs = [
-            "data-type",
-            "file-type",
-            "material-property-key",
-            "step-property-key",
-            "condition-key",
-            "quantity-key",
-            "set-type",
-            "uncertainty-type",
-            "step-type",
-            "property-method",
-            "material-keyword",
-            "process-keyword",
-            "ingredient-keyword",
-        ]
-
-        keys_dict = {}
-        for slug in slugs:
-            response = self.session.get(f"{self.url}/option/{slug}/")
-            keys_dict.update({slug: response.json()})
-
-        return keys_dict
