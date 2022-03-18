@@ -99,24 +99,40 @@ def validate_unit(unit, key_name, key_category):
     elif unit and not si_unit:
         raise RequiredUnitError(f"A unit is not permitted for {key_name}.")
 
-    # Check if unit is valid
-    try:
-        pint_ureg[unit]
-    except:
-        raise InvalidUnitError(f"{unit} is not a recognized unit of measure.")
+    _validate_unit_exists(unit)
 
     # Skip further validation for custom fields
     if key_name[0] == "+":
         return unit
 
-    # Test unit conversion with dummy value (1)
+    _validate_unit_conversion(key_name, unit, si_unit)
+
+    return unit
+
+
+def _validate_unit_exists(unit):
+    """Validates that the unit exists."""
+    try:
+        pint_ureg[unit]
+    except:
+        raise InvalidUnitError(f"{unit} is not a recognized unit of measure.")
+
+
+def _validate_unit_conversion(key_name, unit, si_unit):
+    """Validates that the unit can be converted to appropriate SI units."""
     try:
         _unit_conversion(1, unit, si_unit)
-        return unit
     except:
         raise InvalidUnitError(
             f"{unit} is not a recognized unit of measure for {key_name}."
         )
+
+
+def _unit_conversion(value, unit, si_unit):
+    """Converts a value to SI units."""
+    original_quantity = pint_ureg.Quantity(value, unit)
+    si_value = original_quantity.to(si_unit).magnitude
+    return si_value
 
 
 def _get_key_parameters(key_name, key_category):
@@ -138,10 +154,3 @@ def _get_key_parameters(key_name, key_category):
         raise InvalidKeyError(key_name, key_category.replace("-", " "))
     else:
         raise APISessionRequiredError
-
-
-def _unit_conversion(value, unit, si_unit):
-    """Converts a value to SI units."""
-    original_quantity = pint_ureg.Quantity(value, unit)
-    si_value = original_quantity.to(si_unit).magnitude
-    return si_value
