@@ -51,10 +51,12 @@ class API:
         if response.status_code == 200:
             API.keys = response.json()
             print(f"\nConnection to the API was successful!\n")
-        if response.status_code == 404:
+        elif response.status_code == 404:
             raise APIAuthError("Please provide a correct base URL.")
         elif response.status_code == 401:
             raise APIAuthError(response.json()["detail"])
+        else:
+            raise APIAuthError(f"Status code: {response.status_code}")
 
     def __repr__(self):
         return f"Connected to {self.url}"
