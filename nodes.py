@@ -128,6 +128,14 @@ class Group(Base):
         self.name = name
         self.users = users
 
+    @beartype
+    def add_user(self, user: Union[User, dict]):
+        self._add_node(user, "users")
+
+    @beartype
+    def remove_user(self, user: Union[User, int]):
+        self._remove_node(user, "users")
+
 
 class Reference(Base):
     node_type = "primary"
