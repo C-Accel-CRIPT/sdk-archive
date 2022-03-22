@@ -319,7 +319,7 @@ class Data(Base):
 
     @type.setter
     def type(self, value):
-        self._type = validate_key(value, "data-type")
+        self._type = validate_key("data-type", value)
 
     @beartype
     def add_citation(self, citation: Union[Citation, dict]):
@@ -370,7 +370,7 @@ class File(Base):
 
     @type.setter
     def type(self, value):
-        self._type = validate_key(value, "file-type")
+        self._type = validate_key("file-type", value)
 
     @property
     def source(self):
@@ -418,7 +418,7 @@ class Condition(Base):
 
     @key.setter
     def key(self, value):
-        self._key = validate_key(value, "condition-key")
+        self._key = validate_key("condition-key", value)
 
     @property
     def unit(self):
@@ -426,7 +426,7 @@ class Condition(Base):
 
     @unit.setter
     def unit(self, value):
-        self._unit = validate_unit(value, self.key, "condition-key")
+        self._unit = validate_unit("condition-key", self.key, value)
 
     @property
     def value(self):
@@ -434,7 +434,7 @@ class Condition(Base):
 
     @value.setter
     def value(self, value):
-        self._value = validate_value(value, self.unit, self.key, "condition-key")
+        self._value = validate_value("condition-key", self.key, value, self.unit)
 
     @property
     def type(self):
@@ -442,7 +442,7 @@ class Condition(Base):
 
     @type.setter
     def type(self, value):
-        self._type = validate_key(value, "set-type")
+        self._type = validate_key("set-type", value)
 
     @property
     def uncertainty_type(self):
@@ -450,7 +450,7 @@ class Condition(Base):
 
     @uncertainty_type.setter
     def uncertainty_type(self, value):
-        self._uncertainty_type = validate_key(value, "uncertainty-type")
+        self._uncertainty_type = validate_key("uncertainty-type", value)
 
     @beartype
     def add_data(self, data: Union[Data, dict]):
@@ -500,7 +500,7 @@ class Property(Base):
 
     @key.setter
     def key(self, value):
-        self._key = validate_key(value, "property-key")
+        self._key = validate_key("property-key", value)
 
     @property
     def value(self):
@@ -508,7 +508,7 @@ class Property(Base):
 
     @value.setter
     def value(self, value):
-        self._value = validate_value(value, self.unit, self.key, "property-key")
+        self._value = validate_value("property-key", self.key, value, self.unit)
 
     @property
     def unit(self):
@@ -516,7 +516,7 @@ class Property(Base):
 
     @unit.setter
     def unit(self, value):
-        self._unit = validate_unit(value, self.key, "property-key")
+        self._unit = validate_unit("property-key", self.key, value)
 
     @property
     def type(self):
@@ -524,7 +524,7 @@ class Property(Base):
 
     @type.setter
     def type(self, value):
-        self._type = validate_key(value, "set-type")
+        self._type = validate_key("set-type", value)
 
     @property
     def method(self):
@@ -532,7 +532,7 @@ class Property(Base):
 
     @method.setter
     def method(self, value):
-        self._method = validate_key(value, "property-method")
+        self._method = validate_key("property-method", value)
 
     @property
     def uncertainty_type(self):
@@ -540,7 +540,7 @@ class Property(Base):
 
     @uncertainty_type.setter
     def uncertainty_type(self, value):
-        self._uncertainty_type = validate_key(value, "uncertainty-type")
+        self._uncertainty_type = validate_key("uncertainty-type", value)
 
     @beartype
     def add_data(self, data: Union[Data, dict]):
@@ -634,7 +634,7 @@ class Quantity(Base):
 
     @key.setter
     def key(self, value):
-        self._key = validate_key(value, "quantity-key")
+        self._key = validate_key("quantity-key", value)
 
     @property
     def value(self):
@@ -642,7 +642,7 @@ class Quantity(Base):
 
     @value.setter
     def value(self, value):
-        self._value = validate_value(value, self.unit, self.key, "quantity-key")
+        self._value = validate_value("quantity-key", self.key, value, self.unit)
 
     @property
     def unit(self):
@@ -650,7 +650,7 @@ class Quantity(Base):
 
     @unit.setter
     def unit(self, value):
-        self._unit = validate_unit(value, self.key, "quantity-key")
+        self._unit = validate_unit("quantity-key", self.key, value)
 
 
 class Material(Base):
@@ -699,7 +699,7 @@ class Material(Base):
     def keywords(self, value):
         if value:
             for i in range(len(value)):
-                value[i] = validate_key(value[i], "material-keyword")
+                value[i] = validate_key("material-keyword", value[i])
         self._keywords = value
 
     @beartype
@@ -786,7 +786,7 @@ class IntermediateIngredient(Base):
 
     @keyword.setter
     def keyword(self, value):
-        self._keyword = validate_key(value, "ingredient-keyword")
+        self._keyword = validate_key("ingredient-keyword", value)
 
     @beartype
     def add_quantity(self, quantity: Union[Quantity, dict]):
@@ -820,7 +820,7 @@ class MaterialIngredient(Base):
 
     @keyword.setter
     def keyword(self, value):
-        self._keyword = validate_key(value, "ingredient-keyword")
+        self._keyword = validate_key("ingredient-keyword", value)
 
     @beartype
     def add_quantity(self, quantity: Union[Quantity, dict]):
@@ -871,7 +871,7 @@ class Process(Base):
     def keywords(self, value):
         if value:
             for i in range(len(value)):
-                value[i] = validate_key(value[i], "process-keyword")
+                value[i] = validate_key("process-keyword", value[i])
         self._keywords = value
 
     @beartype
@@ -939,7 +939,7 @@ class Step(Base):
 
     @type.setter
     def type(self, value):
-        self._type = validate_key(value, "step-type")
+        self._type = validate_key("step-type", value)
 
     @beartype
     def add_ingredient(
