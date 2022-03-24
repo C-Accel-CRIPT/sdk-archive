@@ -122,7 +122,7 @@ class Group(Base):
     slug = "group"
 
     @beartype
-    def __init__(self, name: str, users: list[str], url: Union[str, None] = None):
+    def __init__(self, name: str, users: list[Union[User, str]], url: Union[str, None] = None):
         super().__init__()
         self.url = url
         self.name = name
