@@ -110,19 +110,32 @@ class User(Base):
     list_name = "users"
 
     @beartype
-    def __init__(self, email: str, url: Union[str, None] = None):
+    def __init__(
+        self,
+        username: str,
+        email: str,
+        orcid_id: str,
+        public: bool = False,
+        url: Union[str, None] = None,
+    ):
         super().__init__()
         self.url = url
+        self.username = username
         self.email = email
+        self.orcid_id = orcid_id
+        self.public = public
 
 
 class Group(Base):
     node_type = "primary"
     node_name = "Group"
     slug = "group"
+    unique_together = ["name"]
 
     @beartype
-    def __init__(self, name: str, users: list[Union[User, str]], url: Union[str, None] = None):
+    def __init__(
+        self, name: str, users: list[Union[User, str]], url: Union[str, None] = None
+    ):
         super().__init__()
         self.url = url
         self.name = name
@@ -203,6 +216,7 @@ class Collection(Base):
     node_type = "primary"
     node_name = "Collection"
     slug = "collection"
+    unique_together = ["group", "name"]
 
     @beartype
     def __init__(
@@ -242,6 +256,7 @@ class Experiment(Base):
     node_name = "Experiment"
     slug = "experiment"
     list_name = "experiments"
+    unique_together = ["collection", "name"]
 
     @beartype
     def __init__(
@@ -276,6 +291,7 @@ class Data(Base):
     node_name = "Data"
     slug = "data"
     list_name = "data"
+    unique_together = ["experiment", "name"]
 
     @beartype
     def __init__(
@@ -293,7 +309,7 @@ class Data(Base):
         url: Union[str, None] = None,
         files=None,
         materials=None,
-        steps=None,
+        processes=None,
     ):
         super().__init__()
         self.url = url
@@ -307,7 +323,7 @@ class Data(Base):
         self.notes = notes
         self.experiment = experiment
         self.materials = materials if materials else []
-        self.steps = steps if steps else []
+        self.processes = processes if processes else []
         self.citations = citations if citations else []
         self.created_at = None
         self.updated_at = None
@@ -335,12 +351,13 @@ class File(Base):
     node_name = "File"
     slug = "file"
     list_name = "files"
+    unique_together = ["data", "name"]
 
     @beartype
     def __init__(
         self,
         group: Union[Group, str],
-        data: Union[Data, str],
+        data: list[Union[Data, str]],
         source: str,
         type: str,
         name: Union[str, None] = None,
@@ -381,6 +398,14 @@ class File(Base):
         if os.path.exists(value):
             self.name = os.path.basename(value)
         self._source = value
+
+    @beartype
+    def add_data(self, data: Union[Data, dict]):
+        self._add_node(data, "data")
+
+    @beartype
+    def remove_data(self, data: Union[Data, int]):
+        self._remove_node(data, "data")
 
 
 class Condition(Base):
@@ -559,62 +584,30 @@ class Property(Base):
         self._remove_node(condition, "conditions")
 
 
-class Identity(Base):
-    node_type = "primary"
-    node_name = "Identity"
-    slug = "identity"
-
-    @beartype
-    def __init__(
-        self,
-        group: Union[Group, str],
-        name: str,
-        names: Union[list[str], None] = None,
-        cas: Union[str, None] = None,
-        smiles: Union[str, None] = None,
-        bigsmiles: Union[str, None] = None,
-        chem_formula: Union[str, None] = None,
-        chem_repeat: Union[str, None] = None,
-        pubchem_cid: Union[str, None] = None,
-        inchi: Union[str, None] = None,
-        inchi_key: Union[str, None] = None,
-        public: bool = False,
-        url: Union[str, None] = None,
-    ):
-        super().__init__()
-        self.url = url
-        self.group = group
-        self.name = name
-        self.names = names
-        self.cas = cas
-        self.smiles = smiles
-        self.bigsmiles = bigsmiles
-        self.chem_formula = chem_formula
-        self.chem_repeat = chem_repeat
-        self.pubchem_cid = pubchem_cid
-        self.inchi = inchi
-        self.inchi_key = inchi_key
-        self.created_at = None
-        self.updated_at = None
-        self.public = public
-
-
-class Component(Base):
+class Identifier(Base):
     node_type = "secondary"
-    node_name = "Component"
-    list_name = "components"
+    node_name = "Identifier"
+    list_name = "identifiers"
 
     @beartype
-    def __init__(self, identity: Union[Identity, str], component_id: int = 0):
+    def __init__(self, key: str, value: str):
         super().__init__()
-        self.component_id = component_id
-        self.identity = identity
+        self.key = key
+        self.value = value
+
+    @property
+    def key(self):
+        return self._key
+
+    @key.setter
+    def key(self, value):
+        self._key = validate_key("material-identifier", value)
 
 
 class Quantity(Base):
     node_type = "secondary"
     node_name = "Quantity"
-    list_name = "quantity"
+    list_name = "quantities"
 
     @beartype
     def __init__(
@@ -653,25 +646,40 @@ class Quantity(Base):
         self._unit = validate_unit("quantity-key", self.key, value)
 
 
+class Component(Base):
+    node_type = "secondary"
+    node_name = "Component"
+    list_name = "components"
+
+    @beartype
+    def __init__(self, component: Union[Base, str], component_uid: int = 1):
+        super().__init__()
+        self.component_uid = component_uid
+        self.component = component
+
+
 class Material(Base):
     node_type = "primary"
     node_name = "Material"
     slug = "material"
     list_name = "materials"
+    unique_together = ["group", "name"]
 
     @beartype
     def __init__(
         self,
         group: Union[Group, str],
         name: str,
+        identifiers: list[Union[Identifier, dict]],
+        names: Union[list[str], None] = None,
         components: list[Union[Component, dict]] = None,
         vendor: Union[str, None] = None,
         lot_number: Union[str, None] = None,
         keywords: Union[list[str], None] = None,
-        notes: Union[str, None] = None,
-        step: Union[Base, str, None] = None,  # Needs more specific type check
+        process: Union[Base, str, None] = None,  # Needs more specific type check
         properties: list[Union[Property, dict]] = None,
         citations: list[Union[Citation, dict]] = None,
+        notes: Union[str, None] = None,
         public: bool = False,
         url: Union[str, None] = None,
     ):
@@ -679,14 +687,16 @@ class Material(Base):
         self.url = url
         self.group = group
         self.name = name
+        self.names = names if names else []
+        self.identifiers = identifiers
         self.components = components if components else []
         self.vendor = vendor
         self.lot_number = lot_number
-        self.keywords = keywords
-        self.notes = notes
-        self.step = step
+        self.keywords = keywords if keywords else []
+        self.process = process
         self.properties = properties if properties else []
         self.citations = citations if citations else []
+        self.notes = notes
         self.created_at = None
         self.updated_at = None
         self.public = public
@@ -701,6 +711,14 @@ class Material(Base):
             for i in range(len(value)):
                 value[i] = validate_key("material-keyword", value[i])
         self._keywords = value
+
+    @beartype
+    def add_identifier(self, identifier: Union[Identifier, dict]):
+        self._add_node(identifier, "identifiers")
+
+    @beartype
+    def remove_identifier(self, identifier: Union[Identifier, int]):
+        self._remove_node(identifier, "identifiers")
 
     @beartype
     def add_component(self, component: Union[Component, dict]):
@@ -731,6 +749,7 @@ class Inventory(Base):
     node_type = "primary"
     node_name = "Inventory"
     slug = "inventory"
+    unique_together = ["collection", "name"]
 
     @beartype
     def __init__(
@@ -763,44 +782,10 @@ class Inventory(Base):
         self._remove_node(material, "materials")
 
 
-class IntermediateIngredient(Base):
+class Ingredient(Base):
     node_type = "secondary"
-    node_name = "IntermediateIngredient"
-    list_name = "intermediate_ingredients"
-
-    @beartype
-    def __init__(
-        self,
-        ingredient: Union[Base, str],  # Needs more specific type check
-        keyword: str = None,
-        quantities: list[Union[Quantity, dict]] = None,
-    ):
-        super().__init__()
-        self.ingredient = ingredient
-        self.keyword = keyword
-        self.quantities = quantities if quantities else []
-
-    @property
-    def keyword(self):
-        return self._keyword
-
-    @keyword.setter
-    def keyword(self, value):
-        self._keyword = validate_key("ingredient-keyword", value)
-
-    @beartype
-    def add_quantity(self, quantity: Union[Quantity, dict]):
-        self._add_node(quantity, "quantity")
-
-    @beartype
-    def remove_quantity(self, quantity: Union[Quantity, int]):
-        self._remove_node(quantity, "quantity")
-
-
-class MaterialIngredient(Base):
-    node_type = "secondary"
-    node_name = "MaterialIngredient"
-    list_name = "material_ingredients"
+    node_name = "Ingredient"
+    list_name = "ingredients"
 
     @beartype
     def __init__(
@@ -824,11 +809,11 @@ class MaterialIngredient(Base):
 
     @beartype
     def add_quantity(self, quantity: Union[Quantity, dict]):
-        self._add_node(quantity, "quantity")
+        self._add_node(quantity, "quantities")
 
     @beartype
     def remove_quantity(self, quantity: Union[Quantity, int]):
-        self._remove_node(quantity, "quantity")
+        self._remove_node(quantity, "quantities")
 
 
 class Process(Base):
@@ -836,6 +821,7 @@ class Process(Base):
     node_name = "Process"
     slug = "process"
     list_name = "processes"
+    unique_together = ["experiment", "name"]
 
     @beartype
     def __init__(
@@ -844,23 +830,41 @@ class Process(Base):
         experiment: Union[Experiment, str],
         name: str,
         keywords: Union[list[str], None] = None,
-        notes: Union[str, None] = None,
+        description: Union[str, None] = None,
+        dependent_processes: list[Union[Base, str]] = None,
+        ingredients: list[Union[Ingredient, dict]] = None,
+        equipment: Union[list[str], None] = None,
+        duration: Union[Quantity, dict, None] = None,
+        time_position: Union[Quantity, dict, None] = None,
+        properties: list[Union[Property, dict]] = None,
+        conditions: list[Union[Condition, dict]] = None,
+        set_id: Union[int, None] = None,
+        products: list[Union[Material, str]] = None,
         citations: list[Union[Citation, dict]] = None,
+        notes: Union[str, None] = None,
         public: bool = False,
         url: Union[str, None] = None,
-        steps=None,
     ):
         super().__init__()
         self.url = url
         self.group = group
         self.experiment = experiment
         self.name = name
-        self.keywords = keywords
+        self.keywords = keywords if keywords else []
+        self.description = description
+        self.dependent_processes = dependent_processes if dependent_processes else []
+        self.ingredients = ingredients if ingredients else []
+        self.equipment = equipment
+        self.duration = duration
+        self.time_position = time_position
+        self.properties = properties if properties else []
+        self.conditions = conditions if conditions else []
+        self.set_id = set_id
+        self.products = products if products else []
+        self.citations = citations if citations else []
         self.notes = notes
-        self.steps = steps if steps else []
         self.created_at = None
         self.updated_at = None
-        self.citations = citations if citations else []
         self.public = public
 
     @property
@@ -875,105 +879,28 @@ class Process(Base):
         self._keywords = value
 
     @beartype
-    def add_citation(self, citation: Union[Citation, dict]):
-        self._add_node(citation, "citations")
+    def add_dependent_process(self, process: Union[Base, dict]):
+        self._add_node(process, "dependent_processes")
 
     @beartype
-    def remove_citation(self, citation: Union[Citation, int]):
-        self._remove_node(citation, "citations")
-
-
-class Step(Base):
-    node_type = "primary"
-    node_name = "Step"
-    slug = "step"
-    list_name = "steps"
+    def remove_dependent_process(self, process: Union[Base, int]):
+        self._remove_node(process, "dependent_processes")
 
     @beartype
-    def __init__(
-        self,
-        group: Union[Group, str],
-        process: Union[Process, str],
-        step_id: int,
-        type: str,
-        description: Union[str, None] = None,
-        intermediate_ingredients: list[Union[IntermediateIngredient, dict]] = None,
-        material_ingredients: list[Union[MaterialIngredient, dict]] = None,
-        equipment: Union[list[str], None] = None,
-        duration: Union[Quantity, dict, None] = None,
-        time_position: Union[Quantity, dict, None] = None,
-        properties: list[Union[Property, dict]] = None,
-        conditions: list[Union[Condition, dict]] = None,
-        set_id: Union[int, None] = None,
-        material_products: list[Union[Material, str]] = None,
-        dependent_steps: list[Union[Base, str]] = None,
-        public: bool = False,
-        url: Union[str, None] = None,
-    ):
-        super().__init__()
-        self.url = url
-        self.group = group
-        self.process = process
-        self.step_id = step_id
-        self.type = type
-        self.description = description
-        self.intermediate_ingredients = (
-            intermediate_ingredients if intermediate_ingredients else []
-        )
-        self.material_ingredients = material_ingredients if material_ingredients else []
-        self.equipment = equipment
-        self.duration = duration
-        self.time_position = time_position
-        self.properties = properties if properties else []
-        self.conditions = conditions if conditions else []
-        self.set_id = set_id
-        self.material_products = material_products if material_products else []
-        self.dependent_steps = dependent_steps if dependent_steps else []
-        self.created_at = None
-        self.updated_at = None
-        self.public = public
-
-    @property
-    def type(self):
-        return self._type
-
-    @type.setter
-    def type(self, value):
-        self._type = validate_key("step-type", value)
+    def add_ingredient(self, ingredient: Union[Ingredient, dict]):
+        self._add_node(ingredient, "ingredients")
 
     @beartype
-    def add_ingredient(
-        self, ingredient: Union[IntermediateIngredient, MaterialIngredient, dict]
-    ):
-        if isinstance(ingredient, IntermediateIngredient):
-            self._add_node(ingredient, "intermediate_ingredients")
-        elif isinstance(ingredient, MaterialIngredient):
-            self._add_node(ingredient, "material_ingredients")
-
-    @beartype
-    def remove_ingredient(
-        self, ingredient: Union[IntermediateIngredient, MaterialIngredient, int]
-    ):
-        if isinstance(ingredient, IntermediateIngredient):
-            self._remove_node(ingredient, "intermediate_ingredients")
-        elif isinstance(ingredient, MaterialIngredient):
-            self._remove_node(ingredient, "material_ingredients")
+    def remove_ingredient(self, ingredient: Union[Ingredient, int]):
+        self._remove_node(ingredient, "ingredients")
 
     @beartype
     def add_product(self, material: Union[Material, dict]):
-        self._add_node(material, "material_products")
+        self._add_node(material, "products")
 
     @beartype
     def remove_product(self, material: Union[Material, int]):
-        self._remove_node(material, "material_products")
-
-    @beartype
-    def add_dependent_step(self, step: Union[Base, dict]):
-        self._add_node(step, "dependent_steps")
-
-    @beartype
-    def remove_dependent_step(self, step: Union[Base, int]):
-        self._remove_node(step, "dependent_steps")
+        self._remove_node(material, "products")
 
     @beartype
     def add_condition(self, condition: Union[Condition, dict]):
@@ -990,3 +917,11 @@ class Step(Base):
     @beartype
     def remove_property(self, property: Union[Property, int]):
         self._remove_node(property, "properties")
+
+    @beartype
+    def add_citation(self, citation: Union[Citation, dict]):
+        self._add_node(citation, "citations")
+
+    @beartype
+    def remove_citation(self, citation: Union[Citation, int]):
+        self._remove_node(citation, "citations")

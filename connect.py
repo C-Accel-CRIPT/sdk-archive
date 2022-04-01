@@ -123,6 +123,24 @@ class API:
                 f"The save() method cannot be called on secondary nodes such as {node.node_name}"
             )
 
+    def _node_is_unique(self, node):
+        """
+        Check if a defined combination of node attributes already exists.
+
+        :param node: The node to perform the check for.
+        :return: Boolean indicating whether the node is unique.
+        """
+        if hasattr(node, "unique_together"):
+            query = {}
+            for attr in node.unique_together:
+                query.update({attr: getattr(node, attr)})
+
+        response = self.search(node.__class__, query)
+        if response["count"] > 0:
+            return False
+        else:
+            return True
+
     def _set_node_attributes(self, node, response_json):
         """
         Set node attributes using data from an API response.
