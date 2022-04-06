@@ -8,6 +8,7 @@ from weakref import WeakSet
 
 from .errors import AddNodeError, RemoveNodeError, UnsavedNodeError
 from .validators import validate_key, validate_value, validate_unit
+from .utils import sha256_hash
 
 
 class Base:
@@ -360,8 +361,7 @@ class File(Base):
         data: list[Union[Data, str]],
         source: str,
         type: str,
-        name: Union[str, None] = None,
-        id: Union[int, None] = None,
+        checksum: Union[str, None] = None,
         extension: Union[str, None] = None,
         external_source: Union[str, None] = None,
         public: bool = False,
@@ -371,12 +371,13 @@ class File(Base):
         self.url = url
         self.group = group
         self.data = data
-        self.type = type
-        self.name = name
-        self.id = id
+        self.uid = None
+        self.checksum = checksum
+        self.name = None
         self.source = source
         self.extension = extension
         self.external_source = external_source
+        self.type = type
         self.created_at = None
         self.updated_at = None
         self.public = public
@@ -395,8 +396,18 @@ class File(Base):
 
     @source.setter
     def source(self, value):
+        value = value.replace("\\", "/")
         if os.path.exists(value):
+            print("Generating checksum ...")
+            self.checksum = sha256_hash(value)
+            print("Complete.")
             self.name = os.path.basename(value)
+        elif value.startswith(("http", "https")) or not value:
+            pass
+        else:
+            raise FileNotFoundError(
+                "The file could not be found on the local filesystem."
+            )
         self._source = value
 
     @beartype

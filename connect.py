@@ -10,10 +10,13 @@ from getpass import getpass
 
 from beartype import beartype
 from beartype.typing import Type
+import globus_sdk
+from globus_sdk.scopes import ScopeBuilder
 from pprint import pprint
 
 from . import node_classes
 from .nodes import Base
+from .utils import convert_file_size
 from .errors import (
     APIAuthError,
     APIRefreshError,
@@ -21,6 +24,7 @@ from .errors import (
     APIDeleteError,
     APISearchError,
     APIGetError,
+    FileSizeLimitError,
 )
 
 
@@ -46,10 +50,11 @@ class API:
             "Content-Type": "application/json",
         }
 
-        # Test API authentication by fetching keys
-        response = self.session.get(f"{self.url}/keys/all/")
+        # Test API authentication by fetching session info and keys
+        response = self.session.get(f"{self.url}/session-info/")
         if response.status_code == 200:
-            API.keys = response.json()
+            API.current_user = response.json()["user_info"]
+            API.storage_info = response.json()["storage_info"]
             print(f"\nConnection to the API was successful!\n")
         elif response.status_code == 404:
             raise APIAuthError("Please provide a correct base URL.")
@@ -57,6 +62,13 @@ class API:
             raise APIAuthError(response.json()["detail"])
         else:
             raise APIAuthError(f"Status code: {response.status_code}")
+
+        # Fetch keys
+        response = self.session.get(f"{self.url}/keys/all/")
+        if response.status_code == 200:
+            API.keys = response.json()
+        else:
+            raise APIGetError("Could not retrieve controlled vocabulary.")
 
     def __repr__(self):
         return f"Connected to {self.url}"
@@ -105,19 +117,19 @@ class API:
             if response.status_code in (200, 201):
                 # Handle new file uploads
                 if node.slug == "file" and os.path.exists(node.source):
-                    file_id = response.json()["url"].rstrip("/").split("/")[-1]
-                    self._upload_file(file_id, node.source)
+                    file_uid = response.json()["uid"]  # Grab uid from JSON response
+                    self._upload_file(file_uid, node.checksum, node.source)
 
                 self._set_node_attributes(node, response.json())
                 self._generate_nodes(node)
 
-                # Update signed URL for File nodes
+                # Update File node source field
                 if node.slug == "file":
                     self.refresh(node)
 
                 print(f"{node.node_name} node has been saved to the database.")
             else:
-                pprint(response.json())
+                raise APISaveError(f"Unable to save {node.name} to the database.")
         else:
             raise APISaveError(
                 f"The save() method cannot be called on secondary nodes such as {node.node_name}"
@@ -151,22 +163,143 @@ class API:
         for json_key, json_value in response_json.items():
             setattr(node, json_key, json_value)
 
-    def _upload_file(self, file_id, file_path):
+    def _upload_file(self, file_uid, file_checksum, file_path):
         """ "
-        Generate a signed URL then upload the file to S3.
+        Upload the file to Globus or S3.
 
         :param node: ID of the File node.
         """
-        # Choose multipart or single file upload based on file size
-        file_size = os.path.getsize(file_path)
-        if file_size < 655360:
-            self._single_file_upload(file_id, file_path)
-        else:
-            self._multipart_file_upload(file_id, file_path)
+        storage_provider = self.storage_info["provider"]
+        max_file_size = self.storage_info["max_file_size"]
 
-    def _single_file_upload(self, file_id, file_path):
+        # Check if file is too big
+        file_size = os.path.getsize(file_path)
+        if file_size > max_file_size:
+            raise FileSizeLimitError(convert_file_size(max_file_size))
+
+        if storage_provider == "globus":
+            self._globus_https_upload(file_uid, file_checksum, file_path)
+        elif storage_provider == "s3":
+            # Choose multipart or single file upload based on file size
+            if file_size < 655360:
+                self._s3_single_file_upload(file_uid, file_path)
+            else:
+                self._s3_multipart_file_upload(file_uid, file_path)
+
+    def _globus_https_upload(self, file_uid, file_checksum, file_path):
+        """
+        Upload a file to a Globus endpoint via HTTPS.
+
+        :param file_uid: UID of the File node.
+        :param file_path: Path to file on local filesystem.
+        """
+        endpoint_id = self.storage_info["endpoint_id"]
+        native_client_id = self.storage_info["native_client_id"]
+
+        if not hasattr(self, "globus_transfer_client"):
+            client, tokens = self._globus_user_auth(endpoint_id, native_client_id)
+
+            # Initialize transfer client
+            transfer_authorizer = globus_sdk.RefreshTokenAuthorizer(
+                tokens["transfer_refresh_token"],
+                client,
+                access_token=tokens["transfer_access_token"],
+                expires_at=tokens["transfer_expiration"],
+            )
+            transfer_client = globus_sdk.TransferClient(authorizer=transfer_authorizer)
+
+            # Save the client and tokens so the user doesnt have to auth each upload
+            self.globus_transfer_client = transfer_client
+            self.globus_tokens = tokens
+
+        # Stage the transfer
+        unique_file_name = self._globus_stage_upload(file_uid, file_checksum)
+
+        # Get endpoint URL
+        endpoint = self.globus_transfer_client.get_endpoint(endpoint_id)
+        https_server = endpoint["https_server"]
+
+        print("\nUpload in progress ...\n")
+
+        # Perform the transfer
+        https_auth_token = self.globus_tokens["https_auth_token"]
+        headers = {"Authorization": f"Bearer {https_auth_token}"}
+        response = requests.put(
+            url=f"{https_server}/files/{file_uid}/{unique_file_name}",
+            data=open(file_path, "rb"),
+            headers=headers,
+        )
+        if response.status_code != 200:
+            raise APISaveError(f"Unable to complete transfer.")
+
+    def _globus_user_auth(self, endpoint_id, client_id):
+        """
+        Prompts a user to authenticate using their Globus credentials.
+
+        :param endpoint_id: ID of the Globus endpoint.
+        :param client_id: ID of the Globus Native Client.
+        :return: Tokens generated after successful auth.
+        """
+        client = globus_sdk.NativeAppAuthClient(client_id)
+
+        # Define scopes
+        auth_scopes = "openid profile email"
+        transfer_scopes = "urn:globus:auth:scope:transfer.api.globus.org:all"
+        https_scopes = ScopeBuilder(endpoint_id).url_scope_string("https")
+
+        client.oauth2_start_flow(
+            requested_scopes=[auth_scopes, transfer_scopes, https_scopes],
+            refresh_tokens=True,
+        )
+        authorize_url = client.oauth2_get_authorize_url()
+        print(f"Please go to this URL and login:\n\n{authorize_url}\n")
+
+        auth_code = input("Please enter the code here: ").strip()
+        token_response = client.oauth2_exchange_code_for_tokens(auth_code)
+
+        auth_data = token_response.by_resource_server["auth.globus.org"]
+        transfer_data = token_response.by_resource_server["transfer.api.globus.org"]
+        https_transfer_data = token_response.by_resource_server[endpoint_id]
+
+        tokens = {
+            "auth_token": auth_data["access_token"],
+            "transfer_access_token": transfer_data["access_token"],
+            "transfer_refresh_token": transfer_data["refresh_token"],
+            "transfer_expiration": transfer_data["expires_at_seconds"],
+            "https_auth_token": https_transfer_data["access_token"],
+        }
+        return (client, tokens)
+
+    def _globus_stage_upload(self, file_uid, file_checksum):
+        """
+        Sends a POST to the REST API to stage the Globus endpoint for upload.
+
+        Staging consists of creating a directory on the endpoint, applying an
+        access rule to he directory, then removing the access rule after a
+        specified expiration timer.
+
+        :param file_uid: UID of the File node.
+        :return: The unique file name to be used for upload.
+        """
+        payload = {"file_uid": file_uid, "file_checksum": file_checksum}
+        response = self.session.post(
+            url=f"{self.url}/globus-stage-upload/",
+            data=json.dumps(payload),
+        )
+        if response.status_code == 200:
+            return json.loads(response.content)["unique_file_name"]
+        else:
+            raise APISaveError(f"Error initiating transfer.")
+
+    def _s3_single_file_upload(self, file_uid, file_path):
+        """
+        Performs a single file upload to AWS S3.
+
+        :param file_uid: The UID of the File node.
+        :param file_path: The path to the file on the local filesystem.
+        """
         # Generate signed URL for uploading
-        data = {"action": "upload", "file_id": file_id}
+        data = {"action": "upload", "file_uid": file_uid}
         response = self.session.post(
             url=f"{self.url}/signed-url/", data=json.dumps(data)
         )
@@ -184,11 +317,17 @@ class API:
         else:
             pprint(response.content)
 
-    def _multipart_file_upload(self, file_id, file_path):
+    def _s3_multipart_file_upload(self, file_uid, file_path):
+        """
+        Performs a multipart file upload to AWS S3.
+
+        :param file_uid: UID of the File node.
+        :param file_path: Path to the file on the local filesystem.
+        """
         chunk_size = 500 * 1024**2
 
         # Create multipart upload and get upload ID
-        data = {"action": "create", "file_id": file_id}
+        data = {"action": "create", "file_uid": file_uid}
         response = self.session.post(
             url=f"{self.url}/multipart-upload/",
             data=json.dumps(data),
@@ -207,7 +346,7 @@ class API:
                 # Generate signed URL for uploading
                 data = {
                     "action": "upload",
-                    "file_id": file_id,
+                    "file_uid": file_uid,
                     "upload_id": upload_id,
                     "part_number": len(parts) + 1,
                 }
@@ -232,7 +371,7 @@ class API:
         # Complete multipart upload
         data = {
             "action": "complete",
-            "file_id": file_id,
+            "file_uid": file_uid,
             "upload_id": upload_id,
             "parts": parts,
         }

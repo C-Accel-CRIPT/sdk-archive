@@ -161,3 +161,13 @@ class RequiredUnitError(Exception):
 
     def __str__(self):
         return self.message
+
+
+class FileSizeLimitError(Exception):
+    """Raised when a file size exceeds the defined limit."""
+
+    def __init__(self, max_size):
+        self.max_size = max_size
+
+    def __str__(self):
+        return f"The file size exceeds the maximum limit of {self.max_size}."
