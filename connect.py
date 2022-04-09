@@ -430,7 +430,7 @@ class API:
         else:
             raise APISearchError(f"'{query}' is not a valid query.")
 
-        return response.json()
+        return JSONPaginator(self.session, response.content)
 
     def _generate_query_slug(self, query):
         """Generate the query URL slug."""
@@ -472,14 +472,14 @@ class API:
         # Fetch node from search query, if defined
         elif issubclass(obj, Base) and query:
             node_class = obj
-            search_json = self.search(node_class=node_class, query=query)
-            count = search_json["count"]
+            search_result = self.search(node_class=node_class, query=query)
+            count = search_result.current["count"]
             if count < 1:
                 raise APIGetError("Your query did not match any existing nodes.")
             elif count > 1:
                 raise APIGetError("Your query mathced more than one node.")
             else:
-                response_json = search_json["results"][0]
+                response_json = search_result.current["results"][0]
         else:
             raise APIGetError(
                 f"Please enter a node URL or a node class with a search query."
@@ -587,3 +587,56 @@ class API:
             if hasattr(instance, "url") and url == instance.url:
                 return instance
         return None
+
+
+class JSONPaginator:
+    """Used to paginate JSON response content."""
+
+    def __init__(self, session, content):
+        self.session = session
+        self.current = content
+
+    def __repr__(self):
+        return json.dumps(self.current, indent=4)
+
+    def __str__(self):
+        return json.dumps(self.current, indent=4)
+
+    @property
+    def current(self):
+        return self._current
+
+    @current.setter
+    def current(self, value):
+        self._current = json.loads(value)
+
+    def next_page(self):
+        next_url = self.current["next"]
+        if next_url:
+            response = self.session.get(next_url)
+            self.current = response.content
+        else:
+            raise AttributeError("No next.")
+
+    def previous_page(self):
+        previous_url = self.current["previous"]
+        if previous_url:
+            response = self.session.get(previous_url)
+            self.current = response.content
+        else:
+            raise AttributeError("No previous.")
+
+    def to_page(self, page_number: int):
+        if self.current["next"]:
+            url = self.current["next"]
+        elif self.current["previous"]:
+            url = self.current["previous"]
+
+        url = url.split("?page=")[0]
+        url += f"?page={str(page_number)}"
+
+        response = self.session.get(url)
+        if response.status_code == 200:
+            self.current = response.content
+        else:
+            raise APISearchError("Not a valid page.")
