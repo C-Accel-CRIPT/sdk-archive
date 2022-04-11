@@ -17,7 +17,7 @@ class Base:
     All nodes inherit from this class.
     """
 
-    __refs__ = WeakSet()  # Set() of all node instances
+    __refs__ = WeakSet()  # Stores all node instances in memory
 
     def __init__(self):
         self.__refs__.add(self)  # Add instance to __refs__
@@ -30,9 +30,9 @@ class Base:
 
     def as_dict(self):
         """
-        Convert a node object to a custom dict.
+        Convert a node object to a cleaned dictionary.
 
-        :return: The custom dict.
+        :return: The cleaned dictionary.
         """
         custom_dict = {}
         for key, value in self.__dict__.items():
@@ -118,13 +118,21 @@ class User(Base):
         orcid_id: str,
         public: bool = False,
         url: Union[str, None] = None,
+        uid: str = None,
+        groups=None,
+        created_at=None,
+        updated_at=None,
     ):
         super().__init__()
         self.url = url
+        self.uid = uid
         self.username = username
         self.email = email
         self.orcid_id = orcid_id
+        self.groups = groups
         self.public = public
+        self.created_at = created_at
+        self.updated_at = updated_at
 
 
 class Group(Base):
@@ -135,12 +143,23 @@ class Group(Base):
 
     @beartype
     def __init__(
-        self, name: str, users: list[Union[User, str]], url: Union[str, None] = None
+        self,
+        name: str,
+        users: list[Union[User, str]],
+        public: bool = False,
+        url: Union[str, None] = None,
+        uid: str = None,
+        created_at=None,
+        updated_at=None,
     ):
         super().__init__()
         self.url = url
+        self.uid = uid
         self.name = name
         self.users = users
+        self.public = public
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     @beartype
     def add_user(self, user: Union[User, dict]):
@@ -176,9 +195,13 @@ class Reference(Base):
         notes: Union[str, None] = None,
         public: bool = False,
         url: Union[str, None] = None,
+        uid: str = None,
+        created_at=None,
+        updated_at=None,
     ):
         super().__init__()
         self.url = url
+        self.uid = uid
         self.group = group
         self.title = title
         self.doi = doi
@@ -194,9 +217,9 @@ class Reference(Base):
         self.pmid = pmid
         self.website = website
         self.notes = notes
+        self.public = public
         self.created_at = None
         self.updated_at = None
-        self.public = public
 
 
 class Citation(Base):
@@ -228,20 +251,24 @@ class Collection(Base):
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
+        uid: str = None,
         experiments=None,
         inventories=None,
+        created_at=None,
+        updated_at=None,
     ):
         super().__init__()
         self.url = url
+        self.uid = uid
         self.group = group
         self.name = name
         self.notes = notes
         self.experiments = experiments if experiments else []
         self.inventories = inventories if inventories else []
         self.citations = citations if citations else []
-        self.created_at = None
-        self.updated_at = None
         self.public = public
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     @beartype
     def add_citation(self, citation: Union[Citation, dict]):
@@ -269,11 +296,15 @@ class Experiment(Base):
         notes: Union[str, None] = None,
         public: bool = False,
         url: Union[str, None] = None,
+        uid: str = None,
         processes=None,
         data=None,
+        created_at=None,
+        updated_at=None,
     ):
         super().__init__()
         self.url = url
+        self.uid = uid
         self.group = group
         self.collection = collection
         self.name = name
@@ -282,9 +313,9 @@ class Experiment(Base):
         self.notes = notes
         self.processes = processes if processes else []
         self.data = data if data else []
-        self.created_at = None
-        self.updated_at = None
         self.public = public
+        self.created_at = created_at
+        self.updated_at = updated_at
 
 
 class Data(Base):
@@ -308,12 +339,16 @@ class Data(Base):
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         url: Union[str, None] = None,
+        uid: str = None,
         files=None,
         materials=None,
         processes=None,
+        created_at=None,
+        updated_at=None,
     ):
         super().__init__()
         self.url = url
+        self.uid = uid
         self.group = group
         self.name = name
         self.files = files
@@ -326,9 +361,9 @@ class Data(Base):
         self.materials = materials if materials else []
         self.processes = processes if processes else []
         self.citations = citations if citations else []
-        self.created_at = None
-        self.updated_at = None
         self.public = public
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     @property
     def type(self):
@@ -366,9 +401,14 @@ class File(Base):
         external_source: Union[str, None] = None,
         public: bool = False,
         url: Union[str, None] = None,
+        uid: str = None,
+        name=None,
+        created_at=None,
+        updated_at=None,
     ):
         super().__init__()
         self.url = url
+        self.uid = uid
         self.group = group
         self.data = data
         self.uid = None
@@ -378,9 +418,9 @@ class File(Base):
         self.extension = extension
         self.external_source = external_source
         self.type = type
-        self.created_at = None
-        self.updated_at = None
         self.public = public
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     @property
     def type(self):
@@ -428,7 +468,7 @@ class Condition(Base):
     def __init__(
         self,
         key: str,
-        value: Union[str, int, float],
+        value: Union[str, int, float, list],
         unit: Union[str, None] = None,
         type: Union[str, None] = None,
         uncertainty: Union[float, None] = None,
@@ -506,7 +546,7 @@ class Property(Base):
     def __init__(
         self,
         key: str,
-        value: Union[str, int, float],
+        value: Union[str, int, float, list],
         unit: Union[str, None] = None,
         type: Union[str, None] = None,
         method: Union[str, None] = None,
@@ -601,7 +641,7 @@ class Identifier(Base):
     list_name = "identifiers"
 
     @beartype
-    def __init__(self, key: str, value: str):
+    def __init__(self, key: str, value: Union[str, int, float, list]):
         super().__init__()
         self.key = key
         self.value = value
@@ -612,7 +652,15 @@ class Identifier(Base):
 
     @key.setter
     def key(self, value):
-        self._key = validate_key("material-identifier", value)
+        self._key = validate_key("material-identifier-key", value)
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = validate_value("material-identifier-key", self.key, value)
 
 
 class Quantity(Base):
@@ -693,9 +741,13 @@ class Material(Base):
         notes: Union[str, None] = None,
         public: bool = False,
         url: Union[str, None] = None,
+        uid: str = None,
+        created_at=None,
+        updated_at=None,
     ):
         super().__init__()
         self.url = url
+        self.uid = uid
         self.group = group
         self.name = name
         self.names = names if names else []
@@ -708,9 +760,9 @@ class Material(Base):
         self.properties = properties if properties else []
         self.citations = citations if citations else []
         self.notes = notes
-        self.created_at = None
-        self.updated_at = None
         self.public = public
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     @property
     def keywords(self):
@@ -772,17 +824,21 @@ class Inventory(Base):
         description: Union[str, None] = None,
         public: bool = False,
         url: Union[str, None] = None,
+        uid: str = None,
+        created_at=None,
+        updated_at=None,
     ):
         super().__init__()
         self.url = url
+        self.uid = uid
         self.group = group
         self.collection = collection
         self.name = name
         self.description = description
         self.materials = materials
-        self.created_at = None
-        self.updated_at = None
         self.public = public
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     @beartype
     def add_material(self, material: Union[Material, dict]):
@@ -855,9 +911,13 @@ class Process(Base):
         notes: Union[str, None] = None,
         public: bool = False,
         url: Union[str, None] = None,
+        uid: str = None,
+        created_at=None,
+        updated_at=None,
     ):
         super().__init__()
         self.url = url
+        self.uid = uid
         self.group = group
         self.experiment = experiment
         self.name = name
@@ -874,9 +934,9 @@ class Process(Base):
         self.products = products if products else []
         self.citations = citations if citations else []
         self.notes = notes
-        self.created_at = None
-        self.updated_at = None
         self.public = public
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     @property
     def keywords(self):

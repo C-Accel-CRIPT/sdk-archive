@@ -118,7 +118,7 @@ class API:
                 # Handle new file uploads
                 if node.slug == "file" and os.path.exists(node.source):
                     file_uid = response.json()["uid"]  # Grab uid from JSON response
-                    self._upload_file(file_uid, node.checksum, node.source)
+                    self._upload_file(file_uid, node)
 
                 self._set_node_attributes(node, response.json())
                 self._generate_nodes(node)
@@ -129,7 +129,14 @@ class API:
 
                 print(f"{node.node_name} node has been saved to the database.")
             else:
-                raise APISaveError(f"Unable to save {node.name} to the database.")
+                try:
+                    content_dict = json.loads(response.content)
+                    content_json = json.dumps(content_dict, indent=4)
+                    raise APISaveError(content_json)
+                except json.decoder.JSONDecodeError:
+                    raise APISaveError(
+                        f"Failed saving {node.node_name} node to the database."
+                    )
         else:
             raise APISaveError(
                 f"The save() method cannot be called on secondary nodes such as {node.node_name}"
@@ -153,17 +160,17 @@ class API:
         else:
             return True
 
-    def _set_node_attributes(self, node, response_json):
+    def _set_node_attributes(self, node, obj_json):
         """
         Set node attributes using data from an API response.
 
         :param node: The node you want to set attributes for.
         :param response: The response from an API call.
         """
-        for json_key, json_value in response_json.items():
+        for json_key, json_value in obj_json.items():
             setattr(node, json_key, json_value)
 
-    def _upload_file(self, file_uid, file_checksum, file_path):
+    def _upload_file(self, file_uid, node):
         """ "
         Upload the file to Globus or S3.
 
@@ -173,20 +180,20 @@ class API:
         max_file_size = self.storage_info["max_file_size"]
 
         # Check if file is too big
-        file_size = os.path.getsize(file_path)
+        file_size = os.path.getsize(node.source)
         if file_size > max_file_size:
             raise FileSizeLimitError(convert_file_size(max_file_size))
 
         if storage_provider == "globus":
-            self._globus_https_upload(file_uid, file_checksum, file_path)
+            self._globus_https_upload(file_uid, node)
         elif storage_provider == "s3":
             # Choose multipart or single file upload based on file size
             if file_size < 655360:
-                self._s3_single_file_upload(file_uid, file_path)
+                self._s3_single_file_upload(file_uid, node.source)
             else:
-                self._s3_multipart_file_upload(file_uid, file_path)
+                self._s3_multipart_file_upload(file_uid, node.source)
 
-    def _globus_https_upload(self, file_uid, file_checksum, file_path):
+    def _globus_https_upload(self, file_uid, file_obj):
         """
         Upload a file to a Globus endpoint via HTTPS.
 
@@ -213,7 +220,7 @@ class API:
             self.globus_tokens = tokens
 
         # Stage the transfer
-        unique_file_name = self._globus_stage_upload(file_uid, file_checksum)
+        unique_file_name = self._globus_stage_upload(file_uid, file_obj.checksum)
 
         # Get endpoint URL
         endpoint = self.globus_transfer_client.get_endpoint(endpoint_id)
@@ -226,11 +233,11 @@ class API:
         headers = {"Authorization": f"Bearer {https_auth_token}"}
         response = requests.put(
             url=f"{https_server}/files/{file_uid}/{unique_file_name}",
-            data=open(file_path, "rb"),
+            data=open(file_obj.source, "rb"),
             headers=headers,
         )
         if response.status_code != 200:
-            raise APISaveError(f"Unable to complete transfer.")
+            raise APISaveError(f"Unable to complete file transfer.")
 
     def _globus_user_auth(self, endpoint_id, client_id):
         """
@@ -286,10 +293,10 @@ class API:
             url=f"{self.url}/globus-stage-upload/",
             data=json.dumps(payload),
         )
-        if response.status_code == 200:
-            return json.loads(response.content)["unique_file_name"]
-        else:
-            raise APISaveError(f"Error initiating transfer.")
+        if response.status_code != 200:
+            raise APISaveError(f"Error initiating file transfer.")
+
+        return json.loads(response.content)["unique_file_name"]
 
     def _s3_single_file_upload(self, file_uid, file_path):
         """
@@ -453,56 +460,60 @@ class API:
         """
         # Fetch node from a URL, if defined
         if isinstance(obj, str):
-            url = obj
-            if self.url not in url:
-                raise APIGetError("Please enter a valid node URL.")
+            obj_json = self._get_from_url(obj)
 
             # Define node class from URL slug
-            node_slug = url.rstrip("/").rsplit("/")[-2]
+            node_slug = obj.rstrip("/").rsplit("/")[-2]
             node_class = self._define_node_class(node_slug)
-
-            response = self.session.get(url)
-            if response.status_code == 200:
-                response_json = response.json()
-            else:
-                raise APIGetError(
-                    f"The specified {node_class.node_name} node was not found."
-                )
 
         # Fetch node from search query, if defined
         elif issubclass(obj, Base) and query:
+            obj_json = self._get_from_query(obj, query)
+
+            # Define node class from obj
             node_class = obj
-            search_result = self.search(node_class=node_class, query=query)
-            count = search_result.current["count"]
-            if count < 1:
-                raise APIGetError("Your query did not match any existing nodes.")
-            elif count > 1:
-                raise APIGetError("Your query mathced more than one node.")
-            else:
-                response_json = search_result.current["results"][0]
+
         else:
             raise APIGetError(
                 f"Please enter a node URL or a node class with a search query."
             )
 
         # Return the local node object if it already exists
-        local_node = self._get_local_primary_node(response_json["url"])
+        local_node = self._get_local_primary_node(obj_json["url"])
         if local_node:
             return local_node
         else:
-            # Pop then add after node is created
-            created_at = response_json.pop("created_at", None)
-            updated_at = response_json.pop("updated_at", None)
-
-            node = node_class(**response_json)
-            node.created_at = created_at
-            node.updated_at = updated_at
+            # Create a new node object
+            node = node_class(**obj_json)
 
             if counter > 0:
                 counter += 1
+            # Generate nested node objects
             self._generate_nodes(node, counter=counter)
 
             return node
+
+    def _get_from_url(self, url):
+        """Get a node using a URL."""
+        if self.url not in url:
+            raise APIGetError("Please enter a valid node URL.")
+
+        response = self.session.get(url)
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise APIGetError(f"The specified node was not found.")
+
+    def _get_from_query(self, node_class, query):
+        """Get a node using a search query."""
+        search_result = self.search(node_class=node_class, query=query)
+        count = search_result.current["count"]
+        if count < 1:
+            raise APIGetError("Your query did not match any existing nodes.")
+        elif count > 1:
+            raise APIGetError("Your query mathced more than one node.")
+        else:
+            return search_result.current["results"][0]
 
     def _generate_nodes(self, node: Base, counter: int = 0):
         """
@@ -616,7 +627,7 @@ class JSONPaginator:
             response = self.session.get(next_url)
             self.current = response.content
         else:
-            raise AttributeError("No next.")
+            raise APISearchError("You're currently on the final page.")
 
     def previous_page(self):
         previous_url = self.current["previous"]
@@ -624,7 +635,7 @@ class JSONPaginator:
             response = self.session.get(previous_url)
             self.current = response.content
         else:
-            raise AttributeError("No previous.")
+            raise AttributeError("You're currently on the first page.")
 
     def to_page(self, page_number: int):
         if self.current["next"]:
@@ -639,4 +650,4 @@ class JSONPaginator:
         if response.status_code == 200:
             self.current = response.content
         else:
-            raise APISearchError("Not a valid page.")
+            raise APISearchError(f"{page_number} is not a valid page number.")
