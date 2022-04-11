@@ -25,7 +25,7 @@ def validate_key(key_category, key):
     return key_parameters["name"]
 
 
-def validate_value(key_category, key, value, unit):
+def validate_value(key_category, key, value, unit=None):
     """
     Validates a value is within the defined parameters.
 
@@ -58,14 +58,21 @@ def _validate_value_type(key, value, value_type):
         "integer": int,
         "float": float,
         "string": str,
-        "list[number]": (int, float),
-        "list[integer]": int,
-        "list[float]": float,
-        "list[string]": str,
+        "list[number]": [(int, float)],
+        "list[integer]": [int],
+        "list[float]": [float],
+        "list[string]": [str],
     }
     value_type = value_types[value_type]
 
-    if not isinstance(value, value_type):
+    # Handle lists
+    if isinstance(value_type, list):
+        if not isinstance(value, list) or not all(
+            isinstance(i, value_type[0]) for i in value
+        ):
+            raise InvalidValueTypeError(key)
+
+    elif not isinstance(value, value_type):
         raise InvalidValueTypeError(key)
 
 
@@ -75,11 +82,9 @@ def _validate_value_range(key, value, value_range, unit, si_unit):
 
     # convert to SI units if defined
     if si_unit:
-        si_value = _unit_conversion(value, unit, si_unit)
-    else:
-        si_value = value
+        value = _unit_conversion(value, unit, si_unit)
 
-    if not min <= si_value <= max:
+    if not min <= value <= max:
         raise InvalidValueRangeError(key, value, min, max, si_unit)
 
 
