@@ -601,11 +601,12 @@ class API:
 
 
 class JSONPaginator:
-    """Used to paginate JSON response content."""
+    """Used to paginate JSON response content from the REST API."""
 
     def __init__(self, session, content):
-        self.session = session
+        self._session = session
         self.current = content
+        self.count = self.current["count"]
 
     def __repr__(self):
         return json.dumps(self.current, indent=4)
@@ -621,18 +622,20 @@ class JSONPaginator:
     def current(self, value):
         self._current = json.loads(value)
 
-    def next_page(self):
+    @property
+    def next(self):
         next_url = self.current["next"]
         if next_url:
-            response = self.session.get(next_url)
+            response = self._session.get(next_url)
             self.current = response.content
         else:
             raise APISearchError("You're currently on the final page.")
 
-    def previous_page(self):
+    @property
+    def previous(self):
         previous_url = self.current["previous"]
         if previous_url:
-            response = self.session.get(previous_url)
+            response = self._session.get(previous_url)
             self.current = response.content
         else:
             raise AttributeError("You're currently on the first page.")
@@ -646,7 +649,7 @@ class JSONPaginator:
         url = url.split("?page=")[0]
         url += f"?page={str(page_number)}"
 
-        response = self.session.get(url)
+        response = self._session.get(url)
         if response.status_code == 200:
             self.current = response.content
         else:
