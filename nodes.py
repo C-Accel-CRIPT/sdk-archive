@@ -553,6 +553,8 @@ class Property(Base):
         method_description: Union[str, None] = None,
         uncertainty: Union[float, None] = None,
         uncertainty_type: Union[str, None] = None,
+        component_id: Union[int, None] = None,
+        structure: Union[str, None] = None,
         set_id: Union[int, None] = None,
         data: list[Union[Data, str]] = None,
         conditions: list[Union[Condition, dict]] = None,
@@ -566,6 +568,8 @@ class Property(Base):
         self.method_description = method_description
         self.uncertainty = uncertainty
         self.uncertainty_type = uncertainty_type
+        self.component_id = component_id
+        self.structure = structure
         self.set_id = set_id
         self.data = data if data else []
         self.conditions = conditions if conditions else []
