@@ -1,0 +1,3 @@
+This software is currently under CRIPT copyright.
+
+This project is expected to move to a more permissive license in the future.
