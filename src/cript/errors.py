@@ -1,3 +1,6 @@
+"""CRIPT API Errors"""
+
+
 class APIAuthError(Exception):
     """Raised for errors with API authentication."""
 
@@ -140,7 +143,10 @@ class InvalidValueRangeError(Exception):
         self.unit = unit
 
     def __str__(self):
-        return f"{self.key} values must be between {self.min} {self.unit} and {self.max} {self.unit}."
+        return (
+            f"{self.key} values must be between "
+            "{self.min} {self.unit} and {self.max} {self.unit}"
+        )
 
 
 class InvalidUnitError(Exception):
