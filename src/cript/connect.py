@@ -28,7 +28,7 @@ from cript.errors import (
 )
 
 
-class API:
+class API(object):
     @beartype
     def __init__(self, url: str = None, token: str = None):
         """
@@ -600,7 +600,7 @@ class API:
         return None
 
 
-class JSONPaginator:
+class JSONPaginator(object):
     """Used to paginate JSON response content from the REST API."""
 
     def __init__(self, session, content):
