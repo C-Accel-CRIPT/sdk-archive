@@ -13,7 +13,7 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 setup(
     name="cript",
     version=version,
-    description="CRIPT REST API and data model bindings",
+    description="CRIPT Python SDK",
     url="https://github.com/C-Accel-CRIPT/cript",
     author="CRIPT Development Team",
     packages=find_packages(where="src"),
