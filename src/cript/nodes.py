@@ -1001,27 +1001,3 @@ class Process(Base):
     @beartype
     def remove_citation(self, citation: Union[Citation, int]):
         self._remove_node(citation, "citations")
-
-
-# TODO: if classes are moved into their own modules, e.g.,
-# cript/datamodel/user.py, this should be a module level variable defined in
-# cript/datamodel/__init__.py
-NODE_CLASSES = [
-    User,
-    Group,
-    Reference,
-    Citation,
-    Collection,
-    File,
-    Data,
-    Condition,
-    Property,
-    Identifier,
-    Component,
-    Material,
-    Inventory,
-    Quantity,
-    Ingredient,
-    Process,
-    Experiment,
-]

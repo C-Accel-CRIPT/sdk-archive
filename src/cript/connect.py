@@ -14,7 +14,7 @@ from beartype.typing import Type
 import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
-from cript.nodes import NODE_CLASSES
+from cript import NODE_CLASSES
 from cript.nodes import Base
 from cript.utils import convert_file_size
 from cript.errors import (
