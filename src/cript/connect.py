@@ -578,7 +578,7 @@ class API:
         :param key: The key used to find the correct class.
         :return: The correct node class.
         """
-        for node_cls in node_classes:
+        for node_cls in NODE_CLASSES:
             # Use node slug
             if hasattr(node_cls, "slug") and node_cls.slug == key:
                 return node_cls

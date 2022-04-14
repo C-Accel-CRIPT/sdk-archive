@@ -1,20 +1,26 @@
 import os
 import json
 import copy
+from abc import ABCMeta
 from typing import Union
-
-from beartype import beartype
 from weakref import WeakSet
 
-from .errors import AddNodeError, RemoveNodeError, UnsavedNodeError
-from .validators import validate_key, validate_value, validate_unit
-from .utils import sha256_hash
+from beartype import beartype
+
+from cript.errors import AddNodeError
+from cript.errors import RemoveNodeError
+from cript.errors import UnsavedNodeError
+from cript.validators import validate_key
+from cript.validators import validate_value
+from cript.validators import validate_unit
+from cript.utils import sha256_hash
 
 
-class Base:
+class Base(metaclass=ABCMeta):
     """
-    The base CRIPT class node.
-    All nodes inherit from this class.
+    The base abstract class for a CRIPT node.
+    All nodes inherit from this class (note that this class cannot be directly
+    instantiated).
     """
 
     __refs__ = WeakSet()  # Stores all node instances in memory
@@ -34,12 +40,7 @@ class Base:
 
         :return: The cleaned dictionary.
         """
-        custom_dict = {}
-        for key, value in self.__dict__.items():
-            if "_" == key[0]:
-                key = key.lstrip("_")
-            custom_dict[key] = value
-        return custom_dict
+        return {k.lstrip("_"): self.__getattribute__(k) for k in vars(self)}
 
     def print_json(self):
         print(self._to_json())
@@ -1000,3 +1001,27 @@ class Process(Base):
     @beartype
     def remove_citation(self, citation: Union[Citation, int]):
         self._remove_node(citation, "citations")
+
+
+# TODO: if classes are moved into their own modules, e.g.,
+# cript/datamodel/user.py, this should be a module level variable defined in
+# cript/datamodel/__init__.py
+NODE_CLASSES = [
+    User,
+    Group,
+    Reference,
+    Citation,
+    Collection,
+    File,
+    Data,
+    Condition,
+    Property,
+    Identifier,
+    Component,
+    Material,
+    Inventory,
+    Quantity,
+    Ingredient,
+    Process,
+    Experiment,
+]
