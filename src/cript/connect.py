@@ -546,7 +546,7 @@ class API(object):
             # Generate secondary nodes
             elif isinstance(value, dict):
                 node_class = self._define_node_class(key)
-                secondary_node = node_class(**value[i])
+                secondary_node = node_class(**value)
                 node_dict[key] = secondary_node
                 self._generate_nodes(secondary_node, counter=counter + 1)
             # Handle lists
