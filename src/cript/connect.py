@@ -2,22 +2,22 @@
 CRIPT REST API Connector
 """
 import os
-import requests
 import json
 import urllib
+from pprint import pprint
 from typing import Union
 from getpass import getpass
 
+import requests
 from beartype import beartype
 from beartype.typing import Type
 import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
-from pprint import pprint
 
-from . import node_classes
-from .nodes import Base
-from .utils import convert_file_size
-from .errors import (
+from cript.nodes import NODE_CLASSES
+from cript.nodes import Base
+from cript.utils import convert_file_size
+from cript.errors import (
     APIAuthError,
     APIRefreshError,
     APISaveError,
