@@ -1,5 +1,5 @@
-from . import pint_ureg
-from .errors import (
+from cript import pint_ureg
+from cript.errors import (
     InvalidKeyError,
     InvalidValueTypeError,
     InvalidValueRangeError,
