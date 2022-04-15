@@ -48,6 +48,8 @@ NODE_CLASSES = [
     Experiment,
 ]
 
+from cript.connect import API  # noqa 401 402
+
 
 # single-sourcing the package version
 version_file = pkg_resources.resource_filename("cript", "VERSION.txt")
