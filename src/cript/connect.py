@@ -2,22 +2,22 @@
 CRIPT REST API Connector
 """
 import os
-import requests
 import json
 import urllib
+from pprint import pprint
 from typing import Union
 from getpass import getpass
 
+import requests
 from beartype import beartype
 from beartype.typing import Type
 import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
-from pprint import pprint
 
-from . import node_classes
-from .nodes import Base
-from .utils import convert_file_size
-from .errors import (
+from cript import NODE_CLASSES
+from cript.nodes import Base
+from cript.utils import convert_file_size
+from cript.errors import (
     APIAuthError,
     APIRefreshError,
     APISaveError,
@@ -546,7 +546,7 @@ class API:
             # Generate secondary nodes
             elif isinstance(value, dict):
                 node_class = self._define_node_class(key)
-                secondary_node = node_class(**value[i])
+                secondary_node = node_class(**value)
                 node_dict[key] = secondary_node
                 self._generate_nodes(secondary_node, counter=counter + 1)
             # Handle lists
@@ -578,7 +578,7 @@ class API:
         :param key: The key used to find the correct class.
         :return: The correct node class.
         """
-        for node_cls in node_classes:
+        for node_cls in NODE_CLASSES:
             # Use node slug
             if hasattr(node_cls, "slug") and node_cls.slug == key:
                 return node_cls

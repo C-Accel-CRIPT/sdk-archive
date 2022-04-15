@@ -1,5 +1,5 @@
-from . import pint_ureg
-from .errors import (
+from cript import pint_ureg
+from cript.errors import (
     InvalidKeyError,
     InvalidValueTypeError,
     InvalidValueRangeError,
@@ -143,7 +143,7 @@ def _unit_conversion(value, unit, si_unit):
 
 def _get_key_parameters(key_category, key):
     """Get the parameters for a given key from full keys dictionary."""
-    from .connect import API
+    from cript.connect import API
 
     if API.keys:
         # Fetch relevant keys

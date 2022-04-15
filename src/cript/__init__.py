@@ -1,10 +1,14 @@
-# Instantiate the Pint registry.
-# For context, check out https://pint.readthedocs.io/en/stable/tutorial.html#using-pint-in-your-projects.
+import pkg_resources
 import pint
 
+
+# Instantiate the Pint unit registry
+# https://pint.readthedocs.io/en/stable/tutorial.html#using-pint-in-your-projects
+# Note that this needs to be before the node imports below
 pint_ureg = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
 
-from .nodes import (
+
+from cript.nodes import (  # noqa 402
     User,
     Group,
     Reference,
@@ -24,8 +28,7 @@ from .nodes import (
     Experiment,
 )
 
-
-node_classes = [
+NODE_CLASSES = [
     User,
     Group,
     Reference,
@@ -45,5 +48,13 @@ node_classes = [
     Experiment,
 ]
 
+from cript.connect import API  # noqa 401 402
 
-from .connect import API
+
+# single-sourcing the package version
+version_file = pkg_resources.resource_filename("cript", "VERSION.txt")
+with open(version_file, "r") as fr:
+    __version__ = fr.read().strip()
+
+VERSION = __version__
+__short_version__ = __version__.rpartition(".")[0]
