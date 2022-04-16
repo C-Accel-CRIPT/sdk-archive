@@ -15,7 +15,7 @@ import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
 from cript import NODE_CLASSES
-from cript.nodes import Base
+from cript.nodes import Base, User
 from cript.utils import convert_file_size
 from cript.exceptions import (
     APIAuthError,
@@ -53,7 +53,7 @@ class API:
         # Test API authentication by fetching session info and keys
         response = self.session.get(f"{self.url}/session-info/")
         if response.status_code == 200:
-            API.current_user = response.json()["user_info"]
+            API.user = User(**response.json()["user_info"])
             API.storage_info = response.json()["storage_info"]
             print(f"\nConnection to the API was successful!\n")
         elif response.status_code == 404:
