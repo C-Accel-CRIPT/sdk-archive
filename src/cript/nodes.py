@@ -7,9 +7,9 @@ from weakref import WeakSet
 
 from beartype import beartype
 
-from cript.errors import AddNodeError
-from cript.errors import RemoveNodeError
-from cript.errors import UnsavedNodeError
+from cript.exceptions import AddNodeError
+from cript.exceptions import RemoveNodeError
+from cript.exceptions import UnsavedNodeError
 from cript.validators import validate_key
 from cript.validators import validate_value
 from cript.validators import validate_unit

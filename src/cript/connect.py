@@ -17,7 +17,7 @@ from globus_sdk.scopes import ScopeBuilder
 from cript import NODE_CLASSES
 from cript.nodes import Base
 from cript.utils import convert_file_size
-from cript.errors import (
+from cript.exceptions import (
     APIAuthError,
     APIRefreshError,
     APISaveError,
