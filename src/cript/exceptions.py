@@ -61,6 +61,16 @@ class APIGetError(Exception):
         return self.message
 
 
+class APIFileUploadError(Exception):
+    """Raised when a file upload fails."""
+
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return f"File upload could not be completed."
+
+
 class APISessionRequiredError(Exception):
     """Raised when an active API session is required but not yet established."""
 
