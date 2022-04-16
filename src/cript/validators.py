@@ -143,7 +143,7 @@ def _unit_conversion(value, unit, si_unit):
 
 def _get_key_parameters(key_category, key):
     """Get the parameters for a given key from full keys dictionary."""
-    from cript.connect import API
+    from cript.session import API
 
     if API.keys:
         # Fetch relevant keys

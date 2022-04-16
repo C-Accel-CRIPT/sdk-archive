@@ -48,7 +48,7 @@ NODE_CLASSES = [
     Experiment,
 ]
 
-from cript.connect import API  # noqa 401 402
+from cript.session import API  # noqa 401 402
 
 
 # single-sourcing the package version
