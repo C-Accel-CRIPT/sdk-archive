@@ -213,10 +213,11 @@ class API:
         if storage_provider == "globus":
             self._globus_https_upload(file_uid, node)
         elif storage_provider == "s3":
-            # Choose multipart or single file upload based on file size
-            if file_size < 655360:
+            if file_size < 6291456:
                 self._s3_single_file_upload(file_uid, node.source)
             else:
+                # Multipart uploads for files bigger than 6 MB
+                # Ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/qfacts.html
                 self._s3_multipart_file_upload(file_uid, node.source)
 
     def _globus_https_upload(self, file_uid, file_obj):
