@@ -98,11 +98,12 @@ class API:
             )
 
     @beartype
-    def save(self, node: Base):
+    def save(self, node: Base, auto_update=False):
         """
         Create or update a node in the DB.
 
         :param node: The node to be saved.
+        :param auto_update: Indicates whether to update a node that matches a unique constraint.
         """
         if node.node_type == "primary":
             if node.url:
@@ -128,37 +129,62 @@ class API:
                     self.refresh(node)
 
                 print(f"{node.node_name} node has been saved to the database.")
-            else:
+            elif response.status_code == 400:
                 try:
                     content_dict = json.loads(response.content)
                     content_json = json.dumps(content_dict, indent=4)
-                    raise APISaveError(content_json)
                 except json.decoder.JSONDecodeError:
                     raise APISaveError(
                         f"Failed saving {node.node_name} node to the database."
                     )
+
+                # Handle uniqueness errors
+                if "unique" in content_dict:
+                    self._handle_unique_nodes(node, auto_update)
+                else:
+                    raise APISaveError(content_json)
         else:
             raise APISaveError(
                 f"The save() method cannot be called on secondary nodes such as {node.node_name}"
             )
 
-    def _node_is_unique(self, node):
+    def _handle_unique_nodes(self, node, auto_update):
         """
-        Check if a defined combination of node attributes already exists.
+        Handle cases when a new node is using a combination of field
+        values that the database enforces as a unique set.
 
-        :param node: The node to perform the check for.
-        :return: Boolean indicating whether the node is unique.
+        :param node: The node being saved.
+        :param auto_update: Indicates whether to update the existing node.
         """
-        if hasattr(node, "unique_together"):
-            query = {}
-            for attr in node.unique_together:
-                query.update({attr: getattr(node, attr)})
-
-        response = self.search(node.__class__, query)
-        if response["count"] > 0:
-            return False
+        if auto_update == True:
+            choice = "y"
         else:
-            return True
+            print(
+                f"A node already exists with the same values for the following fields: {', '.join(node.unique_together)}"
+            )
+            choice = input("Would you like to update the existing node? (y/N)") or "N"
+
+        if choice == "y":
+            # Create unique fields dict
+            unique_fields = {}
+            for field in node.unique_together:
+                value = getattr(node, field)
+                if hasattr(value, "node_type") and value.node_type == "primary":
+                    value = value.uid
+                unique_fields[field] = value
+
+            # Get the existing node's JSON
+            result = self.search(type(node), unique_fields)
+            existing_json = result.current["results"][0]
+
+            # Check if node is already in memory
+            if self._get_local_primary_node(existing_json["url"]):
+                raise APISaveError(
+                    f"This {node.node_name} node is already present in your local memory."
+                )
+
+            node.url = existing_json["url"]
+            self.save(node)
 
     def _set_node_attributes(self, node, obj_json):
         """
@@ -437,6 +463,9 @@ class API:
         else:
             raise APISearchError(f"'{query}' is not a valid query.")
 
+        if response.status_code != 200:
+            raise APISearchError(f"Could not retrieve search results.")
+
         return JSONPaginator(self.session, response.content)
 
     def _generate_query_slug(self, query):
@@ -506,14 +535,13 @@ class API:
 
     def _get_from_query(self, node_class, query):
         """Get a node using a search query."""
-        search_result = self.search(node_class=node_class, query=query)
-        count = search_result.current["count"]
-        if count < 1:
+        results = self.search(node_class=node_class, query=query)
+        if results.count < 1:
             raise APIGetError("Your query did not match any existing nodes.")
-        elif count > 1:
+        elif results.count > 1:
             raise APIGetError("Your query mathced more than one node.")
         else:
-            return search_result.current["results"][0]
+            return results.current["results"][0]
 
     def _generate_nodes(self, node: Base, counter: int = 0):
         """
