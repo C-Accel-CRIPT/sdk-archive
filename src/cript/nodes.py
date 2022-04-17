@@ -149,8 +149,6 @@ class Group(Base):
         public: bool = False,
         url: Union[str, None] = None,
         uid: str = None,
-        created_by=None,
-        updated_by=None,
         created_at=None,
         updated_at=None,
     ):
@@ -160,8 +158,6 @@ class Group(Base):
         self.name = name
         self.users = users
         self.public = public
-        self.created_by = created_by
-        self.updated_by = updated_by
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -200,8 +196,6 @@ class Reference(Base):
         public: bool = False,
         url: Union[str, None] = None,
         uid: str = None,
-        created_by=None,
-        updated_by=None,
         created_at=None,
         updated_at=None,
     ):
@@ -217,15 +211,13 @@ class Reference(Base):
         self.year = year
         self.volume = volume
         self.issue = issue
-        self.pages = pages
+        self.pages = pages if pages else []
         self.issn = issn
         self.arxiv_id = arxiv_id
         self.pmid = pmid
         self.website = website
         self.notes = notes
         self.public = public
-        self.created_by = created_by
-        self.updated_by = updated_by
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -261,8 +253,6 @@ class Collection(Base):
         uid: str = None,
         experiments=None,
         inventories=None,
-        created_by=None,
-        updated_by=None,
         created_at=None,
         updated_at=None,
     ):
@@ -276,8 +266,6 @@ class Collection(Base):
         self.inventories = inventories if inventories else []
         self.citations = citations if citations else []
         self.public = public
-        self.created_by = created_by
-        self.updated_by = updated_by
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -302,15 +290,13 @@ class Experiment(Base):
         group: Union[Group, str],
         collection: Union[Collection, str],
         name: str,
-        funding: Union[str, None] = None,
+        funding: list[Union[str, None]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
         url: Union[str, None] = None,
         uid: str = None,
         processes=None,
         data=None,
-        created_by=None,
-        updated_by=None,
         created_at=None,
         updated_at=None,
     ):
@@ -320,14 +306,12 @@ class Experiment(Base):
         self.group = group
         self.collection = collection
         self.name = name
-        self.funding = funding
+        self.funding = funding if funding else []
         self.notes = notes
         self.notes = notes
         self.processes = processes if processes else []
         self.data = data if data else []
         self.public = public
-        self.created_by = created_by
-        self.updated_by = updated_by
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -356,8 +340,6 @@ class Data(Base):
         files=None,
         materials=None,
         processes=None,
-        created_by=None,
-        updated_by=None,
         created_at=None,
         updated_at=None,
     ):
@@ -377,8 +359,6 @@ class Data(Base):
         self.processes = processes if processes else []
         self.citations = citations if citations else []
         self.public = public
-        self.created_by = created_by
-        self.updated_by = updated_by
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -419,8 +399,6 @@ class File(Base):
         url: Union[str, None] = None,
         uid: str = None,
         name=None,
-        created_by=None,
-        updated_by=None,
         created_at=None,
         updated_at=None,
     ):
@@ -429,16 +407,14 @@ class File(Base):
         self.uid = uid
         self.group = group
         self.data = data
-        self.uid = None
+        self.uid = uid
         self.checksum = checksum
-        self.name = None
+        self.name = name
         self.source = source
         self.extension = extension
         self.external_source = external_source
         self.type = type
         self.public = public
-        self.created_by = created_by
-        self.updated_by = updated_by
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -765,8 +741,6 @@ class Material(Base):
         public: bool = False,
         url: Union[str, None] = None,
         uid: str = None,
-        created_by=None,
-        updated_by=None,
         created_at=None,
         updated_at=None,
     ):
@@ -786,8 +760,6 @@ class Material(Base):
         self.citations = citations if citations else []
         self.notes = notes
         self.public = public
-        self.created_by = created_by
-        self.updated_by = updated_by
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -851,8 +823,6 @@ class Inventory(Base):
         public: bool = False,
         url: Union[str, None] = None,
         uid: str = None,
-        created_by=None,
-        updated_by=None,
         created_at=None,
         updated_at=None,
     ):
@@ -865,8 +835,6 @@ class Inventory(Base):
         self.description = description
         self.materials = materials
         self.public = public
-        self.created_by = created_by
-        self.updated_by = updated_by
         self.created_at = created_at
         self.updated_at = updated_at
 
@@ -929,9 +897,7 @@ class Process(Base):
         description: Union[str, None] = None,
         prerequisite_processes: list[Union[Base, str]] = None,
         ingredients: list[Union[Ingredient, dict]] = None,
-        equipment: Union[list[str], None] = None,
-        duration: Union[Quantity, dict, None] = None,
-        time_position: Union[Quantity, dict, None] = None,
+        equipment: list[Union[str, None]] = None,
         properties: list[Union[Property, dict]] = None,
         conditions: list[Union[Condition, dict]] = None,
         set_id: Union[int, None] = None,
@@ -941,8 +907,6 @@ class Process(Base):
         public: bool = False,
         url: Union[str, None] = None,
         uid: str = None,
-        created_by=None,
-        updated_by=None,
         created_at=None,
         updated_at=None,
     ):
@@ -958,9 +922,7 @@ class Process(Base):
             prerequisite_processes if prerequisite_processes else []
         )
         self.ingredients = ingredients if ingredients else []
-        self.equipment = equipment
-        self.duration = duration
-        self.time_position = time_position
+        self.equipment = equipment if equipment else []
         self.properties = properties if properties else []
         self.conditions = conditions if conditions else []
         self.set_id = set_id
@@ -968,8 +930,6 @@ class Process(Base):
         self.citations = citations if citations else []
         self.notes = notes
         self.public = public
-        self.created_by = created_by
-        self.updated_by = updated_by
         self.created_at = created_at
         self.updated_at = updated_at
 
