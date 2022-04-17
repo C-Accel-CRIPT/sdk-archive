@@ -140,7 +140,6 @@ class Group(Base):
     node_type = "primary"
     node_name = "Group"
     slug = "group"
-    unique_together = ["name"]
 
     @beartype
     def __init__(
@@ -179,7 +178,6 @@ class Reference(Base):
     node_type = "primary"
     node_name = "Reference"
     slug = "reference"
-    unique_together = ["doi"]
 
     @beartype
     def __init__(
@@ -250,7 +248,6 @@ class Collection(Base):
     node_type = "primary"
     node_name = "Collection"
     slug = "collection"
-    unique_together = ["created_by", "name"]
 
     @beartype
     def __init__(
@@ -298,7 +295,6 @@ class Experiment(Base):
     node_name = "Experiment"
     slug = "experiment"
     list_name = "experiments"
-    unique_together = ["collection", "name"]
 
     @beartype
     def __init__(
@@ -341,7 +337,6 @@ class Data(Base):
     node_name = "Data"
     slug = "data"
     list_name = "data"
-    unique_together = ["experiment", "name"]
 
     @beartype
     def __init__(
@@ -409,7 +404,6 @@ class File(Base):
     node_name = "File"
     slug = "file"
     list_name = "files"
-    unique_together = ["data", "name"]
 
     @beartype
     def __init__(
@@ -752,7 +746,6 @@ class Material(Base):
     node_name = "Material"
     slug = "material"
     list_name = "materials"
-    unique_together = ["created_by", "name"]
 
     @beartype
     def __init__(
@@ -846,7 +839,6 @@ class Inventory(Base):
     node_type = "primary"
     node_name = "Inventory"
     slug = "inventory"
-    unique_together = ["collection", "name"]
 
     @beartype
     def __init__(
@@ -926,7 +918,6 @@ class Process(Base):
     node_name = "Process"
     slug = "process"
     list_name = "processes"
-    unique_together = ["experiment", "name"]
 
     @beartype
     def __init__(
