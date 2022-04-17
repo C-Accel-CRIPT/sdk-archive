@@ -936,7 +936,7 @@ class Process(Base):
         name: str,
         keywords: Union[list[str], None] = None,
         description: Union[str, None] = None,
-        dependent_processes: list[Union[Base, str]] = None,
+        prerequisite_processes: list[Union[Base, str]] = None,
         ingredients: list[Union[Ingredient, dict]] = None,
         equipment: Union[list[str], None] = None,
         duration: Union[Quantity, dict, None] = None,
@@ -963,7 +963,9 @@ class Process(Base):
         self.name = name
         self.keywords = keywords if keywords else []
         self.description = description
-        self.dependent_processes = dependent_processes if dependent_processes else []
+        self.prerequisite_processes = (
+            prerequisite_processes if prerequisite_processes else []
+        )
         self.ingredients = ingredients if ingredients else []
         self.equipment = equipment
         self.duration = duration
@@ -992,12 +994,12 @@ class Process(Base):
         self._keywords = value
 
     @beartype
-    def add_dependent_process(self, process: Union[Base, dict]):
-        self._add_node(process, "dependent_processes")
+    def add_prerequisite_process(self, process: Union[Base, dict]):
+        self._add_node(process, "prerequisite_processes")
 
     @beartype
-    def remove_dependent_process(self, process: Union[Base, int]):
-        self._remove_node(process, "dependent_processes")
+    def remove_prerequisite_process(self, process: Union[Base, int]):
+        self._remove_node(process, "prerequisite_processes")
 
     @beartype
     def add_ingredient(self, ingredient: Union[Ingredient, dict]):
