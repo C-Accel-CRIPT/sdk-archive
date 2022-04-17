@@ -81,7 +81,7 @@ class APISessionRequiredError(Exception):
         return "An API session must be established before you can create this node."
 
 
-class UniqueNodeError(Exception):
+class DuplicateNodeError(Exception):
     """
     Raised when a node is saved using a combination of field
     values that the database enforces as a unique set.
