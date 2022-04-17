@@ -68,7 +68,7 @@ class APIFileUploadError(Exception):
         pass
 
     def __str__(self):
-        return f"File upload could not be completed."
+        return "File upload could not be completed."
 
 
 class APISessionRequiredError(Exception):
@@ -78,7 +78,20 @@ class APISessionRequiredError(Exception):
         pass
 
     def __str__(self):
-        return f"An API session must be established before you can create this node."
+        return "An API session must be established before you can create this node."
+
+
+class UniqueNodeError(Exception):
+    """
+    Raised when a node is saved using a combination of field
+    values that the database enforces as a unique set.
+    """
+
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message
 
 
 class UnsavedNodeError(Exception):
