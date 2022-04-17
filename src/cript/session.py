@@ -1,6 +1,3 @@
-"""
-CRIPT REST API Connector
-"""
 import os
 import json
 import urllib
@@ -24,6 +21,8 @@ from cript.exceptions import (
     APIDeleteError,
     APISearchError,
     APIGetError,
+    APIFileUploadError,
+    DuplicateNodeError,
     FileSizeLimitError,
 )
 
@@ -55,7 +54,6 @@ class API:
         if response.status_code == 200:
             API.user = User(**response.json()["user_info"])
             API.storage_info = response.json()["storage_info"]
-            print(f"\nConnection to the API was successful!\n")
         elif response.status_code == 404:
             raise APIAuthError("Please provide a correct base URL.")
         elif response.status_code == 401:
@@ -69,6 +67,8 @@ class API:
             API.keys = response.json()
         else:
             raise APIGetError("Could not retrieve controlled vocabulary.")
+
+        print(f"Connection to the API was successful!")
 
     def __repr__(self):
         return f"Connected to {self.url}"
@@ -129,62 +129,23 @@ class API:
                     self.refresh(node)
 
                 print(f"{node.node_name} node has been saved to the database.")
+
             elif response.status_code == 400:
                 try:
-                    content_dict = json.loads(response.content)
-                    content_json = json.dumps(content_dict, indent=4)
+                    response_dict = json.loads(response.content)
                 except json.decoder.JSONDecodeError:
                     raise APISaveError(
                         f"Failed saving {node.node_name} node to the database."
                     )
 
-                # Handle uniqueness errors
-                if "unique" in content_dict:
-                    self._handle_unique_nodes(node, auto_update)
-                else:
-                    raise APISaveError(content_json)
+                # Raise error when duplicate node is found
+                if "duplicate" in response_dict:
+                    raise DuplicateNodeError(list(response_dict.values())[0][0])
+
         else:
             raise APISaveError(
                 f"The save() method cannot be called on secondary nodes such as {node.node_name}"
             )
-
-    def _handle_unique_nodes(self, node, auto_update):
-        """
-        Handle cases when a new node is using a combination of field
-        values that the database enforces as a unique set.
-
-        :param node: The node being saved.
-        :param auto_update: Indicates whether to update the existing node.
-        """
-        if auto_update == True:
-            choice = "y"
-        else:
-            print(
-                f"A node already exists with the same values for the following fields: {', '.join(node.unique_together)}"
-            )
-            choice = input("Would you like to update the existing node? (y/N)") or "N"
-
-        if choice == "y":
-            # Create unique fields dict
-            unique_fields = {}
-            for field in node.unique_together:
-                value = getattr(node, field)
-                if hasattr(value, "node_type") and value.node_type == "primary":
-                    value = value.uid
-                unique_fields[field] = value
-
-            # Get the existing node's JSON
-            result = self.search(type(node), unique_fields)
-            existing_json = result.current["results"][0]
-
-            # Check if node is already in memory
-            if self._get_local_primary_node(existing_json["url"]):
-                raise APISaveError(
-                    f"This {node.node_name} node is already present in your local memory."
-                )
-
-            node.url = existing_json["url"]
-            self.save(node)
 
     def _set_node_attributes(self, node, obj_json):
         """
@@ -264,7 +225,7 @@ class API:
             headers=headers,
         )
         if response.status_code != 200:
-            raise APISaveError(f"Unable to complete file transfer.")
+            raise APIFileUploadError
 
     def _globus_user_auth(self, endpoint_id, client_id):
         """
@@ -281,14 +242,16 @@ class API:
         transfer_scopes = "urn:globus:auth:scope:transfer.api.globus.org:all"
         https_scopes = ScopeBuilder(endpoint_id).url_scope_string("https")
 
+        # Initiate auth flow
         client.oauth2_start_flow(
             requested_scopes=[auth_scopes, transfer_scopes, https_scopes],
             refresh_tokens=True,
         )
         authorize_url = client.oauth2_get_authorize_url()
-        print(f"Please go to this URL and login:\n\n{authorize_url}\n")
 
-        auth_code = input("Please enter the code here: ").strip()
+        # Prompt user to login and enter code
+        print(f"Please go to this URL and login:\n\n{authorize_url}\n")
+        auth_code = input("Enter the code here: ").strip()
         token_response = client.oauth2_exchange_code_for_tokens(auth_code)
 
         auth_data = token_response.by_resource_server["auth.globus.org"]
@@ -321,8 +284,7 @@ class API:
             data=json.dumps(payload),
         )
         if response.status_code != 200:
-            raise APISaveError(f"Error initiating file transfer.")
-
+            raise APIFileUploadError
         return json.loads(response.content)["unique_file_name"]
 
     def _s3_single_file_upload(self, file_uid, file_path):
@@ -341,15 +303,13 @@ class API:
         # Upload file
         if response.status_code == 200:
             print("\nUpload in progress ...\n")
-
             url = json.loads(response.content)
             files = {"file": open(file_path, "rb")}
             response = requests.put(url=url, files=files)
-
             if response.status_code != 200:
-                raise APISaveError(f"Unable to upload the file: {response.content}")
+                raise APIFileUploadError
         else:
-            pprint(response.content)
+            raise APIFileUploadError
 
     def _s3_multipart_file_upload(self, file_uid, file_path):
         """
@@ -396,11 +356,9 @@ class API:
                         etag = response.headers["ETag"]
                         parts.append({"ETag": etag, "PartNumber": len(parts) + 1})
                     else:
-                        raise APISaveError(
-                            f"Unable to upload the file: {response.content}"
-                        )
+                        raise APIFileUploadError
                 else:
-                    pprint(response.content)
+                    raise APIFileUploadError
 
         # Complete multipart upload
         data = {
@@ -414,11 +372,11 @@ class API:
             data=json.dumps(data),
         )
         if response.status_code != 200:
-            raise APISaveError(f"Unable to upload the file: {response.content}")
+            raise APIFileUploadError
 
     def delete(self, node: Base):
         """
-        Delete a node locally and in the DB.
+        Delete a node in the DB and clear it locally.
 
         :param node: The node to be deleted.
         :return: Response message.
@@ -428,8 +386,9 @@ class API:
                 response = self.session.delete(url=node.url)
                 if response.status_code == 204:
                     print(f"{node.node_name} node has been deleted from the database.")
-                    # Reset fields to indicate the object has been deleted from DB
+                    # Set specific fields to None, indicating the object has been deleted from DB
                     node.url = None
+                    node.uid = None
                     node.created_at = None
                     node.updated_at = None
                 else:
@@ -450,12 +409,13 @@ class API:
 
         :param node: The node type you want to search.
         :param query: A dictionary defining the query parameters.
-        :return: The JSON response of the query.
+        :return: A JSONPaginator object.
         """
         if node_class.node_type == "secondary":
             raise APISearchError(
                 f"{node_class.node_name} is a secondary node, thus cannot be searched."
             )
+
         if isinstance(query, dict):
             query_slug = self._generate_query_slug(query)
             response = self.session.get(f"{self.url}/{node_class.slug}/?{query_slug}")
@@ -499,10 +459,7 @@ class API:
         # Fetch node from search query, if defined
         elif issubclass(obj, Base) and query:
             obj_json = self._get_from_query(obj, query)
-
-            # Define node class from obj
             node_class = obj
-
         else:
             raise APIGetError(
                 f"Please enter a node URL or a node class with a search query."
@@ -513,21 +470,16 @@ class API:
         if local_node:
             return local_node
         else:
-            # Create a new node object
             node = node_class(**obj_json)
-
             if counter > 0:
                 counter += 1
-            # Generate nested node objects
             self._generate_nodes(node, counter=counter)
-
             return node
 
     def _get_from_url(self, url):
         """Get a node using a URL."""
         if self.url not in url:
             raise APIGetError("Please enter a valid node URL.")
-
         response = self.session.get(url)
         if response.status_code == 200:
             return response.json()
@@ -630,7 +582,7 @@ class API:
 
 
 class JSONPaginator:
-    """Used to paginate JSON response content from the REST API."""
+    """Paginate JSON response content sent from the API."""
 
     def __init__(self, session, content):
         self._session = session
@@ -653,15 +605,17 @@ class JSONPaginator:
 
     @property
     def next(self):
+        """Flip to the next page."""
         next_url = self.current["next"]
         if next_url:
             response = self._session.get(next_url)
             self.current = response.content
         else:
-            raise APISearchError("You're currently on the final page.")
+            raise AttributeError("You're currently on the final page.")
 
     @property
     def previous(self):
+        """Flip to the previous page."""
         previous_url = self.current["previous"]
         if previous_url:
             response = self._session.get(previous_url)
@@ -670,6 +624,11 @@ class JSONPaginator:
             raise AttributeError("You're currently on the first page.")
 
     def to_page(self, page_number: int):
+        """
+        Navigate to a specific page in the results.
+
+        :param page_number: The page number as an int.
+        """
         if self.current["next"]:
             url = self.current["next"]
         elif self.current["previous"]:
@@ -682,4 +641,4 @@ class JSONPaginator:
         if response.status_code == 200:
             self.current = response.content
         else:
-            raise APISearchError(f"{page_number} is not a valid page number.")
+            raise ValueError(f"{page_number} is not a valid page number.")
