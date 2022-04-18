@@ -460,7 +460,7 @@ class Condition(Base):
     def __init__(
         self,
         key: str,
-        value: Union[str, int, float, list],
+        value: Union[str, int, float, list, None] = None,
         unit: Union[str, None] = None,
         type: Union[str, None] = None,
         uncertainty: Union[float, None] = None,
@@ -538,7 +538,7 @@ class Property(Base):
     def __init__(
         self,
         key: str,
-        value: Union[str, int, float, list],
+        value: Union[str, int, float, list, None] = None,
         unit: Union[str, None] = None,
         type: Union[str, None] = None,
         method: Union[str, None] = None,

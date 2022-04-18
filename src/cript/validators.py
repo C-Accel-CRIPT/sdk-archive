@@ -34,14 +34,22 @@ def validate_value(key_category, key, value, unit=None):
     :param value: Value to be validated.
     :param unit: The value's unit of measurement.
     """
+    key_parameters = _get_key_parameters(key_category, key)
+    value_range = key_parameters.get("range")
+    si_unit = key_parameters.get("si_unit")
+
     # Skip validation for custom fields
     if key[0] == "+":
         return value
 
-    key_parameters = _get_key_parameters(key_category, key)
-    value_range = key_parameters.get("range")
+    # Check if value is expected
     value_type = key_parameters.get("value_type")
-    si_unit = key_parameters.get("si_unit")
+    if not value and value_type:
+        raise ValueError(f"A value must be defined for {key}.")
+    elif value and not value_type:
+        raise ValueError(f"A value is not expected for {key}")
+    elif not value and not value_type:
+        return value
 
     if value_type:
         _validate_value_type(key, value, value_type)
