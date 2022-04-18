@@ -1,6 +1,7 @@
 import os
 import json
 import urllib
+import warnings
 from pprint import pprint
 from typing import Union
 from getpass import getpass
@@ -11,7 +12,7 @@ from beartype.typing import Type
 import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
-from cript import NODE_CLASSES
+from cript import VERSION, NODE_CLASSES
 from cript.nodes import Base, User
 from cript.utils import convert_file_size
 from cript.exceptions import (
@@ -28,7 +29,9 @@ from cript.exceptions import (
 
 
 class API:
-    @beartype
+    version = VERSION
+    keys = None
+
     def __init__(self, url: str = None, token: str = None):
         """
         Establishes a session with the CRIPT API.
@@ -36,39 +39,44 @@ class API:
         :param url: The base URL for the relevant CRIPT instance.
         :param token: The user's API token.
         """
+        self.latest_version = None
+        self.user = None
+        self.storage_info = None
         if url is None:
             url = input("Base URL: ")
         if token is None:
             token = getpass("API Token: ")
-
         self.url = url.rstrip("/") + "/api"
 
         self.session = requests.Session()
         self.session.headers = {
             "Authorization": token,
             "Content-Type": "application/json",
+            "Accept": f"application/json; version={self.version}",
         }
 
         # Test API authentication by fetching session info and keys
         response = self.session.get(f"{self.url}/session-info/")
         if response.status_code == 200:
-            API.user = User(**response.json()["user_info"])
-            API.storage_info = response.json()["storage_info"]
+            response_json = response.json()
+            self.latest_version = response_json["latest_version"]
+            self.user = User(**response_json["user_info"])
+            self.storage_info = response_json["storage_info"]
+            API.keys = response_json["keys"]  # For use by validators
         elif response.status_code == 404:
             raise APIAuthError("Please provide a correct base URL.")
         elif response.status_code == 401:
-            raise APIAuthError(response.json()["detail"])
+            raise APIAuthError(response_json["detail"])
         else:
             raise APIAuthError(f"Status code: {response.status_code}")
 
-        # Fetch keys
-        response = self.session.get(f"{self.url}/keys/all/")
-        if response.status_code == 200:
-            API.keys = response.json()
-        else:
-            raise APIGetError("Could not retrieve controlled vocabulary.")
-
         print(f"Connection to the API was successful!")
+
+        # Warn user if an update is required
+        if self.version != self.latest_version:
+            warnings.warn(
+                response_json["version_warning"], DeprecationWarning, stacklevel=2
+            )
 
     def __repr__(self):
         return f"Connected to {self.url}"
