@@ -58,15 +58,14 @@ class API:
         # Test API authentication by fetching session info and keys
         response = self.session.get(f"{self.url}/session-info/")
         if response.status_code == 200:
-            response_json = response.json()
-            self.latest_version = response_json["latest_version"]
-            self.user = User(**response_json["user_info"])
-            self.storage_info = response_json["storage_info"]
-            API.keys = response_json["keys"]  # For use by validators
+            self.latest_version = response.json()["latest_version"]
+            self.user = User(**response.json()["user_info"])
+            self.storage_info = response.json()["storage_info"]
+            API.keys = response.json()["keys"]  # For use by validators
         elif response.status_code == 404:
             raise APIAuthError("Please provide a correct base URL.")
         elif response.status_code == 401:
-            raise APIAuthError(response_json["detail"])
+            raise APIAuthError(response.json()["detail"])
         else:
             raise APIAuthError(f"Status code: {response.status_code}")
 
@@ -75,7 +74,7 @@ class API:
         # Warn user if an update is required
         if self.version != self.latest_version:
             warnings.warn(
-                response_json["version_warning"], DeprecationWarning, stacklevel=2
+                response.json()["version_warning"], DeprecationWarning, stacklevel=2
             )
 
     def __repr__(self):
