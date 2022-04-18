@@ -73,9 +73,7 @@ class API:
 
         # Warn user if an update is required
         if self.version != self.latest_version:
-            warnings.warn(
-                response.json()["version_warning"], DeprecationWarning, stacklevel=2
-            )
+            warnings.warn(response.json()["version_warning"], stacklevel=2)
 
     def __repr__(self):
         return f"Connected to {self.url}"
