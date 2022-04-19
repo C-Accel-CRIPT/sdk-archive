@@ -2,9 +2,9 @@ import os
 import json
 import urllib
 import warnings
-from pprint import pprint
 from typing import Union
 from getpass import getpass
+from logging import getLogger
 
 import requests
 from beartype import beartype
@@ -26,6 +26,9 @@ from cript.exceptions import (
     DuplicateNodeError,
     FileSizeLimitError,
 )
+
+
+logger = getLogger(__name__)
 
 
 class API:
@@ -67,7 +70,7 @@ class API:
         else:
             raise APIAuthError(display_errors(response))
 
-        print(f"Connection to the API was successful!")
+        logger.info("Connection to the API was successful!")
 
         # Warn user if an update is required
         if self.version != self.latest_version:
@@ -93,7 +96,7 @@ class API:
                 self._generate_nodes(node)
             else:
                 raise APIRefreshError(
-                    "Before you can refresh a node, you must either save it or define it's URL."
+                    "Before you can refresh a node, you must either save it or define its URL."
                 )
         else:
             raise APIRefreshError(
@@ -135,7 +138,7 @@ class API:
             if node.slug == "file":
                 self.refresh(node)
 
-            print(f"{node.node_name} node has been saved to the database.")
+            logger.info(f"{node.node_name} node has been saved to the database.")
 
         else:
             try:
@@ -214,7 +217,7 @@ class API:
         endpoint = self.globus_transfer_client.get_endpoint(endpoint_id)
         https_server = endpoint["https_server"]
 
-        print("\nUpload in progress ...\n")
+        logger.info("\nUpload to Globus endpoint in progress ...\n")
 
         # Perform the transfer
         https_auth_token = self.globus_tokens["https_auth_token"]
@@ -329,7 +332,7 @@ class API:
         upload_id = json.loads(response.content)["UploadId"]
 
         # Upload file in chunks
-        print("\nUpload in progress ...\n")
+        logger.info("\nUpload to AWS S3 in progress ...\n")
         parts = []
         with open(file_path, "rb") as local_file:
             while True:
@@ -385,7 +388,9 @@ class API:
             if node.url:
                 response = self.session.delete(url=node.url)
                 if response.status_code == 204:
-                    print(f"{node.node_name} node has been deleted from the database.")
+                    logger.info(
+                        f"{node.node_name} node has been deleted from the database."
+                    )
                     # Set specific fields to None, indicating the object has been deleted from DB
                     node.url = None
                     node.uid = None
@@ -462,7 +467,7 @@ class API:
             node_class = obj
         else:
             raise APIGetError(
-                f"Please enter a node URL or a node class with a search query."
+                "Please enter a node URL or a node class with a search query."
             )
 
         # Return the local node object if it already exists
@@ -484,7 +489,7 @@ class API:
         if response.status_code == 200:
             return response.json()
         else:
-            raise APIGetError(f"The specified node was not found.")
+            raise APIGetError("The specified node was not found.")
 
     def _get_from_query(self, node_class, query):
         """Get a node using a search query."""
@@ -492,7 +497,7 @@ class API:
         if results.count < 1:
             raise APIGetError("Your query did not match any existing nodes.")
         elif results.count > 1:
-            raise APIGetError("Your query mathced more than one node.")
+            raise APIGetError("Your query matched more than one node.")
         else:
             return results.current["results"][0]
 

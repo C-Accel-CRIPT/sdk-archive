@@ -1,5 +1,10 @@
+import logging
 import pkg_resources
 import pint
+
+
+# Set the default logging level for the package
+logging.basicConfig(level=logging.warning)
 
 
 # Single-sourcing the package version

@@ -4,12 +4,16 @@ import copy
 from abc import ABCMeta
 from typing import Union
 from weakref import WeakSet
+from logging import getLogger
 
 from beartype import beartype
 
 from cript.exceptions import AddNodeError, RemoveNodeError, UnsavedNodeError
 from cript.validators import validate_key, validate_value, validate_unit
 from cript.utils import sha256_hash
+
+
+logger = getLogger(__name__)
 
 
 class Base(metaclass=ABCMeta):
