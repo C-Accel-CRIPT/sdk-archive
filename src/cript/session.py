@@ -73,7 +73,11 @@ class API:
         logger.info("Connection to the API was successful!")
 
         # Warn user if an update is required
+        # TODO: (if this makes sense) unify logger.warning and warnings.warn
+        # interfaces. My hunch is that one of them would be sufficient but yet
+        # to test it
         if self.version != self.latest_version:
+            logger.warning(response.json()["version_warning"])
             warnings.warn(response.json()["version_warning"], stacklevel=2)
 
     def __repr__(self):
