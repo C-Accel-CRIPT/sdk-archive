@@ -201,7 +201,7 @@ class Reference(Base):
         self.group = group
         self.title = title
         self.doi = doi
-        self.authors = authors
+        self.authors = authors if authors else []
         self.journal = journal
         self.publisher = publisher
         self.year = year
