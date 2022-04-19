@@ -4,7 +4,7 @@ import pint
 
 
 # Set the default logging level for the package
-logging.basicConfig(level=logging.warning)
+logging.basicConfig(level=logging.WARNING)
 
 
 # Single-sourcing the package version
