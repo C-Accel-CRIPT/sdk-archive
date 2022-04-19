@@ -1,5 +1,6 @@
 import hashlib
 import math
+import json
 
 
 def sha256_hash(file_path):
@@ -21,3 +22,16 @@ def convert_file_size(size_bytes):
     p = math.pow(1024, i)
     s = round(size_bytes / p, 2)
     return f"{s} {size_name[i]}"
+
+
+def display_errors(response):
+    """Prep errors sent from API for display."""
+    try:
+        response_dict = json.loads(response.content)
+    except json.decoder.JSONDecodeError:
+        return "Server error."
+
+    if "detail" in response_dict:
+        return response_dict["detail"]
+
+    return json.dumps(response_dict, indent=4)
