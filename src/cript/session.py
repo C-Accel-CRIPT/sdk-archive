@@ -65,7 +65,7 @@ class API:
         elif response.status_code == 404:
             raise APIAuthError("Please provide a correct base URL.")
         else:
-            raise APIAuthError(display_errors(response))
+            raise APIAuthError(display_errors(response.content))
 
         print(f"Connection to the API was successful!")
 
@@ -142,10 +142,11 @@ class API:
                 # Raise error if duplicate node is found
                 response_dict = json.loads(response.content)
                 if "duplicate" in response_dict:
-                    raise DuplicateNodeError(display_errors(response))
+                    response_dict.pop("duplicate")
+                    raise DuplicateNodeError(display_errors(json.dumps(response_dict)))
             except json.decoder.JSONDecodeError:
                 pass
-            raise APISaveError(display_errors(response))
+            raise APISaveError(display_errors(response.content))
 
     def _set_node_attributes(self, node, obj_json):
         """
@@ -392,7 +393,7 @@ class API:
                     node.created_at = None
                     node.updated_at = None
                 else:
-                    raise APIDeleteError(display_errors(response))
+                    raise APIDeleteError(display_errors(response.content))
             else:
                 raise APIDeleteError(
                     f"This {node.node_name} node does not exist in the database."
@@ -425,7 +426,7 @@ class API:
             raise APISearchError(f"'{query}' is not a valid query.")
 
         if response.status_code != 200:
-            raise APISearchError(display_errors(response))
+            raise APISearchError(display_errors(response.content))
 
         return JSONPaginator(self.session, response.content)
 

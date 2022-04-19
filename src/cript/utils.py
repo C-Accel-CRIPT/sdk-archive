@@ -27,11 +27,15 @@ def convert_file_size(size_bytes):
 def display_errors(response):
     """Prep errors sent from API for display."""
     try:
-        response_dict = json.loads(response.content)
+        response_dict = json.loads(response)
     except json.decoder.JSONDecodeError:
         return "Server error."
 
     if "detail" in response_dict:
-        return response_dict["detail"]
+        ret = response_dict["detail"]
+    elif "errors" in response_dict:
+        ret = response_dict["errors"]
+    else:
+        ret = response_dict
 
-    return json.dumps(response_dict, indent=4)
+    return json.dumps(ret, indent=4)
