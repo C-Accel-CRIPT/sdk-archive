@@ -8,7 +8,12 @@ from weakref import WeakSet
 from beartype import beartype
 
 from cript.exceptions import AddNodeError, RemoveNodeError, UnsavedNodeError
-from cript.validators import validate_key, validate_value, validate_unit
+from cript.validators import (
+    validate_required,
+    validate_key,
+    validate_value,
+    validate_unit,
+)
 from cript.utils import sha256_hash
 
 
@@ -110,52 +115,47 @@ class User(Base):
     @beartype
     def __init__(
         self,
-        username: str,
-        email: str,
-        orcid_id: str,
+        username: str = None,
+        email: str = None,
+        orcid_id: str = None,
         public: bool = False,
-        url: Union[str, None] = None,
-        uid: str = None,
         groups=None,
-        created_at=None,
-        updated_at=None,
     ):
         super().__init__()
-        self.url = url
-        self.uid = uid
+        self.url = None
+        self.uid = None
         self.username = username
         self.email = email
         self.orcid_id = orcid_id
-        self.groups = groups
+        self.groups = groups if groups else []
         self.public = public
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = None
+        self.updated_at = None
 
 
 class Group(Base):
     node_type = "primary"
     node_name = "Group"
     slug = "group"
+    required = ["name", "users"]
+    unique_together = ["name"]
 
     @beartype
     def __init__(
         self,
-        name: str,
-        users: list[Union[User, str]],
+        name: str = None,
+        users: list[Union[User, str]] = None,
         public: bool = False,
-        url: Union[str, None] = None,
-        uid: str = None,
-        created_at=None,
-        updated_at=None,
     ):
         super().__init__()
-        self.url = url
-        self.uid = uid
+        self.url = None
+        self.uid = None
         self.name = name
         self.users = users
         self.public = public
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = None
+        self.updated_at = None
+        validate_required(self)
 
     @beartype
     def add_user(self, user: Union[User, dict]):
@@ -170,13 +170,15 @@ class Reference(Base):
     node_type = "primary"
     node_name = "Reference"
     slug = "reference"
+    required = ["group", "title", "doi"]
+    unique_together = ["doi"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str],
-        title: str,
-        doi: str,
+        group: Union[Group, str] = None,
+        title: str = None,
+        doi: str = None,
         authors: Union[list[str], None] = None,
         journal: Union[str, None] = None,
         publisher: Union[str, None] = None,
@@ -190,14 +192,10 @@ class Reference(Base):
         website: Union[str, None] = None,
         notes: Union[str, None] = None,
         public: bool = False,
-        url: Union[str, None] = None,
-        uid: str = None,
-        created_at=None,
-        updated_at=None,
     ):
         super().__init__()
-        self.url = url
-        self.uid = uid
+        self.url = None
+        self.uid = None
         self.group = group
         self.title = title
         self.doi = doi
@@ -214,8 +212,9 @@ class Reference(Base):
         self.website = website
         self.notes = notes
         self.public = public
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = None
+        self.updated_at = None
+        validate_required(self)
 
 
 class Citation(Base):
@@ -236,25 +235,23 @@ class Collection(Base):
     node_type = "primary"
     node_name = "Collection"
     slug = "collection"
+    required = ["group", "name"]
+    unique_together = ["name", "created_by"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str],
-        name: str,
+        group: Union[Group, str] = None,
+        name: str = None,
         notes: Union[str, None] = None,
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
-        url: Union[str, None] = None,
-        uid: str = None,
         experiments=None,
         inventories=None,
-        created_at=None,
-        updated_at=None,
     ):
         super().__init__()
-        self.url = url
-        self.uid = uid
+        self.url = None
+        self.uid = None
         self.group = group
         self.name = name
         self.notes = notes
@@ -262,8 +259,9 @@ class Collection(Base):
         self.inventories = inventories if inventories else []
         self.citations = citations if citations else []
         self.public = public
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = None
+        self.updated_at = None
+        validate_required(self)
 
     @beartype
     def add_citation(self, citation: Union[Citation, dict]):
@@ -279,26 +277,24 @@ class Experiment(Base):
     node_name = "Experiment"
     slug = "experiment"
     list_name = "experiments"
+    required = ["group", "collection", "name"]
+    unique_together = ["collection", "name"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str],
-        collection: Union[Collection, str],
-        name: str,
+        group: Union[Group, str] = None,
+        collection: Union[Collection, str] = None,
+        name: str = None,
         funding: list[Union[str, None]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
-        url: Union[str, None] = None,
-        uid: str = None,
         processes=None,
         data=None,
-        created_at=None,
-        updated_at=None,
     ):
         super().__init__()
-        self.url = url
-        self.uid = uid
+        self.url = None
+        self.uid = None
         self.group = group
         self.collection = collection
         self.name = name
@@ -308,8 +304,9 @@ class Experiment(Base):
         self.processes = processes if processes else []
         self.data = data if data else []
         self.public = public
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = None
+        self.updated_at = None
+        validate_required(self)
 
 
 class Data(Base):
@@ -317,31 +314,29 @@ class Data(Base):
     node_name = "Data"
     slug = "data"
     list_name = "data"
+    required = ["group", "experiment", "name", "type"]
+    unique_together = ["experiment", "name"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str],
-        experiment: Union[Base, str],
-        name: str,
-        type: str,
+        group: Union[Group, str] = None,
+        experiment: Union[Base, str] = None,
+        name: str = None,
+        type: str = None,
         sample_prep: Union[str, None] = None,
         calibration: Union[str, None] = None,
         configuration: Union[str, None] = None,
         notes: Union[str, None] = None,
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
-        url: Union[str, None] = None,
-        uid: str = None,
         files=None,
         materials=None,
         processes=None,
-        created_at=None,
-        updated_at=None,
     ):
         super().__init__()
-        self.url = url
-        self.uid = uid
+        self.url = None
+        self.uid = None
         self.group = group
         self.name = name
         self.files = files
@@ -355,8 +350,9 @@ class Data(Base):
         self.processes = processes if processes else []
         self.citations = citations if citations else []
         self.public = public
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = None
+        self.updated_at = None
+        validate_required(self)
 
     @property
     def type(self):
@@ -380,30 +376,27 @@ class File(Base):
     node_name = "File"
     slug = "file"
     list_name = "files"
+    required = ["group", "data", "source", "type"]
+    unique_together = ["checksum", "created_by"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str],
-        data: list[Union[Data, str]],
-        source: str,
-        type: str,
+        group: Union[Group, str] = None,
+        data: list[Union[Data, str]] = None,
+        source: str = None,
+        type: str = None,
         checksum: Union[str, None] = None,
         extension: Union[str, None] = None,
         external_source: Union[str, None] = None,
         public: bool = False,
-        url: Union[str, None] = None,
-        uid: str = None,
         name=None,
-        created_at=None,
-        updated_at=None,
     ):
         super().__init__()
-        self.url = url
-        self.uid = uid
+        self.url = None
+        self.uid = None
         self.group = group
         self.data = data
-        self.uid = uid
         self.checksum = checksum
         self.name = name
         self.source = source
@@ -411,8 +404,9 @@ class File(Base):
         self.external_source = external_source
         self.type = type
         self.public = public
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = None
+        self.updated_at = None
+        validate_required(self)
 
     @property
     def type(self):
@@ -455,11 +449,12 @@ class Condition(Base):
     node_type = "secondary"
     node_name = "Condition"
     list_name = "conditions"
+    required = ["key"]
 
     @beartype
     def __init__(
         self,
-        key: str,
+        key: str = None,
         value: Union[str, int, float, list, None] = None,
         unit: Union[str, None] = None,
         type: Union[str, None] = None,
@@ -479,6 +474,7 @@ class Condition(Base):
         self.set_id = set_id
         self.measurement_id = measurement_id
         self.data = data if data else []
+        validate_required(self)
 
     @property
     def key(self):
@@ -533,11 +529,12 @@ class Property(Base):
     node_type = "secondary"
     node_name = "Property"
     list_name = "properties"
+    required = ["key", "value"]
 
     @beartype
     def __init__(
         self,
-        key: str,
+        key: str = None,
         value: Union[str, int, float, list, None] = None,
         unit: Union[str, None] = None,
         type: Union[str, None] = None,
@@ -565,6 +562,7 @@ class Property(Base):
         self.set_id = set_id
         self.data = data if data else []
         self.conditions = conditions if conditions else []
+        validate_required(self)
 
     @property
     def key(self):
@@ -635,12 +633,14 @@ class Identifier(Base):
     node_type = "secondary"
     node_name = "Identifier"
     list_name = "identifiers"
+    required = ["key", "value"]
 
     @beartype
-    def __init__(self, key: str, value: Union[str, int, float, list]):
+    def __init__(self, key: str = None, value: Union[str, int, float, list] = None):
         super().__init__()
         self.key = key
         self.value = value
+        validate_required(self)
 
     @property
     def key(self):
@@ -663,18 +663,20 @@ class Quantity(Base):
     node_type = "secondary"
     node_name = "Quantity"
     list_name = "quantities"
+    required = ["key", "value"]
 
     @beartype
     def __init__(
         self,
-        key: str,
-        value: Union[int, float],
+        key: str = None,
+        value: Union[int, float] = None,
         unit: Union[str, None] = None,
     ):
         super().__init__()
         self.key = key
         self.unit = unit
         self.value = value
+        validate_required(self)
 
     @property
     def key(self):
@@ -705,12 +707,14 @@ class Component(Base):
     node_type = "secondary"
     node_name = "Component"
     list_name = "components"
+    required = ["component"]
 
     @beartype
-    def __init__(self, component: Union[Base, str], component_uid: int = 1):
+    def __init__(self, component_uid: int = 1, component: Union[Base, str] = None):
         super().__init__()
         self.component_uid = component_uid
         self.component = component
+        validate_required(self)
 
 
 class Material(Base):
@@ -718,13 +722,15 @@ class Material(Base):
     node_name = "Material"
     slug = "material"
     list_name = "materials"
+    required = ["group", "name"]
+    unique_together = ["name", "created_by"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str],
-        name: str,
-        identifiers: list[Union[Identifier, dict]],
+        group: Union[Group, str] = None,
+        name: str = None,
+        identifiers: list[Union[Identifier, dict]] = None,
         names: Union[list[str], None] = None,
         components: list[Union[Component, dict]] = None,
         vendor: Union[str, None] = None,
@@ -735,14 +741,10 @@ class Material(Base):
         citations: list[Union[Citation, dict]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
-        url: Union[str, None] = None,
-        uid: str = None,
-        created_at=None,
-        updated_at=None,
     ):
         super().__init__()
-        self.url = url
-        self.uid = uid
+        self.url = None
+        self.uid = None
         self.group = group
         self.name = name
         self.names = names if names else []
@@ -756,8 +758,9 @@ class Material(Base):
         self.citations = citations if citations else []
         self.notes = notes
         self.public = public
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = None
+        self.updated_at = None
+        validate_required(self)
 
     @property
     def keywords(self):
@@ -807,32 +810,31 @@ class Inventory(Base):
     node_type = "primary"
     node_name = "Inventory"
     slug = "inventory"
+    required = ["group", "collection", "name"]
+    unique_together = ["collection", "name"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str],
-        collection: Union[Collection, str],
-        name: str,
-        materials: list[Union[Material, str]],
+        group: Union[Group, str] = None,
+        collection: Union[Collection, str] = None,
+        name: str = None,
+        materials: list[Union[Material, str]] = None,
         description: Union[str, None] = None,
         public: bool = False,
-        url: Union[str, None] = None,
-        uid: str = None,
-        created_at=None,
-        updated_at=None,
     ):
         super().__init__()
-        self.url = url
-        self.uid = uid
+        self.url = None
+        self.uid = None
         self.group = group
         self.collection = collection
         self.name = name
         self.description = description
         self.materials = materials
         self.public = public
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = None
+        self.updated_at = None
+        validate_required(self)
 
     @beartype
     def add_material(self, material: Union[Material, dict]):
@@ -847,6 +849,7 @@ class Ingredient(Base):
     node_type = "secondary"
     node_name = "Ingredient"
     list_name = "ingredients"
+    required = ["ingredient"]
 
     @beartype
     def __init__(
@@ -859,6 +862,7 @@ class Ingredient(Base):
         self.ingredient = ingredient
         self.keyword = keyword
         self.quantities = quantities if quantities else []
+        validate_required(self)
 
     @property
     def keyword(self):
@@ -882,6 +886,8 @@ class Process(Base):
     node_name = "Process"
     slug = "process"
     list_name = "processes"
+    required = ["group", "experiment", "name"]
+    unique_together = ["experiment", "name"]
 
     @beartype
     def __init__(
@@ -901,14 +907,10 @@ class Process(Base):
         citations: list[Union[Citation, dict]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
-        url: Union[str, None] = None,
-        uid: str = None,
-        created_at=None,
-        updated_at=None,
     ):
         super().__init__()
-        self.url = url
-        self.uid = uid
+        self.url = None
+        self.uid = None
         self.group = group
         self.experiment = experiment
         self.name = name
@@ -926,8 +928,9 @@ class Process(Base):
         self.citations = citations if citations else []
         self.notes = notes
         self.public = public
-        self.created_at = created_at
-        self.updated_at = updated_at
+        self.created_at = None
+        self.updated_at = None
+        validate_required(self)
 
     @property
     def keywords(self):
