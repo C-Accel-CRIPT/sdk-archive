@@ -9,6 +9,14 @@ from cript.exceptions import (
 )
 
 
+def validate_required(node):
+    """Validate that required fields are defined."""
+    fields_str = ", ".join(node.required)
+    for field in node.required:
+        if not hasattr(node, field) or not getattr(node, field):
+            raise TypeError(f"Missing required field(s): {fields_str}")
+
+
 def validate_key(key_category, key):
     """
     Validates a key name to ensure it's in the controlled vocabulary.
@@ -34,13 +42,13 @@ def validate_value(key_category, key, value, unit=None):
     :param value: Value to be validated.
     :param unit: The value's unit of measurement.
     """
-    key_parameters = _get_key_parameters(key_category, key)
-    value_range = key_parameters.get("range")
-    si_unit = key_parameters.get("si_unit")
-
     # Skip validation for custom fields
     if key[0] == "+":
         return value
+
+    key_parameters = _get_key_parameters(key_category, key)
+    value_range = key_parameters.get("range")
+    si_unit = key_parameters.get("si_unit")
 
     # Check if value is expected
     value_type = key_parameters.get("value_type")
@@ -104,6 +112,12 @@ def validate_unit(key_category, key, unit):
     :param key: Name of the key.
     :param unit: Unit to be validated.
     """
+    _validate_unit_exists(unit)
+
+    # Skip further validation for custom fields
+    if key[0] == "+":
+        return unit
+
     key_parameters = _get_key_parameters(key_category, key)
     si_unit = key_parameters["si_unit"]
 
@@ -116,10 +130,6 @@ def validate_unit(key_category, key, unit):
         raise RequiredUnitError(f"A unit is not permitted for {key}.")
 
     _validate_unit_exists(unit)
-
-    # Skip further validation for custom fields
-    if key[0] == "+":
-        return unit
 
     _validate_unit_conversion(key, unit, si_unit)
 
