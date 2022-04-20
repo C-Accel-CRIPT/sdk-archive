@@ -62,13 +62,13 @@ class API:
         response = self.session.get(f"{self.url}/session-info/")
         if response.status_code == 200:
             self.latest_version = response.json()["latest_version"]
-            self.user = User(**response.json()["user_info"])
+            self.user = self._create_node(User, response.json()["user_info"])
             self.storage_info = response.json()["storage_info"]
             API.keys = response.json()["keys"]  # For use by validators
         elif response.status_code == 404:
             raise APIAuthError("Please provide a correct base URL.")
         else:
-            raise APIAuthError(display_errors(response))
+            raise APIAuthError(display_errors(response.content))
 
         logger.info("Connection to the API was successful!")
 
@@ -149,10 +149,12 @@ class API:
                 # Raise error if duplicate node is found
                 response_dict = json.loads(response.content)
                 if "duplicate" in response_dict:
-                    raise DuplicateNodeError(display_errors(response))
+                    response_dict.pop("duplicate")  # Pop flag for display purposes
+                    response_content = json.dumps(response_dict)
+                    raise DuplicateNodeError(display_errors(response_content))
             except json.decoder.JSONDecodeError:
                 pass
-            raise APISaveError(display_errors(response))
+            raise APISaveError(display_errors(response.content))
 
     def _set_node_attributes(self, node, obj_json):
         """
@@ -401,7 +403,7 @@ class API:
                     node.created_at = None
                     node.updated_at = None
                 else:
-                    raise APIDeleteError(display_errors(response))
+                    raise APIDeleteError(display_errors(response.content))
             else:
                 raise APIDeleteError(
                     f"This {node.node_name} node does not exist in the database."
@@ -434,7 +436,7 @@ class API:
             raise APISearchError(f"'{query}' is not a valid query.")
 
         if response.status_code != 200:
-            raise APISearchError(display_errors(response))
+            raise APISearchError(display_errors(response.content))
 
         return JSONPaginator(self.session, response.content)
 
@@ -479,7 +481,9 @@ class API:
         if local_node:
             return local_node
         else:
-            node = node_class(**obj_json)
+            # Create a new node
+            node = self._create_node(node_class, obj_json)
+
             if counter > 0:
                 counter += 1
             self._generate_nodes(node, counter=counter)
@@ -576,6 +580,31 @@ class API:
             if hasattr(node_cls, "list_name") and node_cls.list_name == key:
                 return node_cls
         return None
+
+    def _create_node(self, node_class, obj_json):
+        """
+        Create a node with JSON returned from the API.
+
+        :param node_class: The class of the node to be created.
+        :param obj_json: The JSON returned from the API.
+        :return: The created node.
+        """
+        # Pop common attributes
+        url = obj_json.pop("url")
+        uid = obj_json.pop("uid")
+        created_at = obj_json.pop("created_at")
+        updated_at = obj_json.pop("updated_at")
+
+        # Create node
+        node = node_class(**obj_json)
+
+        # Replace comon attributes
+        node.url = url
+        node.uid = uid
+        node.created_at = created_at
+        node.updated_at = updated_at
+
+        return node
 
     def _get_local_primary_node(self, url: str):
         """

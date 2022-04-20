@@ -22,6 +22,7 @@ __short_version__ = __version__.rpartition(".")[0]
 pint_ureg = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
 
 
+from cript import exceptions
 from cript.nodes import (  # noqa 402
     User,
     Group,
