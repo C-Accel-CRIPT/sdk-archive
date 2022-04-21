@@ -749,7 +749,7 @@ class Material(Base):
         self.group = group
         self.name = name
         self.names = names if names else []
-        self.identifiers = identifiers
+        self.identifiers = identifiers if identifiers else []
         self.components = components if components else []
         self.vendor = vendor
         self.lot_number = lot_number
