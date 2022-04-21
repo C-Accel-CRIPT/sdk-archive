@@ -422,18 +422,19 @@ class File(Base):
 
     @source.setter
     def source(self, value):
-        value = value.replace("\\", "/")
-        if os.path.exists(value):
-            print("Generating checksum ...")
-            self.checksum = sha256_hash(value)
-            print("Complete.")
-            self.name = os.path.basename(value)
-        elif value.startswith(("http", "https")) or not value:
-            pass
-        else:
-            raise FileNotFoundError(
-                "The file could not be found on the local filesystem."
-            )
+        if value:
+            if os.path.exists(value):
+                value = value.replace("\\", "/")
+                print("Generating checksum ...")
+                self.checksum = sha256_hash(value)
+                print("Complete.")
+                self.name = os.path.basename(value)
+            elif value.startswith(("http", "https")):
+                pass
+            else:
+                raise FileNotFoundError(
+                    "The file could not be found on the local filesystem."
+                )
         self._source = value
 
     @beartype
