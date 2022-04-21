@@ -101,7 +101,7 @@ class API:
             )
 
     @beartype
-    def save(self, node: Base, auto_update=False):
+    def save(self, node: Base):
         """
         Create or update a node in the DB.
 
