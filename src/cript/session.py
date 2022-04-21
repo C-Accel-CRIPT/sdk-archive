@@ -221,8 +221,9 @@ class API:
         # Perform the transfer
         https_auth_token = self.globus_tokens["https_auth_token"]
         headers = {"Authorization": f"Bearer {https_auth_token}"}
+        storage_path = self.storage_info["path"]
         response = requests.put(
-            url=f"{https_server}/files/{file_uid}/{unique_file_name}",
+            url=f"{https_server}{storage_path}{file_uid}/{unique_file_name}",
             data=open(file_obj.source, "rb"),
             headers=headers,
         )
@@ -299,7 +300,7 @@ class API:
         # Generate signed URL for uploading
         data = {"action": "upload", "file_uid": file_uid}
         response = self.session.post(
-            url=f"{self.url}/signed-url/", data=json.dumps(data)
+            url=f"{self.url}/s3-signed-url/", data=json.dumps(data)
         )
 
         # Upload file
@@ -325,7 +326,7 @@ class API:
         # Create multipart upload and get upload ID
         data = {"action": "create", "file_uid": file_uid}
         response = self.session.post(
-            url=f"{self.url}/multipart-upload/",
+            url=f"{self.url}/s3-multipart-upload/",
             data=json.dumps(data),
         )
         upload_id = json.loads(response.content)["UploadId"]
@@ -347,7 +348,7 @@ class API:
                     "part_number": len(parts) + 1,
                 }
                 response = self.session.post(
-                    url=f"{self.url}/signed-url/", data=json.dumps(data)
+                    url=f"{self.url}/s3-signed-url/", data=json.dumps(data)
                 )
 
                 # Upload file chunk
@@ -370,39 +371,66 @@ class API:
             "parts": parts,
         }
         response = self.session.post(
-            url=f"{self.url}/multipart-upload/",
+            url=f"{self.url}s3-multipart-upload/",
             data=json.dumps(data),
         )
         if response.status_code != 200:
             raise APIFileUploadError
 
-    def delete(self, node: Base):
+    def delete(self, obj: Base, query: dict = None):
         """
         Delete a node in the DB and clear it locally.
 
         :param node: The node to be deleted.
         :return: Response message.
         """
-        if node.node_type == "primary":
-            if node.url:
-                response = self.session.delete(url=node.url)
-                if response.status_code == 204:
-                    print(f"{node.node_name} node has been deleted from the database.")
-                    # Set specific fields to None, indicating the object has been deleted from DB
-                    node.url = None
-                    node.uid = None
-                    node.created_at = None
-                    node.updated_at = None
+        # Delete with node
+        if isinstance(obj, Base):
+            if obj.node_type == "primary":
+                if obj.url:
+                    url = obj.url
                 else:
-                    raise APIDeleteError(display_errors(response.content))
+                    raise APIDeleteError(
+                        f"This {obj.node_name} node does not exist in the database."
+                    )
             else:
                 raise APIDeleteError(
-                    f"This {node.node_name} node does not exist in the database."
+                    f"The delete() method cannot be called on secondary nodes such as {obj.node_name}"
                 )
+
+        # Delete with URL
+        elif isinstance(obj, str):
+            url = obj
+            if self.url not in url:
+                raise APIDeleteError("Invalid URL provided.")
+
+        # Delete with search query
+        elif issubclass(obj, Base) and isinstance(query, dict):
+            results = self.search(node_class=obj, query=query)
+            if results.count == 1:
+                url = results.current["results"][0]["url"]
+            elif results.count < 1:
+                raise APIGetError("Your query did not match any existing nodes.")
+            elif results.count > 1:
+                raise APIGetError("Your query mathced more than one node.")
         else:
             raise APIDeleteError(
-                f"The delete() method cannot be called on secondary nodes such as {node.node_name}"
+                "Please enter a node, valid node URL, or a node class and search query."
             )
+
+        response = self.session.delete(url)
+        if response.status_code == 204:
+            # Check if node exists locally
+            # If it does, clear fields to indicate it has been delete
+            local_node = self._get_local_primary_node(url)
+            if local_node:
+                local_node.url = None
+                local_node.uid = None
+                local_node.created_at = None
+                local_node.updated_at = None
+            print("Node has been deleted from the database.")
+        else:
+            raise APIGetError(display_errors(response.content))
 
     @beartype
     def search(self, node_class: Type[Base], query: dict = None):
@@ -428,7 +456,6 @@ class API:
 
         if response.status_code != 200:
             raise APISearchError(display_errors(response.content))
-
         return JSONPaginator(self.session, response.content)
 
     def _generate_query_slug(self, query):
@@ -450,55 +477,45 @@ class API:
         :param counter: Cross-method recursion counter.
         :return: The generated node object.
         """
-        # Fetch node from a URL, if defined
+        # Get node with a URL
         if isinstance(obj, str):
-            obj_json = self._get_from_url(obj)
-
+            if self.url not in obj:
+                raise APIGetError("Please enter a valid node URL.")
+            response = self.session.get(obj)
+            if response.status_code == 200:
+                obj_json = response.json()
+            else:
+                raise APIGetError(f"The specified node was not found.")
             # Define node class from URL slug
             node_slug = obj.rstrip("/").rsplit("/")[-2]
             node_class = self._define_node_class(node_slug)
 
-        # Fetch node from search query, if defined
+        # Get node with a search query
         elif issubclass(obj, Base) and query:
-            obj_json = self._get_from_query(obj, query)
-            node_class = obj
+            results = self.search(node_class=obj, query=query)
+            if results.count < 1:
+                raise APIGetError("Your query did not match any existing nodes.")
+            elif results.count > 1:
+                raise APIGetError("Your query mathced more than one node.")
+            else:
+                obj_json = results.current["results"][0]
+                node_class = obj
         else:
             raise APIGetError(
-                f"Please enter a node URL or a node class with a search query."
+                f"Please enter a valid node URL or a node class and search query."
             )
 
         # Return the local node object if it already exists
+        # Otherwise, create a new node
         local_node = self._get_local_primary_node(obj_json["url"])
         if local_node:
             return local_node
         else:
-            # Create a new node
             node = self._create_node(node_class, obj_json)
-
             if counter > 0:
                 counter += 1
             self._generate_nodes(node, counter=counter)
             return node
-
-    def _get_from_url(self, url):
-        """Get a node using a URL."""
-        if self.url not in url:
-            raise APIGetError("Please enter a valid node URL.")
-        response = self.session.get(url)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise APIGetError(f"The specified node was not found.")
-
-    def _get_from_query(self, node_class, query):
-        """Get a node using a search query."""
-        results = self.search(node_class=node_class, query=query)
-        if results.count < 1:
-            raise APIGetError("Your query did not match any existing nodes.")
-        elif results.count > 1:
-            raise APIGetError("Your query mathced more than one node.")
-        else:
-            return results.current["results"][0]
 
     def _generate_nodes(self, node: Base, counter: int = 0):
         """
