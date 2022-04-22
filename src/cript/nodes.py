@@ -14,7 +14,7 @@ from cript.validators import (
     validate_value,
     validate_unit,
 )
-from cript.utils import sha256_hash
+from cript.utils import sha256_hash, auto_assign_group
 
 
 class Base(metaclass=ABCMeta):
@@ -137,7 +137,7 @@ class Group(Base):
     node_type = "primary"
     node_name = "Group"
     slug = "group"
-    required = ["name", "users"]
+    required = ["name"]
     unique_together = ["name"]
 
     @beartype
@@ -295,7 +295,7 @@ class Experiment(Base):
         super().__init__()
         self.url = None
         self.uid = None
-        self.group = group
+        self.group = auto_assign_group(group, collection)
         self.collection = collection
         self.name = name
         self.funding = funding if funding else []
@@ -337,7 +337,8 @@ class Data(Base):
         super().__init__()
         self.url = None
         self.uid = None
-        self.group = group
+        self.group = auto_assign_group(group, experiment)
+        self.experiment = experiment
         self.name = name
         self.files = files
         self.type = type
@@ -345,7 +346,6 @@ class Data(Base):
         self.calibration = calibration
         self.configuration = configuration
         self.notes = notes
-        self.experiment = experiment
         self.materials = materials if materials else []
         self.processes = processes if processes else []
         self.citations = citations if citations else []
@@ -827,7 +827,7 @@ class Inventory(Base):
         super().__init__()
         self.url = None
         self.uid = None
-        self.group = group
+        self.group = auto_assign_group(group, collection)
         self.collection = collection
         self.name = name
         self.description = description
@@ -893,9 +893,9 @@ class Process(Base):
     @beartype
     def __init__(
         self,
-        group: Union[Group, str],
-        experiment: Union[Experiment, str],
-        name: str,
+        group: Union[Group, str] = None,
+        experiment: Union[Experiment, str] = None,
+        name: str = None,
         keywords: Union[list[str], None] = None,
         description: Union[str, None] = None,
         prerequisite_processes: list[Union[Base, str]] = None,
@@ -912,7 +912,7 @@ class Process(Base):
         super().__init__()
         self.url = None
         self.uid = None
-        self.group = group
+        self.group = auto_assign_group(group, experiment)
         self.experiment = experiment
         self.name = name
         self.keywords = keywords if keywords else []

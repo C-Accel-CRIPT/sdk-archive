@@ -3,6 +3,16 @@ import math
 import json
 
 
+def auto_assign_group(group, parent):
+    """
+    Decide whether to inherit the group from a node's parent.
+    e.g., Experiment could inherit the group of it's parent Collection.
+    """
+    if parent and not group:
+        return parent.group
+    return group
+
+
 def sha256_hash(file_path):
     """Generate a SHA256 hash of a file."""
     sha256_hash = hashlib.sha256()
