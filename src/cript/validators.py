@@ -6,15 +6,15 @@ from cript.exceptions import (
     InvalidUnitError,
     RequiredUnitError,
     APISessionRequiredError,
+    RequiredFieldsError,
 )
 
 
 def validate_required(node):
     """Validate that required fields are defined."""
-    fields_str = ", ".join(node.required)
     for field in node.required:
         if not hasattr(node, field) or not getattr(node, field):
-            raise TypeError(f"Missing required field(s): {fields_str}")
+            raise RequiredFieldsError(node.required)
 
 
 def validate_key(key_category, key):
