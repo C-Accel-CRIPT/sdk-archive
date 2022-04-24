@@ -385,7 +385,7 @@ class File(Base):
         group: Union[Group, str] = None,
         data: list[Union[Data, str]] = None,
         source: str = None,
-        type: str = None,
+        type: str = "data",
         checksum: Union[str, None] = None,
         extension: Union[str, None] = None,
         external_source: Union[str, None] = None,
