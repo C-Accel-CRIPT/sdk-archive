@@ -151,7 +151,7 @@ class Group(Base):
         self.url = None
         self.uid = None
         self.name = name
-        self.users = users
+        self.users = users if users else []
         self.public = public
         self.created_at = None
         self.updated_at = None
