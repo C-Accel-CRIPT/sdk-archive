@@ -237,7 +237,8 @@ class API:
 
         :param endpoint_id: ID of the Globus endpoint.
         :param client_id: ID of the Globus Native Client.
-        :return: Tokens generated after successful auth.
+        :return: A tuple of the auth client and generated tokens.
+        :rtype: (globus_sdk.NativeAppAuthClient, dict)
         """
         client = globus_sdk.NativeAppAuthClient(client_id)
 
@@ -277,6 +278,7 @@ class API:
 
         :param file_uid: UID of the :class:`File` object.
         :return: The unique file name to be used for upload.
+        :rtype: str
         """
         payload = {"file_uid": file_uid, "file_checksum": file_checksum}
         response = self.session.post(
@@ -478,6 +480,7 @@ class API:
         :param url: The API URL of the node.
         :param counter: Cross-method recursion counter.
         :return: The generated node object.
+        :rtype: cript.nodes.Base
         """
         # Get node with a URL
         if isinstance(obj, str):
@@ -581,6 +584,7 @@ class API:
 
         :param key: The key string indicating the class.
         :return: The correct node class.
+        :rtype: cript.nodes.Base
         """
         for node_cls in NODE_CLASSES:
             # Use node slug
@@ -598,6 +602,7 @@ class API:
         :param node_class: The class of the node to be created.
         :param obj_json: The JSON returned from the API.
         :return: The created node.
+        :rtype: cript.nodes.Base
         """
         # Pop common attributes
         url = obj_json.pop("url")
@@ -622,6 +627,7 @@ class API:
 
         :param url: The URL to match against existing node objects.
         :return: The matching object or None.
+        :rtype: Union[cript.nodes.Base, None]
         """
         for instance in Base.__refs__:
             if hasattr(instance, "url") and url == instance.url:
