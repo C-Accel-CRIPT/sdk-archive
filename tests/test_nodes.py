@@ -27,7 +27,7 @@ from cript.nodes import Ingredient
 from cript.nodes import Process
 
 
-def test_base_as_dict():
+def test_base_clean_dict():
     pass
 
 

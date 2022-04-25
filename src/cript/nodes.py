@@ -35,14 +35,6 @@ class Base(metaclass=ABCMeta):
     def __str__(self):
         return self._to_json()
 
-    def as_dict(self):
-        """
-        Convert a node object to a cleaned dictionary.
-
-        :return: The cleaned dictionary.
-        """
-        return {k.lstrip("_"): self.__getattribute__(k) for k in vars(self)}
-
     def print_json(self):
         print(self._to_json())
 
@@ -50,8 +42,13 @@ class Base(metaclass=ABCMeta):
         return json.dumps(self._prep_for_upload(), indent=4)
 
     def _prep_for_upload(self):
-        """Convert a node into a dict that can be sent to the API."""
-        node_dict = copy.deepcopy(self.as_dict())
+        """
+        Convert a node into a dict that can be sent to the API.
+
+        :return: The converted dict.
+        :rtype: dict
+        """
+        node_dict = copy.deepcopy(self._clean_dict())
         for key, value in node_dict.items():
             # Check if the value is a node
             if isinstance(value, Base):
@@ -73,6 +70,15 @@ class Base(metaclass=ABCMeta):
                         elif value[i].node_type == "secondary":
                             value[i] = value[i]._prep_for_upload()
         return node_dict
+
+    def _clean_dict(self):
+        """
+        Convert a node object to a cleaned dictionary.
+
+        :return: The cleaned dictionary.
+        :rtype: dict
+        """
+        return {k.lstrip("_"): self.__getattribute__(k) for k in vars(self)}
 
     def _add_node(self, node, attr_name):
         """
