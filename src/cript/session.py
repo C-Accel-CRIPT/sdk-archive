@@ -426,7 +426,8 @@ class API:
                 local_node.uid = None
                 local_node.created_at = None
                 local_node.updated_at = None
-            print("Node has been deleted from the database.")
+            if print_success:
+                print("Node has been deleted from the database.")
         else:
             raise APIGetError(display_errors(response.content))
 
