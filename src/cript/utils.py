@@ -7,6 +7,11 @@ def auto_assign_group(group, parent):
     """
     Decide whether to inherit the group from a node's parent.
     e.g., Experiment could inherit the group of it's parent Collection.
+
+    :param group: Current value of the node's group field.
+    :param parent: The parent node of the relevant node.
+    :return: The :class:`Group` object that will be assigned to the node.
+    :rtype: cript.nodes.Group
     """
     if parent and not group:
         return parent.group
@@ -14,7 +19,13 @@ def auto_assign_group(group, parent):
 
 
 def sha256_hash(file_path):
-    """Generate a SHA256 hash of a file."""
+    """
+    Generate a SHA256 hash of a file.
+
+    :param file_path: Path to the file.
+    :return: SHA256 has of the file.
+    :rtype: str
+    """
     sha256_hash = hashlib.sha256()
     with open(file_path, "rb") as f:
         # Read and update hash string value in blocks of 4K
@@ -24,7 +35,13 @@ def sha256_hash(file_path):
 
 
 def convert_file_size(size_bytes):
-    """Converts file size from bytes to other units."""
+    """
+    Converts file size from bytes to other units.
+
+    :param size_bytes: Some number of bytes to be converted.
+    :return: The converted file size.
+    :rtype: str
+    """
     if size_bytes == 0:
         return "0B"
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
@@ -35,7 +52,13 @@ def convert_file_size(size_bytes):
 
 
 def display_errors(response):
-    """Prep errors sent from API for display."""
+    """
+    Prep errors sent from API for display.
+
+    :param response: The API error response.
+    :return: The error message as JSON.
+    :rtype: str
+    """
     try:
         response_dict = json.loads(response)
     except json.decoder.JSONDecodeError:
