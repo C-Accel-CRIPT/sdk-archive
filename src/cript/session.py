@@ -77,7 +77,6 @@ class API:
         # interfaces. My hunch is that one of them would be sufficient but yet
         # to test it
         if self.version != self.latest_version:
-            logger.warning(response.json()["version_warning"])
             warnings.warn(response.json()["version_warning"], stacklevel=2)
 
     def __repr__(self):
