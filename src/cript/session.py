@@ -35,31 +35,31 @@ class API:
     version = VERSION
     keys = None
 
-    def __init__(self, url: str = None, token: str = None):
+    def __init__(self, base_url: str = None, api_token: str = None):
         """
-        Establishes a session with the CRIPT API.
+        Establishes a session with a CRIPT API endpoint.
 
-        :param url: The base URL for the relevant CRIPT instance.
-        :param token: The user's API token.
+        :param base_url: The base URL for the relevant CRIPT instance. (e.g., https://criptapp.org)
+        :param api_token: The API token used for authentication.
         """
         self.latest_version = None
         self.user = None
         self.storage_info = None
-        if url is None:
-            url = input("Base URL: ")
-        if token is None:
-            token = getpass("API Token: ")
-        self.url = url.rstrip("/") + "/api"
+        if base_url is None:
+            base_url = input("Base URL: ")
+        if api_token is None:
+            api_token = getpass("API Token: ")
+        self.base_url = base_url.rstrip("/") + "/api"
 
         self.session = requests.Session()
         self.session.headers = {
-            "Authorization": token,
+            "Authorization": api_token,
             "Content-Type": "application/json",
             "Accept": f"application/json; version={self.version}",
         }
 
         # Test API authentication by fetching session info and keys
-        response = self.session.get(f"{self.url}/session-info/")
+        response = self.session.get(f"{self.base_url}/session-info/")
         if response.status_code == 200:
             self.latest_version = response.json()["latest_version"]
             self.user = self._create_node(User, response.json()["user_info"])
@@ -81,15 +81,15 @@ class API:
             warnings.warn(response.json()["version_warning"], stacklevel=2)
 
     def __repr__(self):
-        return f"Connected to {self.url}"
+        return f"Connected to {self.base_url}"
 
     def __str__(self):
-        return f"Connected to {self.url}"
+        return f"Connected to {self.base_url}"
 
     @beartype
     def refresh(self, node: Base):
         """
-        Overwrite a node's attributes with the latest values from the DB.
+        Overwrite a node's attributes with the latest values from the database.
 
         :param node: The node to refresh.
         """
@@ -108,12 +108,12 @@ class API:
             )
 
     @beartype
-    def save(self, node: Base, auto_update=False):
+    def save(self, node: Base, print_success: bool = True):
         """
-        Create or update a node in the DB.
+        Create or update a node in the database.
 
         :param node: The node to be saved.
-        :param auto_update: Indicates whether to update a node that matches a unique constraint.
+        :param print_success: Boolean indicating whether to print a message when a node is saved successfully.
         """
         if node.node_type == "primary":
             if node.url:
@@ -122,7 +122,7 @@ class API:
             else:
                 # Create a new object via POST
                 response = self.session.post(
-                    url=f"{self.url}/{node.slug}/", data=node._to_json()
+                    url=f"{self.base_url}/{node.slug}/", data=node._to_json()
                 )
         else:
             raise APISaveError(
@@ -143,6 +143,8 @@ class API:
                 self.refresh(node)
 
             logger.info(f"{node.node_name} node has been saved to the database.")
+            if print_success:
+                print(f"{node.node_name} node has been saved to the database.")
 
         else:
             try:
@@ -167,10 +169,11 @@ class API:
             setattr(node, json_key, json_value)
 
     def _upload_file(self, file_uid, node):
-        """ "
-        Upload the file to Globus or S3.
+        """
+        Upload a file to Globus or S3.
 
-        :param node: ID of the File node.
+        :param file_uid: UID of the :class:`File` object.
+        :param node: The :class:`File` object.
         """
         storage_provider = self.storage_info["provider"]
         max_file_size = self.storage_info["max_file_size"]
@@ -194,8 +197,8 @@ class API:
         """
         Upload a file to a Globus endpoint via HTTPS.
 
-        :param file_uid: UID of the File node.
-        :param file_path: Path to file on local filesystem.
+        :param file_uid: UID of the :class:`File` object.
+        :param file_path: The file path on local filesystem.
         """
         endpoint_id = self.storage_info["endpoint_id"]
         native_client_id = self.storage_info["native_client_id"]
@@ -228,8 +231,9 @@ class API:
         # Perform the transfer
         https_auth_token = self.globus_tokens["https_auth_token"]
         headers = {"Authorization": f"Bearer {https_auth_token}"}
+        storage_path = self.storage_info["path"]
         response = requests.put(
-            url=f"{https_server}/files/{file_uid}/{unique_file_name}",
+            url=f"{https_server}{storage_path}{file_uid}/{unique_file_name}",
             data=open(file_obj.source, "rb"),
             headers=headers,
         )
@@ -238,7 +242,7 @@ class API:
 
     def _globus_user_auth(self, endpoint_id, client_id):
         """
-        Prompts a user to authenticate using their Globus credentials.
+        Prompts a user authorize using their Globus credentials.
 
         :param endpoint_id: ID of the Globus endpoint.
         :param client_id: ID of the Globus Native Client.
@@ -278,18 +282,14 @@ class API:
 
     def _globus_stage_upload(self, file_uid, file_checksum):
         """
-        Sends a POST to the REST API to stage the Globus endpoint for upload.
+        Sends a POST to the API to stage the Globus endpoint for upload.
 
-        Staging consists of creating a directory on the endpoint, applying an
-        access rule to he directory, then removing the access rule after a
-        specified expiration timer.
-
-        :param file_uid: UID of the File node.
+        :param file_uid: UID of the :class:`File` object.
         :return: The unique file name to be used for upload.
         """
         payload = {"file_uid": file_uid, "file_checksum": file_checksum}
         response = self.session.post(
-            url=f"{self.url}/globus-stage-upload/",
+            url=f"{self.base_url}/globus-stage-upload/",
             data=json.dumps(payload),
         )
         if response.status_code != 200:
@@ -300,13 +300,13 @@ class API:
         """
         Performs a single file upload to AWS S3.
 
-        :param file_uid: The UID of the File node.
+        :param file_uid: UID of the :class:`File` object.
         :param file_path: The path to the file on the local filesystem.
         """
         # Generate signed URL for uploading
         data = {"action": "upload", "file_uid": file_uid}
         response = self.session.post(
-            url=f"{self.url}/signed-url/", data=json.dumps(data)
+            url=f"{self.base_url}/s3-signed-url/", data=json.dumps(data)
         )
 
         # Upload file
@@ -332,7 +332,7 @@ class API:
         # Create multipart upload and get upload ID
         data = {"action": "create", "file_uid": file_uid}
         response = self.session.post(
-            url=f"{self.url}/multipart-upload/",
+            url=f"{self.base_url}/s3-multipart-upload/",
             data=json.dumps(data),
         )
         upload_id = json.loads(response.content)["UploadId"]
@@ -354,7 +354,7 @@ class API:
                     "part_number": len(parts) + 1,
                 }
                 response = self.session.post(
-                    url=f"{self.url}/signed-url/", data=json.dumps(data)
+                    url=f"{self.base_url}/s3-signed-url/", data=json.dumps(data)
                 )
 
                 # Upload file chunk
@@ -377,50 +377,81 @@ class API:
             "parts": parts,
         }
         response = self.session.post(
-            url=f"{self.url}/multipart-upload/",
+            url=f"{self.base_url}s3-multipart-upload/",
             data=json.dumps(data),
         )
         if response.status_code != 200:
             raise APIFileUploadError
 
-    def delete(self, node: Base):
+    def delete(self, obj: Base, query: dict = None, print_success: bool = True):
         """
-        Delete a node in the DB and clear it locally.
+        Delete a node in the database and clear it locally.
 
-        :param node: The node to be deleted.
-        :return: Response message.
+        :param obj: The node to be deleted itself or its class.
+        :param query: (Optional) A dictionary defining the query parameters (e.g., {"name": "NewMaterial"})
+        :param print_success: A boolean indicating whether to print a message on successful deletion.
         """
-        if node.node_type == "primary":
-            if node.url:
-                response = self.session.delete(url=node.url)
-                if response.status_code == 204:
-                    logger.info(
-                        f"{node.node_name} node has been deleted from the database."
-                    )
-                    # Set specific fields to None, indicating the object has been deleted from DB
-                    node.url = None
-                    node.uid = None
-                    node.created_at = None
-                    node.updated_at = None
+        # Delete with node
+        if isinstance(obj, Base):
+            if obj.node_type == "primary":
+                if obj.url:
+                    url = obj.url
                 else:
-                    raise APIDeleteError(display_errors(response.content))
+                    raise APIDeleteError(
+                        f"This {obj.node_name} node does not exist in the database."
+                    )
             else:
                 raise APIDeleteError(
-                    f"This {node.node_name} node does not exist in the database."
+                    f"The delete() method cannot be called on secondary nodes such as {obj.node_name}"
                 )
+
+        # Delete with URL
+        elif isinstance(obj, str):
+            url = obj
+            if self.base_url not in url:
+                raise APIDeleteError("Invalid URL provided.")
+
+        # Delete with search query
+        elif issubclass(obj, Base) and isinstance(query, dict):
+            results = self.search(node_class=obj, query=query)
+            if results.count == 1:
+                url = results.current["results"][0]["url"]
+            elif results.count < 1:
+                raise APIGetError("Your query did not match any existing nodes.")
+            elif results.count > 1:
+                raise APIGetError("Your query mathced more than one node.")
         else:
             raise APIDeleteError(
-                f"The delete() method cannot be called on secondary nodes such as {node.node_name}"
+                "Please enter a node, valid node URL, or a node class and search query."
             )
+
+        response = self.session.delete(url)
+        if response.status_code == 204:
+            # Check if node exists locally
+            # If it does, clear fields to indicate it has been delete
+            local_node = self._get_local_primary_node(url)
+            if local_node:
+                local_node.url = None
+                local_node.uid = None
+                local_node.created_at = None
+                local_node.updated_at = None
+                logger.info(
+                    f"{local_node.node_name} node has been deleted from the database."
+                )
+            if print_success:
+                print("Node has been deleted from the database.")
+        else:
+            raise APIGetError(display_errors(response.content))
 
     @beartype
     def search(self, node_class: Type[Base], query: dict = None):
         """
         Send a query to the API and print the results.
 
-        :param node: The node type you want to search.
-        :param query: A dictionary defining the query parameters.
-        :return: A JSONPaginator object.
+        :param node_class: The class of the node type to query for.
+        :param query: (Optional) A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
+        :return: A :class:`JSONPaginator` object containing the results.
+        :rtype: cript.session.JSONPaginator
         """
         if node_class.node_type == "secondary":
             raise APISearchError(
@@ -429,15 +460,16 @@ class API:
 
         if isinstance(query, dict):
             query_slug = self._generate_query_slug(query)
-            response = self.session.get(f"{self.url}/{node_class.slug}/?{query_slug}")
+            response = self.session.get(
+                f"{self.base_url}/{node_class.slug}/?{query_slug}"
+            )
         elif query is None:
-            response = self.session.get(f"{self.url}/{node_class.slug}/")
+            response = self.session.get(f"{self.base_url}/{node_class.slug}/")
         else:
             raise APISearchError(f"'{query}' is not a valid query.")
 
         if response.status_code != 200:
             raise APISearchError(display_errors(response.content))
-
         return JSONPaginator(self.session, response.content)
 
     def _generate_query_slug(self, query):
@@ -453,61 +485,51 @@ class API:
     @beartype
     def get(self, obj: Union[str, Type[Base]], query: dict = None, counter: int = 0):
         """
-        Get the JSON for a node and use it to generated a local node object.
+        Get the JSON for a node and use it to generate a local node object.
 
         :param url: The API URL of the node.
         :param counter: Cross-method recursion counter.
         :return: The generated node object.
         """
-        # Fetch node from a URL, if defined
+        # Get node with a URL
         if isinstance(obj, str):
-            obj_json = self._get_from_url(obj)
-
+            if self.base_url not in obj:
+                raise APIGetError("Please enter a valid node URL.")
+            response = self.session.get(obj)
+            if response.status_code == 200:
+                obj_json = response.json()
+            else:
+                raise APIGetError("The specified node was not found.")
             # Define node class from URL slug
             node_slug = obj.rstrip("/").rsplit("/")[-2]
             node_class = self._define_node_class(node_slug)
 
-        # Fetch node from search query, if defined
+        # Get node with a search query
         elif issubclass(obj, Base) and query:
-            obj_json = self._get_from_query(obj, query)
-            node_class = obj
+            results = self.search(node_class=obj, query=query)
+            if results.count < 1:
+                raise APIGetError("Your query did not match any existing nodes.")
+            elif results.count > 1:
+                raise APIGetError("Your query mathced more than one node.")
+            else:
+                obj_json = results.current["results"][0]
+                node_class = obj
         else:
             raise APIGetError(
                 "Please enter a node URL or a node class with a search query."
             )
 
         # Return the local node object if it already exists
+        # Otherwise, create a new node
         local_node = self._get_local_primary_node(obj_json["url"])
         if local_node:
             return local_node
         else:
-            # Create a new node
             node = self._create_node(node_class, obj_json)
-
             if counter > 0:
                 counter += 1
             self._generate_nodes(node, counter=counter)
             return node
-
-    def _get_from_url(self, url):
-        """Get a node using a URL."""
-        if self.url not in url:
-            raise APIGetError("Please enter a valid node URL.")
-        response = self.session.get(url)
-        if response.status_code == 200:
-            return response.json()
-        else:
-            raise APIGetError("The specified node was not found.")
-
-    def _get_from_query(self, node_class, query):
-        """Get a node using a search query."""
-        results = self.search(node_class=node_class, query=query)
-        if results.count < 1:
-            raise APIGetError("Your query did not match any existing nodes.")
-        elif results.count > 1:
-            raise APIGetError("Your query matched more than one node.")
-        else:
-            return results.current["results"][0]
 
     def _generate_nodes(self, node: Base, counter: int = 0):
         """
@@ -526,7 +548,7 @@ class API:
             if key == "url":
                 continue
             # Generate primary nodes
-            if isinstance(value, str) and self.url in value:
+            if isinstance(value, str) and self.base_url in value:
                 # Check if node already exists in memory
                 local_node = self._get_local_primary_node(value)
                 if local_node:
@@ -547,7 +569,7 @@ class API:
             elif isinstance(value, list):
                 for i in range(len(value)):
                     # Generate primary nodes
-                    if isinstance(value[i], str) and self.url in value[i]:
+                    if isinstance(value[i], str) and self.base_url in value[i]:
                         # Check if node already exists in memory
                         local_node = self._get_local_primary_node(value[i])
                         if local_node:
@@ -569,7 +591,7 @@ class API:
         """
         Find the correct class associated with a given key.
 
-        :param key: The key used to find the correct class.
+        :param key: The key string indicating the class.
         :return: The correct node class.
         """
         for node_cls in NODE_CLASSES:
@@ -665,7 +687,7 @@ class JSONPaginator:
         """
         Navigate to a specific page in the results.
 
-        :param page_number: The page number as an int.
+        :param page_number: The page number to turn to.
         """
         if self.current["next"]:
             url = self.current["next"]

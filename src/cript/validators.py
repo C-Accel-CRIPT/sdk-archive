@@ -6,23 +6,29 @@ from cript.exceptions import (
     InvalidUnitError,
     RequiredUnitError,
     APISessionRequiredError,
+    RequiredFieldsError,
 )
 
 
 def validate_required(node):
-    """Validate that required fields are defined."""
-    fields_str = ", ".join(node.required)
+    """
+    Validate that required fields are defined.
+
+    :param node: The node to validate.
+    """
     for field in node.required:
         if not hasattr(node, field) or not getattr(node, field):
-            raise TypeError(f"Missing required field(s): {fields_str}")
+            raise RequiredFieldsError(node.required)
 
 
 def validate_key(key_category, key):
     """
-    Validates a key name to ensure it's in the controlled vocabulary.
+    Validates that the key name is in the controlled vocabulary.
 
     :key_category: Name of the relevant key category.
     :param key: Name of the key.
+    :return: The validated key name.
+    :rtype: str
     """
     # Skip validation for custom and undefined keys
     if not key or key[0] == "+":
@@ -41,6 +47,7 @@ def validate_value(key_category, key, value, unit=None):
     :param key: Name of the key.
     :param value: Value to be validated.
     :param unit: The value's unit of measurement.
+    :return: The validated value.
     """
     # Skip validation for custom fields
     if key[0] == "+":
@@ -68,7 +75,13 @@ def validate_value(key_category, key, value, unit=None):
 
 
 def _validate_value_type(key, value, value_type):
-    """Validate that the value is of the expected type."""
+    """
+    Validate that the value is of the expected type.
+
+    :param key: Name of the key.
+    :param value: Value to be validated.
+    :param value_type: The expected value type as listed in the key tables.
+    """
     value_types = {
         "number": (int, float),
         "integer": int,
@@ -93,7 +106,15 @@ def _validate_value_type(key, value, value_type):
 
 
 def _validate_value_range(key, value, value_range, unit, si_unit):
-    """Validates a value is within the defined range."""
+    """
+    Validates a value is within the defined range.
+
+    :param key: Name of the key.
+    :param value: Value to be validated.
+    :param value_range: The upper and lower bounds for the value.
+    :param unit: The unit entered by the user.
+    :param si_unit: The SI unit for the specific attribute.
+    """
     min, max = value_range[0], value_range[1]
 
     # convert to SI units if defined
@@ -111,6 +132,8 @@ def validate_unit(key_category, key, unit):
     :key_category: Name of the relevant key category.
     :param key: Name of the key.
     :param unit: Unit to be validated.
+    :return: The validated unit.
+    :rtype: str
     """
     _validate_unit_exists(unit)
 
@@ -137,7 +160,11 @@ def validate_unit(key_category, key, unit):
 
 
 def _validate_unit_exists(unit):
-    """Validates that the unit exists."""
+    """
+    Validates that the unit exists.
+
+    :param unit: The unit entered by the user.
+    """
     try:
         pint_ureg[unit]
     except:
@@ -145,7 +172,13 @@ def _validate_unit_exists(unit):
 
 
 def _validate_unit_conversion(key, unit, si_unit):
-    """Validates that the unit can be converted to appropriate SI units."""
+    """
+    Validates that the unit can be converted to appropriate SI units.
+
+    :param key: Name of the key.
+    :param unit: The unit entered by the user.
+    :param si_unit: The SI unit for the specific attribute.
+    """
     try:
         _unit_conversion(1, unit, si_unit)
     except:
@@ -153,14 +186,26 @@ def _validate_unit_conversion(key, unit, si_unit):
 
 
 def _unit_conversion(value, unit, si_unit):
-    """Converts a value to SI units."""
+    """
+    Converts a value to SI units.
+
+    :param value: The value entered by the user.
+    :param unit: The unit entered by the user.
+    :param si_unit: The SI unit for the specific attribute.
+    :return: The converted value.
+    """
     original_quantity = pint_ureg.Quantity(value, unit)
     si_value = original_quantity.to(si_unit).magnitude
     return si_value
 
 
 def _get_key_parameters(key_category, key):
-    """Get the parameters for a given key from full keys dictionary."""
+    """
+    Get the parameters for a given key from full keys dictionary.
+
+    :key_category: Name of the relevant key category.
+    :param key: Name of the key.
+    """
     from cript.session import API
 
     if API.keys:

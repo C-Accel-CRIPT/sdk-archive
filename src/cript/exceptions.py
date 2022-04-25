@@ -1,7 +1,10 @@
-"""CRIPT API Errors"""
+class CRIPTError(Exception):
+    """Base CRIPT exception."""
+
+    pass
 
 
-class APIAuthError(Exception):
+class APIAuthError(CRIPTError):
     """Raised for errors with API authentication."""
 
     def __init__(self, error):
@@ -11,7 +14,7 @@ class APIAuthError(Exception):
         return self.error
 
 
-class APIRefreshError(Exception):
+class APIRefreshError(CRIPTError):
     """Raised for errors with refreshing a nodes attribute values."""
 
     def __init__(self, message):
@@ -21,7 +24,7 @@ class APIRefreshError(Exception):
         return self.message
 
 
-class APISaveError(Exception):
+class APISaveError(CRIPTError):
     """Raised for errors when saving a node to the database."""
 
     def __init__(self, message):
@@ -31,7 +34,7 @@ class APISaveError(Exception):
         return self.message
 
 
-class APIDeleteError(Exception):
+class APIDeleteError(CRIPTError):
     """Raised for errors when deleting a node to the database."""
 
     def __init__(self, message):
@@ -41,7 +44,7 @@ class APIDeleteError(Exception):
         return self.message
 
 
-class APISearchError(Exception):
+class APISearchError(CRIPTError):
     """Raised for errors when sending search query."""
 
     def __init__(self, message):
@@ -51,7 +54,7 @@ class APISearchError(Exception):
         return self.message
 
 
-class APIGetError(Exception):
+class APIGetError(CRIPTError):
     """Raised for errors when getting an object from the API."""
 
     def __init__(self, message):
@@ -61,7 +64,7 @@ class APIGetError(Exception):
         return self.message
 
 
-class APIFileUploadError(Exception):
+class APIFileUploadError(CRIPTError):
     """Raised when a file upload fails."""
 
     def __init__(self):
@@ -71,17 +74,17 @@ class APIFileUploadError(Exception):
         return "File upload could not be completed."
 
 
-class APISessionRequiredError(Exception):
+class APISessionRequiredError(CRIPTError):
     """Raised when an active API session is required but not yet established."""
 
     def __init__(self):
         pass
 
     def __str__(self):
-        return "An API session must be established before you can create this node."
+        return "An API session must be established before you can perform this action."
 
 
-class DuplicateNodeError(Exception):
+class DuplicateNodeError(CRIPTError):
     """
     Raised when a node is saved using a combination of field
     values that the database enforces as a unique set.
@@ -94,7 +97,7 @@ class DuplicateNodeError(Exception):
         return self.message
 
 
-class UnsavedNodeError(Exception):
+class UnsavedNodeError(CRIPTError):
     """Raised when an attempt is made to add an unsaved node to another node."""
 
     def __init__(self, node_name):
@@ -106,7 +109,7 @@ class UnsavedNodeError(Exception):
         )
 
 
-class AddNodeError(Exception):
+class AddNodeError(CRIPTError):
     """
     Raised when an attempt is made to add an unrelated node.
     e.g., Attempting to add a Condition node to a Collection node.
@@ -120,7 +123,7 @@ class AddNodeError(Exception):
         return f"{self.child_node_name} nodes cannot be added to {self.parent_node_name} nodes."
 
 
-class RemoveNodeError(Exception):
+class RemoveNodeError(CRIPTError):
     """
     Raised when an attempt is made to remove an unrelated node.
     e.g., Attempting to remove a Condition node from a Collection node.
@@ -134,7 +137,7 @@ class RemoveNodeError(Exception):
         return f"{self.parent_node_name} nodes do not contain {self.child_node_name} nodes."
 
 
-class InvalidKeyError(Exception):
+class InvalidKeyError(CRIPTError):
     """Raised when a key is used that does not exist."""
 
     def __init__(self, key, category):
@@ -145,7 +148,7 @@ class InvalidKeyError(Exception):
         return f"'{self.key}' is not a valid {self.category}."
 
 
-class InvalidValueTypeError(Exception):
+class InvalidValueTypeError(CRIPTError):
     """Raised when a value is an incorrect type."""
 
     def __init__(self, key):
@@ -155,7 +158,7 @@ class InvalidValueTypeError(Exception):
         return f"{self.key} is using an incorrect value type."
 
 
-class InvalidValueRangeError(Exception):
+class InvalidValueRangeError(CRIPTError):
     """Raised when a value falls outside the defined range."""
 
     def __init__(self, key, value, min, max, unit):
@@ -172,7 +175,7 @@ class InvalidValueRangeError(Exception):
         )
 
 
-class InvalidUnitError(Exception):
+class InvalidUnitError(CRIPTError):
     """Raised when a unit is invalid."""
 
     def __init__(self, message):
@@ -182,7 +185,7 @@ class InvalidUnitError(Exception):
         return self.message
 
 
-class RequiredUnitError(Exception):
+class RequiredUnitError(CRIPTError):
     """Raised when a unit is expected but not provided or vice versa."""
 
     def __init__(self, message):
@@ -192,7 +195,7 @@ class RequiredUnitError(Exception):
         return self.message
 
 
-class FileSizeLimitError(Exception):
+class FileSizeLimitError(CRIPTError):
     """Raised when a file size exceeds the defined limit."""
 
     def __init__(self, max_size):
@@ -200,3 +203,13 @@ class FileSizeLimitError(Exception):
 
     def __str__(self):
         return f"The file size exceeds the maximum limit of {self.max_size}."
+
+
+class RequiredFieldsError(CRIPTError):
+    """Raised when an object attempts to instantiate without defined required fields."""
+
+    def __init__(self, required_fields_list):
+        self.required_fields_str = ", ".join(required_fields_list)
+
+    def __str__(self):
+        return f"Missing required field(s): {self.required_fields_str}"

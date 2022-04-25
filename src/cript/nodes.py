@@ -15,7 +15,7 @@ from cript.validators import (
     validate_value,
     validate_unit,
 )
-from cript.utils import sha256_hash
+from cript.utils import sha256_hash, auto_assign_group
 
 
 logger = getLogger(__name__)
@@ -39,14 +39,6 @@ class Base(metaclass=ABCMeta):
     def __str__(self):
         return self._to_json()
 
-    def as_dict(self):
-        """
-        Convert a node object to a cleaned dictionary.
-
-        :return: The cleaned dictionary.
-        """
-        return {k.lstrip("_"): self.__getattribute__(k) for k in vars(self)}
-
     def print_json(self):
         print(self._to_json())
 
@@ -54,8 +46,13 @@ class Base(metaclass=ABCMeta):
         return json.dumps(self._prep_for_upload(), indent=4)
 
     def _prep_for_upload(self):
-        """Convert a node into a dict that can be sent to the API."""
-        node_dict = copy.deepcopy(self.as_dict())
+        """
+        Convert a node into a dict that can be sent to the API.
+
+        :return: The converted dict.
+        :rtype: dict
+        """
+        node_dict = copy.deepcopy(self._clean_dict())
         for key, value in node_dict.items():
             # Check if the value is a node
             if isinstance(value, Base):
@@ -77,6 +74,15 @@ class Base(metaclass=ABCMeta):
                         elif value[i].node_type == "secondary":
                             value[i] = value[i]._prep_for_upload()
         return node_dict
+
+    def _clean_dict(self):
+        """
+        Convert a node object to a cleaned dictionary.
+
+        :return: The cleaned dictionary.
+        :rtype: dict
+        """
+        return {k.lstrip("_"): self.__getattribute__(k) for k in vars(self)}
 
     def _add_node(self, node, attr_name):
         """
@@ -141,7 +147,7 @@ class Group(Base):
     node_type = "primary"
     node_name = "Group"
     slug = "group"
-    required = ["name", "users"]
+    required = ["name"]
     unique_together = ["name"]
 
     @beartype
@@ -155,7 +161,7 @@ class Group(Base):
         self.url = None
         self.uid = None
         self.name = name
-        self.users = users
+        self.users = users if users else []
         self.public = public
         self.created_at = None
         self.updated_at = None
@@ -299,7 +305,7 @@ class Experiment(Base):
         super().__init__()
         self.url = None
         self.uid = None
-        self.group = group
+        self.group = auto_assign_group(group, collection)
         self.collection = collection
         self.name = name
         self.funding = funding if funding else []
@@ -341,7 +347,8 @@ class Data(Base):
         super().__init__()
         self.url = None
         self.uid = None
-        self.group = group
+        self.group = auto_assign_group(group, experiment)
+        self.experiment = experiment
         self.name = name
         self.files = files
         self.type = type
@@ -349,7 +356,6 @@ class Data(Base):
         self.calibration = calibration
         self.configuration = configuration
         self.notes = notes
-        self.experiment = experiment
         self.materials = materials if materials else []
         self.processes = processes if processes else []
         self.citations = citations if citations else []
@@ -389,7 +395,7 @@ class File(Base):
         group: Union[Group, str] = None,
         data: list[Union[Data, str]] = None,
         source: str = None,
-        type: str = None,
+        type: str = "data",
         checksum: Union[str, None] = None,
         extension: Union[str, None] = None,
         external_source: Union[str, None] = None,
@@ -426,18 +432,19 @@ class File(Base):
 
     @source.setter
     def source(self, value):
-        value = value.replace("\\", "/")
-        if os.path.exists(value):
-            print("Generating checksum ...")
-            self.checksum = sha256_hash(value)
-            print("Complete.")
-            self.name = os.path.basename(value)
-        elif value.startswith(("http", "https")) or not value:
-            pass
-        else:
-            raise FileNotFoundError(
-                "The file could not be found on the local filesystem."
-            )
+        if value:
+            if os.path.exists(value):
+                value = value.replace("\\", "/")
+                print("Generating checksum ...")
+                self.checksum = sha256_hash(value)
+                print("Complete.")
+                self.name = os.path.basename(value)
+            elif value.startswith(("http", "https")):
+                pass
+            else:
+                raise FileNotFoundError(
+                    "The file could not be found on the local filesystem."
+                )
         self._source = value
 
     @beartype
@@ -752,7 +759,7 @@ class Material(Base):
         self.group = group
         self.name = name
         self.names = names if names else []
-        self.identifiers = identifiers
+        self.identifiers = identifiers if identifiers else []
         self.components = components if components else []
         self.vendor = vendor
         self.lot_number = lot_number
@@ -830,7 +837,7 @@ class Inventory(Base):
         super().__init__()
         self.url = None
         self.uid = None
-        self.group = group
+        self.group = auto_assign_group(group, collection)
         self.collection = collection
         self.name = name
         self.description = description
@@ -896,9 +903,9 @@ class Process(Base):
     @beartype
     def __init__(
         self,
-        group: Union[Group, str],
-        experiment: Union[Experiment, str],
-        name: str,
+        group: Union[Group, str] = None,
+        experiment: Union[Experiment, str] = None,
+        name: str = None,
         keywords: Union[list[str], None] = None,
         description: Union[str, None] = None,
         prerequisite_processes: list[Union[Base, str]] = None,
@@ -915,7 +922,7 @@ class Process(Base):
         super().__init__()
         self.url = None
         self.uid = None
-        self.group = group
+        self.group = auto_assign_group(group, experiment)
         self.experiment = experiment
         self.name = name
         self.keywords = keywords if keywords else []
