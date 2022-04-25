@@ -473,12 +473,19 @@ class API:
         return slug
 
     @beartype
-    def get(self, obj: Union[str, Type[Base]], query: dict = None, counter: int = 0):
+    def get(
+        self,
+        obj: Union[str, Type[Base]],
+        query: dict = None,
+        level: int = 0,
+        max_level: int = 1,
+    ):
         """
         Get the JSON for a node and use it to generate a local node object.
 
         :param url: The API URL of the node.
-        :param counter: Cross-method recursion counter.
+        :param level: Current nested node level.
+        :param max_level: Max depth to recursively generate nested nodes.
         :return: The generated node object.
         :rtype: cript.nodes.Base
         """
@@ -517,20 +524,22 @@ class API:
             return local_node
         else:
             node = self._create_node(node_class, obj_json)
-            if counter > 0:
-                counter += 1
-            self._generate_nodes(node, counter=counter)
+            self._generate_nodes(node, level=level, max_level=max_level)
             return node
 
-    def _generate_nodes(self, node: Base, counter: int = 0):
+    def _generate_nodes(self, node: Base, level: int = 0, max_level: int = 1):
         """
         Generate nested node objects within a given node.
 
         :param node: The parent node.
-        :param counter: Cross method recursion counter.
+        :param level: Current nested node level.
+        :param max_level: Max depth to recursively generate nested nodes.
         """
+        if level <= max_level:
+            level += 1
+
         # Limit recursion to one level
-        if counter > 1:
+        if level > max_level:
             return
 
         node_dict = node.__dict__
@@ -546,7 +555,9 @@ class API:
                     node_dict[key] = local_node
                 else:
                     try:
-                        node_dict[key] = self.get(value, counter=counter + 1)
+                        node_dict[key] = self.get(
+                            value, level=level, max_level=max_level
+                        )
                     except APIGetError:
                         # Leave the URL if node is not viewable
                         pass
@@ -555,7 +566,7 @@ class API:
                 node_class = self._define_node_class(key)
                 secondary_node = node_class(**value)
                 node_dict[key] = secondary_node
-                self._generate_nodes(secondary_node, counter=counter + 1)
+                self._generate_nodes(secondary_node, level=level, max_level=max_level)
             # Handle lists
             elif isinstance(value, list):
                 for i in range(len(value)):
@@ -567,7 +578,9 @@ class API:
                             value[i] = local_node
                         else:
                             try:
-                                value[i] = self.get(value[i], counter=counter + 1)
+                                value[i] = self.get(
+                                    value[i], level=level, max_level=max_level
+                                )
                             except APIGetError:
                                 # Leave the URL if node is not viewable
                                 pass
@@ -576,7 +589,9 @@ class API:
                         node_class = self._define_node_class(key)
                         secondary_node = node_class(**value[i])
                         value[i] = secondary_node
-                        self._generate_nodes(secondary_node, counter=counter + 1)
+                        self._generate_nodes(
+                            secondary_node, level=level, max_level=max_level
+                        )
 
     def _define_node_class(self, key: str):
         """
