@@ -12,7 +12,7 @@ import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
 from cript import VERSION, NODE_CLASSES
-from cript.nodes import Base, User
+from cript.nodes import Base, User, File
 from cript.utils import convert_file_size, display_errors
 from cript.exceptions import (
     APIAuthError,
@@ -22,6 +22,7 @@ from cript.exceptions import (
     APISearchError,
     APIGetError,
     APIFileUploadError,
+    APIFileDownloadError,
     DuplicateNodeError,
     FileSizeLimitError,
 )
@@ -159,12 +160,80 @@ class API:
         for json_key, json_value in obj_json.items():
             setattr(node, json_key, json_value)
 
+    @beartype
+    def download(self, file_obj: File, path: str = None):
+        """
+        Download a file from the defined storage provider.
+
+        :param node: The :class:`File` node object.
+        :param path: Path where the file should go.
+        """
+        storage_provider = self.storage_info["provider"]
+        if not path:
+            path = f"./{file_obj.name}"
+
+        if storage_provider == "globus":
+            self._globus_https_download(file_obj, path)
+        elif storage_provider == "s3":
+            pass  # Coming soon
+
+    def _globus_https_download(self, file_obj: File, path: str):
+        """
+        Download a file from a Globus endpoint.
+
+        :param node: The :class:`File` node object.
+        :param path: Path where the file should go.
+        """
+        endpoint_id = self.storage_info["endpoint_id"]
+        native_client_id = self.storage_info["native_client_id"]
+
+        if not hasattr(self, "globus_transfer_client"):
+            auth_client, tokens = self._globus_user_auth(endpoint_id, native_client_id)
+            self._globus_set_transfer_client(auth_client, tokens)
+
+        # Stage the transfer
+        globus_url = self._globus_stage_download(file_obj.uid)
+        print("Download in progress ...")
+
+        # Perform transfer
+        https_auth_token = self.globus_tokens["https_auth_token"]
+        headers = {"Authorization": f"Bearer {https_auth_token}"}
+        response = requests.get(
+            url=globus_url,
+            headers=headers,
+            allow_redirects=True,
+        )
+
+        if response.status_code == 200:
+            # Save the file to local filesystem
+            f = open(path, "wb")
+            f.write(response.content)
+            f.close()
+        else:
+            raise APIFileDownloadError
+
+    def _globus_stage_download(self, file_uid):
+        """
+        Sends a POST to the API to stage the Globus endpoint for download.
+
+        :param file_uid: UID of the :class:`File` node object.
+        :return: The Globus download URL.
+        :rtype: str
+        """
+        payload = {"file_uid": file_uid}
+        response = self.session.post(
+            url=f"{self.base_url}/globus-stage-download/", data=json.dumps(payload)
+        )
+        if response.status_code != 200:
+            raise APIFileDownloadError
+        return json.loads(response.content)
+
     def _upload_file(self, file_uid, node):
         """
-        Upload a file to Globus or S3.
+        Upload a file to the defined storage provider.
 
-        :param file_uid: UID of the :class:`File` object.
-        :param node: The :class:`File` object.
+        :param file_uid: UID of the :class:`File` node object.
+        :param node: The :class:`File` node object.
         """
         storage_provider = self.storage_info["provider"]
         max_file_size = self.storage_info["max_file_size"]
@@ -188,43 +257,30 @@ class API:
         """
         Upload a file to a Globus endpoint via HTTPS.
 
-        :param file_uid: UID of the :class:`File` object.
+        :param file_uid: UID of the :class:`File` node object.
         :param file_path: The file path on local filesystem.
         """
         endpoint_id = self.storage_info["endpoint_id"]
         native_client_id = self.storage_info["native_client_id"]
 
         if not hasattr(self, "globus_transfer_client"):
-            client, tokens = self._globus_user_auth(endpoint_id, native_client_id)
-
-            # Initialize transfer client
-            transfer_authorizer = globus_sdk.RefreshTokenAuthorizer(
-                tokens["transfer_refresh_token"],
-                client,
-                access_token=tokens["transfer_access_token"],
-                expires_at=tokens["transfer_expiration"],
-            )
-            transfer_client = globus_sdk.TransferClient(authorizer=transfer_authorizer)
-
-            # Save the client and tokens so the user doesnt have to auth each upload
-            self.globus_transfer_client = transfer_client
-            self.globus_tokens = tokens
+            auth_client, tokens = self._globus_user_auth(endpoint_id, native_client_id)
+            self._globus_set_transfer_client(auth_client, tokens)
 
         # Stage the transfer
         unique_file_name = self._globus_stage_upload(file_uid, file_obj.checksum)
+        print("Upload in progress ...")
 
         # Get endpoint URL
         endpoint = self.globus_transfer_client.get_endpoint(endpoint_id)
         https_server = endpoint["https_server"]
-
-        print("\nUpload in progress ...\n")
 
         # Perform the transfer
         https_auth_token = self.globus_tokens["https_auth_token"]
         headers = {"Authorization": f"Bearer {https_auth_token}"}
         storage_path = self.storage_info["path"]
         response = requests.put(
-            url=f"{https_server}{storage_path}{file_uid}/{unique_file_name}",
+            url=f"{https_server}/{storage_path}{file_uid}/{unique_file_name}",
             data=open(file_obj.source, "rb"),
             headers=headers,
         )
@@ -240,7 +296,7 @@ class API:
         :return: A tuple of the auth client and generated tokens.
         :rtype: (globus_sdk.NativeAppAuthClient, dict)
         """
-        client = globus_sdk.NativeAppAuthClient(client_id)
+        auth_client = globus_sdk.NativeAppAuthClient(client_id)
 
         # Define scopes
         auth_scopes = "openid profile email"
@@ -248,21 +304,21 @@ class API:
         https_scopes = ScopeBuilder(endpoint_id).url_scope_string("https")
 
         # Initiate auth flow
-        client.oauth2_start_flow(
+        auth_client.oauth2_start_flow(
             requested_scopes=[auth_scopes, transfer_scopes, https_scopes],
             refresh_tokens=True,
         )
-        authorize_url = client.oauth2_get_authorize_url()
+        authorize_url = auth_client.oauth2_get_authorize_url()
 
         # Prompt user to login and enter code
         print(f"Please go to this URL and login:\n\n{authorize_url}\n")
         auth_code = input("Enter the code here: ").strip()
-        token_response = client.oauth2_exchange_code_for_tokens(auth_code)
+        token_response = auth_client.oauth2_exchange_code_for_tokens(auth_code)
 
+        # Get tokens
         auth_data = token_response.by_resource_server["auth.globus.org"]
         transfer_data = token_response.by_resource_server["transfer.api.globus.org"]
         https_transfer_data = token_response.by_resource_server[endpoint_id]
-
         tokens = {
             "auth_token": auth_data["access_token"],
             "transfer_access_token": transfer_data["access_token"],
@@ -270,13 +326,35 @@ class API:
             "transfer_expiration": transfer_data["expires_at_seconds"],
             "https_auth_token": https_transfer_data["access_token"],
         }
-        return (client, tokens)
+
+        return (auth_client, tokens)
+
+    def _globus_set_transfer_client(self, auth_client, tokens):
+        """
+        Initialize and save the transfer client so the user doesn't have to
+        auth for each upload.
+
+        :param auth_client: Instance of :class:`globus_sdk.NativeAppAuthClient`
+        :param tokens: The relevant auth, transfer, and refresh tokens.
+        """
+        # Initialize transfer client
+        transfer_authorizer = globus_sdk.RefreshTokenAuthorizer(
+            tokens["transfer_refresh_token"],
+            auth_client,
+            access_token=tokens["transfer_access_token"],
+            expires_at=tokens["transfer_expiration"],
+        )
+        transfer_client = globus_sdk.TransferClient(authorizer=transfer_authorizer)
+
+        # Save the transfer client and tokens as object attributes
+        self.globus_transfer_client = transfer_client
+        self.globus_tokens = tokens
 
     def _globus_stage_upload(self, file_uid, file_checksum):
         """
         Sends a POST to the API to stage the Globus endpoint for upload.
 
-        :param file_uid: UID of the :class:`File` object.
+        :param file_uid: UID of the :class:`File` node object.
         :return: The unique file name to be used for upload.
         :rtype: str
         """
@@ -293,7 +371,7 @@ class API:
         """
         Performs a single file upload to AWS S3.
 
-        :param file_uid: UID of the :class:`File` object.
+        :param file_uid: UID of the :class:`File` node object.
         :param file_path: The path to the file on the local filesystem.
         """
         # Generate signed URL for uploading
@@ -308,7 +386,7 @@ class API:
 
         # Upload file
         if response.status_code == 200:
-            print("\nUpload in progress ...\n")
+            print("Upload in progress ...")
             url = json.loads(response.content)
             files = {"file": open(node.source, "rb")}
             response = requests.put(url=url, files=files)
@@ -339,7 +417,7 @@ class API:
         upload_id = json.loads(response.content)["UploadId"]
 
         # Upload file in chunks
-        print("\nUpload in progress ...\n")
+        print("Upload in progress ...")
         parts = []
         with open(node.source, "rb") as local_file:
             while True:
