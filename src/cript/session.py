@@ -108,12 +108,11 @@ class API:
             )
 
     @beartype
-    def save(self, node: Base, print_success: bool = True):
+    def save(self, node: Base):
         """
         Create or update a node in the database.
 
         :param node: The node to be saved.
-        :param print_success: Boolean indicating whether to print a message when a node is saved successfully.
         """
         if node.node_type == "primary":
             if node.url:
@@ -142,10 +141,7 @@ class API:
             if node.slug == "file":
                 self.refresh(node)
 
-            msg = f"{node.node_name} node has been saved to the database."
-            logger.info(msg)
-            if print_success:
-                print(msg)
+            logger.info(f"{node.node_name} node has been saved to the database.")
 
         else:
             try:
@@ -474,13 +470,12 @@ class API:
         if response.status_code != 200:
             raise APIFileUploadError
 
-    def delete(self, obj: Base, query: dict = None, print_success: bool = True):
+    def delete(self, obj: Base, query: dict = None):
         """
         Delete a node in the database and clear it locally.
 
         :param obj: The node to be deleted itself or its class.
         :param query: (Optional) A dictionary defining the query parameters (e.g., {"name": "NewMaterial"})
-        :param print_success: A boolean indicating whether to print a message on successful deletion.
         """
         # Delete with node
         if isinstance(obj, Base):
@@ -518,7 +513,6 @@ class API:
 
         response = self.session.delete(url)
         if response.status_code == 204:
-            logger.info(msg)
             # Check if node exists locally
             # If it does, clear fields to indicate it has been deleted
             local_node = self._get_local_primary_node(url)
@@ -527,10 +521,7 @@ class API:
                 local_node.uid = None
                 local_node.created_at = None
                 local_node.updated_at = None
-            msg = "The node has been deleted from the database."
-            logger.info(msg)
-            if print_success:
-                print(msg)
+            logger.info("The node has been deleted from the database.")
         else:
             raise APIGetError(display_errors(response.content))
 
