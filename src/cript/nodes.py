@@ -435,9 +435,9 @@ class File(Base):
         if value:
             if os.path.exists(value):
                 value = value.replace("\\", "/")
-                print("Generating checksum ...")
+                logger.info(f"Generating checksum for {value}...")
                 self.checksum = sha256_hash(value)
-                print("Complete.")
+                logger.info("Complete.")
                 self.name = os.path.basename(value)
             elif value.startswith(("http", "https")):
                 pass
