@@ -21,10 +21,10 @@ setup(
     include_package_data=True,
     python_requires=">=3.9",
     install_requires=[
-        "beartype >= 0.10.0",
-        "globus-sdk >= 3.6.0",
-        "pint >= 0.18",
-        "requests >= 2.27",
+        "beartype >= 0.10.4",
+        "globus-sdk >= 3.7.0",
+        "pint >= 0.19.2",
+        "requests >= 2.27.1",
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
