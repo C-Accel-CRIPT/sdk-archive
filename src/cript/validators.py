@@ -62,7 +62,7 @@ def validate_value(key_category, key, value, unit=None):
     value_type = key_parameters.get("value_type")
     if value is None and value_type:
         raise ValueError(f"A value must be defined for {key}.")
-    elif value and not value_type:
+    elif value is not None and not value_type:
         raise ValueError(f"A value is not expected for {key}")
     elif value is None and not value_type:
         return value
