@@ -202,7 +202,9 @@ class API:
 
         # Stage the transfer
         globus_url = self._globus_stage_download(file_obj.uid)
-        print("Download in progress ...")
+        logger.info(
+            f"Download of file {file_obj.uid} from Globus endpoint in progress."
+        )
 
         # Perform transfer
         https_auth_token = self.globus_tokens["https_auth_token"]
@@ -278,7 +280,7 @@ class API:
 
         # Stage the transfer
         unique_file_name = self._globus_stage_upload(file_uid, file_obj.checksum)
-        logger.info("\nUpload to Globus endpoint in progress ...\n")
+        logger.info(f"Upload of file {file_uid} to Globus endpoint in progress.")
 
         # Get endpoint URL
         endpoint = self.globus_transfer_client.get_endpoint(endpoint_id)
@@ -395,7 +397,7 @@ class API:
 
         # Upload file
         if response.status_code == 200:
-            print("Upload in progress ...")
+            logger.info(f"Upload of file {file_uid} to AWS S3 in progress.")
             url = json.loads(response.content)
             files = {"file": open(node.source, "rb")}
             response = requests.put(url=url, files=files)
@@ -426,7 +428,7 @@ class API:
         upload_id = json.loads(response.content)["UploadId"]
 
         # Upload file in chunks
-        logger.info("\nUpload to AWS S3 in progress ...\n")
+        logger.info(f"Upload of file {file_uid} to AWS S3 in progress.")
         parts = []
         with open(node.source, "rb") as local_file:
             while True:
@@ -515,7 +517,6 @@ class API:
             )
 
         response = self.session.delete(url)
-        msg = "The node has been deleted from the database."
         if response.status_code == 204:
             logger.info(msg)
             # Check if node exists locally
@@ -526,6 +527,8 @@ class API:
                 local_node.uid = None
                 local_node.created_at = None
                 local_node.updated_at = None
+            msg = "The node has been deleted from the database."
+            logger.info(msg)
             if print_success:
                 print(msg)
         else:
