@@ -434,7 +434,7 @@ class File(Base):
 
     @source.setter
     def source(self, value):
-        if value:
+        if value != "Invalid":
             if os.path.exists(value):
                 value = value.replace("\\", "/")
                 logger.info(f"Generating checksum for {value}.")
