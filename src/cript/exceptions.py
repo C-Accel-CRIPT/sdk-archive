@@ -74,6 +74,16 @@ class APIFileUploadError(CRIPTError):
         return "File upload could not be completed."
 
 
+class APIFileDownloadError(CRIPTError):
+    """Raised when a file download fails."""
+
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return "File download could not be completed."
+
+
 class APISessionRequiredError(CRIPTError):
     """Raised when an active API session is required but not yet established."""
 
