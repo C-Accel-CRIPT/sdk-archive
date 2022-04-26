@@ -70,7 +70,7 @@ class API:
         else:
             raise APIAuthError(display_errors(response.content))
 
-        logger.info("Connection to the API was successful!")
+        logger.info(f"Connection to {self.base_url} API was successful!")
 
         # Warn user if an update is required
         # TODO: (if this makes sense) unify logger.warning and warnings.warn
@@ -141,9 +141,10 @@ class API:
             if node.slug == "file":
                 self.refresh(node)
 
-            logger.info(f"{node.node_name} node has been saved to the database.")
+            msg = f"{node.node_name} node has been saved to the database."
+            logger.info(msg)
             if print_success:
-                print(f"{node.node_name} node has been saved to the database.")
+                print(msg)
 
         else:
             try:
@@ -436,20 +437,19 @@ class API:
             )
 
         response = self.session.delete(url)
+        msg = "The node has been deleted from the database."
         if response.status_code == 204:
+            logger.info(msg)
             # Check if node exists locally
-            # If it does, clear fields to indicate it has been delete
+            # If it does, clear fields to indicate it has been deleted
             local_node = self._get_local_primary_node(url)
             if local_node:
                 local_node.url = None
                 local_node.uid = None
                 local_node.created_at = None
                 local_node.updated_at = None
-                logger.info(
-                    f"{local_node.node_name} node has been deleted from the database."
-                )
             if print_success:
-                print("Node has been deleted from the database.")
+                print(msg)
         else:
             raise APIGetError(display_errors(response.content))
 
