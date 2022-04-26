@@ -397,6 +397,7 @@ class File(Base):
         external_source: Union[str, None] = None,
         public: bool = False,
         name=None,
+        unique_name=None,
     ):
         super().__init__()
         self.url = None
@@ -405,6 +406,7 @@ class File(Base):
         self.data = data
         self.checksum = checksum
         self.name = name
+        self.unique_name = unique_name
         self.source = source
         self.extension = extension
         self.external_source = external_source
