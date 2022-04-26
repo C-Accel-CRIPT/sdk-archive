@@ -48,9 +48,10 @@ def validate_value(key_category, key, value, unit=None):
     :param value: Value to be validated.
     :param unit: The value's unit of measurement.
     :return: The validated value.
+    :rtype: Union[int, float, str]
     """
-    # Skip validation for custom fields
-    if key[0] == "+":
+    # Skip validation for empty values and custom fields
+    if not key or key[0] == "+":
         return value
 
     key_parameters = _get_key_parameters(key_category, key)
@@ -138,7 +139,7 @@ def validate_unit(key_category, key, unit):
     _validate_unit_exists(unit)
 
     # Skip further validation for custom fields
-    if key[0] == "+":
+    if not key or key[0] == "+":
         return unit
 
     key_parameters = _get_key_parameters(key_category, key)
@@ -193,6 +194,7 @@ def _unit_conversion(value, unit, si_unit):
     :param unit: The unit entered by the user.
     :param si_unit: The SI unit for the specific attribute.
     :return: The converted value.
+    :rtype: Union[int, float, str]
     """
     original_quantity = pint_ureg.Quantity(value, unit)
     si_value = original_quantity.to(si_unit).magnitude
