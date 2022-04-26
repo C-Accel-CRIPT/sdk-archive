@@ -17,7 +17,7 @@ def validate_required(node):
     :param node: The node to validate.
     """
     for field in node.required:
-        if not hasattr(node, field) or not getattr(node, field):
+        if not hasattr(node, field) or getattr(node, field) is None:
             raise RequiredFieldsError(node.required)
 
 
@@ -60,11 +60,11 @@ def validate_value(key_category, key, value, unit=None):
 
     # Check if value is expected
     value_type = key_parameters.get("value_type")
-    if not value and value_type:
+    if value is None and value_type:
         raise ValueError(f"A value must be defined for {key}.")
     elif value and not value_type:
         raise ValueError(f"A value is not expected for {key}")
-    elif not value and not value_type:
+    elif value is None and not value_type:
         return value
 
     if value_type:
