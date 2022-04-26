@@ -4,6 +4,7 @@ import urllib
 import warnings
 from typing import Union
 from getpass import getpass
+from logging import getLogger
 
 import requests
 from beartype import beartype
@@ -26,6 +27,9 @@ from cript.exceptions import (
     DuplicateNodeError,
     FileSizeLimitError,
 )
+
+
+logger = getLogger(__name__)
 
 
 class API:
@@ -67,9 +71,12 @@ class API:
         else:
             raise APIAuthError(display_errors(response.content))
 
-        print(f"Connection {self.base_url} was successful!")
+        logger.info(f"Connection to {self.base_url} API was successful!")
 
         # Warn user if an update is required
+        # TODO: (if this makes sense) unify logger.warning and warnings.warn
+        # interfaces. My hunch is that one of them would be sufficient but yet
+        # to test it
         if self.version != self.latest_version:
             warnings.warn(response.json()["version_warning"], stacklevel=2)
 
@@ -93,7 +100,7 @@ class API:
                 self._generate_nodes(node)
             else:
                 raise APIRefreshError(
-                    "Before you can refresh a node, you must either save it or define it's URL."
+                    "Before you can refresh a node, you must either save it or define its URL."
                 )
         else:
             raise APIRefreshError(
@@ -135,8 +142,10 @@ class API:
             if node.slug == "file":
                 self.refresh(node)
 
+            msg = f"{node.node_name} node has been saved to the database."
+            logger.info(msg)
             if print_success:
-                print(f"{node.node_name} node has been saved to the database.")
+                print(msg)
 
         else:
             try:
@@ -269,7 +278,7 @@ class API:
 
         # Stage the transfer
         unique_file_name = self._globus_stage_upload(file_uid, file_obj.checksum)
-        print("Upload in progress ...")
+        logger.info("\nUpload to Globus endpoint in progress ...\n")
 
         # Get endpoint URL
         endpoint = self.globus_transfer_client.get_endpoint(endpoint_id)
@@ -417,7 +426,7 @@ class API:
         upload_id = json.loads(response.content)["UploadId"]
 
         # Upload file in chunks
-        print("Upload in progress ...")
+        logger.info("\nUpload to AWS S3 in progress ...\n")
         parts = []
         with open(node.source, "rb") as local_file:
             while True:
@@ -506,9 +515,11 @@ class API:
             )
 
         response = self.session.delete(url)
+        msg = "The node has been deleted from the database."
         if response.status_code == 204:
+            logger.info(msg)
             # Check if node exists locally
-            # If it does, clear fields to indicate it has been delete
+            # If it does, clear fields to indicate it has been deleted
             local_node = self._get_local_primary_node(url)
             if local_node:
                 local_node.url = None
@@ -516,7 +527,7 @@ class API:
                 local_node.created_at = None
                 local_node.updated_at = None
             if print_success:
-                print("Node has been deleted from the database.")
+                print(msg)
         else:
             raise APIGetError(display_errors(response.content))
 
@@ -584,7 +595,7 @@ class API:
             if response.status_code == 200:
                 obj_json = response.json()
             else:
-                raise APIGetError(f"The specified node was not found.")
+                raise APIGetError("The specified node was not found.")
             # Define node class from URL slug
             node_slug = obj.rstrip("/").rsplit("/")[-2]
             node_class = self._define_node_class(node_slug)
@@ -601,7 +612,7 @@ class API:
                 node_class = obj
         else:
             raise APIGetError(
-                f"Please enter a valid node URL or a node class and search query."
+                "Please enter a node URL or a node class with a search query."
             )
 
         # Return the local node object if it already exists

@@ -4,6 +4,7 @@ import copy
 from abc import ABCMeta
 from typing import Union
 from weakref import WeakSet
+from logging import getLogger
 
 from beartype import beartype
 
@@ -15,6 +16,9 @@ from cript.validators import (
     validate_unit,
 )
 from cript.utils import sha256_hash, auto_assign_group
+
+
+logger = getLogger(__name__)
 
 
 class Base(metaclass=ABCMeta):
@@ -433,9 +437,9 @@ class File(Base):
         if value:
             if os.path.exists(value):
                 value = value.replace("\\", "/")
-                print("Generating checksum ...")
+                logger.info(f"Generating checksum for {value}...")
                 self.checksum = sha256_hash(value)
-                print("Complete.")
+                logger.info("Complete.")
                 self.name = os.path.basename(value)
             elif value.startswith(("http", "https")):
                 pass
