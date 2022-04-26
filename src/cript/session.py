@@ -178,11 +178,11 @@ class API:
             self._globus_https_upload(file_uid, node)
         elif storage_provider == "s3":
             if file_size < 6291456:
-                self._s3_single_file_upload(file_uid, node.source)
+                self._s3_single_file_upload(file_uid, node)
             else:
                 # Multipart uploads for files bigger than 6 MB
                 # Ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/qfacts.html
-                self._s3_multipart_file_upload(file_uid, node.source)
+                self._s3_multipart_file_upload(file_uid, node)
 
     def _globus_https_upload(self, file_uid, file_obj):
         """
@@ -289,7 +289,7 @@ class API:
             raise APIFileUploadError
         return json.loads(response.content)["unique_file_name"]
 
-    def _s3_single_file_upload(self, file_uid, file_path):
+    def _s3_single_file_upload(self, file_uid, node):
         """
         Performs a single file upload to AWS S3.
 
@@ -297,23 +297,27 @@ class API:
         :param file_path: The path to the file on the local filesystem.
         """
         # Generate signed URL for uploading
-        data = {"action": "upload", "file_uid": file_uid}
+        payload = {
+            "action": "upload",
+            "file_uid": file_uid,
+            "file_checksum": node.checksum,
+        }
         response = self.session.post(
-            url=f"{self.base_url}/s3-signed-url/", data=json.dumps(data)
+            url=f"{self.base_url}/s3-signed-url/", data=json.dumps(payload)
         )
 
         # Upload file
         if response.status_code == 200:
             print("\nUpload in progress ...\n")
             url = json.loads(response.content)
-            files = {"file": open(file_path, "rb")}
+            files = {"file": open(node.source, "rb")}
             response = requests.put(url=url, files=files)
             if response.status_code != 200:
                 raise APIFileUploadError
         else:
             raise APIFileUploadError
 
-    def _s3_multipart_file_upload(self, file_uid, file_path):
+    def _s3_multipart_file_upload(self, file_uid, node):
         """
         Performs a multipart file upload to AWS S3.
 
@@ -323,17 +327,21 @@ class API:
         chunk_size = 500 * 1024**2
 
         # Create multipart upload and get upload ID
-        data = {"action": "create", "file_uid": file_uid}
+        payload = {
+            "action": "create",
+            "file_uid": file_uid,
+            "file_checksum": node.checksum,
+        }
         response = self.session.post(
             url=f"{self.base_url}/s3-multipart-upload/",
-            data=json.dumps(data),
+            data=json.dumps(payload),
         )
         upload_id = json.loads(response.content)["UploadId"]
 
         # Upload file in chunks
         print("\nUpload in progress ...\n")
         parts = []
-        with open(file_path, "rb") as local_file:
+        with open(node.source, "rb") as local_file:
             while True:
                 file_data = local_file.read(chunk_size)
                 if not file_data:
@@ -343,6 +351,7 @@ class API:
                 data = {
                     "action": "upload",
                     "file_uid": file_uid,
+                    "file_checksum": node.checksum,
                     "upload_id": upload_id,
                     "part_number": len(parts) + 1,
                 }
@@ -370,7 +379,7 @@ class API:
             "parts": parts,
         }
         response = self.session.post(
-            url=f"{self.base_url}s3-multipart-upload/",
+            url=f"{self.base_url}/s3-multipart-upload/",
             data=json.dumps(data),
         )
         if response.status_code != 200:
