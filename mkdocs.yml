@@ -1,12 +1,20 @@
 site_name: CRIPT SDK Documentation
-theme:
-    name: readthedocs
+
+theme: material
+
 markdown_extensions:
 - toc:
     baselevel: 1
-    toc_depth: 4
     permalink: True
 
 plugins:
     - search
-    - mkdocstrings
+    - mkdocstrings:
+        default_handler: python
+        handlers:
+            python:
+                selection:
+                    docstring_style: "restructured-text"
+                rendering:
+                    show_source: true
+                    heading_level: 3
