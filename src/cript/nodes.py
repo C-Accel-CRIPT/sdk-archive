@@ -130,8 +130,8 @@ class User(Base):
         username: str = None,
         email: str = None,
         orcid_id: str = None,
-        public: bool = False,
         groups=None,
+        public: bool = False,
     ):
         super().__init__()
         self.url = None
@@ -269,20 +269,20 @@ class Collection(Base):
         self,
         group: Union[Group, str] = None,
         name: str = None,
+        experiments=None,
+        inventories=None,
         notes: Union[str, None] = None,
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
-        experiments=None,
-        inventories=None,
     ):
         super().__init__()
         self.url = None
         self.uid = None
         self.group = group
         self.name = name
-        self.notes = notes
         self.experiments = experiments if experiments else []
         self.inventories = inventories if inventories else []
+        self.notes = notes
         self.citations = citations if citations else []
         self.public = public
         self.created_at = None
@@ -316,11 +316,11 @@ class Experiment(Base):
         group: Union[Group, str] = None,
         collection: Union[Collection, str] = None,
         name: str = None,
+        processes=None,
+        data=None,
         funding: list[Union[str, None]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
-        processes=None,
-        data=None,
     ):
         super().__init__()
         self.url = None
@@ -359,15 +359,15 @@ class Data(Base):
         experiment: Union[Base, str] = None,
         name: str = None,
         type: str = None,
+        files=None,
         sample_prep: Union[str, None] = None,
         calibration: Union[str, None] = None,
         configuration: Union[str, None] = None,
+        materials=None,
+        processes=None,
         notes: Union[str, None] = None,
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
-        files=None,
-        materials=None,
-        processes=None,
     ):
         super().__init__()
         self.url = None
@@ -380,9 +380,9 @@ class Data(Base):
         self.sample_prep = sample_prep
         self.calibration = calibration
         self.configuration = configuration
-        self.notes = notes
         self.materials = materials if materials else []
         self.processes = processes if processes else []
+        self.notes = notes
         self.citations = citations if citations else []
         self.public = public
         self.created_at = None
@@ -419,16 +419,16 @@ class File(Base):
     @beartype
     def __init__(
         self,
+        name: str = None,
         group: Union[Group, str] = None,
         data: list[Union[Data, str]] = None,
         source: str = None,
         type: str = "data",
         checksum: Union[str, None] = None,
         extension: Union[str, None] = None,
+        unique_name: str = None,
         external_source: Union[str, None] = None,
         public: bool = False,
-        name=None,
-        unique_name=None,
     ):
         super().__init__()
         self.url = None
