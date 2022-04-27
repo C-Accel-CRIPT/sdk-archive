@@ -10,9 +10,3 @@ markdown_extensions:
 plugins:
     - search
     - mkdocstrings
-
-# nav:
-#     - Home: index.md
-#     - Nodes:
-#         - Base: nodes/base.md
-#         - Collection: nodes/collection.md
