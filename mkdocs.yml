@@ -18,3 +18,13 @@ plugins:
                 rendering:
                     show_source: true
                     heading_level: 3
+
+nav:
+    - Home: index.md
+    - Quickstart: quickstart.md
+    - Tutorial: tutorial.md
+    - Nodes:
+        - Primary: nodes/primary.md
+        - Secondary: nodes/secondary.md
+    - API: api.md
+    - Exceptions: exceptions.md
