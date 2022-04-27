@@ -179,10 +179,7 @@ class InvalidValueRangeError(CRIPTError):
         self.unit = unit
 
     def __str__(self):
-        return (
-            f"{self.key} values must be between "
-            "{self.min} {self.unit} and {self.max} {self.unit}"
-        )
+        return f"{self.key} values must be between {self.min} {self.unit} and {self.max} {self.unit}"
 
 
 class InvalidUnitError(CRIPTError):
