@@ -33,6 +33,8 @@ logger = getLogger(__name__)
 
 
 class API:
+    """The entry point for interacting with the CRIPT API."""
+
     version = VERSION
     keys = None
 
@@ -160,13 +162,13 @@ class API:
         Set node attributes using data from an API response.
 
         :param node: The node you want to set attributes for.
-        :param response: The response from an API call.
+        :param obj_json: The JSON representation of the node object.
         """
         for json_key, json_value in obj_json.items():
             setattr(node, json_key, json_value)
 
     @beartype
-    def download(self, file_obj: File, path: str = None):
+    def download(self, node: File, path: str = None):
         """
         Download a file from the defined storage provider.
 
@@ -175,14 +177,14 @@ class API:
         """
         storage_provider = self.storage_info["provider"]
         if not path:
-            path = f"./{file_obj.name}"
+            path = f"./{node.name}"
 
         if storage_provider == "globus":
-            self._globus_https_download(file_obj, path)
+            self._globus_https_download(node, path)
         elif storage_provider == "s3":
             pass  # Coming soon
 
-    def _globus_https_download(self, file_obj: File, path: str):
+    def _globus_https_download(self, node: File, path: str):
         """
         Download a file from a Globus endpoint.
 
@@ -197,10 +199,8 @@ class API:
             self._globus_set_transfer_client(auth_client, tokens)
 
         # Stage the transfer
-        globus_url = self._globus_stage_download(file_obj.uid)
-        logger.info(
-            f"Download of file {file_obj.uid} from Globus endpoint in progress."
-        )
+        globus_url = self._globus_stage_download(node.uid)
+        logger.info(f"Download of file {node.uid} from Globus endpoint in progress.")
 
         # Perform transfer
         https_auth_token = self.globus_tokens["https_auth_token"]
@@ -260,12 +260,12 @@ class API:
                 # Ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/qfacts.html
                 self._s3_multipart_file_upload(file_uid, node)
 
-    def _globus_https_upload(self, file_uid, file_obj):
+    def _globus_https_upload(self, file_uid, node):
         """
         Upload a file to a Globus endpoint via HTTPS.
 
         :param file_uid: UID of the :class:`File` node object.
-        :param file_path: The file path on local filesystem.
+        :param node: The :class:`File` node object.
         """
         endpoint_id = self.storage_info["endpoint_id"]
         native_client_id = self.storage_info["native_client_id"]
@@ -275,7 +275,7 @@ class API:
             self._globus_set_transfer_client(auth_client, tokens)
 
         # Stage the transfer
-        unique_file_name = self._globus_stage_upload(file_uid, file_obj.checksum)
+        unique_file_name = self._globus_stage_upload(file_uid, node.checksum)
         logger.info(f"Upload of file {file_uid} to Globus endpoint in progress.")
 
         # Get endpoint URL
@@ -288,7 +288,7 @@ class API:
         storage_path = self.storage_info["path"]
         response = requests.put(
             url=f"{https_server}/{storage_path}{file_uid}/{unique_file_name}",
-            data=open(file_obj.source, "rb"),
+            data=open(node.source, "rb"),
             headers=headers,
         )
         if response.status_code != 200:
@@ -362,6 +362,7 @@ class API:
         Sends a POST to the API to stage the Globus endpoint for upload.
 
         :param file_uid: UID of the :class:`File` node object.
+        :file_checksum: The checksum of the raw file.
         :return: The unique file name to be used for upload.
         :rtype: str
         """
@@ -379,7 +380,7 @@ class API:
         Performs a single file upload to AWS S3.
 
         :param file_uid: UID of the :class:`File` node object.
-        :param file_path: The path to the file on the local filesystem.
+        :param node: The :class:`File` node object.
         """
         # Generate signed URL for uploading
         payload = {
@@ -407,7 +408,7 @@ class API:
         Performs a multipart file upload to AWS S3.
 
         :param file_uid: UID of the File node.
-        :param file_path: Path to the file on the local filesystem.
+        :param node: The :class:`File` node object.
         """
         chunk_size = 500 * 1024**2
 
@@ -707,7 +708,7 @@ class API:
         Create a node with JSON returned from the API.
 
         :param node_class: The class of the node to be created.
-        :param obj_json: The JSON returned from the API.
+        :param obj_json: The JSON representation of the node object.
         :return: The created node.
         :rtype: cript.nodes.Base
         """

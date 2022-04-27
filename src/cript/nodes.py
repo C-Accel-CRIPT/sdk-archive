@@ -117,6 +117,8 @@ class Base(metaclass=ABCMeta):
 
 
 class User(Base):
+    """Object representing a CRIPT user."""
+
     node_type = "primary"
     node_name = "User"
     slug = "user"
@@ -144,6 +146,8 @@ class User(Base):
 
 
 class Group(Base):
+    """Object representing a CRIPT group."""
+
     node_type = "primary"
     node_name = "Group"
     slug = "group"
@@ -177,6 +181,8 @@ class Group(Base):
 
 
 class Reference(Base):
+    """Object representing a bibliographic resource."""
+
     node_type = "primary"
     node_name = "Reference"
     slug = "reference"
@@ -228,6 +234,11 @@ class Reference(Base):
 
 
 class Citation(Base):
+    """
+    Object representing how a :class:`Reference` object
+    is applied in a given context.
+    """
+
     node_type = "secondary"
     node_name = "Citation"
     list_name = "citations"
@@ -242,6 +253,11 @@ class Citation(Base):
 
 
 class Collection(Base):
+    """
+    Object representing a logical grouping of :class:`Experiment` and
+    :class:`Inventory` objects.
+    """
+
     node_type = "primary"
     node_name = "Collection"
     slug = "collection"
@@ -283,6 +299,10 @@ class Collection(Base):
 
 
 class Experiment(Base):
+    """
+    Object representing an experiment.
+    """
+
     node_type = "primary"
     node_name = "Experiment"
     slug = "experiment"
@@ -320,6 +340,11 @@ class Experiment(Base):
 
 
 class Data(Base):
+    """
+    Object representing a set of :class:`File` objects and
+    related meta-data.
+    """
+
     node_type = "primary"
     node_name = "Data"
     slug = "data"
@@ -382,6 +407,8 @@ class Data(Base):
 
 
 class File(Base):
+    """Object representing a single raw data file."""
+
     node_type = "primary"
     node_name = "File"
     slug = "file"
@@ -459,6 +486,11 @@ class File(Base):
 
 
 class Condition(Base):
+    """
+    Object representing a condition (e.g., temperature).
+    These are used as modifiers for :class:`Property` and :class:`Process` objects.
+    """
+
     node_type = "secondary"
     node_name = "Condition"
     list_name = "conditions"
@@ -539,6 +571,11 @@ class Condition(Base):
 
 
 class Property(Base):
+    """
+    Object representing an observed or measured attribute
+    of a :class:`Material` or :class:`Process` object.
+    """
+
     node_type = "secondary"
     node_name = "Property"
     list_name = "properties"
@@ -643,6 +680,11 @@ class Property(Base):
 
 
 class Identifier(Base):
+    """
+    Object representing an identifier of a :class:`Material` object
+    (e.g., CAS, BigSMILES).
+    """
+
     node_type = "secondary"
     node_name = "Identifier"
     list_name = "identifiers"
@@ -673,6 +715,11 @@ class Identifier(Base):
 
 
 class Quantity(Base):
+    """
+    Object representing a specified amount of an :class:`Ingredient`
+    object used as input to a :class:`Process` object.
+    """
+
     node_type = "secondary"
     node_name = "Quantity"
     list_name = "quantities"
@@ -717,6 +764,8 @@ class Quantity(Base):
 
 
 class Component(Base):
+    """Object representing a mixture component of a :class:`Material` object."""
+
     node_type = "secondary"
     node_name = "Component"
     list_name = "components"
@@ -731,6 +780,8 @@ class Component(Base):
 
 
 class Material(Base):
+    """Object representing a material, mixture or compound."""
+
     node_type = "primary"
     node_name = "Material"
     slug = "material"
@@ -820,6 +871,8 @@ class Material(Base):
 
 
 class Inventory(Base):
+    """Object representing a logical grouping of :class:`Material` objects."""
+
     node_type = "primary"
     node_name = "Inventory"
     slug = "inventory"
@@ -859,6 +912,11 @@ class Inventory(Base):
 
 
 class Ingredient(Base):
+    """
+    Object representing a :class:`Material` object being used
+    as an input to a :class:`Process` object.
+    """
+
     node_type = "secondary"
     node_name = "Ingredient"
     list_name = "ingredients"
@@ -895,6 +953,11 @@ class Ingredient(Base):
 
 
 class Process(Base):
+    """
+    Object representing a process of creating or transforming
+    a :class:`Material` object.
+    """
+
     node_type = "primary"
     node_name = "Process"
     slug = "process"
