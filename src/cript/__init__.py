@@ -7,7 +7,7 @@ import pint
 # Set the default logging level for the package
 logging.basicConfig(level=logging.WARNING)
 logging.captureWarnings(True)
-
+pint.util.logger.setLevel(logging.ERROR)  # Mute Pint warnings
 
 # Single-sourcing the package version
 version_file = pkg_resources.resource_filename("cript", "VERSION.txt")
