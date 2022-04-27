@@ -1,0 +1,18 @@
+site_name: CRIPT SDK Documentation
+theme:
+    name: readthedocs
+markdown_extensions:
+- toc:
+    baselevel: 1
+    toc_depth: 4
+    permalink: True
+
+plugins:
+    - search
+    - mkdocstrings
+
+# nav:
+#     - Home: index.md
+#     - Nodes:
+#         - Base: nodes/base.md
+#         - Collection: nodes/collection.md
