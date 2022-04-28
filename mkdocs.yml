@@ -22,6 +22,10 @@ plugins:
 nav:
     - Home: index.md
     - Quickstart: quickstart.md
+<<<<<<< HEAD
+=======
+    - Tutorial: tutorial.md
+>>>>>>> docs-edit
     - Nodes:
         - Primary: nodes/primary.md
         - Secondary: nodes/secondary.md

@@ -6,15 +6,17 @@ Prerequisites:
 
 Install with pip:
 ```
-python3 -m pip install cript
+pip install cript
 ```
 
 ## Connect to CRIPT
 
 Establish a connection with an API endpoint:
 ```python
-url = "https://criptapp.org"  # Public instance of CRIPT
-token = "Token 123456789"  
+import cript
+
+url = "<cript_url>"  # e.g., https://criptapp.org
+token = "<your_api_token>"
 api = cript.API(base_url=url, api_token=token)
 ```
 <sup>**Note**: Your API token can be found in the UI under Account Settings.</sup>
@@ -32,7 +34,9 @@ api.save(group)
 ... then a Collection:
 ```python
 collection = cript.Collection(group=group, name="MyCollection")
+api.save(collection)
 ```
+<sup>**Note**: By default, all nodes are private. You can make them public with the `public=True` argument.</sup>
 
 ## Update a node
 For example, update the Collection node created above:
@@ -95,7 +99,7 @@ data = api.get("<data_url>")
 Next, create a File node that points to your local file:
 ```python
 path = "path/to/local/file"
-file = cript.File(group=group, data=[data], type="data", source=path)
+f = cript.File(group=group, data=[data], type="data", source=path)
 api.save(file)
 ```
 
@@ -103,6 +107,6 @@ api.save(file)
 For example, download the file you uploaded above.
 ```python
 path = path/on/local/filesystem
-api.download(file, path=path)
+api.download(f, path=path)
 ```
-<sup>**Note**: The default path for a download parameter is your current directory.</sup>
+<sup>**Note**: The default path for a download is your current directory.</sup>
