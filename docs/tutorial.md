@@ -43,7 +43,7 @@ Notice that the Material node objects have been auto-generated.
 type(inv.materials[0])
 # <class 'cript.nodes.Material'>
 ```
-<sup>**Note**: By default, nested node generation occurs one level deep. You can modify this with the `max-level` argument.</sup>
+<sup>**Note**: By default, nested node generation occurs one level deep. You can modify this with the `max_level` argument.</sup>
 
 
 ### Create a Process node
