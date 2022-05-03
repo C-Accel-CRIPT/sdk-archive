@@ -795,10 +795,7 @@ class Material(Base):
         group: Union[Group, str] = None,
         name: str = None,
         identifiers: list[Union[Identifier, dict]] = None,
-        names: Union[list[str], None] = None,
         components: list[Union[Component, dict]] = None,
-        vendor: Union[str, None] = None,
-        lot_number: Union[str, None] = None,
         keywords: Union[list[str], None] = None,
         process: Union[Base, str, None] = None,  # Needs more specific type check
         properties: list[Union[Property, dict]] = None,
@@ -811,11 +808,8 @@ class Material(Base):
         self.uid = None
         self.group = group
         self.name = name
-        self.names = names if names else []
         self.identifiers = identifiers if identifiers else []
         self.components = components if components else []
-        self.vendor = vendor
-        self.lot_number = lot_number
         self.keywords = keywords if keywords else []
         self.process = process
         self.properties = properties if properties else []
