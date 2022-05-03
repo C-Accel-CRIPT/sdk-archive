@@ -597,6 +597,7 @@ class Property(Base):
         set_id: Union[int, None] = None,
         data: list[Union[Data, str]] = None,
         conditions: list[Union[Condition, dict]] = None,
+        citations: list[Union[Citation, dict]] = None,
     ):
         super().__init__()
         self.key = key
@@ -612,6 +613,7 @@ class Property(Base):
         self.set_id = set_id
         self.data = data if data else []
         self.conditions = conditions if conditions else []
+        self.citations = citations if citations else []
         validate_required(self)
 
     @property
@@ -677,6 +679,14 @@ class Property(Base):
     @beartype
     def remove_condition(self, condition: Union[Condition, int]):
         self._remove_node(condition, "conditions")
+
+    @beartype
+    def add_citation(self, citation: Union[Citation, dict]):
+        self._add_node(citation, "citations")
+
+    @beartype
+    def remove_citation(self, citation: Union[Citation, int]):
+        self._remove_node(citation, "citations")
 
 
 class Identifier(Base):
@@ -799,7 +809,6 @@ class Material(Base):
         keywords: Union[list[str], None] = None,
         process: Union[Base, str, None] = None,  # Needs more specific type check
         properties: list[Union[Property, dict]] = None,
-        citations: list[Union[Citation, dict]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
     ):
@@ -813,7 +822,6 @@ class Material(Base):
         self.keywords = keywords if keywords else []
         self.process = process
         self.properties = properties if properties else []
-        self.citations = citations if citations else []
         self.notes = notes
         self.public = public
         self.created_at = None
@@ -854,14 +862,6 @@ class Material(Base):
     @beartype
     def remove_property(self, property: Union[Property, int]):
         self._remove_node(property, "properties")
-
-    @beartype
-    def add_citation(self, citation: Union[Citation, dict]):
-        self._add_node(citation, "citations")
-
-    @beartype
-    def remove_citation(self, citation: Union[Citation, int]):
-        self._remove_node(citation, "citations")
 
 
 class Inventory(Base):
