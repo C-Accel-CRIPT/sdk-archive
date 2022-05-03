@@ -117,7 +117,12 @@ class Base(metaclass=ABCMeta):
 
 
 class User(Base):
-    """Object representing a CRIPT user."""
+    """
+    Object representing a CRIPT user.
+
+    Note: A user cannot be created or modified using the SDK.
+          This object is for read-only purposes only.
+    """
 
     node_type = "primary"
     node_name = "User"
