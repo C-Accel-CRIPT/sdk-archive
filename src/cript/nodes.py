@@ -242,14 +242,16 @@ class Citation(Base):
     node_type = "secondary"
     node_name = "Citation"
     list_name = "citations"
+    required = ["reference"]
 
     @beartype
     def __init__(
-        self, reference: Union[Reference, str], method: Union[str, None] = None
+        self, reference: Union[Reference, str] = None, method: Union[str, None] = None
     ):
         super().__init__()
         self.method = method
         self.reference = reference
+        validate_required(self)
 
 
 class Collection(Base):
