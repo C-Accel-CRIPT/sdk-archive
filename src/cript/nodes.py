@@ -602,8 +602,8 @@ class Property(Base):
         component_id: Union[int, None] = None,
         structure: Union[str, None] = None,
         set_id: Union[int, None] = None,
-        data: list[Union[Data, str]] = None,
         conditions: list[Union[Condition, dict]] = None,
+        data: list[Union[Data, str]] = None,
         citations: list[Union[Citation, dict]] = None,
     ):
         super().__init__()
@@ -618,8 +618,8 @@ class Property(Base):
         self.component_id = component_id
         self.structure = structure
         self.set_id = set_id
-        self.data = data if data else []
         self.conditions = conditions if conditions else []
+        self.data = data if data else []
         self.citations = citations if citations else []
         validate_required(self)
 
@@ -1019,6 +1019,17 @@ class Process(Base):
             for i in range(len(value)):
                 value[i] = validate_key("process-keyword", value[i])
         self._keywords = value
+
+    @property
+    def equipment(self):
+        return self._equipment
+
+    @equipment.setter
+    def equipment(self, value):
+        if value:
+            for i in range(len(value)):
+                value[i] = validate_key("equipment", value[i])
+        self._equipment = value
 
     @beartype
     def add_prerequisite_process(self, process: Union[Base, dict]):
