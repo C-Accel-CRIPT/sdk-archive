@@ -251,12 +251,20 @@ class Citation(Base):
 
     @beartype
     def __init__(
-        self, reference: Union[Reference, str] = None, method: Union[str, None] = None
+        self, reference: Union[Reference, str] = None, type: Union[str, None] = None
     ):
         super().__init__()
-        self.method = method
+        self.type = type
         self.reference = reference
         validate_required(self)
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = validate_key("citation-type", value)
 
 
 class Collection(Base):
