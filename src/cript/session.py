@@ -89,17 +89,18 @@ class API:
         return f"Connected to {self.base_url}"
 
     @beartype
-    def refresh(self, node: Base):
+    def refresh(self, node: Base, max_level: int = 1):
         """
         Overwrite a node's attributes with the latest values from the database.
 
         :param node: The node to refresh.
+        :param max_level: Max depth to recursively generate nested nodes.
         """
         if hasattr(node, "url"):
             if node.url:
                 response = self.session.get(node.url)
                 self._set_node_attributes(node, response.json())
-                self._generate_nodes(node)
+                self._generate_nodes(node, max_level=max_level)
             else:
                 raise APIRefreshError(
                     "Before you can refresh a node, you must either save it or define its URL."
@@ -110,11 +111,12 @@ class API:
             )
 
     @beartype
-    def save(self, node: Base):
+    def save(self, node: Base, max_level: int = 1):
         """
         Create or update a node in the database.
 
         :param node: The node to be saved.
+        :param max_level: Max depth to recursively generate nested nodes.
         """
         if node.node_type == "primary":
             if node.url:
@@ -137,11 +139,11 @@ class API:
                 self._upload_file(file_uid, node)
 
             self._set_node_attributes(node, response.json())
-            self._generate_nodes(node)
+            self._generate_nodes(node, max_level=max_level)
 
             # Update File node source field
             if node.slug == "file":
-                self.refresh(node)
+                self.refresh(node, max_level=max_level)
 
             logger.info(f"{node.node_name} node has been saved to the database.")
 
