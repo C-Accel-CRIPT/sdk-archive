@@ -478,7 +478,7 @@ class API:
         Delete a node in the database and clear it locally.
 
         :param obj: The node to be deleted itself or its class.
-        :param query: (Optional) A dictionary defining the query parameters (e.g., {"name": "NewMaterial"})
+        :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"})
         """
         # Delete with node
         if isinstance(obj, Base):
@@ -534,7 +534,7 @@ class API:
         Send a query to the API and print the results.
 
         :param node_class: The class of the node type to query for.
-        :param query: (Optional) A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
+        :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
         :return: A :class:`JSONPaginator` object containing the results.
         :rtype: cript.session.JSONPaginator
         """
