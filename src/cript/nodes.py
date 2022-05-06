@@ -253,7 +253,7 @@ class Citation(Base):
     def __init__(
         self,
         reference: Union[Reference, str] = None,
-        type: Union[str, None] = None,
+        type: Union[str, None] = "reference",
         notes: Union[str, None] = None,
     ):
         super().__init__()
