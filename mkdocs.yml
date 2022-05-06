@@ -2,13 +2,9 @@ site_name: CRIPT SDK Documentation
 
 theme: material
 
-markdown_extensions:
-- toc:
-    baselevel: 1
-    permalink: True
-
 plugins:
     - search
+    - mkdocs-jupyter
     - mkdocstrings:
         default_handler: python
         handlers:
@@ -28,3 +24,16 @@ nav:
         - Secondary: nodes/secondary.md
     - API: api.md
     - Exceptions: exceptions.md
+
+markdown_extensions:
+    - toc:
+        baselevel: 1
+        permalink: True
+    - admonition
+    - pymdownx.details
+    - pymdownx.superfences
+    - pymdownx.highlight:
+        anchor_linenums: true
+    - pymdownx.inlinehilite
+    - pymdownx.snippets
+    - pymdownx.superfences
