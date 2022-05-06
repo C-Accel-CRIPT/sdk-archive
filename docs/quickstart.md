@@ -12,14 +12,15 @@ pip install cript
 ## Connect to CRIPT
 
 Establish a connection with an API endpoint:
-```python
+``` py
 import cript
 
 url = "<cript_url>"  # e.g., https://criptapp.org
 token = "<your_api_token>"
 api = cript.API(base_url=url, api_token=token)
 ```
-<sup>**Note**: Your API token can be found in the UI under Account Settings.</sup>
+!!! note
+    Your API token can be found in the UI under Account Settings.
 
 ---
 
@@ -27,37 +28,38 @@ api = cript.API(base_url=url, api_token=token)
 
 ## Create a node
 For example, create a Group node:
-```python
+``` py
 group = cript.Group(name="MyGroup")
 api.save(group)
 ```
 ... then a Collection:
-```python
-collection = cript.Collection(group=group, name="MyCollection")
+``` py
+collection = cript.Collection(group=group, name="MyCollection", public=True)
 api.save(collection)
 ```
-<sup>**Note**: By default, all nodes are private. You can make them public with the `public=True` argument.</sup>
+!!! note
+    By default, all nodes are private. You can make them public with the `public=True` argument.
 
 ## Update a node
 For example, update the Collection node created above:
-```python
+``` py
 collection.name = "OurCollection"
 api.save(collection)
 ```
 
 ## Delete a node
 For example, delete the Collection node created above:
-```python
+``` py
 api.delete(collection)
 ```
 
 ## Get an existing node
 For example, get the official CRIPT Group node:
-```python
+``` py
 group = api.get(cript.Group, {"name": "CRIPT"})
 ```
 ... then get the official styrene Material node via CAS number:
-```python
+``` py
 query = {
     "group": group.uid,
     "identifiers": [
@@ -70,7 +72,7 @@ query = {
 styrene =  api.get(cript.Material, query)
 ```
 ... or get it via URL:
-```python
+``` py
 url = "https://criptapp.org/api/material/8edbde8a-edce-4ad8-bf52-bd1ef81ba399/"
 styrene =  api.get(url)
 ```
@@ -78,7 +80,7 @@ styrene =  api.get(url)
 
 ## Run a search query
 For example, search for all Material nodes that contain benzene:
-```python
+``` py
 query = {
     "identifiers": [
         {
@@ -92,12 +94,12 @@ results =  api.search(cript.Material, query)
 
 ## Upload a file
 First, you'll need a Group and Data node:
-```python
+``` py
 group = data = api.get("<group_url>")
 data = api.get("<data_url>")
 ```
 Next, create a File node that points to your local file:
-```python
+``` py
 path = "path/to/local/file"
 f = cript.File(group=group, data=[data], type="data", source=path)
 api.save(file)
@@ -105,8 +107,9 @@ api.save(file)
 
 ## Download a file
 For example, download the file you uploaded above.
-```python
+``` py
 path = path/on/local/filesystem
 api.download(f, path=path)
 ```
-<sup>**Note**: The default path for a download is your current directory.</sup>
+!!! note
+    The default path for a download is your current directory.
