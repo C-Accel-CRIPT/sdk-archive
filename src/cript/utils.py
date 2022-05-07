@@ -1,6 +1,19 @@
+import re
 import hashlib
 import math
 import json
+
+
+def get_api_url(host: str):
+    """
+    Clean the hostname provided by the user and generate a URL.
+
+    :param host: Hostname of the CRIPT endpoint.
+    :return: The API URL that will be used to connect.
+    :rtype: str
+    """
+    host = re.sub("https://|http://", "", host).rstrip("/")
+    return f"https://{host}/api"
 
 
 def auto_assign_group(group, parent):

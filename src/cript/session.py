@@ -14,7 +14,7 @@ from globus_sdk.scopes import ScopeBuilder
 
 from cript import VERSION, NODE_CLASSES
 from cript.nodes import Base, User, File
-from cript.utils import convert_file_size, display_errors
+from cript.utils import get_api_url, convert_file_size, display_errors
 from cript.exceptions import (
     APIAuthError,
     APIRefreshError,
@@ -38,21 +38,21 @@ class API:
     version = VERSION
     keys = None
 
-    def __init__(self, base_url: str = None, api_token: str = None):
+    def __init__(self, host: str = None, api_token: str = None):
         """
         Establishes a session with a CRIPT API endpoint.
 
-        :param base_url: The base URL for the relevant CRIPT instance. (e.g., https://criptapp.org)
+        :param host: The hostname of the relevant CRIPT instance. (e.g., criptapp.org)
         :param api_token: The API token used for authentication.
         """
+        if host is None:
+            host = input("Host: ")
+        if api_token is None:
+            api_token = getpass("API Token: ")
+        self.api_url = get_api_url(host)
         self.latest_version = None
         self.user = None
         self.storage_info = None
-        if base_url is None:
-            base_url = input("Base URL: ")
-        if api_token is None:
-            api_token = getpass("API Token: ")
-        self.base_url = base_url.rstrip("/") + "/api"
 
         self.session = requests.Session()
         self.session.headers = {
@@ -62,7 +62,7 @@ class API:
         }
 
         # Test API authentication by fetching session info and keys
-        response = self.session.get(f"{self.base_url}/session-info/")
+        response = self.session.get(f"{self.api_url}/session-info/")
         if response.status_code == 200:
             self.latest_version = response.json()["latest_version"]
             self.user = self._create_node(User, response.json()["user_info"])
@@ -73,20 +73,17 @@ class API:
         else:
             raise APIAuthError(display_errors(response.content))
 
-        logger.info(f"Connection to {self.base_url} API was successful!")
+        logger.info(f"Connection to {self.api_url} API was successful!")
 
         # Warn user if an update is required
-        # TODO: (if this makes sense) unify logger.warning and warnings.warn
-        # interfaces. My hunch is that one of them would be sufficient but yet
-        # to test it
         if self.version != self.latest_version:
             warnings.warn(response.json()["version_warning"], stacklevel=2)
 
     def __repr__(self):
-        return f"Connected to {self.base_url}"
+        return f"Connected to {self.api_url}"
 
     def __str__(self):
-        return f"Connected to {self.base_url}"
+        return f"Connected to {self.api_url}"
 
     @beartype
     def refresh(self, node: Base, max_level: int = 1):
@@ -125,7 +122,7 @@ class API:
             else:
                 # Create a new object via POST
                 response = self.session.post(
-                    url=f"{self.base_url}/{node.slug}/", data=node._to_json()
+                    url=f"{self.api_url}/{node.slug}/", data=node._to_json()
                 )
         else:
             raise APISaveError(
@@ -231,7 +228,7 @@ class API:
         """
         payload = {"file_uid": file_uid}
         response = self.session.post(
-            url=f"{self.base_url}/globus-stage-download/", data=json.dumps(payload)
+            url=f"{self.api_url}/globus-stage-download/", data=json.dumps(payload)
         )
         if response.status_code != 200:
             raise APIFileDownloadError
@@ -370,7 +367,7 @@ class API:
         """
         payload = {"file_uid": file_uid, "file_checksum": file_checksum}
         response = self.session.post(
-            url=f"{self.base_url}/globus-stage-upload/",
+            url=f"{self.api_url}/globus-stage-upload/",
             data=json.dumps(payload),
         )
         if response.status_code != 200:
@@ -391,7 +388,7 @@ class API:
             "file_checksum": node.checksum,
         }
         response = self.session.post(
-            url=f"{self.base_url}/s3-signed-url/", data=json.dumps(payload)
+            url=f"{self.api_url}/s3-signed-url/", data=json.dumps(payload)
         )
 
         # Upload file
@@ -421,7 +418,7 @@ class API:
             "file_checksum": node.checksum,
         }
         response = self.session.post(
-            url=f"{self.base_url}/s3-multipart-upload/",
+            url=f"{self.api_url}/s3-multipart-upload/",
             data=json.dumps(payload),
         )
         upload_id = json.loads(response.content)["UploadId"]
@@ -444,7 +441,7 @@ class API:
                     "part_number": len(parts) + 1,
                 }
                 response = self.session.post(
-                    url=f"{self.base_url}/s3-signed-url/", data=json.dumps(data)
+                    url=f"{self.api_url}/s3-signed-url/", data=json.dumps(data)
                 )
 
                 # Upload file chunk
@@ -467,7 +464,7 @@ class API:
             "parts": parts,
         }
         response = self.session.post(
-            url=f"{self.base_url}/s3-multipart-upload/",
+            url=f"{self.api_url}/s3-multipart-upload/",
             data=json.dumps(data),
         )
         if response.status_code != 200:
@@ -497,7 +494,7 @@ class API:
         # Delete with URL
         elif isinstance(obj, str):
             url = obj
-            if self.base_url not in url:
+            if self.api_url not in url:
                 raise APIDeleteError("Invalid URL provided.")
 
         # Delete with search query
@@ -546,10 +543,10 @@ class API:
         if isinstance(query, dict):
             query_slug = self._generate_query_slug(query)
             response = self.session.get(
-                f"{self.base_url}/{node_class.slug}/?{query_slug}"
+                f"{self.api_url}/{node_class.slug}/?{query_slug}"
             )
         elif query is None:
-            response = self.session.get(f"{self.base_url}/{node_class.slug}/")
+            response = self.session.get(f"{self.api_url}/{node_class.slug}/")
         else:
             raise APISearchError(f"'{query}' is not a valid query.")
 
@@ -586,7 +583,7 @@ class API:
         """
         # Get node with a URL
         if isinstance(obj, str):
-            if self.base_url not in obj:
+            if self.api_url not in obj:
                 raise APIGetError("Please enter a valid node URL.")
             response = self.session.get(obj)
             if response.status_code == 200:
@@ -643,7 +640,7 @@ class API:
             if key == "url":
                 continue
             # Generate primary nodes
-            if isinstance(value, str) and self.base_url in value:
+            if isinstance(value, str) and self.api_url in value:
                 # Check if node already exists in memory
                 local_node = self._get_local_primary_node(value)
                 if local_node:
@@ -666,7 +663,7 @@ class API:
             elif isinstance(value, list):
                 for i in range(len(value)):
                     # Generate primary nodes
-                    if isinstance(value[i], str) and self.base_url in value[i]:
+                    if isinstance(value[i], str) and self.api_url in value[i]:
                         # Check if node already exists in memory
                         local_node = self._get_local_primary_node(value[i])
                         if local_node:
