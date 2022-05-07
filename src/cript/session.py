@@ -38,18 +38,19 @@ class API:
     version = VERSION
     keys = None
 
-    def __init__(self, host: str = None, api_token: str = None):
+    def __init__(self, host: str = None, api_token: str = None, tls: bool = True):
         """
         Establishes a session with a CRIPT API endpoint.
 
         :param host: The hostname of the relevant CRIPT instance. (e.g., criptapp.org)
         :param api_token: The API token used for authentication.
+        :param tls: Indicates whether to use TLS encryption for the API connection.
         """
         if host is None:
             host = input("Host: ")
         if api_token is None:
             api_token = getpass("API Token: ")
-        self.api_url = get_api_url(host)
+        self.api_url = get_api_url(host, tls)
         self.latest_version = None
         self.user = None
         self.storage_info = None

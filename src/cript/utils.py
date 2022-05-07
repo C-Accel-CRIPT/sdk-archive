@@ -4,16 +4,21 @@ import math
 import json
 
 
-def get_api_url(host: str):
+def get_api_url(host: str, tls: bool = True):
     """
     Clean the hostname provided by the user and generate a URL.
 
     :param host: Hostname of the CRIPT endpoint.
+    :param tls: Indicates whether to use TLS encryption for the API connection.
     :return: The API URL that will be used to connect.
     :rtype: str
     """
     host = re.sub("https://|http://", "", host).rstrip("/")
-    return f"https://{host}/api"
+    if tls == True:
+        protocol = "https"
+    else:
+        protocol = "http"
+    return f"{protocol}://{host}/api"
 
 
 def auto_assign_group(group, parent):
