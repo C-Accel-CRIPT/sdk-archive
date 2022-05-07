@@ -15,9 +15,9 @@ Establish a connection with an API endpoint:
 ``` py
 import cript
 
-url = "<cript_url>"  # e.g., https://criptapp.org
+host = "<endpoint_hostname>"  # e.g., criptapp.org
 token = "<your_api_token>"
-api = cript.API(base_url=url, api_token=token)
+api = cript.API(host, token)
 ```
 !!! note
     Your API token can be found in the UI under Account Settings.

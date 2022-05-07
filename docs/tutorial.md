@@ -4,9 +4,9 @@
 ``` py
 import cript
 
-url = "https://criptapp.org"
+host = "criptapp.org"
 token = "<your_api_token>"  
-api = cript.API(base_url=url, api_token=token)
+api = cript.API(host, token)
 ```
 !!! note
     Your API token can be found in the UI under [Account Settings](https://criptapp.org/settings/).
