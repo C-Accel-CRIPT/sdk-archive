@@ -108,7 +108,7 @@ api.save(file)
 ## Download a file
 For example, download the file you uploaded above.
 ``` py
-path = path/on/local/filesystem
+path = "path/to/local/file"
 api.download(f, path=path)
 ```
 !!! note
