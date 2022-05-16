@@ -909,7 +909,7 @@ class Inventory(Base):
         self.collection = collection
         self.name = name
         self.description = description
-        self.materials = materials
+        self.materials = materials if materials else []
         self.public = public
         self.created_at = None
         self.updated_at = None
