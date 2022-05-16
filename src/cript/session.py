@@ -506,7 +506,7 @@ class API:
             elif results.count < 1:
                 raise APIGetError("Your query did not match any existing nodes.")
             elif results.count > 1:
-                raise APIGetError("Your query mathced more than one node.")
+                raise APIGetError("Your query matched more than one node.")
         else:
             raise APIDeleteError(
                 "Please enter a node, valid node URL, or a node class and search query."
