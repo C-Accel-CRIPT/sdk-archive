@@ -191,7 +191,7 @@ class Reference(Base):
     node_type = "primary"
     node_name = "Reference"
     slug = "reference"
-    required = ["group", "title", "doi"]
+    required = ["group", "title"]
     unique_together = ["doi"]
 
     @beartype
