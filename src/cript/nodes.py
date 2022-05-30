@@ -192,7 +192,7 @@ class Reference(Base):
     node_name = "Reference"
     slug = "reference"
     required = ["group", "title"]
-    unique_together = ["doi"]
+    unique_together = ["title", "created_by"]
 
     @beartype
     def __init__(
