@@ -199,7 +199,7 @@ class Reference(Base):
         self,
         group: Union[Group, str] = None,
         title: str = None,
-        doi: str = None,
+        doi: Union[str, None] = None,
         authors: Union[list[str], None] = None,
         journal: Union[str, None] = None,
         publisher: Union[str, None] = None,
