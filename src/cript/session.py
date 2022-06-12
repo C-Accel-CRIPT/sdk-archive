@@ -133,8 +133,9 @@ class API:
         if response.status_code in (200, 201):
             # Handle new file uploads
             if node.slug == "file" and os.path.exists(node.source):
-                file_uid = response.json()["uid"]  # Grab uid from JSON response
-                self._upload_file(file_uid, node)
+                file_url = response.json()["url"]
+                file_uid = response.json()["uid"]
+                self._upload_file(file_url, file_uid, node)
 
             self._set_node_attributes(node, response.json())
             self._generate_nodes(node, max_level=max_level)
@@ -235,11 +236,12 @@ class API:
             raise APIFileDownloadError
         return json.loads(response.content)
 
-    def _upload_file(self, file_uid, node):
+    def _upload_file(self, file_url, file_uid, node):
         """
         Upload a file to the defined storage provider.
 
         :param file_uid: UID of the :class:`File` node object.
+        :param file_url: URL of the :class:`File` node object.
         :param node: The :class:`File` node object.
         """
         storage_provider = self.storage_info["provider"]
@@ -251,7 +253,7 @@ class API:
             raise FileSizeLimitError(convert_file_size(max_file_size))
 
         if storage_provider == "globus":
-            self._globus_https_upload(file_uid, node)
+            self._globus_https_upload(file_url, file_uid, node)
         elif storage_provider == "s3":
             if file_size < 6291456:
                 self._s3_single_file_upload(file_uid, node)
@@ -260,10 +262,11 @@ class API:
                 # Ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/qfacts.html
                 self._s3_multipart_file_upload(file_uid, node)
 
-    def _globus_https_upload(self, file_uid, node):
+    def _globus_https_upload(self, file_url, file_uid, node):
         """
         Upload a file to a Globus endpoint via HTTPS.
 
+        :param file_url: URL of the :class:`File` node object.
         :param file_uid: UID of the :class:`File` node object.
         :param node: The :class:`File` node object.
         """
@@ -286,12 +289,23 @@ class API:
         https_auth_token = self.globus_tokens["https_auth_token"]
         headers = {"Authorization": f"Bearer {https_auth_token}"}
         storage_path = self.storage_info["path"]
-        response = requests.put(
-            url=f"{https_server}/{storage_path}{file_uid}/{unique_file_name}",
-            data=open(node.source, "rb"),
-            headers=headers,
-        )
-        if response.status_code != 200:
+        try:
+            response = requests.put(
+                url=f"{https_server}/{storage_path}{file_uid}/{unique_file_name}",
+                data=open(node.source, "rb"),
+                headers=headers,
+            )
+            error = None
+        except requests.exceptions.RequestException as e:
+            error = e
+
+        # Delete File node if upload fails
+        if error or response.status_code != 200:
+            if error is None:
+                error = response.status_code
+            node.url = file_url
+            self.delete(node)
+            logger.info(f"Upload of file {file_uid} failed: {error}")
             raise APIFileUploadError
 
     def _globus_user_auth(self, endpoint_id, client_id):
