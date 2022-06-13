@@ -933,17 +933,17 @@ class Ingredient(Base):
     node_type = "secondary"
     node_name = "Ingredient"
     list_name = "ingredients"
-    required = ["ingredient"]
+    required = ["material"]
 
     @beartype
     def __init__(
         self,
-        ingredient: Union[Material, str],
+        material: Union[Material, str],
         keyword: str = None,
         quantities: list[Union[Quantity, dict]] = None,
     ):
         super().__init__()
-        self.ingredient = ingredient
+        self.material = material
         self.keyword = keyword
         self.quantities = quantities if quantities else []
         validate_required(self)
