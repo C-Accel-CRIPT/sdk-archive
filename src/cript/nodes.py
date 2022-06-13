@@ -798,13 +798,13 @@ class Component(Base):
     node_type = "secondary"
     node_name = "Component"
     list_name = "components"
-    required = ["component"]
+    required = ["material"]
 
     @beartype
-    def __init__(self, component_uid: int = 1, component: Union[Base, str] = None):
+    def __init__(self, component_uid: int = 1, material: Union[Base, str] = None):
         super().__init__()
         self.component_uid = component_uid
-        self.component = component
+        self.material = material
         validate_required(self)
 
 
