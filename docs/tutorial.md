@@ -82,11 +82,11 @@ workup_qty = cript.Quantity(key="volume", value=100, unit="ml")
 ```
 Next, we'll create Ingredient nodes for each.
 ``` py
-initiator = cript.Ingredient(keyword="initiator" ,ingredient=solution, quantities=[initiator_qty])
-solvent = cript.Ingredient(keyword="solvent" ,ingredient=toluene, quantities=[solvent_qty])
-monomer = cript.Ingredient(keyword="monomer" ,ingredient=styrene, quantities=[monomer_qty])
-quench = cript.Ingredient(keyword="quench" ,ingredient=butanol, quantities=[quench_qty])
-workup = cript.Ingredient(keyword="workup" ,ingredient=methanol, quantities=[workup_qty])
+initiator = cript.Ingredient(keyword="initiator" ,material=solution, quantities=[initiator_qty])
+solvent = cript.Ingredient(keyword="solvent" ,material=toluene, quantities=[solvent_qty])
+monomer = cript.Ingredient(keyword="monomer" ,material=styrene, quantities=[monomer_qty])
+quench = cript.Ingredient(keyword="quench" ,material=butanol, quantities=[quench_qty])
+workup = cript.Ingredient(keyword="workup" ,material=methanol, quantities=[workup_qty])
 ```
 Last, we'll add the Ingredient nodes to the Process node.
 ``` py
