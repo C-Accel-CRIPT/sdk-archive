@@ -801,9 +801,9 @@ class Component(Base):
     required = ["material"]
 
     @beartype
-    def __init__(self, component_uid: int = 1, material: Union[Base, str] = None):
+    def __init__(self, component_id: int = 1, material: Union[Base, str] = None):
         super().__init__()
-        self.component_uid = component_uid
+        self.component_id = component_id
         self.material = material
         validate_required(self)
 
