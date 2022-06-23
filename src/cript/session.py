@@ -590,7 +590,8 @@ class API:
         """
         Get the JSON for a node and use it to generate a local node object.
 
-        :param url: The API URL of the node.
+        :param obj: The node's URL or class type.
+        :param query: Search query if obj argument is a class type.
         :param level: Current nested node level.
         :param max_level: Max depth to recursively generate nested nodes.
         :return: The generated node object.
