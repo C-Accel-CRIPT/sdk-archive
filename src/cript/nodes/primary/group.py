@@ -1,0 +1,45 @@
+from typing import Union
+from logging import getLogger
+
+from beartype import beartype
+
+from cript.nodes import Base, User
+from cript.validators import validate_required
+
+
+logger = getLogger(__name__)
+
+
+class Group(Base):
+    """Object representing a CRIPT group."""
+
+    node_type = "primary"
+    node_name = "Group"
+    slug = "group"
+    required = ["name"]
+    unique_together = ["name"]
+
+    @beartype
+    def __init__(
+        self,
+        name: str = None,
+        users: list[Union[User, str]] = None,
+        public: bool = False,
+    ):
+        super().__init__()
+        self.url = None
+        self.uid = None
+        self.name = name
+        self.users = users if users else []
+        self.public = public
+        self.created_at = None
+        self.updated_at = None
+        validate_required(self)
+
+    @beartype
+    def add_user(self, user: Union[User, dict]):
+        self._add_node(user, "users")
+
+    @beartype
+    def remove_user(self, user: Union[User, int]):
+        self._remove_node(user, "users")
