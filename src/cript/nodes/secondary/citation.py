@@ -3,14 +3,15 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, Reference
+from cript.nodes.primary.reference import Reference
+from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.validators import validate_required, validate_key
 
 
 logger = getLogger(__name__)
 
 
-class Citation(Base):
+class Citation(BaseSecondary):
     """
     Object representing how a :class:`Reference` object
     is applied in a given context.

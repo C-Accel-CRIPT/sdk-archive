@@ -14,7 +14,6 @@ logger = getLogger(__name__)
 class Material(BasePrimary):
     """Object representing a material, mixture or compound."""
 
-    node_type = "primary"
     node_name = "Material"
     slug = "material"
     list_name = "materials"

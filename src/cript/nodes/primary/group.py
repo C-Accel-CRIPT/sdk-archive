@@ -14,7 +14,6 @@ logger = getLogger(__name__)
 class Group(BasePrimary):
     """Object representing a CRIPT group."""
 
-    node_type = "primary"
     node_name = "Group"
     slug = "group"
     required = ["name"]
