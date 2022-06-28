@@ -319,13 +319,21 @@ def define_materials(group: c.Group) -> list[c.Material]:
 
 
 def main():
-    group = c.Group(name=__file__)
+    import pathlib
 
-    materials = define_materials(group)
+    host = "criptapp.org"
+    with open(str(pathlib.Path(__file__).parent.parent) + "\\api_key.txt", "r") as f:
+        token = f.read()
+    api = c.API(host, token)
 
-    for material in materials:
-        pass
-        # save
+    group = c.Group(name="refactor_test")
+    api.save(group)
+
+    # materials = define_materials(group)
+    #
+    # for material in materials:
+    #     pass
+    #     # save
 
 
 if __name__ == "__main__":
