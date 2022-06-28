@@ -319,7 +319,10 @@ def define_materials(group: c.Group) -> list[c.Material]:
 
 
 def main():
-    group = c.Group(name=__file__)
+    api = c.DummyAPI(folder="database")
+
+    group = c.Group(name="example_group")
+    api.save(group)
 
     materials = define_materials(group)
 

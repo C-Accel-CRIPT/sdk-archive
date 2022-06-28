@@ -1,0 +1,42 @@
+[
+    {
+        "description": "value",
+        "name": "value"
+    },
+    {
+        "description": "minimum value in series",
+        "name": "min"
+    },
+    {
+        "description": "maximum value in series",
+        "name": "max"
+    },
+    {
+        "description": "mean value in series",
+        "name": "mean"
+    },
+    {
+        "description": "mode value in series",
+        "name": "mode"
+    },
+    {
+        "description": "median value in series",
+        "name": "median"
+    },
+    {
+        "description": "the value at the begin of a change",
+        "name": "onset"
+    },
+    {
+        "description": "the value at a transition point",
+        "name": "cross"
+    },
+    {
+        "description": "the value at the end of a change",
+        "name": "terminal"
+    },
+    {
+        "description": "no value (only to be used with 'associated' and 'structure')",
+        "name": "none"
+    }
+]

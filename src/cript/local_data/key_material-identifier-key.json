@@ -1,0 +1,100 @@
+[
+    {
+        "description": "preferred name",
+        "name": "preferred_name",
+        "names": [],
+        "value_length": null,
+        "value_type": "string"
+    },
+    {
+        "description": "additional names",
+        "name": "names",
+        "names": [],
+        "value_length": null,
+        "value_type": "list[string]"
+    },
+    {
+        "description": "CAS number",
+        "name": "cas",
+        "names": [],
+        "value_length": null,
+        "value_type": "string"
+    },
+    {
+        "description": "bigSMILES line notation",
+        "name": "bigsmiles",
+        "names": [],
+        "value_length": null,
+        "value_type": "string"
+    },
+    {
+        "description": "simplified molecular-input line-entry system (SMILES)",
+        "name": "smiles",
+        "names": [],
+        "value_length": null,
+        "value_type": "string"
+    },
+    {
+        "description": "chemical formula",
+        "name": "chem_formula",
+        "names": [],
+        "value_length": null,
+        "value_type": "string"
+    },
+    {
+        "description": "chemical formula of repeating unit",
+        "name": "chem_repeat",
+        "names": [],
+        "value_length": null,
+        "value_type": "string"
+    },
+    {
+        "description": "IUPAC International Chemical Identifier",
+        "name": "inchi",
+        "names": [],
+        "value_length": null,
+        "value_type": "string"
+    },
+    {
+        "description": "a hashed version of the full InChI",
+        "name": "inchi_key",
+        "names": [],
+        "value_length": null,
+        "value_type": "string"
+    },
+    {
+        "description": "amino acid sequence",
+        "name": "amino_acid",
+        "names": [],
+        "value_length": null,
+        "value_type": "string"
+    },
+    {
+        "description": "company the material was obtain from",
+        "name": "vendor",
+        "names": [],
+        "value_length": null,
+        "value_type": "string"
+    },
+    {
+        "description": "lot or batch number",
+        "name": "lot_number",
+        "names": [],
+        "value_length": null,
+        "value_type": "string"
+    },
+    {
+        "description": "PubChem CID",
+        "name": "pubchem_cid",
+        "names": [],
+        "value_length": null,
+        "value_type": "integer"
+    },
+    {
+        "description": null,
+        "name": "+vendor",
+        "names": [],
+        "value_length": null,
+        "value_type": null
+    }
+]

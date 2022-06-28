@@ -1,0 +1,198 @@
+[
+    {
+        "description": "(generic) glassware",
+        "name": "glass"
+    },
+    {
+        "description": "round bottom flask",
+        "name": "glass_rbf"
+    },
+    {
+        "description": "beaker",
+        "name": "glass_beaker"
+    },
+    {
+        "description": "Erlenmeyer Flask",
+        "name": "glass_erl"
+    },
+    {
+        "description": "test tube",
+        "name": "glass_test_tube"
+    },
+    {
+        "description": "pipet",
+        "name": "glass_pipet"
+    },
+    {
+        "description": "volumetric flasks",
+        "name": "glass_volumetric"
+    },
+    {
+        "description": "graduated cylinder",
+        "name": "glass_grad_cyl"
+    },
+    {
+        "description": "reflux condenser",
+        "name": "glass_condenser"
+    },
+    {
+        "description": "distillation head",
+        "name": "glass_distill"
+    },
+    {
+        "description": "burettes",
+        "name": "glass_burettes"
+    },
+    {
+        "description": "watch glass",
+        "name": "glass_watch"
+    },
+    {
+        "description": "funnel",
+        "name": "glass_funnel"
+    },
+    {
+        "description": "buchner funnel",
+        "name": "glass_buchner"
+    },
+    {
+        "description": "glass frit / funnel with frit",
+        "name": "glass_frit"
+    },
+    {
+        "description": "column as in chronograph",
+        "name": "glass_column"
+    },
+    {
+        "description": "separation funnel",
+        "name": "glass_sep_funnel"
+    },
+    {
+        "description": "Soxhlet extractor",
+        "name": "glass_sox"
+    },
+    {
+        "description": "addition funnel",
+        "name": "glass_add_funnel"
+    },
+    {
+        "description": null,
+        "name": "dripping funnel"
+    },
+    {
+        "description": "syringe",
+        "name": "glass_syringe"
+    },
+    {
+        "description": "glass pressure vessel",
+        "name": "glass_pres_vessel"
+    },
+    {
+        "description": "vials",
+        "name": "glass_vial"
+    },
+    {
+        "description": "mortar and pestle",
+        "name": "mortar_pestle"
+    },
+    {
+        "description": "bunsen burner",
+        "name": "burner"
+    },
+    {
+        "description": "heating mantle",
+        "name": "heat_mantle"
+    },
+    {
+        "description": "filter_paper",
+        "name": "filter_paper"
+    },
+    {
+        "description": "syringe_filter",
+        "name": "syringe_filter"
+    },
+    {
+        "description": "thermometer",
+        "name": "thermometer"
+    },
+    {
+        "description": "canula",
+        "name": "canula"
+    },
+    {
+        "description": "(generic) plasticware",
+        "name": "plastic"
+    },
+    {
+        "description": "syringe",
+        "name": "plastic_syringe"
+    },
+    {
+        "description": "stir bar",
+        "name": "stir_bar"
+    },
+    {
+        "description": "scale for mass",
+        "name": "scale"
+    },
+    {
+        "description": "hot plate",
+        "name": "hot_plate"
+    },
+    {
+        "description": "magnetic stirrer",
+        "name": "stirrer"
+    },
+    {
+        "description": "mechanical/overhead stirrer",
+        "name": "stirrer_mech"
+    },
+    {
+        "description": "centrifuge",
+        "name": "centrifuge"
+    },
+    {
+        "description": "vacuum pump (>50 torr)",
+        "name": "vac"
+    },
+    {
+        "description": "high vacuum pump(<50 torr)",
+        "name": "hi_vac"
+    },
+    {
+        "description": "vacuum oven",
+        "name": "vac_oven"
+    },
+    {
+        "description": "oven",
+        "name": "oven"
+    },
+    {
+        "description": "rotovap",
+        "name": "rotovap"
+    },
+    {
+        "description": "syringe pump",
+        "name": "syringe_pump"
+    },
+    {
+        "description": "liquid handler",
+        "name": "liquid_handler"
+    },
+    {
+        "description": "sonicator",
+        "name": "sonicator"
+    },
+    {
+        "description": "glove_box",
+        "name": "glove_box"
+    },
+    {
+        "description": "light",
+        "name": "light"
+    },
+    {
+        "description": "metal reactor",
+        "name": "metal_reactor"
+    }
+]

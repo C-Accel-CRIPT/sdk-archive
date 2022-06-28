@@ -66,3 +66,4 @@ NODE_CLASSES = [
 ]
 
 from cript.session import API  # noqa 401 402
+from cript.dummy_api import DummyAPI

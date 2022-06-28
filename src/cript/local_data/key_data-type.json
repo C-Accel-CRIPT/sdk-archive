@@ -1,0 +1,222 @@
+[
+    {
+        "description": "reaction conversion vs time",
+        "name": "rxn_conv"
+    },
+    {
+        "description": "M_n vs monomer conversion",
+        "name": "mn_conv"
+    },
+    {
+        "description": "SEC trace (by retention time)",
+        "name": "sec_trace"
+    },
+    {
+        "description": "SEC trace (by elution volume)",
+        "name": "sec_trace_vol"
+    },
+    {
+        "description": "molecular weight distribution (by mole)",
+        "name": "mwd"
+    },
+    {
+        "description": "molecular weight distribution (by weight)",
+        "name": "mwd_wt"
+    },
+    {
+        "description": "Free induction decay",
+        "name": "nmr"
+    },
+    {
+        "description": "proton NMR (H1 NMR)",
+        "name": "nmr_h1"
+    },
+    {
+        "description": "carbon NMR (C13 NMR)",
+        "name": "nmr_c13"
+    },
+    {
+        "description": "nitrogen NMR (N15 NMR)",
+        "name": "nmr_n15"
+    },
+    {
+        "description": "oxygen NMR (O17 NMR)",
+        "name": "nmr_o17"
+    },
+    {
+        "description": "fluorine NMR (F19 NMR)",
+        "name": "nmr_f19"
+    },
+    {
+        "description": "silicon NMR (Si29 NMR)",
+        "name": "nmr_si29"
+    },
+    {
+        "description": "phosphorous NMR (P31 NMR)",
+        "name": "nmr_p31"
+    },
+    {
+        "description": "nuclear Overhauser effect NMR",
+        "name": "nmr_noe"
+    },
+    {
+        "description": "total correlation spectroscopy NMR",
+        "name": "nmr_tocsy"
+    },
+    {
+        "description": "infrared spectroscopy",
+        "name": "ir"
+    },
+    {
+        "description": "stress strain curve",
+        "name": "stress_strain"
+    },
+    {
+        "description": "wide angle light scattering",
+        "name": "waxs"
+    },
+    {
+        "description": "small angle light scattering",
+        "name": "saxs"
+    },
+    {
+        "description": "storage modulus",
+        "name": "g_prime"
+    },
+    {
+        "description": "loss modulus",
+        "name": "g_double_prime"
+    },
+    {
+        "description": "Single value photograph (like gray scale)",
+        "name": "photo_gray"
+    },
+    {
+        "description": "Radial distribution of computational properties in scalar",
+        "name": "comp_scalar_distr"
+    },
+    {
+        "description": "Time evolution of computational properties in scalar",
+        "name": "comp_scalar_evolve"
+    },
+    {
+        "description": "snapshot of molecular configuration from computation",
+        "name": "comp_snapshot"
+    },
+    {
+        "description": "landscape of computational property",
+        "name": "comp_scalar_landscape"
+    },
+    {
+        "description": "photo with the dimension 1 being rows, dimension 2 being columns, and dimension 3 being  [red, green, blue]",
+        "name": "photo_rgb"
+    },
+    {
+        "description": "correlation spectroscopy NMR (H - H)",
+        "name": "nmr_cosy"
+    },
+    {
+        "description": "heteronuclear single-quantum correlation spectroscopy NMR (H - C)",
+        "name": "nmr_hsqc"
+    },
+    {
+        "description": "heteronuclear multiple-bond correlation spectroscopy NMR (H - C)",
+        "name": "nmr_hmbc"
+    },
+    {
+        "description": "Diffusion NMR",
+        "name": "nmr_dosy"
+    },
+    {
+        "description": "NMR kinetic array",
+        "name": "nmr_kinetic"
+    },
+    {
+        "description": "wide angle light scattering image",
+        "name": "waxs_i"
+    },
+    {
+        "description": "small angle light scattering image",
+        "name": "saxs_i"
+    },
+    {
+        "description": "small angle neutron scattering image",
+        "name": "s_neutron"
+    },
+    {
+        "description": "transmission electron microscopy height map",
+        "name": "tem_height"
+    },
+    {
+        "description": "atomic force microscope height map",
+        "name": "afm_height"
+    },
+    {
+        "description": "atomic force microscope amplitude map",
+        "name": "afm_amp"
+    },
+    {
+        "description": "atomic force microscope phase map",
+        "name": "afm_phase"
+    },
+    {
+        "description": "single frame of molecular or ensemble configuration from computation",
+        "name": "computation_config"
+    },
+    {
+        "description": "a set of configurational frames from computation",
+        "name": "computation_trajectory"
+    },
+    {
+        "description": "forcefield parameters",
+        "name": "computation_forcefield"
+    },
+    {
+        "description": null,
+        "name": "+dsc"
+    },
+    {
+        "description": null,
+        "name": "+torque_temp"
+    },
+    {
+        "description": null,
+        "name": "+xrd"
+    },
+    {
+        "description": null,
+        "name": "+ftir"
+    },
+    {
+        "description": null,
+        "name": "+rheology"
+    },
+    {
+        "description": null,
+        "name": "+frequency sweep"
+    },
+    {
+        "description": null,
+        "name": "+sans pattern"
+    },
+    {
+        "description": null,
+        "name": "+diffusion curve"
+    },
+    {
+        "description": "DSC (differential scanning calorimetry) data",
+        "name": "thermogram"
+    },
+    {
+        "description": "frequency sweep",
+        "name": "frequency_sweep"
+    },
+    {
+        "description": "time temperature superposition",
+        "name": "time_temperature_superposition"
+    },
+    {
+        "description": null,
+        "name": "+nir"
+    }
+]
