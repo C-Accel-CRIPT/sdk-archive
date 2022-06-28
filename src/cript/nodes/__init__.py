@@ -1,5 +1,4 @@
 # Order important
-from cript.nodes.base import Base
 from cript.nodes.primary.user import User
 from cript.nodes.primary.group import Group
 from cript.nodes.primary.reference import Reference

@@ -3,20 +3,21 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, Material, Quantity
+from cript.nodes.primary.material import Material
+from cript.nodes.secondary.quantity import Quantity
+from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.validators import validate_required, validate_key
 
 
 logger = getLogger(__name__)
 
 
-class Ingredient(Base):
+class Ingredient(BaseSecondary):
     """
     Object representing a :class:`Material` object being used
     as an input to a :class:`Process` object.
     """
 
-    node_type = "secondary"
     node_name = "Ingredient"
     list_name = "ingredients"
     required = ["material"]

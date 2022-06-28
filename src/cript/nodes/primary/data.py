@@ -1,14 +1,10 @@
-import os
-import json
-import copy
-from abc import ABCMeta
 from typing import Union
-from weakref import WeakSet
 from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, Group, Citation
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes import Group, Citation
 from cript.validators import validate_required, validate_key
 from cript.utils import auto_assign_group
 
@@ -16,13 +12,12 @@ from cript.utils import auto_assign_group
 logger = getLogger(__name__)
 
 
-class Data(Base):
+class Data(BasePrimary):
     """
     Object representing a set of :class:`File` objects and
     related meta-data.
     """
 
-    node_type = "primary"
     node_name = "Data"
     slug = "data"
     list_name = "data"
@@ -33,7 +28,7 @@ class Data(Base):
     def __init__(
         self,
         group: Union[Group, str] = None,
-        experiment: Union[Base, str] = None,
+        experiment: Union[BasePrimary, str] = None,
         name: str = None,
         type: str = None,
         files=None,

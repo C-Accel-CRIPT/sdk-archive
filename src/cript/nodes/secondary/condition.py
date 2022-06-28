@@ -3,7 +3,8 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, Data
+from cript.nodes.secondary.base_secondary import BaseSecondary
+from cript.nodes.primary.data import Data
 from cript.validators import (
     validate_required,
     validate_key,
@@ -15,13 +16,12 @@ from cript.validators import (
 logger = getLogger(__name__)
 
 
-class Condition(Base):
+class Condition(BaseSecondary):
     """
     Object representing a condition (e.g., temperature).
     These are used as modifiers for :class:`Property` and :class:`Process` objects.
     """
 
-    node_type = "secondary"
     node_name = "Condition"
     list_name = "conditions"
     required = ["key"]

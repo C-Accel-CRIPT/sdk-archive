@@ -25,7 +25,7 @@ def validate_key(key_category, key):
     """
     Validates that the key name is in the controlled vocabulary.
 
-    :key_category: Name of the relevant key category.
+    :param key_category: Name of the relevant key category.
     :param key: Name of the key.
     :return: The validated key name.
     :rtype: str
@@ -43,7 +43,7 @@ def validate_value(key_category, key, value, unit=None):
     """
     Validates a value is within the defined parameters.
 
-    :key_category: Name of the relevant key category.
+    :param key_category: Name of the relevant key category.
     :param key: Name of the key.
     :param value: Value to be validated.
     :param unit: The value's unit of measurement.
@@ -116,21 +116,21 @@ def _validate_value_range(key, value, value_range, unit, si_unit):
     :param unit: The unit entered by the user.
     :param si_unit: The SI unit for the specific attribute.
     """
-    min, max = value_range[0], value_range[1]
+    min_, max_ = value_range[0], value_range[1]
 
     # convert to SI units if defined
     if si_unit:
         value = _unit_conversion(value, unit, si_unit)
 
-    if not min <= value <= max:
-        raise InvalidValueRangeError(key, value, min, max, si_unit)
+    if not min_ <= value <= max_:
+        raise InvalidValueRangeError(key, value, min_, max_, si_unit)
 
 
 def validate_unit(key_category, key, unit):
     """
     Validates that the unit exists and can be converted to SI units.
 
-    :key_category: Name of the relevant key category.
+    :param key_category: Name of the relevant key category.
     :param key: Name of the key.
     :param unit: Unit to be validated.
     :return: The validated unit.
@@ -168,7 +168,7 @@ def _validate_unit_exists(unit):
     """
     try:
         pint_ureg[unit]
-    except:
+    except Exception as e:
         raise InvalidUnitError(f"{unit} is not a recognized unit of measure.")
 
 
@@ -182,7 +182,7 @@ def _validate_unit_conversion(key, unit, si_unit):
     """
     try:
         _unit_conversion(1, unit, si_unit)
-    except:
+    except Exception as e:
         raise InvalidUnitError(f"{unit} is not a recognized unit of measure for {key}.")
 
 
@@ -205,7 +205,7 @@ def _get_key_parameters(key_category, key):
     """
     Get the parameters for a given key from full keys dictionary.
 
-    :key_category: Name of the relevant key category.
+    :param key_category: Name of the relevant key category.
     :param key: Name of the key.
     """
     from cript.session import API
