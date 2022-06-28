@@ -3,7 +3,10 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, Group, Collection, Material
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes.primary.group import Group
+from cript.nodes.primary.collection import Collection
+from cript.nodes.primary.material import Material
 from cript.validators import validate_required
 from cript.utils import auto_assign_group
 
@@ -11,10 +14,9 @@ from cript.utils import auto_assign_group
 logger = getLogger(__name__)
 
 
-class Inventory(Base):
+class Inventory(BasePrimary):
     """Object representing a logical grouping of :class:`Material` objects."""
 
-    node_type = "primary"
     node_name = "Inventory"
     slug = "inventory"
     required = ["group", "collection", "name"]

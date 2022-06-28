@@ -16,7 +16,6 @@ class Citation(Base):
     is applied in a given context.
     """
 
-    node_type = "secondary"
     node_name = "Citation"
     list_name = "citations"
     required = ["reference"]

@@ -3,20 +3,19 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base
+from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.validators import validate_required, validate_key, validate_value
 
 
 logger = getLogger(__name__)
 
 
-class Identifier(Base):
+class Identifier(BaseSecondary):
     """
     Object representing an identifier of a :class:`Material` object
     (e.g., CAS, BigSMILES).
     """
 
-    node_type = "secondary"
     node_name = "Identifier"
     list_name = "identifiers"
     required = ["key", "value"]

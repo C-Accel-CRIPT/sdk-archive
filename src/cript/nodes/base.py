@@ -19,6 +19,10 @@ class Base(metaclass=ABCMeta):
 
     __refs__ = WeakSet()  # Stores all node instances in memory
 
+    node_name = None
+    list_name = None
+    required = None
+
     def __init__(self):
         self.__refs__.add(self)  # Add instance to __refs__
 
@@ -78,7 +82,7 @@ class Base(metaclass=ABCMeta):
         Append a node to another node's list attribute.
 
         :param node: The node that will be appended.
-        :param attr: The name of the list attribute (e.g., conditions).
+        :param attr_name: The name of the list attribute (e.g., conditions).
         """
         if node.node_type == "primary" and node.url is None:
             raise UnsavedNodeError(node.node_name)

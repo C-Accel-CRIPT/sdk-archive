@@ -3,20 +3,21 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, Group, Citation
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes.primary.group import Group
+from cript.nodes.secondary.citation import Citation
 from cript.validators import validate_required
 
 
 logger = getLogger(__name__)
 
 
-class Collection(Base):
+class Collection(BasePrimary):
     """
     Object representing a logical grouping of :class:`Experiment` and
     :class:`Inventory` objects.
     """
 
-    node_type = "primary"
     node_name = "Collection"
     slug = "collection"
     required = ["group", "name"]

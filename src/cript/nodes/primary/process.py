@@ -3,16 +3,14 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import (
-    Base,
-    Group,
-    Experiment,
-    Ingredient,
-    Material,
-    Property,
-    Condition,
-    Citation,
-)
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes.primary.group import Group
+from cript.nodes.primary.experiment import Experiment
+from cript.nodes.primary.material import Material
+from cript.nodes.secondary.ingredient import Ingredient
+from cript.nodes.secondary.property import Property
+from cript.nodes.secondary.condition import Condition
+from cript.nodes.secondary.citation import Citation
 from cript.validators import validate_required, validate_key
 from cript.utils import auto_assign_group
 
@@ -20,13 +18,12 @@ from cript.utils import auto_assign_group
 logger = getLogger(__name__)
 
 
-class Process(Base):
+class Process(BasePrimary):
     """
     Object representing a process of creating or transforming
     a :class:`Material` object.
     """
 
-    node_type = "primary"
     node_name = "Process"
     slug = "process"
     list_name = "processes"
@@ -41,7 +38,7 @@ class Process(Base):
         name: str = None,
         keywords: Union[list[str], None] = None,
         description: Union[str, None] = None,
-        prerequisite_processes: list[Union[Base, str]] = None,
+        prerequisite_processes: list[Union[BasePrimary, str]] = None,
         ingredients: list[Union[Ingredient, dict]] = None,
         equipment: list[Union[str, None]] = None,
         properties: list[Union[Property, dict]] = None,
@@ -99,11 +96,11 @@ class Process(Base):
         self._equipment = value
 
     @beartype
-    def add_prerequisite_process(self, process: Union[Base, dict]):
+    def add_prerequisite_process(self, process: Union[BasePrimary, dict]):
         self._add_node(process, "prerequisite_processes")
 
     @beartype
-    def remove_prerequisite_process(self, process: Union[Base, int]):
+    def remove_prerequisite_process(self, process: Union[BasePrimary, int]):
         self._remove_node(process, "prerequisite_processes")
 
     @beartype

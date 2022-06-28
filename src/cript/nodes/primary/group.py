@@ -3,14 +3,15 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, User
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes.primary.user import User
 from cript.validators import validate_required
 
 
 logger = getLogger(__name__)
 
 
-class Group(Base):
+class Group(BasePrimary):
     """Object representing a CRIPT group."""
 
     node_type = "primary"
