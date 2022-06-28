@@ -24,7 +24,7 @@ class Property(Base):
     node_type = "secondary"
     node_name = "Property"
     list_name = "properties"
-    required = ["key", "value"]
+    required = ["key"]
 
     @beartype
     def __init__(
