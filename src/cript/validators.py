@@ -120,7 +120,9 @@ def _validate_value_range(key, value, value_range, unit, si_unit):
 
     # convert to SI units if defined
     if si_unit:
-        value = _unit_conversion(value, unit, si_unit)
+        pint_unit = _validate_unit(key, unit, si_unit)
+        pint_quantity = value * pint_unit
+        value = pint_quantity.to(si_unit).magnitude
 
     if not min_ <= value <= max_:
         raise InvalidValueRangeError(key, value, min_, max_, si_unit)
@@ -136,8 +138,6 @@ def validate_unit(key_category, key, unit):
     :return: The validated unit.
     :rtype: str
     """
-    _validate_unit_exists(unit)
-
     # Skip further validation for custom fields
     if not key or key[0] == "+":
         return unit
@@ -153,26 +153,12 @@ def validate_unit(key_category, key, unit):
     elif unit and not si_unit:
         raise RequiredUnitError(f"A unit is not permitted for {key}.")
 
-    _validate_unit_exists(unit)
-
-    _validate_unit_conversion(key, unit, si_unit)
+    _validate_unit(key, unit, si_unit)
 
     return unit
 
 
-def _validate_unit_exists(unit):
-    """
-    Validates that the unit exists.
-
-    :param unit: The unit entered by the user.
-    """
-    try:
-        pint_ureg[unit]
-    except Exception as e:
-        raise InvalidUnitError(f"{unit} is not a recognized unit of measure.")
-
-
-def _validate_unit_conversion(key, unit, si_unit):
+def _validate_unit(key, unit, si_unit) -> pint_ureg.Unit:
     """
     Validates that the unit can be converted to appropriate SI units.
 
@@ -181,24 +167,14 @@ def _validate_unit_conversion(key, unit, si_unit):
     :param si_unit: The SI unit for the specific attribute.
     """
     try:
-        _unit_conversion(1, unit, si_unit)
+        pint_unit = pint_ureg.Unit(unit)
     except Exception as e:
+        raise InvalidUnitError(f"{unit} is not a recognized unit of measure.")
+
+    if pint_unit.dimensionality != pint_ureg.Unit(si_unit):
         raise InvalidUnitError(f"{unit} is not a recognized unit of measure for {key}.")
 
-
-def _unit_conversion(value, unit, si_unit):
-    """
-    Converts a value to SI units.
-
-    :param value: The value entered by the user.
-    :param unit: The unit entered by the user.
-    :param si_unit: The SI unit for the specific attribute.
-    :return: The converted value.
-    :rtype: Union[int, float, str]
-    """
-    original_quantity = pint_ureg.Quantity(value, unit)
-    si_value = original_quantity.to(si_unit).magnitude
-    return si_value
+    return pint_unit
 
 
 def _get_key_parameters(key_category, key):
