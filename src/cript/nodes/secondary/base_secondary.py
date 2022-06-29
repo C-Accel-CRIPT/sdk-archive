@@ -21,8 +21,8 @@ class BaseSecondary(Base, abc.ABC):
                 node_dict[key] = value._prep_for_upload()
             elif isinstance(value, list):
                 for i in range(len(value)):
-                    if hasattr(value, "_prep_for_upload"):
-                        node_dict[key] = value._prep_for_upload()
+                    if hasattr(value[i], "_prep_for_upload"):
+                        node_dict[key] = value[i]._prep_for_upload()
 
         return node_dict
 
