@@ -26,7 +26,7 @@ class BasePrimary(Base, abc.ABC):
             elif isinstance(value, list):
                 for i in range(len(value)):
                     if hasattr(value[i], "_prep_for_upload"):
-                        node_dict[key] = value[i]._prep_for_upload()
+                        value[i] = value[i]._prep_for_upload()
 
         return json.dumps(node_dict, indent=4)
 
