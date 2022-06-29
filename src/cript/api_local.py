@@ -267,7 +267,7 @@ class APILocal:
             self._generate_nodes(node, level=level, max_level=max_level)
             return node
 
-    def _get_by_uid(self, obj):
+    def _get_by_uid(self, obj) -> tuple[dict, BasePrimary]:
         _validate_uid(obj)
         if obj not in self.database_by_uid:
             raise APIGetError("The specified node was not found.")
@@ -297,7 +297,7 @@ class APILocal:
         node_dict = node.__dict__
         for key, value in node_dict.items():
             # Skip the url field
-            if key == "url":
+            if key in ("url", "uid"):
                 continue
             # Generate primary nodes
             if isinstance(value, str) and _validate_uid_bool(value):

@@ -38,9 +38,9 @@ class BasePrimary(Base, abc.ABC):
         :rtype: dict
         """
         # Check if primary node has been saved
-        if self.url is None:
+        if self.uid is None:
             raise UnsavedNodeError(self.node_name)
-        return self.url
+        return self.uid
 
     def _add_node(self, node, attr_name):
         """
@@ -49,7 +49,7 @@ class BasePrimary(Base, abc.ABC):
         :param node: The node that will be appended.
         :param attr_name: The name of the list attribute (e.g., conditions).
         """
-        if self.url is None:
+        if self.uid is None:
             raise UnsavedNodeError(node.node_name)
         elif hasattr(self, attr_name):
             getattr(self, attr_name).append(node)
