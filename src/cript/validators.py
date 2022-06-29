@@ -140,6 +140,8 @@ def validate_unit(key_category, key, unit):
     """
     # Skip further validation for custom fields
     if not key or key[0] == "+":
+        if unit:
+            _validate_pint_unit(unit)
         return unit
 
     key_parameters = _get_key_parameters(key_category, key)
@@ -166,13 +168,24 @@ def _validate_unit(key, unit, si_unit) -> pint_ureg.Unit:
     :param unit: The unit entered by the user.
     :param si_unit: The SI unit for the specific attribute.
     """
+    pint_unit = _validate_pint_unit(unit)
+
+    if pint_unit.dimensionality != pint_ureg.Unit(si_unit).dimensionality:
+        raise InvalidUnitError(f"{unit} is not a recognized unit of measure for {key}.")
+
+    return pint_unit
+
+
+def _validate_pint_unit(unit) -> pint_ureg.Unit:
+    """
+    Validates that the unit can be converted to appropriate SI units.
+
+    :param unit: The unit entered by the user.
+    """
     try:
         pint_unit = pint_ureg.Unit(unit)
     except Exception as e:
         raise InvalidUnitError(f"{unit} is not a recognized unit of measure.")
-
-    if pint_unit.dimensionality != pint_ureg.Unit(si_unit):
-        raise InvalidUnitError(f"{unit} is not a recognized unit of measure for {key}.")
 
     return pint_unit
 
