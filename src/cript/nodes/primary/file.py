@@ -5,7 +5,9 @@ from logging import getLogger
 from beartype import beartype
 
 
-from cript.nodes import Base, Group, Data
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes.primary.group import Group
+from cript.nodes.primary.data import Data
 from cript.validators import validate_required, validate_key
 from cript.utils import sha256_hash
 
@@ -13,10 +15,9 @@ from cript.utils import sha256_hash
 logger = getLogger(__name__)
 
 
-class File(Base):
+class File(BasePrimary):
     """Object representing a single raw data file."""
 
-    node_type = "primary"
     node_name = "File"
     slug = "file"
     list_name = "files"

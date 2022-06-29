@@ -171,11 +171,11 @@ class InvalidValueTypeError(CRIPTError):
 class InvalidValueRangeError(CRIPTError):
     """Raised when a value falls outside the defined range."""
 
-    def __init__(self, key, value, min, max, unit):
+    def __init__(self, key, value, min_, max_, unit):
         self.key = key
         self.value = value
-        self.min = min
-        self.max = max
+        self.min = min_
+        self.max = max_
         self.unit = unit
 
     def __str__(self):

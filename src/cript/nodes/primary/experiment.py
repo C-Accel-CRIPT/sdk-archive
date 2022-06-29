@@ -3,7 +3,9 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, Group, Collection
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes.primary.group import Group
+from cript.nodes.primary.collection import Collection
 from cript.validators import validate_required
 from cript.utils import auto_assign_group
 
@@ -11,12 +13,11 @@ from cript.utils import auto_assign_group
 logger = getLogger(__name__)
 
 
-class Experiment(Base):
+class Experiment(BasePrimary):
     """
     Object representing an experiment.
     """
 
-    node_type = "primary"
     node_name = "Experiment"
     slug = "experiment"
     list_name = "experiments"
