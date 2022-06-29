@@ -733,7 +733,7 @@ class API:
         # Create node
         node = node_class(**obj_json)
 
-        # Replace comon attributes
+        # Replace common attributes
         node.url = url
         node.uid = uid
         node.created_at = created_at

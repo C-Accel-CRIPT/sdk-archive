@@ -21,10 +21,10 @@ def define_materials(group: c.Group) -> list[c.Material]:
             c.Property(key="density", value=1.0, unit="g/ml",
                        conditions=[c.Condition(key="temperature", value=4, unit="degC")]
                        ),
-            c.Property(key="bp", value=100, unit="degC",
+            c.Property(key="temp_boiling", value=100, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="atm")]
                        ),
-            c.Property(key="mp", value=0, unit="degC",
+            c.Property(key="temp_melt", value=0, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="bar")]
                        )
         ]
@@ -49,10 +49,10 @@ def define_materials(group: c.Group) -> list[c.Material]:
             c.Property(key="density", value=1.5, unit="g/ml",
                        conditions=[c.Condition(key="temperature", value=25, unit="degC")]
                        ),
-            c.Property(key="bp", value=61, unit="degC",
+            c.Property(key="temp_boiling", value=61, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="atm")]
                        ),
-            c.Property(key="mp", value=-64, unit="degC",
+            c.Property(key="temp_melt", value=-64, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="bar")]
                        )
         ]
@@ -77,10 +77,10 @@ def define_materials(group: c.Group) -> list[c.Material]:
             c.Property(key="density", value=1.25, unit="g/l",
                        conditions=[c.Condition(key="temperature", value=4, unit="degC")]
                        ),
-            c.Property(key="bp", value=77.355, unit="K",
+            c.Property(key="temp_boiling", value=77.355, unit="K",
                        conditions=[c.Condition(key="pressure", value=1, unit="atm")]
                        ),
-            c.Property(key="mp", value=63.23, unit="K",
+            c.Property(key="temp_melt", value=63.23, unit="K",
                        conditions=[c.Condition(key="pressure", value=1, unit="bar")]
                        )
         ]
@@ -108,10 +108,10 @@ def define_materials(group: c.Group) -> list[c.Material]:
                            c.Condition(key="pressure", value=1, unit="bar")
                        ]
                        ),
-            c.Property(key="bp", value=87.3, unit="K",
+            c.Property(key="temp_boiling", value=87.3, unit="K",
                        conditions=[c.Condition(key="pressure", value=1, unit="atm")]
                        ),
-            c.Property(key="mp", value=83.81, unit="K",
+            c.Property(key="temp_melt", value=83.81, unit="K",
                        conditions=[c.Condition(key="pressure", value=1, unit="bar")]
                        )
         ]
@@ -136,10 +136,10 @@ def define_materials(group: c.Group) -> list[c.Material]:
             c.Property(key="density", value=0.906, unit="g/ml",
                        conditions=[c.Condition(key="temperature", value=25, unit="degC")]
                        ),
-            c.Property(key="bp", value=145, unit="degC",
+            c.Property(key="temp_boiling", value=145, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="atm")]
                        ),
-            c.Property(key="mp", value=-30, unit="degC",
+            c.Property(key="temp_melt", value=-30, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="bar")]
                        )
         ],
@@ -167,10 +167,10 @@ def define_materials(group: c.Group) -> list[c.Material]:
             c.Property(key="density", value=0.87, unit="g/ml",
                        conditions=[c.Condition(key="temperature", value=25, unit="degC")]
                        ),
-            c.Property(key="bp", value=111, unit="degC",
+            c.Property(key="temp_boiling", value=111, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="atm")]
                        ),
-            c.Property(key="mp", value=-95, unit="degC",
+            c.Property(key="temp_melt", value=-95, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="bar")]
                        ),
             c.Property(key="solubility", value=0.52, unit="g/L",
@@ -202,10 +202,10 @@ def define_materials(group: c.Group) -> list[c.Material]:
             c.Property(key="density", value=0.8876, unit="g/ml",
                        conditions=[c.Condition(key="temperature", value=20, unit="degC")]
                        ),
-            c.Property(key="bp", value=66, unit="degC",
+            c.Property(key="temp_boiling", value=66, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="atm")]
                        ),
-            c.Property(key="mp", value=-108, unit="degC",
+            c.Property(key="temp_melt", value=-108, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="bar")]
                        ),
             c.Property(key="solubility", value=-1,
@@ -236,10 +236,10 @@ def define_materials(group: c.Group) -> list[c.Material]:
             c.Property(key="density", value=0.81, unit="g/ml",
                        conditions=[c.Condition(key="temperature", value=20, unit="degC")]
                        ),
-            c.Property(key="bp", value=117.7, unit="degC",
+            c.Property(key="temp_boiling", value=117.7, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="atm")]
                        ),
-            c.Property(key="mp", value=-89.9, unit="degC",
+            c.Property(key="temp_melt", value=-89.9, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="bar")]
                        )
         ]
@@ -264,10 +264,10 @@ def define_materials(group: c.Group) -> list[c.Material]:
             c.Property(key="density", value=0.792, unit="g/ml",
                        conditions=[c.Condition(key="temperature", value=20, unit="degC")]
                        ),
-            c.Property(key="bp", value=64.7, unit="degC",
+            c.Property(key="temp_boiling", value=64.7, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="atm")]
                        ),
-            c.Property(key="mp", value=-97.6, unit="degC",
+            c.Property(key="temp_melt", value=-97.6, unit="degC",
                        conditions=[c.Condition(key="pressure", value=1, unit="bar")]
                        )
         ]
@@ -319,16 +319,17 @@ def define_materials(group: c.Group) -> list[c.Material]:
 
 
 def main():
-    api = c.DummyAPI(folder="database")
+    api = c.APILocal(folder="database")
 
-    group = c.Group(name="example_group")
-    api.save(group)
+    # group = c.Group(name="example_group")
+    # api.save(group)
+    group = api.get("67b86a11-f721-498e-a4af-6d3e42c09b92")
 
     materials = define_materials(group)
 
-    for material in materials:
-        pass
-        # save
+    # for material in materials:
+    #     pass
+    #     # save
 
 
 if __name__ == "__main__":

@@ -208,22 +208,26 @@ def _get_key_parameters(key_category, key):
     :param key_category: Name of the relevant key category.
     :param key: Name of the key.
     """
+
     from cript.session import API
 
-    if API.keys:
-        # Fetch relevant keys
-        if key_category == "property-key":
-            keys_info = (
-                API.keys["material-property-key"] + API.keys["process-property-key"]
-            )
-        else:
-            keys_info = API.keys[key_category]
+    # fall back to local copy of keys if web version not available
+    if not API.keys:
+        from cript.api_local import APILocal
+        API = APILocal
 
-        key = key.strip().lower()
-        for key_info in keys_info:
-            if key == key_info["name"]:
-                return key_info
-
-        raise InvalidKeyError(key, key_category.replace("-", " "))
+    # Fetch relevant keys
+    if key_category == "property-key":
+        keys_info = (
+            API.keys["material-property-key"] + API.keys["process-property-key"]
+        )
     else:
-        raise APISessionRequiredError
+        keys_info = API.keys[key_category]
+
+    key = key.strip().lower()
+    for key_info in keys_info:
+        if key == key_info["name"]:
+            return key_info
+
+    raise InvalidKeyError(key, key_category.replace("-", " "))
+

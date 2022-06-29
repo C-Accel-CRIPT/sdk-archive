@@ -220,3 +220,17 @@ class RequiredFieldsError(CRIPTError):
 
     def __str__(self):
         return f"Missing required field(s): {self.required_fields_str}"
+
+
+def find_depth(tb, continue_test):
+    depth = 0
+
+    while tb is not None:
+        filename = tb.tb_frame.f_code.co_filename
+
+        # Run the test we're given against the filename
+        if not continue_test(filename):
+            return depth
+
+        tb = tb.tb_next
+        depth += 1

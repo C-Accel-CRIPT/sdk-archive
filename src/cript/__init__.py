@@ -65,5 +65,7 @@ NODE_CLASSES = [
     Experiment,
 ]
 
+NODE_NAMES: list[str] = [node.node_name.lower() for node in NODE_CLASSES]
+
 from cript.session import API  # noqa 401 402
-from cript.dummy_api import DummyAPI
+from cript.api_local import APILocal
