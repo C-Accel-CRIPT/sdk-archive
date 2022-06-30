@@ -4,6 +4,7 @@ import json
 import pathlib
 import glob
 import uuid
+import datetime
 from typing import Union
 from logging import getLogger
 
@@ -138,12 +139,18 @@ class APILocal:
         if node.uid:
             # update
             if node.uid in self.database_by_uid:
+                node.updated_at = datetime.datetime.now().isoformat()
                 with open(self.folder / (_generate_file_name(node) + ".json"), "w", encoding=ENCODING) as f:
                     f.write(node._to_json())
                 logger.info(f"Update: {node.node_name}({node.uid}) node has been updated in the database.")
+            else:
+                raise APISaveError(f"The node you are saving has a uid, but it is not in the database, "
+                                   f"so it can't be updated. {node.node_name}")
         else:
             # save
             node.uid = str(uuid.uuid4())
+            node.updated_at = datetime.datetime.now().isoformat()
+            node.created_at = datetime.datetime.now().isoformat()
             with open(self.folder / (_generate_file_name(node) + ".json"), "w", encoding=ENCODING) as f:
                 f.write(node._to_json())
             logger.info(f"{node.node_name}({node.uid})  node has been saved to the database.")
