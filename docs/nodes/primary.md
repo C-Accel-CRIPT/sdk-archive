@@ -6,9 +6,6 @@
 ### Group
 ::: cript.nodes.Group
 
-### Base
-::: cript.nodes.Base
-
 ### Collection
 ::: cript.nodes.Collection
 
