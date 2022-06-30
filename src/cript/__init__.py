@@ -65,4 +65,4 @@ NODE_CLASSES = [
     Experiment,
 ]
 
-from cript.session import API  # noqa 401 402
+from cript.api import API  # noqa 401 402

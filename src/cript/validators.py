@@ -197,7 +197,7 @@ def _get_key_parameters(key_category, key):
     :param key_category: Name of the relevant key category.
     :param key: Name of the key.
     """
-    from cript.session import API
+    from cript.api import API
 
     if API.keys:
         # Fetch relevant keys
