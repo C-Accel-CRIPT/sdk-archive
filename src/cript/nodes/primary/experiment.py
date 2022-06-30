@@ -36,18 +36,12 @@ class Experiment(BasePrimary):
         notes: Union[str, None] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = auto_assign_group(group, collection)
         self.collection = collection
         self.name = name
         self.funding = funding if funding else []
-        self.notes = notes
-        self.notes = notes
         self.processes = processes if processes else []
         self.data = data if data else []
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
+        self.notes = notes
         validate_required(self)

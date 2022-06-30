@@ -29,13 +29,8 @@ class User(BasePrimary):
         groups=None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.username = username
         self.email = email
         self.orcid_id = orcid_id
         self.groups = groups if groups else []
-        self.public = public
-        self.created_at = None
-        self.updated_at = None

@@ -32,17 +32,12 @@ class Inventory(BasePrimary):
         description: Union[str, None] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = auto_assign_group(group, collection)
         self.collection = collection
         self.name = name
         self.description = description
         self.materials = materials if materials else []
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
         validate_required(self)
 
     @beartype

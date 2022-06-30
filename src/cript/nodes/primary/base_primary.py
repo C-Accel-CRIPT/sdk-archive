@@ -12,11 +12,18 @@ class BasePrimary(Base, abc.ABC):
     required = None
     unique_together = None
 
-    def __init__(
-            self):
+    def __init__(self,
+                 url: str = None,
+                 uid: str = None,
+                 public: bool = False,
+                 created_at: str = None,
+                 updated_at: str = None):
         super().__init__()
-        self.url = None
-        self.uid = None
+        self.url = url
+        self.uid = uid
+        self.public = public
+        self.created_at = created_at
+        self.updated_at = updated_at
 
     def _to_json(self):
         node_dict = copy.deepcopy(self._clean_dict())

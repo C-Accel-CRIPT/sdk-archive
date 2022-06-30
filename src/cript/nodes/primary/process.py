@@ -49,9 +49,7 @@ class Process(BasePrimary):
         notes: Union[str, None] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = auto_assign_group(group, experiment)
         self.experiment = experiment
         self.name = name
@@ -68,9 +66,6 @@ class Process(BasePrimary):
         self.products = products if products else []
         self.citations = citations if citations else []
         self.notes = notes
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
         validate_required(self)
 
     @property
