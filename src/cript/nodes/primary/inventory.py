@@ -47,7 +47,7 @@ class Inventory(BasePrimary):
         self._index_table = dict()
         self._degenerate_index_table = set()
 
-    def __index__(self, obj: Union[int, slice, str]) -> Material:
+    def __getitem__(self, obj: Union[int, slice, str]) -> Material:
         """
         obj can be an index or slice of self.materials or a unique identifier of a material
         """
