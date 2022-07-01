@@ -79,6 +79,8 @@ class Inventory(BasePrimary):
 
     def _generate_index_table(self):
         for i, material in enumerate(self.materials):
+            self._add_value_index_table(material.name, i)
+            self._add_value_index_table(material.uid, i)
             for identifier in material.identifiers:
                 if isinstance(identifier.value, list):
                     for value in identifier.value:
