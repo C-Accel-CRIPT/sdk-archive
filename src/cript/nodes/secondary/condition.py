@@ -33,7 +33,7 @@ class Condition(BaseSecondary):
         value: Union[str, int, float, list, None] = None,
         unit: Union[str, None] = None,
         type: Union[str, None] = None,
-        uncertainty: Union[float, None] = None,
+        uncertainty: Union[float, int, None] = None,
         uncertainty_type: Union[str, None] = None,
         set_id: Union[int, None] = None,
         measurement_id: Union[int, None] = None,
