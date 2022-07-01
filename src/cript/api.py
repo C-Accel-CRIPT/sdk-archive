@@ -556,7 +556,7 @@ class API:
         :return: A :class:`JSONPaginator` object containing the results.
         :rtype: cript.session.JSONPaginator
         """
-        if not isinstance(node_class, BasePrimary):
+        if not issubclass(node_class, BasePrimary):
             raise APISearchError(
                 f"{node_class.node_name} is a secondary node, thus cannot be searched."
             )
