@@ -38,9 +38,7 @@ class File(BasePrimary):
         external_source: Union[str, None] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = group
         self.data = data
         self.checksum = checksum
@@ -50,9 +48,6 @@ class File(BasePrimary):
         self.extension = extension
         self.external_source = external_source
         self.type = type
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
         validate_required(self)
 
     @property

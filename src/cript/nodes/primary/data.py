@@ -41,9 +41,7 @@ class Data(BasePrimary):
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = auto_assign_group(group, experiment)
         self.experiment = experiment
         self.name = name
@@ -54,11 +52,8 @@ class Data(BasePrimary):
         self.configuration = configuration
         self.materials = materials if materials else []
         self.processes = processes if processes else []
-        self.notes = notes
         self.citations = citations if citations else []
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
+        self.notes = notes
         validate_required(self)
 
     @property

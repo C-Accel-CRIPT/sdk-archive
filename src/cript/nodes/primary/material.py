@@ -33,9 +33,7 @@ class Material(BasePrimary):
         notes: Union[str, None] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = group
         self.name = name
         self.identifiers = identifiers if identifiers else []
@@ -44,9 +42,6 @@ class Material(BasePrimary):
         self.process = process
         self.properties = properties if properties else []
         self.notes = notes
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
         validate_required(self)
 
     @property

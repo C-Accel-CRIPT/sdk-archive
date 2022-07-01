@@ -26,14 +26,9 @@ class Group(BasePrimary):
         users: list[Union[User, str]] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.name = name
         self.users = users if users else []
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
         validate_required(self)
 
     @beartype

@@ -39,9 +39,7 @@ class Reference(BasePrimary):
         notes: Union[str, None] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = group
         self.title = title
         self.doi = doi
@@ -57,7 +55,4 @@ class Reference(BasePrimary):
         self.pmid = pmid
         self.website = website
         self.notes = notes
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
         validate_required(self)
