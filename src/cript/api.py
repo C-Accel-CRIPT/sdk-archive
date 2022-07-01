@@ -166,7 +166,7 @@ class API:
             setattr(node, json_key, json_value)
 
     @beartype
-    def download(self, node: File, path: str = None):
+    def download_file(self, node: File, path: str = None):
         """
         Download a file from the defined storage provider.
 

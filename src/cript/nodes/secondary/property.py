@@ -38,7 +38,7 @@ class Property(BaseSecondary):
         type: Union[str, None] = None,
         method: Union[str, None] = None,
         method_description: Union[str, None] = None,
-        uncertainty: Union[float, None] = None,
+        uncertainty: Union[float, int, None] = None,
         uncertainty_type: Union[str, None] = None,
         component_id: Union[int, None] = None,
         structure: Union[str, None] = None,
