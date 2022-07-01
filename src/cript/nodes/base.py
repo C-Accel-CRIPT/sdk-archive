@@ -76,7 +76,7 @@ class Base(abc.ABC):
         :return: The cleaned dictionary.
         :rtype: dict
         """
-        return {k.lstrip("_"): self.__getattribute__(k) for k in vars(self)}
+        return {k.lstrip("_"): self.__getattribute__(k) for k in vars(self) if not k.startswith("__")}
 
     @abc.abstractmethod
     def _add_node(self, node, attr_name):

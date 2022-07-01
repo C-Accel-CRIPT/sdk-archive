@@ -44,8 +44,8 @@ class Inventory(BasePrimary):
         self.created_at = None
         self.updated_at = None
         validate_required(self)
-        self._index_table = dict()
-        self._degenerate_index_table = set()
+        self.__index_table = dict()
+        self.__degenerate_index_table = set()
 
     def __getitem__(self, obj: Union[int, slice, str]) -> Material:
         """
@@ -54,11 +54,11 @@ class Inventory(BasePrimary):
         if isinstance(obj, (int, slice)):
             return self.materials[obj]
         elif isinstance(obj, str):
-            if not self._index_table:
+            if not self.__index_table:
                 self._generate_index_table()
-            if obj in self._index_table:
-                return self.materials[self._index_table[obj]]
-            if obj in self._degenerate_index_table:
+            if obj in self.__index_table:
+                return self.materials[self.__index_table[obj]]
+            if obj in self.__degenerate_index_table:
                 raise ValueError("Multiple materials share this index. Try another.")
 
         raise TypeError("Invalid object for indexing.")
@@ -87,12 +87,12 @@ class Inventory(BasePrimary):
                     self._add_value_index_table(identifier.value, i)
 
     def _add_value_index_table(self, value: str, index: int):
-        if value in self._index_table:
-            if self._index_table[value] != index:
+        if value in self.__index_table:
+            if self.__index_table[value] != index:
                 # if value is already in index table and not from same material node,
                 # remove it and add to degenerate table
-                del self._index_table[value]
-                self._degenerate_index_table.add(value)
+                del self.__index_table[value]
+                self.__degenerate_index_table.add(value)
             return
 
-        self._index_table[value] = index
+        self.__index_table[value] = index
