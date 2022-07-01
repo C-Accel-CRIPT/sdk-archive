@@ -139,12 +139,11 @@ class RemoveNodeError(CRIPTError):
     e.g., Attempting to remove a Condition node from a Collection node.
     """
 
-    def __init__(self, child_node_name, parent_node_name):
-        self.child_node_name = child_node_name
-        self.parent_node_name = parent_node_name
+    def __init__(self, message):
+        self.message = message
 
     def __str__(self):
-        return f"{self.parent_node_name} nodes do not contain {self.child_node_name} nodes."
+        return self.message
 
 
 class InvalidKeyError(CRIPTError):
