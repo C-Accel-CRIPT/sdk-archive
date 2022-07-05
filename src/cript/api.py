@@ -99,14 +99,18 @@ class API:
         :param max_level: Max depth to recursively generate nested nodes.
         """
         if not isinstance(node, BasePrimary):
-            raise APIRefreshError(f"{node.node_name} is a secondary node, thus cannot be refreshed.")
+            raise APIRefreshError(
+                f"{node.node_name} is a secondary node, thus cannot be refreshed."
+            )
 
         if node.url:
             response = self.session.get(node.url)
             self._set_node_attributes(node, response.json())
             self._generate_nodes(node, max_level=max_level)
         else:
-            raise APIRefreshError("Before you can refresh a node, you must either save it or define its URL.")
+            raise APIRefreshError(
+                "Before you can refresh a node, you must either save it or define its URL."
+            )
 
     @beartype
     def save(self, node: BasePrimary, max_level: int = 1):
@@ -117,14 +121,18 @@ class API:
         :param max_level: Max depth to recursively generate nested nodes.
         """
         if not isinstance(node, BasePrimary):
-            raise APISaveError(f"The save() method cannot be called on secondary nodes such as {node.node_name}")
+            raise APISaveError(
+                f"The save() method cannot be called on secondary nodes such as {node.node_name}"
+            )
 
         if node.url:
             # Update an existing object via PUT
             response = self.session.put(url=node.url, data=node._to_json())
         else:
             # Create a new object via POST
-            response = self.session.post(url=f"{self.api_url}/{node.slug}/", data=node._to_json())
+            response = self.session.post(
+                url=f"{self.api_url}/{node.slug}/", data=node._to_json()
+            )
 
         if response.status_code in (200, 201):
             # Handle new file uploads
@@ -500,7 +508,9 @@ class API:
             if obj.url:
                 url = obj.url
             else:
-                raise APIDeleteError(f"This {obj.node_name} node does not exist in the database.")
+                raise APIDeleteError(
+                    f"This {obj.node_name} node does not exist in the database."
+                )
 
         # Delete with URL
         elif isinstance(obj, str):
@@ -546,8 +556,10 @@ class API:
         :return: A :class:`JSONPaginator` object containing the results.
         :rtype: cript.session.JSONPaginator
         """
-        if not isinstance(node_class, BasePrimary):
-            raise APISearchError(f"{node_class.node_name} is a secondary node, thus cannot be searched.")
+        if not issubclass(node_class, BasePrimary):
+            raise APISearchError(
+                f"{node_class.node_name} is a secondary node, thus cannot be searched."
+            )
 
         if isinstance(query, dict):
             query_slug = self._generate_query_slug(query)
