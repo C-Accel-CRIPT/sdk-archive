@@ -49,30 +49,44 @@ class BasePrimary(Base, abc.ABC):
             raise UnsavedNodeError(self.node_name)
         return self.url
 
-    def _add_node(self, node, attr_name):
+    def _add_node(self, node: Base, attr_name: str):
         """
         Append a node to another node's list attribute.
 
         :param node: The node that will be appended.
         :param attr_name: The name of the list attribute (e.g., conditions).
         """
-        if self.url is None:
+        if isinstance(node, BasePrimary) and node.url is None:
             raise UnsavedNodeError(node.node_name)
-        elif hasattr(self, attr_name):
+
+        if hasattr(self, attr_name):
             getattr(self, attr_name).append(node)
         else:
             raise AddNodeError(node.node_name, self.node_name)
 
-    def _remove_node(self, node, attr):
+    def _remove_node(self, node: Base, attr: str):
         """
         Remove a node from another node's list attribute.
 
         :param node: The node that will be removed or it's position in the list.
         :param attr: The name of the list attribute (e.g., conditions).
         """
-        if isinstance(node, int):
-            getattr(self, attr).pop(node)
-        elif hasattr(self, attr):
-            getattr(self, attr).remove(node.url)
+        if not hasattr(self, attr):
+            raise RemoveNodeError(f"The node does not have attribute: {attr}")
+
+        attribute = getattr(self, attr)
+
+        if isinstance(node, int) and 0 < node <= len(attribute):
+            attribute.pop(node)
+        elif isinstance(node, BasePrimary):
+            if isinstance(attribute[0], str):
+                # primary node attributes may be list[URL]
+                attribute.remove(node.url)
+            else:
+                # primary nodes attributes may be list[BasePrimary]
+                attribute.remove(node)
+        elif isinstance(node, Base):
+            # for BaseSecondary
+            attribute.remove(node)
         else:
-            raise RemoveNodeError(node.node_name, self.node_name)
+            raise RemoveNodeError(f"{self.node_name} nodes do not contain {node.node_name} nodes.")
