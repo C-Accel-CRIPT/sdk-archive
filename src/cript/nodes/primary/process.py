@@ -30,7 +30,7 @@ class Process(Base):
     node_name = "Process"
     slug = "process"
     list_name = "processes"
-    required = ["group", "experiment", "name"]
+    required = ["group", "experiment", "name", "type"]
     unique_together = ["experiment", "name"]
 
     @beartype
@@ -39,6 +39,7 @@ class Process(Base):
         group: Union[Group, str] = None,
         experiment: Union[Experiment, str] = None,
         name: str = None,
+        type: str = None,
         keywords: Union[list[str], None] = None,
         description: Union[str, None] = None,
         prerequisite_processes: list[Union[Base, str]] = None,
@@ -58,6 +59,7 @@ class Process(Base):
         self.group = auto_assign_group(group, experiment)
         self.experiment = experiment
         self.name = name
+        self.type = type
         self.keywords = keywords if keywords else []
         self.description = description
         self.prerequisite_processes = (
@@ -75,6 +77,14 @@ class Process(Base):
         self.created_at = None
         self.updated_at = None
         validate_required(self)
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = validate_key("process-type", value)
 
     @property
     def keywords(self):
