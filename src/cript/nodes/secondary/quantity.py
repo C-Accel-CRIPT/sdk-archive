@@ -32,11 +32,15 @@ class Quantity(Base):
         key: str = None,
         value: Union[int, float] = None,
         unit: Union[str, None] = None,
+        uncertainty: Union[float, None] = None,
+        uncertainty_type: Union[str, None] = None,
     ):
         super().__init__()
         self.key = key
         self.unit = unit
         self.value = value
+        self.uncertainty = uncertainty
+        self.uncertainty_type = uncertainty_type
         validate_required(self)
 
     @property
@@ -62,3 +66,11 @@ class Quantity(Base):
     @unit.setter
     def unit(self, value):
         self._unit = validate_unit("quantity-key", self.key, value)
+
+    @property
+    def uncertainty_type(self):
+        return self._uncertainty_type
+
+    @uncertainty_type.setter
+    def uncertainty_type(self, value):
+        self._uncertainty_type = validate_key("uncertainty-type", value)
