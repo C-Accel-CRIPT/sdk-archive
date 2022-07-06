@@ -18,7 +18,7 @@ def validate_required(node):
     """
     for field in node.required:
         if not hasattr(node, field) or getattr(node, field) is None:
-            raise RequiredFieldsError(node.required)
+            raise RequiredFieldsError(node.node_name, node.required)
 
 
 def validate_key(key_category, key):

@@ -214,8 +214,9 @@ class FileSizeLimitError(CRIPTError):
 class RequiredFieldsError(CRIPTError):
     """Raised when an object attempts to instantiate without defined required fields."""
 
-    def __init__(self, required_fields_list):
+    def __init__(self, node_name, required_fields_list):
+        self.node_name = node_name
         self.required_fields_str = ", ".join(required_fields_list)
 
     def __str__(self):
-        return f"Missing required field(s): {self.required_fields_str}"
+        return f"{self.node_name} node is missing required field(s): {self.required_fields_str}"
