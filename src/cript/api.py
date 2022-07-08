@@ -659,8 +659,8 @@ class API:
 
         node_dict = node.__dict__
         for key, value in node_dict.items():
-            # Skip the url field
-            if key == "url":
+            # Skip empty values and the url field
+            if not value or key == "url":
                 continue
             # Generate primary nodes
             if isinstance(value, str) and self.api_url in value:
