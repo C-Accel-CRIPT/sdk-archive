@@ -818,8 +818,10 @@ class JSONPaginator:
         """
         if self.current["next"]:
             url = self.current["next"]
-        else:  # elif self.current["previous"]:
+        elif self.current["previous"]:
             url = self.current["previous"]
+        else:
+            raise ValueError(f"{page_number} is not a valid page number.")
 
         url = url.split("?page=")[0]
         url += f"?page={str(page_number)}"
