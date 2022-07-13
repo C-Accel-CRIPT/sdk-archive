@@ -28,7 +28,10 @@ api.save(coll)
 
 ### Create an Experiment node
 ``` py
-expt = cript.Experiment(collection=coll, name="Anionic Polymerization of Styrene with SecBuLi")
+expt = cript.Experiment(
+    collection=coll, 
+    name="Anionic Polymerization of Styrene with SecBuLi"
+)
 api.save(expt)
 ```
 
@@ -66,11 +69,11 @@ api.save(prcs)
 ### Add Ingredient nodes to the Process node
 First, let's grab the Material nodes we need from the Inventory node.
 ``` py
-solution = next((mat for mat in inv.materials if mat.name == 'SecBuLi solution 1.4M cHex'), None)
-toluene = next((mat for mat in inv.materials if mat.name == 'toluene'), None)
-styrene = next((mat for mat in inv.materials if mat.name == 'styrene'), None)
-butanol = next((mat for mat in inv.materials if mat.name == '1-butanol'), None)
-methanol = next((mat for mat in inv.materials if mat.name == 'methanol'), None)
+solution = inv['SecBuLi solution 1.4M cHex']
+toluene = inv['toluene']
+styrene = inv['styrene']
+butanol = inv['1-butanol']
+methanol = inv['methanol']
 ```
 Next, we'll define Quantity nodes indicating the amount of each Ingredient.
 ``` py
@@ -82,11 +85,31 @@ workup_qty = cript.Quantity(key="volume", value=100, unit="ml")
 ```
 Next, we'll create Ingredient nodes for each.
 ``` py
-initiator = cript.Ingredient(keyword="initiator" ,material=solution, quantities=[initiator_qty])
-solvent = cript.Ingredient(keyword="solvent" ,material=toluene, quantities=[solvent_qty])
-monomer = cript.Ingredient(keyword="monomer" ,material=styrene, quantities=[monomer_qty])
-quench = cript.Ingredient(keyword="quench" ,material=butanol, quantities=[quench_qty])
-workup = cript.Ingredient(keyword="workup" ,material=methanol, quantities=[workup_qty])
+initiator = cript.Ingredient(
+    keyword="initiator", 
+    material=solution, 
+    quantities=[initiator_qty]
+)
+solvent = cript.Ingredient(
+    keyword="solvent", 
+    material=toluene, 
+    quantities=[solvent_qty]
+)
+monomer = cript.Ingredient(
+    keyword="monomer", 
+    material=styrene, 
+    quantities=[monomer_qty]
+)
+quench = cript.Ingredient(
+    keyword="quench", 
+    material=butanol, 
+    quantities=[quench_qty]
+)
+workup = cript.Ingredient(
+    keyword="workup", 
+    material=methanol, 
+    quantities=[workup_qty]
+)
 ```
 Last, we'll add the Ingredient nodes to the Process node.
 ``` py
@@ -107,7 +130,12 @@ prcs.add_condition(time)
 
 ### Add a Property node to the Process node
 ``` py
-yield_mass = cript.Property(key="yield_mass", value=0.47, unit="g", method="scale")
+yield_mass = cript.Property(
+    key="yield_mass", 
+    value=0.47, 
+    unit="g", 
+    method="scale"
+)
 prcs.add_property(yield_mass)
 ```
 
@@ -118,9 +146,15 @@ polystyrene = cript.Material(group=group, name="polystyrene")
 ```
 Next, we'll add some Identifier nodes.
 ``` py
-names = cript.Identifier(key="names", value=["poly(styrene)", "poly(vinylbenzene)"])
+names = cript.Identifier(
+    key="names", 
+    value=["poly(styrene)", "poly(vinylbenzene)"]
+)
+bigsmiles = cript.Identifier(
+    key="bigsmiles", 
+    value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
+)
 chem_repeat = cript.Identifier(key="chem_repeat", value="C8H8")
-bigsmiles = cript.Identifier(key="bigsmiles", value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC")
 cas = cript.Identifier(key="cas", value="100-42-5")
 
 polystyrene.add_identifier(names)
