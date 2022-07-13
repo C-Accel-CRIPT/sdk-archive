@@ -14,7 +14,7 @@ def get_api_url(host: str, tls: bool = True):
     :rtype: str
     """
     host = re.sub("https://|http://", "", host).rstrip("/")
-    if tls == True:
+    if tls:
         protocol = "https"
     else:
         protocol = "http"
@@ -44,12 +44,12 @@ def sha256_hash(file_path):
     :return: SHA256 has of the file.
     :rtype: str
     """
-    sha256_hash = hashlib.sha256()
+    sha256_hash_ = hashlib.sha256()
     with open(file_path, "rb") as f:
         # Read and update hash string value in blocks of 4K
         for byte_block in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(byte_block)
-        return str(sha256_hash.hexdigest())
+            sha256_hash_.update(byte_block)
+        return str(sha256_hash_.hexdigest())
 
 
 def convert_file_size(size_bytes):

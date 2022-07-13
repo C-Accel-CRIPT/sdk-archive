@@ -2,13 +2,13 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base
+from cript.nodes.primary.base_primary import BasePrimary
 
 
 logger = getLogger(__name__)
 
 
-class User(Base):
+class User(BasePrimary):
     """
     Object representing a CRIPT user.
 
@@ -16,7 +16,6 @@ class User(Base):
           This object is for read-only purposes only.
     """
 
-    node_type = "primary"
     node_name = "User"
     slug = "user"
     list_name = "users"
@@ -30,13 +29,8 @@ class User(Base):
         groups=None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.username = username
         self.email = email
         self.orcid_id = orcid_id
         self.groups = groups if groups else []
-        self.public = public
-        self.created_at = None
-        self.updated_at = None

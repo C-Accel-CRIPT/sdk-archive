@@ -3,7 +3,7 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base
+from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.validators import (
     validate_required,
     validate_key,
@@ -15,13 +15,12 @@ from cript.validators import (
 logger = getLogger(__name__)
 
 
-class Quantity(Base):
+class Quantity(BaseSecondary):
     """
     Object representing a specified amount of an :class:`Ingredient`
     object used as input to a :class:`Process` object.
     """
 
-    node_type = "secondary"
     node_name = "Quantity"
     list_name = "quantities"
     required = ["key", "value"]

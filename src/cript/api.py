@@ -13,7 +13,11 @@ import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
 from cript import VERSION, NODE_CLASSES
-from cript.nodes import Base, User, File
+from cript.nodes.base import Base
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes.primary.user import User
+from cript.nodes.primary.file import File
+from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.utils import get_api_url, convert_file_size, display_errors
 from cript.exceptions import (
     APIAuthError,
@@ -87,47 +91,47 @@ class API:
         return f"Connected to {self.api_url}"
 
     @beartype
-    def refresh(self, node: Base, max_level: int = 1):
+    def refresh(self, node: BasePrimary, max_level: int = 1):
         """
         Overwrite a node's attributes with the latest values from the database.
 
         :param node: The node to refresh.
         :param max_level: Max depth to recursively generate nested nodes.
         """
-        if hasattr(node, "url"):
-            if node.url:
-                response = self.session.get(node.url)
-                self._set_node_attributes(node, response.json())
-                self._generate_nodes(node, max_level=max_level)
-            else:
-                raise APIRefreshError(
-                    "Before you can refresh a node, you must either save it or define its URL."
-                )
-        else:
+        if not isinstance(node, BasePrimary):
             raise APIRefreshError(
                 f"{node.node_name} is a secondary node, thus cannot be refreshed."
             )
 
+        if node.url:
+            response = self.session.get(node.url)
+            self._set_node_attributes(node, response.json())
+            self._generate_nodes(node, max_level=max_level)
+        else:
+            raise APIRefreshError(
+                "Before you can refresh a node, you must either save it or define its URL."
+            )
+
     @beartype
-    def save(self, node: Base, max_level: int = 1):
+    def save(self, node: BasePrimary, max_level: int = 1):
         """
         Create or update a node in the database.
 
         :param node: The node to be saved.
         :param max_level: Max depth to recursively generate nested nodes.
         """
-        if node.node_type == "primary":
-            if node.url:
-                # Update an existing object via PUT
-                response = self.session.put(url=node.url, data=node._to_json())
-            else:
-                # Create a new object via POST
-                response = self.session.post(
-                    url=f"{self.api_url}/{node.slug}/", data=node._to_json()
-                )
-        else:
+        if not isinstance(node, BasePrimary):
             raise APISaveError(
                 f"The save() method cannot be called on secondary nodes such as {node.node_name}"
+            )
+
+        if node.url:
+            # Update an existing object via PUT
+            response = self.session.put(url=node.url, data=node._to_json())
+        else:
+            # Create a new object via POST
+            response = self.session.post(
+                url=f"{self.api_url}/{node.slug}/", data=node._to_json()
             )
 
         if response.status_code in (200, 201):
@@ -158,7 +162,8 @@ class API:
                 pass
             raise APISaveError(display_errors(response.content))
 
-    def _set_node_attributes(self, node, obj_json):
+    @staticmethod
+    def _set_node_attributes(node, obj_json):
         """
         Set node attributes using data from an API response.
 
@@ -169,7 +174,7 @@ class API:
             setattr(node, json_key, json_value)
 
     @beartype
-    def download(self, node: File, path: str = None):
+    def download_file(self, node: File, path: str = None):
         """
         Download a file from the defined storage provider.
 
@@ -308,7 +313,8 @@ class API:
             logger.info(f"Upload of file {file_uid} failed: {error}")
             raise APIFileUploadError
 
-    def _globus_user_auth(self, endpoint_id, client_id):
+    @staticmethod
+    def _globus_user_auth(endpoint_id, client_id):
         """
         Prompts a user authorize using their Globus credentials.
 
@@ -348,7 +354,7 @@ class API:
             "https_auth_token": https_transfer_data["access_token"],
         }
 
-        return (auth_client, tokens)
+        return auth_client, tokens
 
     def _globus_set_transfer_client(self, auth_client, tokens):
         """
@@ -485,25 +491,25 @@ class API:
         if response.status_code != 200:
             raise APIFileUploadError
 
-    def delete(self, obj: Base, query: dict = None):
+    def delete(self, obj: Union[BasePrimary, str, type], query: dict = None):
         """
         Delete a node in the database and clear it locally.
 
         :param obj: The node to be deleted itself or its class.
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"})
         """
+        if isinstance(obj, BaseSecondary):
+            raise APIDeleteError(
+                f"The delete() method cannot be called on secondary nodes such as {obj.node_name}"
+            )
+
         # Delete with node
-        if isinstance(obj, Base):
-            if obj.node_type == "primary":
-                if obj.url:
-                    url = obj.url
-                else:
-                    raise APIDeleteError(
-                        f"This {obj.node_name} node does not exist in the database."
-                    )
+        if isinstance(obj, BasePrimary):
+            if obj.url:
+                url = obj.url
             else:
                 raise APIDeleteError(
-                    f"The delete() method cannot be called on secondary nodes such as {obj.node_name}"
+                    f"This {obj.node_name} node does not exist in the database."
                 )
 
         # Delete with URL
@@ -513,7 +519,7 @@ class API:
                 raise APIDeleteError("Invalid URL provided.")
 
         # Delete with search query
-        elif issubclass(obj, Base) and isinstance(query, dict):
+        elif issubclass(obj, BasePrimary) and isinstance(query, dict):
             results = self.search(node_class=obj, query=query)
             if results.count == 1:
                 url = results.current["results"][0]["url"]
@@ -541,7 +547,7 @@ class API:
             raise APIGetError(display_errors(response.content))
 
     @beartype
-    def search(self, node_class: Type[Base], query: dict = None):
+    def search(self, node_class: Type[BasePrimary], query: dict = None):
         """
         Send a query to the API and print the results.
 
@@ -550,7 +556,7 @@ class API:
         :return: A :class:`JSONPaginator` object containing the results.
         :rtype: cript.session.JSONPaginator
         """
-        if node_class.node_type == "secondary":
+        if not issubclass(node_class, BasePrimary):
             raise APISearchError(
                 f"{node_class.node_name} is a secondary node, thus cannot be searched."
             )
@@ -569,7 +575,8 @@ class API:
             raise APISearchError(display_errors(response.content))
         return JSONPaginator(self.session, response.content)
 
-    def _generate_query_slug(self, query):
+    @staticmethod
+    def _generate_query_slug(query):
         """Generate the query URL slug."""
         slug = ""
         for key in query:
@@ -582,7 +589,7 @@ class API:
     @beartype
     def get(
         self,
-        obj: Union[str, Type[Base]],
+        obj: Union[str, Type[BasePrimary]],
         query: dict = None,
         level: int = 0,
         max_level: int = 1,
@@ -611,12 +618,12 @@ class API:
             node_class = self._define_node_class(node_slug)
 
         # Get node with a search query
-        elif issubclass(obj, Base) and query:
+        elif issubclass(obj, BasePrimary) and query:
             results = self.search(node_class=obj, query=query)
             if results.count < 1:
                 raise APIGetError("Your query did not match any existing nodes.")
             elif results.count > 1:
-                raise APIGetError("Your query mathced more than one node.")
+                raise APIGetError("Your query matched more than one node.")
             else:
                 obj_json = results.current["results"][0]
                 node_class = obj
@@ -652,8 +659,8 @@ class API:
 
         node_dict = node.__dict__
         for key, value in node_dict.items():
-            # Skip the url field
-            if key == "url":
+            # Skip empty values and the url field
+            if not value or key == "url":
                 continue
             # Generate primary nodes
             if isinstance(value, str) and self.api_url in value:
@@ -701,7 +708,8 @@ class API:
                             secondary_node, level=level, max_level=max_level
                         )
 
-    def _define_node_class(self, key: str):
+    @staticmethod
+    def _define_node_class(key: str):
         """
         Find the correct class associated with a given key.
 
@@ -718,7 +726,8 @@ class API:
                 return node_cls
         return None
 
-    def _create_node(self, node_class, obj_json):
+    @staticmethod
+    def _create_node(node_class, obj_json):
         """
         Create a node with JSON returned from the API.
 
@@ -744,7 +753,8 @@ class API:
 
         return node
 
-    def _get_local_primary_node(self, url: str):
+    @staticmethod
+    def _get_local_primary_node(url: str):
         """
         Use a URL to get a primary node object stored in memory.
 
@@ -810,6 +820,8 @@ class JSONPaginator:
             url = self.current["next"]
         elif self.current["previous"]:
             url = self.current["previous"]
+        else:
+            raise ValueError(f"{page_number} is not a valid page number.")
 
         url = url.split("?page=")[0]
         url += f"?page={str(page_number)}"

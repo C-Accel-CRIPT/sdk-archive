@@ -3,17 +3,17 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, Group
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes.primary.group import Group
 from cript.validators import validate_required
 
 
 logger = getLogger(__name__)
 
 
-class Reference(Base):
+class Reference(BasePrimary):
     """Object representing a bibliographic resource."""
 
-    node_type = "primary"
     node_name = "Reference"
     slug = "reference"
     required = ["group", "title"]
@@ -39,9 +39,7 @@ class Reference(Base):
         notes: Union[str, None] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = group
         self.title = title
         self.doi = doi
@@ -57,7 +55,4 @@ class Reference(Base):
         self.pmid = pmid
         self.website = website
         self.notes = notes
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
         validate_required(self)

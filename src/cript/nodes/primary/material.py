@@ -3,17 +3,17 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, Group, Identifier, Component, Property
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes import Group, Identifier, Component, Property
 from cript.validators import validate_required, validate_key
 
 
 logger = getLogger(__name__)
 
 
-class Material(Base):
+class Material(BasePrimary):
     """Object representing a material, mixture or compound."""
 
-    node_type = "primary"
     node_name = "Material"
     slug = "material"
     list_name = "materials"
@@ -28,14 +28,12 @@ class Material(Base):
         identifiers: list[Union[Identifier, dict]] = None,
         components: list[Union[Component, dict]] = None,
         keywords: Union[list[str], None] = None,
-        process: Union[Base, str, None] = None,  # Needs more specific type check
+        process: Union[BasePrimary, str, None] = None,  # Needs more specific type check
         properties: list[Union[Property, dict]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = group
         self.name = name
         self.identifiers = identifiers if identifiers else []
@@ -44,9 +42,6 @@ class Material(Base):
         self.process = process
         self.properties = properties if properties else []
         self.notes = notes
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
         validate_required(self)
 
     @property

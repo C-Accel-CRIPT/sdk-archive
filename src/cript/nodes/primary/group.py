@@ -3,17 +3,17 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, User
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes.primary.user import User
 from cript.validators import validate_required
 
 
 logger = getLogger(__name__)
 
 
-class Group(Base):
+class Group(BasePrimary):
     """Object representing a CRIPT group."""
 
-    node_type = "primary"
     node_name = "Group"
     slug = "group"
     required = ["name"]
@@ -26,14 +26,9 @@ class Group(Base):
         users: list[Union[User, str]] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.name = name
         self.users = users if users else []
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
         validate_required(self)
 
     @beartype

@@ -3,20 +3,21 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, Group, Citation
+from cript.nodes.primary.base_primary import BasePrimary
+from cript.nodes.primary.group import Group
+from cript.nodes.secondary.citation import Citation
 from cript.validators import validate_required
 
 
 logger = getLogger(__name__)
 
 
-class Collection(Base):
+class Collection(BasePrimary):
     """
     Object representing a logical grouping of :class:`Experiment` and
     :class:`Inventory` objects.
     """
 
-    node_type = "primary"
     node_name = "Collection"
     slug = "collection"
     required = ["group", "name"]
@@ -33,18 +34,13 @@ class Collection(Base):
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = group
         self.name = name
         self.experiments = experiments if experiments else []
         self.inventories = inventories if inventories else []
-        self.notes = notes
         self.citations = citations if citations else []
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
+        self.notes = notes
         validate_required(self)
 
     @beartype

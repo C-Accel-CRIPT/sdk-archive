@@ -3,7 +3,11 @@ from logging import getLogger
 
 from beartype import beartype
 
-from cript.nodes import Base, Data, Condition, Citation
+
+from cript.nodes.primary.data import Data
+from cript.nodes.secondary.base_secondary import BaseSecondary
+from cript.nodes.secondary.condition import Condition
+from cript.nodes.secondary.citation import Citation
 from cript.validators import (
     validate_required,
     validate_key,
@@ -15,13 +19,12 @@ from cript.validators import (
 logger = getLogger(__name__)
 
 
-class Property(Base):
+class Property(BaseSecondary):
     """
     Object representing an observed or measured attribute
     of a :class:`Material` or :class:`Process` object.
     """
 
-    node_type = "secondary"
     node_name = "Property"
     list_name = "properties"
     required = ["key"]
@@ -35,7 +38,7 @@ class Property(Base):
         type: Union[str, None] = None,
         method: Union[str, None] = None,
         method_description: Union[str, None] = None,
-        uncertainty: Union[float, None] = None,
+        uncertainty: Union[float, int, None] = None,
         uncertainty_type: Union[str, None] = None,
         component_id: Union[int, None] = None,
         structure: Union[str, None] = None,
