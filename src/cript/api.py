@@ -553,8 +553,8 @@ class API:
 
         :param node_class: The class of the node type to query for.
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
-        :return: A :class:`JSONPaginator` object containing the results.
-        :rtype: cript.session.JSONPaginator
+        :return: A :class:`SearchPaginator` object containing the results.
+        :rtype: cript.session.SearchPaginator
         """
         if not issubclass(node_class, BasePrimary):
             raise APISearchError(
@@ -571,7 +571,7 @@ class API:
 
         if response.status_code != 200:
             raise APISearchError(display_errors(response.content))
-        return JSONPaginator(self.session, response.content, payload)
+        return SearchPaginator(self.session, response.content, payload)
 
     @beartype
     def get(
@@ -755,8 +755,8 @@ class API:
         return None
 
 
-class JSONPaginator:
-    """Paginate JSON response content sent from the API."""
+class SearchPaginator:
+    """Paginate search JSON response content."""
 
     def __init__(self, session, content, payload):
         self._session = session
