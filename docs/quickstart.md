@@ -79,17 +79,25 @@ styrene =  api.get(url)
 
 
 ## Run a search query
-For example, search for all Material nodes that contain benzene:
+For example, search for Material nodes with a molar mass less than 10 g/mol:
 ``` py
 query = {
-    "identifiers": [
+    "properties": [
         {
-            "key": "bigsmiles",
-            "value": "c1ccccc1"
+            "key": "molar_mass",
+            "value__lt": 10,
+            "unit": "g/mol"
         }
     ]
 }
 results =  api.search(cript.Material, query)
+```
+
+... then paginate through the results.
+``` py
+results.next         # Flip to the next page
+results.previous     # Flip to the previous page
+results.to_page(10)  # Flip to page 10 (or any other)
 ```
 
 ## Upload a file
@@ -109,7 +117,7 @@ api.save(file)
 For example, download the file you uploaded above.
 ``` py
 path = "path/to/local/file"
-api.download(f, path=path)
+api.download_file(f, path=path)
 ```
 !!! note
     The default path for a download is your current directory.

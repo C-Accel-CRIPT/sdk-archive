@@ -547,14 +547,14 @@ class API:
             raise APIGetError(display_errors(response.content))
 
     @beartype
-    def search(self, node_class: Type[BasePrimary], query: dict = None):
+    def search(self, node_class: Type[BasePrimary], query: dict):
         """
         Send a query to the API and print the results.
 
         :param node_class: The class of the node type to query for.
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
-        :return: A :class:`JSONPaginator` object containing the results.
-        :rtype: cript.session.JSONPaginator
+        :return: A :class:`SearchPaginator` object containing the results.
+        :rtype: cript.session.SearchPaginator
         """
         if not issubclass(node_class, BasePrimary):
             raise APISearchError(
@@ -562,29 +562,16 @@ class API:
             )
 
         if isinstance(query, dict):
-            query_slug = self._generate_query_slug(query)
-            response = self.session.get(
-                f"{self.api_url}/{node_class.slug}/?{query_slug}"
+            payload = json.dumps(query)
+            response = self.session.post(
+                url=f"{self.api_url}/search/{node_class.slug}/", data=payload
             )
-        elif query is None:
-            response = self.session.get(f"{self.api_url}/{node_class.slug}/")
         else:
             raise APISearchError(f"'{query}' is not a valid query.")
 
         if response.status_code != 200:
             raise APISearchError(display_errors(response.content))
-        return JSONPaginator(self.session, response.content)
-
-    @staticmethod
-    def _generate_query_slug(query):
-        """Generate the query URL slug."""
-        slug = ""
-        for key in query:
-            value = query[key]
-            if isinstance(value, str):
-                value = urllib.parse.quote(value.encode("utf8"))
-            slug += f"{key}={value}&"
-        return slug
+        return SearchPaginator(self.session, response.content, payload)
 
     @beartype
     def get(
@@ -745,7 +732,7 @@ class API:
         # Create node
         node = node_class(**obj_json)
 
-        # Replace comon attributes
+        # Replace common attributes
         node.url = url
         node.uid = uid
         node.created_at = created_at
@@ -768,12 +755,13 @@ class API:
         return None
 
 
-class JSONPaginator:
-    """Paginate JSON response content sent from the API."""
+class SearchPaginator:
+    """Paginate search JSON response content."""
 
-    def __init__(self, session, content):
+    def __init__(self, session, content, payload):
         self._session = session
         self.current = content
+        self.payload = payload
         self.count = self.current["count"]
 
     def __repr__(self):
@@ -795,7 +783,7 @@ class JSONPaginator:
         """Flip to the next page."""
         next_url = self.current["next"]
         if next_url:
-            response = self._session.get(next_url)
+            response = self._session.post(url=next_url, data=self.payload)
             self.current = response.content
         else:
             raise AttributeError("You're currently on the final page.")
@@ -805,7 +793,7 @@ class JSONPaginator:
         """Flip to the previous page."""
         previous_url = self.current["previous"]
         if previous_url:
-            response = self._session.get(previous_url)
+            response = self._session.post(url=previous_url, data=self.payload)
             self.current = response.content
         else:
             raise AttributeError("You're currently on the first page.")
@@ -826,7 +814,7 @@ class JSONPaginator:
         url = url.split("?page=")[0]
         url += f"?page={str(page_number)}"
 
-        response = self._session.get(url)
+        response = self._session.post(url=url, data=self.payload)
         if response.status_code == 200:
             self.current = response.content
         else:
