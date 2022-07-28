@@ -70,11 +70,11 @@ api.save(prcs)
 ### Add Ingredient nodes to the Process node
 First, let's grab the Material nodes we need from the Inventory node.
 ``` py
-solution = inv['SecBuLi solution 1.4M cHex']
-toluene = inv['toluene']
-styrene = inv['styrene']
-butanol = inv['1-butanol']
-methanol = inv['methanol']
+solution = next((mat for mat in inv.materials if mat.name == 'SecBuLi solution 1.4M cHex'), None)
+toluene = next((mat for mat in inv.materials if mat.name == 'toluene'), None)
+styrene = next((mat for mat in inv.materials if mat.name == 'styrene'), None)
+butanol = next((mat for mat in inv.materials if mat.name == '1-butanol'), None)
+methanol = next((mat for mat in inv.materials if mat.name == 'methanol'), None)
 ```
 Next, we'll define Quantity nodes indicating the amount of each Ingredient.
 ``` py
