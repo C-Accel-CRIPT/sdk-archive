@@ -57,6 +57,7 @@ type(inv.materials[0])
 prcs = cript.Process(
     experiment=expt, 
     name="Anionic of Styrene",
+    type = "multistep",
     description = "In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
                   "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
                   "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
