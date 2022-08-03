@@ -38,7 +38,7 @@ class Property(BaseSecondary):
         type: Union[str, None] = None,
         method: Union[str, None] = None,
         method_description: Union[str, None] = None,
-        sample_preparation: Union[BasePrimary, None] = None,
+        sample_preparation: Union[BasePrimary, str, None] = None,
         uncertainty: Union[float, int, None] = None,
         uncertainty_type: Union[str, None] = None,
         components: list[Union[BasePrimary, str]] = None,

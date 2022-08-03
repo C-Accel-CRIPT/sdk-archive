@@ -32,7 +32,7 @@ class Data(BasePrimary):
         name: str = None,
         type: str = None,
         files=None,
-        sample_preparation: Union[BasePrimary, None] = None,
+        sample_preparation: Union[BasePrimary, str, None] = None,
         calibration: Union[str, None] = None,
         configuration: Union[str, None] = None,
         materials=None,
