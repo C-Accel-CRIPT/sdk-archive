@@ -3,6 +3,7 @@ from logging import getLogger
 
 from beartype import beartype
 
+from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.nodes.primary.data import Data
 from cript.validators import (
@@ -35,6 +36,7 @@ class Condition(BaseSecondary):
         type: Union[str, None] = None,
         uncertainty: Union[float, int, None] = None,
         uncertainty_type: Union[str, None] = None,
+        material: Union[BasePrimary, str, None] = None,
         set_id: Union[int, None] = None,
         measurement_id: Union[int, None] = None,
         data: Union[Data, str, None] = None,
@@ -46,6 +48,7 @@ class Condition(BaseSecondary):
         self.type = type
         self.uncertainty = uncertainty
         self.uncertainty_type = uncertainty_type
+        self.material = material
         self.set_id = set_id
         self.measurement_id = measurement_id
         self.data = data
