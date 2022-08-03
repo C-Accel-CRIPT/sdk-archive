@@ -44,7 +44,7 @@ class Property(BaseSecondary):
         structure: Union[str, None] = None,
         set_id: Union[int, None] = None,
         conditions: list[Union[Condition, dict]] = None,
-        data: list[Union[Data, str]] = None,
+        data: Union[Data, str, None] = None,
         citations: list[Union[Citation, dict]] = None,
     ):
         super().__init__()
@@ -60,7 +60,7 @@ class Property(BaseSecondary):
         self.structure = structure
         self.set_id = set_id
         self.conditions = conditions if conditions else []
-        self.data = data if data else []
+        self.data = data
         self.citations = citations if citations else []
         validate_required(self)
 
@@ -111,14 +111,6 @@ class Property(BaseSecondary):
     @uncertainty_type.setter
     def uncertainty_type(self, value):
         self._uncertainty_type = validate_key("uncertainty-type", value)
-
-    @beartype
-    def add_data(self, data: Union[Data, dict]):
-        self._add_node(data, "data")
-
-    @beartype
-    def remove_data(self, data: Union[Data, int]):
-        self._remove_node(data, "data")
 
     @beartype
     def add_condition(self, condition: Union[Condition, dict]):

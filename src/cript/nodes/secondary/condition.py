@@ -37,7 +37,7 @@ class Condition(BaseSecondary):
         uncertainty_type: Union[str, None] = None,
         set_id: Union[int, None] = None,
         measurement_id: Union[int, None] = None,
-        data: list[Union[Data, str]] = None,
+        data: Union[Data, str, None] = None,
     ):
         super().__init__()
         self.key = key
@@ -48,7 +48,7 @@ class Condition(BaseSecondary):
         self.uncertainty_type = uncertainty_type
         self.set_id = set_id
         self.measurement_id = measurement_id
-        self.data = data if data else []
+        self.data = data
         validate_required(self)
 
     @property
@@ -90,11 +90,3 @@ class Condition(BaseSecondary):
     @uncertainty_type.setter
     def uncertainty_type(self, value):
         self._uncertainty_type = validate_key("uncertainty-type", value)
-
-    @beartype
-    def add_data(self, data: Union[Data, dict]):
-        self._add_node(data, "data")
-
-    @beartype
-    def remove_data(self, data: Union[Data, int]):
-        self._remove_node(data, "data")
