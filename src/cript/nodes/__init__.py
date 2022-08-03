@@ -3,6 +3,7 @@ from cript.nodes.primary.user import User
 from cript.nodes.primary.group import Group
 from cript.nodes.primary.reference import Reference
 from cript.nodes.secondary.citation import Citation
+from cript.nodes.primary.project import Project
 from cript.nodes.primary.collection import Collection
 from cript.nodes.primary.experiment import Experiment
 from cript.nodes.primary.data import Data

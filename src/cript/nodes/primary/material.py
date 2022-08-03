@@ -4,7 +4,11 @@ from logging import getLogger
 from beartype import beartype
 
 from cript.nodes.primary.base_primary import BasePrimary
-from cript.nodes import Group, Identifier, Component, Property
+from cript.nodes.primary.group import Group
+from cript.nodes.primary.project import Project
+from cript.nodes.secondary.identifier import Identifier
+from cript.nodes.secondary.component import Component
+from cript.nodes.secondary.property import Property
 from cript.validators import validate_required, validate_key
 
 
@@ -17,13 +21,14 @@ class Material(BasePrimary):
     node_name = "Material"
     slug = "material"
     list_name = "materials"
-    required = ["group", "name"]
-    unique_together = ["name", "created_by"]
+    required = ["group", "project", "name"]
+    unique_together = ["project", "name"]
 
     @beartype
     def __init__(
         self,
         group: Union[Group, str] = None,
+        project: Union[Project, str] = None,
         name: str = None,
         identifiers: list[Union[Identifier, dict]] = None,
         components: list[Union[Component, dict]] = None,
@@ -35,6 +40,7 @@ class Material(BasePrimary):
     ):
         super().__init__(public=public)
         self.group = group
+        self.project = project
         self.name = name
         self.identifiers = identifiers if identifiers else []
         self.components = components if components else []
