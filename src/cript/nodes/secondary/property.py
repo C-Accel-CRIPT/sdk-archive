@@ -3,8 +3,7 @@ from logging import getLogger
 
 from beartype import beartype
 
-
-from cript.nodes.primary.material import Material
+from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.data import Data
 from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.nodes.secondary.condition import Condition
@@ -41,8 +40,8 @@ class Property(BaseSecondary):
         method_description: Union[str, None] = None,
         uncertainty: Union[float, int, None] = None,
         uncertainty_type: Union[str, None] = None,
-        components: list[Union[Material, None]] = None,
-        components_relative: list[Union[Material, None]] = None,
+        components: list[Union[BasePrimary, None]] = None,
+        components_relative: list[Union[BasePrimary, None]] = None,
         structure: Union[str, None] = None,
         set_id: Union[int, None] = None,
         conditions: list[Union[Condition, dict]] = None,
@@ -116,19 +115,19 @@ class Property(BaseSecondary):
         self._uncertainty_type = validate_key("uncertainty-type", value)
 
     @beartype
-    def add_components(self, component: Union[Material, dict]):
+    def add_components(self, component: Union[BasePrimary, dict]):
         self._add_node(component, "components")
 
     @beartype
-    def remove_components(self, component: Union[Material, int]):
+    def remove_components(self, component: Union[BasePrimary, int]):
         self._remove_node(component, "components")
 
     @beartype
-    def add_components_relative(self, component: Union[Material, dict]):
+    def add_components_relative(self, component: Union[BasePrimary, dict]):
         self._add_node(component, "components_relative")
 
     @beartype
-    def remove_components_relative(self, component: Union[Material, int]):
+    def remove_components_relative(self, component: Union[BasePrimary, int]):
         self._remove_node(component, "components_relative")
 
     @beartype
