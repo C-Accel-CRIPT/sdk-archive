@@ -8,6 +8,7 @@ from cript.nodes.primary.group import Group
 from cript.nodes.primary.experiment import Experiment
 from cript.nodes.primary.material import Material
 from cript.nodes.secondary.ingredient import Ingredient
+from cript.nodes.secondary.equipment import Equipment
 from cript.nodes.secondary.property import Property
 from cript.nodes.secondary.condition import Condition
 from cript.nodes.secondary.citation import Citation
@@ -41,7 +42,7 @@ class Process(BasePrimary):
         description: Union[str, None] = None,
         prerequisite_processes: list[Union[BasePrimary, str]] = None,
         ingredients: list[Union[Ingredient, dict]] = None,
-        equipment: list[Union[str, None]] = None,
+        equipment: list[Union[Equipment, str]] = None,
         properties: list[Union[Property, dict]] = None,
         conditions: list[Union[Condition, dict]] = None,
         set_id: Union[int, None] = None,
@@ -91,16 +92,13 @@ class Process(BasePrimary):
                 value[i] = validate_key("process-keyword", value[i])
         self._keywords = value
 
-    @property
-    def equipment(self):
-        return self._equipment
+    @beartype
+    def add_equipment(self, piece: Union[Equipment, dict]):
+        self._add_node(piece, "equipment")
 
-    @equipment.setter
-    def equipment(self, value):
-        if value:
-            for i in range(len(value)):
-                value[i] = validate_key("equipment", value[i])
-        self._equipment = value
+    @beartype
+    def remove_equipment(self, piece: Union[Equipment, int]):
+        self._remove_node(piece, "equipment")
 
     @beartype
     def add_prerequisite_process(self, process: Union[BasePrimary, dict]):
