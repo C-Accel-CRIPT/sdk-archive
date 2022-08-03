@@ -7,7 +7,6 @@ from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
 from cript.nodes.primary.project import Project
 from cript.nodes.secondary.identifier import Identifier
-from cript.nodes.secondary.component import Component
 from cript.nodes.secondary.property import Property
 from cript.validators import validate_required, validate_key
 
@@ -31,9 +30,9 @@ class Material(BasePrimary):
         project: Union[Project, str] = None,
         name: str = None,
         identifiers: list[Union[Identifier, dict]] = None,
-        components: list[Union[Component, dict]] = None,
+        components: list[Union[BasePrimary, str]] = None,
         keywords: Union[list[str], None] = None,
-        process: Union[BasePrimary, str, None] = None,  # Needs more specific type check
+        process: Union[BasePrimary, str, None] = None,
         properties: list[Union[Property, dict]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
@@ -70,11 +69,11 @@ class Material(BasePrimary):
         self._remove_node(identifier, "identifiers")
 
     @beartype
-    def add_component(self, component: Union[Component, dict]):
+    def add_component(self, component: Union[BasePrimary, dict]):
         self._add_node(component, "components")
 
     @beartype
-    def remove_component(self, component: Union[Component, int]):
+    def remove_component(self, component: Union[BasePrimary, int]):
         self._remove_node(component, "components")
 
     @beartype

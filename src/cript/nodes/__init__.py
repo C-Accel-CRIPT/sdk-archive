@@ -12,7 +12,6 @@ from cript.nodes.secondary.condition import Condition
 from cript.nodes.secondary.property import Property
 from cript.nodes.secondary.identifier import Identifier
 from cript.nodes.secondary.quantity import Quantity
-from cript.nodes.secondary.component import Component
 from cript.nodes.primary.material import Material
 from cript.nodes.primary.inventory import Inventory
 from cript.nodes.secondary.ingredient import Ingredient
