@@ -46,6 +46,7 @@ class Process(BasePrimary):
         conditions: list[Union[Condition, dict]] = None,
         set_id: Union[int, None] = None,
         products: list[Union[Material, str]] = None,
+        waste: list[Union[Material, str]] = None,
         citations: list[Union[Citation, dict]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
@@ -66,6 +67,7 @@ class Process(BasePrimary):
         self.conditions = conditions if conditions else []
         self.set_id = set_id
         self.products = products if products else []
+        self.waste = waste if waste else []
         self.citations = citations if citations else []
         self.notes = notes
         validate_required(self)
@@ -123,6 +125,14 @@ class Process(BasePrimary):
     @beartype
     def remove_product(self, material: Union[Material, int]):
         self._remove_node(material, "products")
+
+    @beartype
+    def add_waste(self, material: Union[Material, dict]):
+        self._add_node(material, "waste")
+
+    @beartype
+    def remove_waste(self, material: Union[Material, int]):
+        self._remove_node(material, "waste")
 
     @beartype
     def add_condition(self, condition: Union[Condition, dict]):
