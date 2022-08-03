@@ -47,6 +47,7 @@ class Property(BaseSecondary):
         conditions: list[Union[Condition, dict]] = None,
         data: Union[Data, str, None] = None,
         citations: list[Union[Citation, dict]] = None,
+        notes: Union[str, None] = None,
     ):
         super().__init__()
         self.key = key
@@ -64,6 +65,7 @@ class Property(BaseSecondary):
         self.conditions = conditions if conditions else []
         self.data = data
         self.citations = citations if citations else []
+        self.notes = notes
         validate_required(self)
 
     @property
