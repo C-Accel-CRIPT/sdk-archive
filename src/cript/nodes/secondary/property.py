@@ -38,6 +38,7 @@ class Property(BaseSecondary):
         type: Union[str, None] = None,
         method: Union[str, None] = None,
         method_description: Union[str, None] = None,
+        sample_preparation: Union[BasePrimary, None] = None,
         uncertainty: Union[float, int, None] = None,
         uncertainty_type: Union[str, None] = None,
         components: list[Union[BasePrimary, None]] = None,
@@ -56,6 +57,7 @@ class Property(BaseSecondary):
         self.type = type
         self.method = method
         self.method_description = method_description
+        self.sample_preparation = sample_preparation
         self.uncertainty = uncertainty
         self.uncertainty_type = uncertainty_type
         self.components = components if components else []
