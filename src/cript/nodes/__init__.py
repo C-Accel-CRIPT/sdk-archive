@@ -15,4 +15,5 @@ from cript.nodes.secondary.quantity import Quantity
 from cript.nodes.primary.material import Material
 from cript.nodes.primary.inventory import Inventory
 from cript.nodes.secondary.ingredient import Ingredient
+from cript.nodes.secondary.equipment import Equipment
 from cript.nodes.primary.process import Process
