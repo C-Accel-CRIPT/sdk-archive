@@ -32,7 +32,7 @@ class Data(BasePrimary):
         name: str = None,
         type: str = None,
         files=None,
-        sample_prep: Union[str, None] = None,
+        sample_preparation: Union[BasePrimary, str, None] = None,
         calibration: Union[str, None] = None,
         configuration: Union[str, None] = None,
         materials=None,
@@ -47,7 +47,7 @@ class Data(BasePrimary):
         self.name = name
         self.files = files
         self.type = type
-        self.sample_prep = sample_prep
+        self.sample_preparation = sample_preparation
         self.calibration = calibration
         self.configuration = configuration
         self.materials = materials if materials else []

@@ -5,8 +5,10 @@ from beartype import beartype
 
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
+from cript.nodes.primary.project import Project
 from cript.nodes.secondary.citation import Citation
 from cript.validators import validate_required
+from cript.utils import auto_assign_group
 
 
 logger = getLogger(__name__)
@@ -20,13 +22,14 @@ class Collection(BasePrimary):
 
     node_name = "Collection"
     slug = "collection"
-    required = ["group", "name"]
-    unique_together = ["name", "created_by"]
+    required = ["group", "project", "name"]
+    unique_together = ["project", "name"]
 
     @beartype
     def __init__(
         self,
         group: Union[Group, str] = None,
+        project: Union[Project, str] = None,
         name: str = None,
         experiments=None,
         inventories=None,
@@ -35,7 +38,8 @@ class Collection(BasePrimary):
         public: bool = False,
     ):
         super().__init__(public=public)
-        self.group = group
+        self.group = auto_assign_group(group, project)
+        self.project = project
         self.name = name
         self.experiments = experiments if experiments else []
         self.inventories = inventories if inventories else []

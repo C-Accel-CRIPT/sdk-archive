@@ -27,14 +27,19 @@ api = cript.API(host, token)
 # Example Tasks
 
 ## Create a node
-For example, create a Group node:
+For example, create a Group:
 ``` py
 group = cript.Group(name="MyGroup")
 api.save(group)
 ```
+... then a Project:
+``` py
+project = cript.Project(group=group, name="MyProject")
+api.save(project)
+```
 ... then a Collection:
 ``` py
-collection = cript.Collection(group=group, name="MyCollection", public=True)
+collection = cript.Collection(project=project, name="MyCollection")
 api.save(collection)
 ```
 !!! note
@@ -54,14 +59,14 @@ api.delete(collection)
 ```
 
 ## Get an existing node
-For example, get the official CRIPT Group node:
+For example, get the official CRIPT Project node:
 ``` py
-group = api.get(cript.Group, {"name": "CRIPT"})
+project = api.get(cript.Project, {"name": "CRIPT"})
 ```
 ... then get the official styrene Material node via CAS number:
 ``` py
 query = {
-    "group": group.uid,
+    "project": project.uid,
     "identifiers": [
         {
             "key": "cas",
@@ -101,15 +106,15 @@ results.to_page(10)  # Flip to page 10 (or any other)
 ```
 
 ## Upload a file
-First, you'll need a Group and Data node:
+First, you'll need a Project and Data node:
 ``` py
-group = data = api.get("<group_url>")
+project = api.get("<project_url>")
 data = api.get("<data_url>")
 ```
 Next, create a File node that points to your local file:
 ``` py
 path = "path/to/local/file"
-f = cript.File(group=group, data=[data], type="data", source=path)
+f = cript.File(project=project, data=[data], source=path)
 api.save(file)
 ```
 

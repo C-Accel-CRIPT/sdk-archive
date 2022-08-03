@@ -7,9 +7,11 @@ from beartype import beartype
 
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
+from cript.nodes.primary.project import Project
 from cript.nodes.primary.data import Data
 from cript.validators import validate_required, validate_key
 from cript.utils import sha256_hash
+from cript.utils import auto_assign_group
 
 
 logger = getLogger(__name__)
@@ -21,7 +23,7 @@ class File(BasePrimary):
     node_name = "File"
     slug = "file"
     list_name = "files"
-    required = ["group", "data", "source", "type"]
+    required = ["group", "project", "data", "source", "type"]
     unique_together = ["checksum", "created_by"]
 
     @beartype
@@ -29,6 +31,7 @@ class File(BasePrimary):
         self,
         name: str = None,
         group: Union[Group, str] = None,
+        project: Union[Project, str] = None,
         data: list[Union[Data, str]] = None,
         source: str = None,
         type: str = "data",
@@ -39,7 +42,8 @@ class File(BasePrimary):
         public: bool = False,
     ):
         super().__init__(public=public)
-        self.group = group
+        self.group = auto_assign_group(group, project)
+        self.project = project
         self.data = data
         self.checksum = checksum
         self.name = name

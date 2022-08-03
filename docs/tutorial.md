@@ -20,9 +20,19 @@ api.save(group)
 !!! note
     Group names are globally unique.
 
+
+### Create a Project node
+``` py
+proj = cript.Project(group=group, name="MyProject")
+api.save(project)
+```
+!!! note
+    Project names are globally unique.
+
+
 ### Create a Collection node
 ``` py
-coll = cript.Collection(group=group, name="Tutorial")
+coll = cript.Collection(project=proj, name="Tutorial")
 api.save(coll)
 ```
 
@@ -57,6 +67,7 @@ type(inv.materials[0])
 prcs = cript.Process(
     experiment=expt, 
     name="Anionic of Styrene",
+    type = "multistep",
     description = "In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
                   "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
                   "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
@@ -69,11 +80,11 @@ api.save(prcs)
 ### Add Ingredient nodes to the Process node
 First, let's grab the Material nodes we need from the Inventory node.
 ``` py
-solution = inv['SecBuLi solution 1.4M cHex']
-toluene = inv['toluene']
-styrene = inv['styrene']
-butanol = inv['1-butanol']
-methanol = inv['methanol']
+solution = next((mat for mat in inv.materials if mat.name == 'SecBuLi solution 1.4M cHex'), None)
+toluene = next((mat for mat in inv.materials if mat.name == 'toluene'), None)
+styrene = next((mat for mat in inv.materials if mat.name == 'styrene'), None)
+butanol = next((mat for mat in inv.materials if mat.name == '1-butanol'), None)
+methanol = next((mat for mat in inv.materials if mat.name == 'methanol'), None)
 ```
 Next, we'll define Quantity nodes indicating the amount of each Ingredient.
 ``` py
@@ -142,7 +153,7 @@ prcs.add_property(yield_mass)
 ### Create a Material node (process product)
 First, we'll instantiate the node.
 ``` py
-polystyrene = cript.Material(group=group, name="polystyrene")
+polystyrene = cript.Material(project=proj, name="polystyrene")
 ```
 Next, we'll add some Identifier nodes.
 ``` py
@@ -195,7 +206,7 @@ api.save(sec)
 First, we'll instantiate a File node and associate with the Data node created above.
 ``` py
 path = "path/to/local/file"
-f = cript.File(group=group, data=[sec], source=path)
+f = cript.File(project=proj, data=[sec], source=path)
 ```
 !!! note
     The `source` field should point to a file on your local filesystem. 
