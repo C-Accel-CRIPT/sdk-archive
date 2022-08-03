@@ -9,6 +9,7 @@ from cript.nodes.primary.project import Project
 from cript.nodes.secondary.identifier import Identifier
 from cript.nodes.secondary.property import Property
 from cript.validators import validate_required, validate_key
+from cript.utils import auto_assign_group
 
 
 logger = getLogger(__name__)
@@ -38,7 +39,7 @@ class Material(BasePrimary):
         public: bool = False,
     ):
         super().__init__(public=public)
-        self.group = group
+        self.group = auto_assign_group(group, project)
         self.project = project
         self.name = name
         self.identifiers = identifiers if identifiers else []

@@ -8,6 +8,7 @@ from cript.nodes.primary.group import Group
 from cript.nodes.primary.project import Project
 from cript.nodes.secondary.citation import Citation
 from cript.validators import validate_required
+from cript.utils import auto_assign_group
 
 
 logger = getLogger(__name__)
@@ -37,7 +38,7 @@ class Collection(BasePrimary):
         public: bool = False,
     ):
         super().__init__(public=public)
-        self.group = group
+        self.group = auto_assign_group(group, project)
         self.project = project
         self.name = name
         self.experiments = experiments if experiments else []

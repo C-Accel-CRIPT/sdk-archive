@@ -11,6 +11,7 @@ from cript.nodes.primary.project import Project
 from cript.nodes.primary.data import Data
 from cript.validators import validate_required, validate_key
 from cript.utils import sha256_hash
+from cript.utils import auto_assign_group
 
 
 logger = getLogger(__name__)
@@ -41,7 +42,7 @@ class File(BasePrimary):
         public: bool = False,
     ):
         super().__init__(public=public)
-        self.group = group
+        self.group = auto_assign_group(group, project)
         self.project = project
         self.data = data
         self.checksum = checksum
