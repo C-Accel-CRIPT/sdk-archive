@@ -20,9 +20,19 @@ api.save(group)
 !!! note
     Group names are globally unique.
 
+
+### Create a Project node
+``` py
+proj = cript.Project(group=group, name="MyProject")
+api.save(project)
+```
+!!! note
+    Project names are globally unique.
+
+
 ### Create a Collection node
 ``` py
-coll = cript.Collection(group=group, name="Tutorial")
+coll = cript.Collection(project=proj, name="Tutorial")
 api.save(coll)
 ```
 
@@ -143,7 +153,7 @@ prcs.add_property(yield_mass)
 ### Create a Material node (process product)
 First, we'll instantiate the node.
 ``` py
-polystyrene = cript.Material(group=group, name="polystyrene")
+polystyrene = cript.Material(project=proj, name="polystyrene")
 ```
 Next, we'll add some Identifier nodes.
 ``` py
@@ -187,7 +197,6 @@ sec = cript.Data(
     experiment=expt, 
     name="Crude SEC of polystyrene", 
     type="sec_trace",
-    sample_prep = "5 mg of polymer in 1 ml of THF, filtered 0.45um pores.",
 )
 api.save(sec)
 ```
@@ -196,7 +205,7 @@ api.save(sec)
 First, we'll instantiate a File node and associate with the Data node created above.
 ``` py
 path = "path/to/local/file"
-f = cript.File(group=group, data=[sec], source=path)
+f = cript.File(project=proj, data=[sec], source=path)
 ```
 !!! note
     The `source` field should point to a file on your local filesystem. 
@@ -215,7 +224,7 @@ mw_n = cript.Property(key="mw_n", value=5200, unit="g/mol")
 ```
 Next, we'll add the Data node to the new Property node.
 ``` py
-mw_n.add_data(sec)
+mw_n.data = sec
 ```
 Last, we'll add the new Property node to polystyrene then save it.
 ``` py

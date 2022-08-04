@@ -28,6 +28,7 @@ from cript import exceptions  # noqa 401 402
 from cript.nodes import (  # noqa 402
     User,
     Group,
+    Project,
     Reference,
     Citation,
     Collection,
@@ -36,7 +37,6 @@ from cript.nodes import (  # noqa 402
     Condition,
     Property,
     Identifier,
-    Component,
     Material,
     Inventory,
     Quantity,
@@ -48,6 +48,7 @@ from cript.nodes import (  # noqa 402
 NODE_CLASSES = [
     User,
     Group,
+    Project,
     Reference,
     Citation,
     Collection,
@@ -56,7 +57,6 @@ NODE_CLASSES = [
     Condition,
     Property,
     Identifier,
-    Component,
     Material,
     Inventory,
     Quantity,

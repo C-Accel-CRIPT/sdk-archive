@@ -9,14 +9,14 @@
 ### Identifier
 ::: cript.nodes.Identifier
 
-### Component
-::: cript.nodes.Component
-
 ### Ingredient
 ::: cript.nodes.Ingredient
 
 ### Quantity
 ::: cript.nodes.Quantity
+
+### Equipment
+::: cript.nodes.Equipment
 
 ### Citation
 ::: cript.nodes.Citation
