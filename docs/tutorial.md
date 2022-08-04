@@ -197,7 +197,6 @@ sec = cript.Data(
     experiment=expt, 
     name="Crude SEC of polystyrene", 
     type="sec_trace",
-    sample_prep = "5 mg of polymer in 1 ml of THF, filtered 0.45um pores.",
 )
 api.save(sec)
 ```
@@ -225,7 +224,7 @@ mw_n = cript.Property(key="mw_n", value=5200, unit="g/mol")
 ```
 Next, we'll add the Data node to the new Property node.
 ``` py
-mw_n.add_data(sec)
+mw_n.data = sec
 ```
 Last, we'll add the new Property node to polystyrene then save it.
 ``` py
