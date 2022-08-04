@@ -6,8 +6,8 @@
 ### Group
 ::: cript.nodes.Group
 
-### Base
-::: cript.nodes.Base
+### Project
+::: cript.nodes.Project
 
 ### Collection
 ::: cript.nodes.Collection

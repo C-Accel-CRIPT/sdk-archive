@@ -215,22 +215,9 @@ class FileSizeLimitError(CRIPTError):
 class RequiredFieldsError(CRIPTError):
     """Raised when an object attempts to instantiate without defined required fields."""
 
-    def __init__(self, required_fields_list):
+    def __init__(self, node_name, required_fields_list):
+        self.node_name = node_name
         self.required_fields_str = ", ".join(required_fields_list)
 
     def __str__(self):
-        return f"Missing required field(s): {self.required_fields_str}"
-
-
-def find_depth(tb, continue_test):
-    depth = 0
-
-    while tb is not None:
-        filename = tb.tb_frame.f_code.co_filename
-
-        # Run the test we're given against the filename
-        if not continue_test(filename):
-            return depth
-
-        tb = tb.tb_next
-        depth += 1
+        return f"{self.node_name} node is missing required field(s): {self.required_fields_str}"

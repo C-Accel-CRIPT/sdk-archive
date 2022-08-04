@@ -8,6 +8,7 @@ from cript.nodes.primary.group import Group
 from cript.nodes.primary.experiment import Experiment
 from cript.nodes.primary.material import Material
 from cript.nodes.secondary.ingredient import Ingredient
+from cript.nodes.secondary.equipment import Equipment
 from cript.nodes.secondary.property import Property
 from cript.nodes.secondary.condition import Condition
 from cript.nodes.secondary.citation import Citation
@@ -27,7 +28,7 @@ class Process(BasePrimary):
     node_name = "Process"
     slug = "process"
     list_name = "processes"
-    required = ["group", "experiment", "name"]
+    required = ["group", "experiment", "name", "type"]
     unique_together = ["experiment", "name"]
 
     @beartype
@@ -36,25 +37,26 @@ class Process(BasePrimary):
         group: Union[Group, str] = None,
         experiment: Union[Experiment, str] = None,
         name: str = None,
+        type: str = None,
         keywords: Union[list[str], None] = None,
         description: Union[str, None] = None,
         prerequisite_processes: list[Union[BasePrimary, str]] = None,
         ingredients: list[Union[Ingredient, dict]] = None,
-        equipment: list[Union[str, None]] = None,
+        equipment: list[Union[Equipment, str]] = None,
         properties: list[Union[Property, dict]] = None,
         conditions: list[Union[Condition, dict]] = None,
         set_id: Union[int, None] = None,
         products: list[Union[Material, str]] = None,
+        waste: list[Union[Material, str]] = None,
         citations: list[Union[Citation, dict]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = auto_assign_group(group, experiment)
         self.experiment = experiment
         self.name = name
+        self.type = type
         self.keywords = keywords if keywords else []
         self.description = description
         self.prerequisite_processes = (
@@ -66,12 +68,18 @@ class Process(BasePrimary):
         self.conditions = conditions if conditions else []
         self.set_id = set_id
         self.products = products if products else []
+        self.waste = waste if waste else []
         self.citations = citations if citations else []
         self.notes = notes
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
         validate_required(self)
+
+    @property
+    def type(self):
+        return self._type
+
+    @type.setter
+    def type(self, value):
+        self._type = validate_key("process-type", value)
 
     @property
     def keywords(self):
@@ -84,16 +92,13 @@ class Process(BasePrimary):
                 value[i] = validate_key("process-keyword", value[i])
         self._keywords = value
 
-    @property
-    def equipment(self):
-        return self._equipment
+    @beartype
+    def add_equipment(self, piece: Union[Equipment, dict]):
+        self._add_node(piece, "equipment")
 
-    @equipment.setter
-    def equipment(self, value):
-        if value:
-            for i in range(len(value)):
-                value[i] = validate_key("equipment", value[i])
-        self._equipment = value
+    @beartype
+    def remove_equipment(self, piece: Union[Equipment, int]):
+        self._remove_node(piece, "equipment")
 
     @beartype
     def add_prerequisite_process(self, process: Union[BasePrimary, dict]):
@@ -118,6 +123,14 @@ class Process(BasePrimary):
     @beartype
     def remove_product(self, material: Union[Material, int]):
         self._remove_node(material, "products")
+
+    @beartype
+    def add_waste(self, material: Union[Material, dict]):
+        self._add_node(material, "waste")
+
+    @beartype
+    def remove_waste(self, material: Union[Material, int]):
+        self._remove_node(material, "waste")
 
     @beartype
     def add_condition(self, condition: Union[Condition, dict]):

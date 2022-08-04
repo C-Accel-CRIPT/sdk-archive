@@ -32,7 +32,7 @@ class Data(BasePrimary):
         name: str = None,
         type: str = None,
         files=None,
-        sample_prep: Union[str, None] = None,
+        sample_preparation: Union[BasePrimary, str, None] = None,
         calibration: Union[str, None] = None,
         configuration: Union[str, None] = None,
         materials=None,
@@ -41,24 +41,19 @@ class Data(BasePrimary):
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
     ):
-        super().__init__()
-        self.url = None
-        self.uid = None
+        super().__init__(public=public)
         self.group = auto_assign_group(group, experiment)
         self.experiment = experiment
         self.name = name
         self.files = files
         self.type = type
-        self.sample_prep = sample_prep
+        self.sample_preparation = sample_preparation
         self.calibration = calibration
         self.configuration = configuration
         self.materials = materials if materials else []
         self.processes = processes if processes else []
-        self.notes = notes
         self.citations = citations if citations else []
-        self.public = public
-        self.created_at = None
-        self.updated_at = None
+        self.notes = notes
         validate_required(self)
 
     @property

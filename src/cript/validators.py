@@ -18,7 +18,7 @@ def validate_required(node):
     """
     for field in node.required:
         if not hasattr(node, field) or getattr(node, field) is None:
-            raise RequiredFieldsError(node.required)
+            raise RequiredFieldsError(node.node_name, node.required)
 
 
 def validate_key(key_category, key):
@@ -197,21 +197,16 @@ def _get_key_parameters(key_category, key):
     :param key_category: Name of the relevant key category.
     :param key: Name of the key.
     """
+    from cript.api import API
 
-    from cript.session import API
-
-    # fall back to local copy of keys if web version not available
-    if not API.keys:
-        from cript.api_local import APILocal
-        API = APILocal
-
-    # Fetch relevant keys
-    if key_category == "property-key":
-        keys_info = (
-            API.keys["material-property-key"] + API.keys["process-property-key"]
-        )
-    else:
-        keys_info = API.keys[key_category]
+    if API.keys:
+        # Fetch relevant keys
+        if key_category == "property-key":
+            keys_info = (
+                API.keys["material-property-key"] + API.keys["process-property-key"]
+            )
+        else:
+            keys_info = API.keys[key_category]
 
     key = key.strip().lower()
     for key_info in keys_info:

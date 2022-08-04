@@ -27,14 +27,19 @@ api = cript.API(host, token)
 # Example Tasks
 
 ## Create a node
-For example, create a Group node:
+For example, create a Group:
 ``` py
 group = cript.Group(name="MyGroup")
 api.save(group)
 ```
+... then a Project:
+``` py
+project = cript.Project(group=group, name="MyProject")
+api.save(project)
+```
 ... then a Collection:
 ``` py
-collection = cript.Collection(group=group, name="MyCollection", public=True)
+collection = cript.Collection(project=project, name="MyCollection")
 api.save(collection)
 ```
 !!! note
@@ -54,14 +59,14 @@ api.delete(collection)
 ```
 
 ## Get an existing node
-For example, get the official CRIPT Group node:
+For example, get the official CRIPT Project node:
 ``` py
-group = api.get(cript.Group, {"name": "CRIPT"})
+project = api.get(cript.Project, {"name": "CRIPT"})
 ```
 ... then get the official styrene Material node via CAS number:
 ``` py
 query = {
-    "group": group.uid,
+    "project": project.uid,
     "identifiers": [
         {
             "key": "cas",
@@ -79,29 +84,37 @@ styrene =  api.get(url)
 
 
 ## Run a search query
-For example, search for all Material nodes that contain benzene:
+For example, search for Material nodes with a molar mass less than 10 g/mol:
 ``` py
 query = {
-    "identifiers": [
+    "properties": [
         {
-            "key": "bigsmiles",
-            "value": "c1ccccc1"
+            "key": "molar_mass",
+            "value__lt": 10,
+            "unit": "g/mol"
         }
     ]
 }
 results =  api.search(cript.Material, query)
 ```
 
-## Upload a file
-First, you'll need a Group and Data node:
+... then paginate through the results.
 ``` py
-group = data = api.get("<group_url>")
+results.next         # Flip to the next page
+results.previous     # Flip to the previous page
+results.to_page(10)  # Flip to page 10 (or any other)
+```
+
+## Upload a file
+First, you'll need a Project and Data node:
+``` py
+project = api.get("<project_url>")
 data = api.get("<data_url>")
 ```
 Next, create a File node that points to your local file:
 ``` py
 path = "path/to/local/file"
-f = cript.File(group=group, data=[data], type="data", source=path)
+f = cript.File(project=project, data=[data], source=path)
 api.save(file)
 ```
 
@@ -109,7 +122,7 @@ api.save(file)
 For example, download the file you uploaded above.
 ``` py
 path = "path/to/local/file"
-api.download(f, path=path)
+api.download_file(f, path=path)
 ```
 !!! note
     The default path for a download is your current directory.

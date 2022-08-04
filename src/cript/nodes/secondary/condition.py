@@ -3,6 +3,7 @@ from logging import getLogger
 
 from beartype import beartype
 
+from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.nodes.primary.data import Data
 from cript.validators import (
@@ -33,11 +34,12 @@ class Condition(BaseSecondary):
         value: Union[str, int, float, list, None] = None,
         unit: Union[str, None] = None,
         type: Union[str, None] = None,
-        uncertainty: Union[float, None] = None,
+        uncertainty: Union[float, int, None] = None,
         uncertainty_type: Union[str, None] = None,
+        material: Union[BasePrimary, str, None] = None,
         set_id: Union[int, None] = None,
         measurement_id: Union[int, None] = None,
-        data: list[Union[Data, str]] = None,
+        data: Union[Data, str, None] = None,
     ):
         super().__init__()
         self.key = key
@@ -46,9 +48,10 @@ class Condition(BaseSecondary):
         self.type = type
         self.uncertainty = uncertainty
         self.uncertainty_type = uncertainty_type
+        self.material = material
         self.set_id = set_id
         self.measurement_id = measurement_id
-        self.data = data if data else []
+        self.data = data
         validate_required(self)
 
     @property
@@ -90,11 +93,3 @@ class Condition(BaseSecondary):
     @uncertainty_type.setter
     def uncertainty_type(self, value):
         self._uncertainty_type = validate_key("uncertainty-type", value)
-
-    @beartype
-    def add_data(self, data: Union[Data, dict]):
-        self._add_node(data, "data")
-
-    @beartype
-    def remove_data(self, data: Union[Data, int]):
-        self._remove_node(data, "data")

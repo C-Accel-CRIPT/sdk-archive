@@ -20,15 +20,28 @@ api.save(group)
 !!! note
     Group names are globally unique.
 
+
+### Create a Project node
+``` py
+proj = cript.Project(group=group, name="MyProject")
+api.save(project)
+```
+!!! note
+    Project names are globally unique.
+
+
 ### Create a Collection node
 ``` py
-coll = cript.Collection(group=group, name="Tutorial")
+coll = cript.Collection(project=proj, name="Tutorial")
 api.save(coll)
 ```
 
 ### Create an Experiment node
 ``` py
-expt = cript.Experiment(collection=coll, name="Anionic Polymerization of Styrene with SecBuLi")
+expt = cript.Experiment(
+    collection=coll, 
+    name="Anionic Polymerization of Styrene with SecBuLi"
+)
 api.save(expt)
 ```
 
@@ -54,6 +67,7 @@ type(inv.materials[0])
 prcs = cript.Process(
     experiment=expt, 
     name="Anionic of Styrene",
+    type = "multistep",
     description = "In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
                   "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
                   "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
@@ -82,11 +96,31 @@ workup_qty = cript.Quantity(key="volume", value=100, unit="ml")
 ```
 Next, we'll create Ingredient nodes for each.
 ``` py
-initiator = cript.Ingredient(keyword="initiator" ,material=solution, quantities=[initiator_qty])
-solvent = cript.Ingredient(keyword="solvent" ,material=toluene, quantities=[solvent_qty])
-monomer = cript.Ingredient(keyword="monomer" ,material=styrene, quantities=[monomer_qty])
-quench = cript.Ingredient(keyword="quench" ,material=butanol, quantities=[quench_qty])
-workup = cript.Ingredient(keyword="workup" ,material=methanol, quantities=[workup_qty])
+initiator = cript.Ingredient(
+    keyword="initiator", 
+    material=solution, 
+    quantities=[initiator_qty]
+)
+solvent = cript.Ingredient(
+    keyword="solvent", 
+    material=toluene, 
+    quantities=[solvent_qty]
+)
+monomer = cript.Ingredient(
+    keyword="monomer", 
+    material=styrene, 
+    quantities=[monomer_qty]
+)
+quench = cript.Ingredient(
+    keyword="quench", 
+    material=butanol, 
+    quantities=[quench_qty]
+)
+workup = cript.Ingredient(
+    keyword="workup", 
+    material=methanol, 
+    quantities=[workup_qty]
+)
 ```
 Last, we'll add the Ingredient nodes to the Process node.
 ``` py
@@ -107,20 +141,31 @@ prcs.add_condition(time)
 
 ### Add a Property node to the Process node
 ``` py
-yield_mass = cript.Property(key="yield_mass", value=0.47, unit="g", method="scale")
+yield_mass = cript.Property(
+    key="yield_mass", 
+    value=0.47, 
+    unit="g", 
+    method="scale"
+)
 prcs.add_property(yield_mass)
 ```
 
 ### Create a Material node (process product)
 First, we'll instantiate the node.
 ``` py
-polystyrene = cript.Material(group=group, name="polystyrene")
+polystyrene = cript.Material(project=proj, name="polystyrene")
 ```
 Next, we'll add some Identifier nodes.
 ``` py
-names = cript.Identifier(key="names", value=["poly(styrene)", "poly(vinylbenzene)"])
+names = cript.Identifier(
+    key="names", 
+    value=["poly(styrene)", "poly(vinylbenzene)"]
+)
+bigsmiles = cript.Identifier(
+    key="bigsmiles", 
+    value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
+)
 chem_repeat = cript.Identifier(key="chem_repeat", value="C8H8")
-bigsmiles = cript.Identifier(key="bigsmiles", value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC")
 cas = cript.Identifier(key="cas", value="100-42-5")
 
 polystyrene.add_identifier(names)
@@ -152,7 +197,6 @@ sec = cript.Data(
     experiment=expt, 
     name="Crude SEC of polystyrene", 
     type="sec_trace",
-    sample_prep = "5 mg of polymer in 1 ml of THF, filtered 0.45um pores.",
 )
 api.save(sec)
 ```
@@ -161,7 +205,7 @@ api.save(sec)
 First, we'll instantiate a File node and associate with the Data node created above.
 ``` py
 path = "path/to/local/file"
-f = cript.File(group=group, data=[sec], source=path)
+f = cript.File(project=proj, data=[sec], source=path)
 ```
 !!! note
     The `source` field should point to a file on your local filesystem. 
@@ -180,7 +224,7 @@ mw_n = cript.Property(key="mw_n", value=5200, unit="g/mol")
 ```
 Next, we'll add the Data node to the new Property node.
 ``` py
-mw_n.add_data(sec)
+mw_n.data = sec
 ```
 Last, we'll add the new Property node to polystyrene then save it.
 ``` py
