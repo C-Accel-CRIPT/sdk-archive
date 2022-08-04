@@ -130,5 +130,53 @@
     {
         "description": "infrared spectroscopy",
         "name": "near-ir"
+    },
+    {
+        "description": null,
+        "name": "+ir"
+    },
+    {
+        "description": null,
+        "name": "+mals"
+    },
+    {
+        "description": null,
+        "name": "+viscometer"
+    },
+    {
+        "description": null,
+        "name": "+membrane_osmometer"
+    },
+    {
+        "description": null,
+        "name": "+sec_ir"
+    },
+    {
+        "description": null,
+        "name": "+sec_mals"
+    },
+    {
+        "description": null,
+        "name": "+sec_visco"
+    },
+    {
+        "description": null,
+        "name": "+archimedes principle"
+    },
+    {
+        "description": null,
+        "name": "+debugging"
+    },
+    {
+        "description": null,
+        "name": "+size exclusion chromatography with infrared"
+    },
+    {
+        "description": null,
+        "name": "+size exclusion chromatography with multiangle light scattering"
+    },
+    {
+        "description": null,
+        "name": "+size exclusion chromatography with viscometry"
     }
 ]

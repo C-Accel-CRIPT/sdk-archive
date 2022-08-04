@@ -199,14 +199,19 @@ def _get_key_parameters(key_category, key):
     """
     from cript.api import API
 
-    if API.keys:
-        # Fetch relevant keys
-        if key_category == "property-key":
-            keys_info = (
-                API.keys["material-property-key"] + API.keys["process-property-key"]
-            )
-        else:
-            keys_info = API.keys[key_category]
+    # fall back to local copy of keys if web version not available
+    if not API.keys:
+        from cript.api_local import APILocal
+        APILocal._load_keys()
+        API = APILocal
+
+    # Fetch relevant keys
+    if key_category == "property-key":
+        keys_info = (
+            API.keys["material-property-key"] + API.keys["process-property-key"]
+        )
+    else:
+        keys_info = API.keys[key_category]
 
     key = key.strip().lower()
     for key_info in keys_info:

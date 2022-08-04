@@ -1,9 +1,10 @@
 import cript as c
 
 
-def define_materials(group: c.Group) -> list[c.Material]:
+def define_materials(project: c.Project) -> list[c.Material]:
     water = c.Material(
-        group=group,
+        project=project,
+        group=project.group,
         name="water",
         identifiers=[
             c.Identifier("preferred_name", "water"),
@@ -29,9 +30,10 @@ def define_materials(group: c.Group) -> list[c.Material]:
                        )
         ]
     )
-    print(water)
+
     dueterated_chloroform = c.Material(
-        group=group,
+        project=project,
+        group=project.group,
         name="deuterated chloroform",
         identifiers=[
             c.Identifier("preferred_name", "deuterated chloroform"),
@@ -59,7 +61,8 @@ def define_materials(group: c.Group) -> list[c.Material]:
     )
 
     nitrogen = c.Material(
-        group=group,
+        project=project,
+        group=project.group,
         name="nitrogen",
         identifiers=[
             c.Identifier("preferred_name", "nitrogen"),
@@ -87,7 +90,8 @@ def define_materials(group: c.Group) -> list[c.Material]:
     )
 
     argon = c.Material(
-        group=group,
+        project=project,
+        group=project.group,
         name="Argon",
         identifiers=[
             c.Identifier("preferred_name", "argon"),
@@ -118,7 +122,8 @@ def define_materials(group: c.Group) -> list[c.Material]:
     )
 
     styrene = c.Material(
-        group=group,
+        project=project,
+        group=project.group,
         name="styrene",
         identifiers=[
             c.Identifier("preferred_name", "styrene"),
@@ -149,7 +154,8 @@ def define_materials(group: c.Group) -> list[c.Material]:
     )
 
     toluene = c.Material(
-        group=group,
+        project=project,
+        group=project.group,
         name="toluene",
         identifiers=[
             c.Identifier("preferred_name", "toluene"),
@@ -183,7 +189,8 @@ def define_materials(group: c.Group) -> list[c.Material]:
     )
 
     thf = c.Material(
-        group=group,
+        project=project,
+        group=project.group,
         name="thf",
         identifiers=[
             c.Identifier("preferred_name", "tetrahydrofuran"),
@@ -211,14 +218,15 @@ def define_materials(group: c.Group) -> list[c.Material]:
             c.Property(key="+solubility", value=-1, unit="g/ml",
                        conditions=[
                            c.Condition(key="temperature", value=20, unit="degC"),
-                           #c.Condition(key="temperature", value=water),
+                           c.Condition(key="+solvent", material=water),
                        ]
                        )
         ]
     )
 
     butanol = c.Material(
-        group=group,
+        project=project,
+        group=project.group,
         name="nbutanol",
         identifiers=[
             c.Identifier("preferred_name", "1-butanol"),
@@ -246,7 +254,8 @@ def define_materials(group: c.Group) -> list[c.Material]:
     )
 
     methanol = c.Material(
-        group=group,
+        project=project,
+        group=project.group,
         name="methanol",
         identifiers=[
             c.Identifier("preferred_name", "methanol"),
@@ -274,7 +283,8 @@ def define_materials(group: c.Group) -> list[c.Material]:
     )
 
     secBuLi = c.Material(
-        group=group,
+        project=project,
+        group=project.group,
         name="secBuLi",
         identifiers=[
             c.Identifier("preferred_name", "sec-butyllithium"),
@@ -291,7 +301,8 @@ def define_materials(group: c.Group) -> list[c.Material]:
     )
 
     secBuLi_solution = c.Material(
-        group=group,
+        project=project,
+        group=project.group,
         name="SecBuLi solution 1.4M cHex",
         components=[secBuLi, toluene],
         identifiers=[
@@ -308,9 +319,7 @@ def define_materials(group: c.Group) -> list[c.Material]:
             c.Property(key="density", value=0.769, unit="g/ml",
                        conditions=[c.Condition(key="pressure", value=1, unit="bar")]
                        ),
-            c.Property(key="conc_molar", value=1.4, unit="M", component_id=secBuLi,
-                       conditions=[c.Condition(key="material", value=toluene)]
-                       )
+            c.Property(key="conc_molar", value=1.4, unit="M", components=[secBuLi], components_relative=[toluene])
         ]
     )
 
@@ -323,13 +332,15 @@ def main():
 
     # group = c.Group(name="example_group")
     # api.save(group)
-    group = api.get("67b86a11-f721-498e-a4af-6d3e42c09b92")
+    # group = api.get("d9fa4092-97af-4abd-84ac-6a82ba7fca32")
+    # project = c.Project(group=group, name="testing_project")
+    # api.save(project)
+    project = api.get("03c79d57-5ccc-4617-a1d7-fd49c638cb8a")
 
-    materials = define_materials(group)
+    materials = define_materials(project)
 
     # for material in materials:
-    #     pass
-    #     # save
+    #     api.save(material)
 
 
 if __name__ == "__main__":

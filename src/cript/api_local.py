@@ -1,4 +1,5 @@
 import os
+import shutil
 import re
 import json
 import pathlib
@@ -22,7 +23,6 @@ from cript.exceptions import (
     APISearchError,
     APIGetError,
 )
-
 
 logger = getLogger(__name__)
 
@@ -74,21 +74,43 @@ def _format_folder(folder: Union[str, pathlib.Path]) -> pathlib.Path:
     return pathlib.Path(folder)
 
 
+def make_new_folder(folder: pathlib.Path):
+    if not os.path.isdir(folder):
+        os.makedirs(folder)
+
+
+def move_copy_file(old_location: Union[pathlib.Path, str], new_location: Union[pathlib.Path, str]):
+    if not isinstance(old_location, pathlib.Path):
+        old_location = pathlib.Path(old_location)
+    if not isinstance(new_location, pathlib.Path):
+        new_location = pathlib.Path(new_location)
+    new_location = new_location.joinpath(old_location.name)
+    shutil.copy2(old_location, new_location)
+
+
 class APILocal:
     """The entry point for interacting with the CRIPT API."""
 
     version = VERSION
     keys = {}
 
-    def __init__(self, folder: Union[str, pathlib.Path] = None):
+    def __init__(self, folder: Union[str, pathlib.Path], data_folder: Union[str, pathlib.Path] = None):
         """
         Establishes a session with a dummy CRIPT API.
         """
         if not APILocal.keys:  # if empty
             APILocal._load_keys()
 
-        self.name = "dummy"
+        self.name = "local"
+        # database folder
         self.folder: pathlib.Path = _format_folder(folder)
+        make_new_folder(self.folder)
+        # data folder
+        if data_folder is None:
+            data_folder = self.folder.joinpath("data")
+        self.data_folder: pathlib.Path = _format_folder(data_folder)
+        make_new_folder(self.data_folder)
+
         self.database_by_node = {}
         self.database_by_uid = {}
         self._load_database()
@@ -118,8 +140,12 @@ class APILocal:
         files = glob.glob(str(self.folder / "*.json"))
 
         for file in files:
-            # TODO: add try except
-            node, uid = _split_filename(file)
+            try:
+                node, uid = _split_filename(file)
+            except ValueError:
+                logger.warning(f"Unrecognized file found in database and will be skipped. {file}")
+                continue
+
             self.database_by_uid[uid] = file
             if node not in self.database_by_node:
                 self.database_by_node[node] = {}
@@ -149,15 +175,23 @@ class APILocal:
         else:
             # save
             node.uid = str(uuid.uuid4())
+            node.url = str(f"local://cript/{node.slug}/{node.uid}/")
             node.updated_at = datetime.datetime.now().isoformat()
             node.created_at = datetime.datetime.now().isoformat()
-            with open(self.folder / (_generate_file_name(node) + ".json"), "w", encoding=ENCODING) as f:
+            file_name = self.folder / (_generate_file_name(node) + ".json")
+            with open(file_name, "w", encoding=ENCODING) as f:
                 f.write(node._to_json())
             logger.info(f"{node.node_name}({node.uid})  node has been saved to the database.")
 
+            # add node to api database list
+            self.database_by_uid[node.uid] = node
+            if node.slug not in self.database_by_node:
+                self.database_by_node[node.slug] = {node.uid: file_name}
+            else:
+                self.database_by_node[node.slug][node.uid] = file_name
+
         if isinstance(node, File) and os.path.exists(node.source):
-            raise NotImplementedError
-            # self._upload_file(node)
+            move_copy_file(node.source, self.data_folder)
 
         # self._set_node_attributes(node, response.json())
         # self._generate_nodes(node, max_level=max_level)
@@ -237,11 +271,11 @@ class APILocal:
 
     @beartype
     def get(
-        self,
-        obj: Union[str, Type[Base]],
-        query: dict = None,
-        level: int = 0,
-        max_level: int = 1,
+            self,
+            obj: Union[str, Type[Base]],
+            query: dict = None,
+            level: int = 0,
+            max_level: int = 1,
     ):
         """
         Get the JSON for a node and use it to generate a local node object.

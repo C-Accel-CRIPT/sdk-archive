@@ -261,5 +261,27 @@
         "si_unit": "kilogram * meter ** 2 / second ** 2",
         "value_length": null,
         "value_type": "number"
+    },
+    {
+        "description": null,
+        "methods": null,
+        "name": "+scb",
+        "names": [],
+        "prefer_unit": null,
+        "range": null,
+        "si_unit": null,
+        "value_length": null,
+        "value_type": null
+    },
+    {
+        "description": null,
+        "methods": null,
+        "name": "+lcbf",
+        "names": [],
+        "prefer_unit": null,
+        "range": null,
+        "si_unit": null,
+        "value_length": null,
+        "value_type": null
     }
 ]

@@ -193,10 +193,6 @@
     },
     {
         "description": null,
-        "name": "+frequency sweep"
-    },
-    {
-        "description": null,
         "name": "+sans pattern"
     },
     {
@@ -208,15 +204,19 @@
         "name": "thermogram"
     },
     {
-        "description": "frequency sweep",
-        "name": "frequency_sweep"
-    },
-    {
         "description": "time temperature superposition",
         "name": "time_temperature_superposition"
     },
     {
         "description": null,
         "name": "+nir"
+    },
+    {
+        "description": "frequency sweep",
+        "name": "frequency sweep"
+    },
+    {
+        "description": "frequency sweep",
+        "name": "frequency_sweep"
     }
 ]

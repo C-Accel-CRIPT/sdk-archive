@@ -38,5 +38,9 @@
     {
         "description": "no value (only to be used with 'associated' and 'structure')",
         "name": "none"
+    },
+    {
+        "description": "the rate the value changes with respect to time",
+        "name": "rate"
     }
 ]

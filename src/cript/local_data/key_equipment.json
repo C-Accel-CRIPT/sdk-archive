@@ -194,5 +194,49 @@
     {
         "description": "metal reactor",
         "name": "metal_reactor"
+    },
+    {
+        "description": null,
+        "name": "+mixer_centrifugal"
+    },
+    {
+        "description": null,
+        "name": "+printer_diw"
+    },
+    {
+        "description": "Fused deposition modeling (Fused filament fabrication)",
+        "name": "printer_fdm"
+    },
+    {
+        "description": "Direct ink writing (Bioplotting)",
+        "name": "printer_diw"
+    },
+    {
+        "description": "Stereolithography",
+        "name": "printer_sla"
+    },
+    {
+        "description": "Digital light processing",
+        "name": "printer_dlp"
+    },
+    {
+        "description": "Continuous liquid interface production",
+        "name": "printer_clip"
+    },
+    {
+        "description": "Selective laser sintering",
+        "name": "printer_sls"
+    },
+    {
+        "description": "Inkjet (Material jetting)",
+        "name": "printer_inkjet"
+    },
+    {
+        "description": "Binderjetting",
+        "name": "printer_binderjet"
+    },
+    {
+        "description": "centrifugal mixer",
+        "name": "mixer_centrifugal"
     }
 ]

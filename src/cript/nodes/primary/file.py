@@ -79,7 +79,7 @@ class File(BasePrimary):
                 pass
             else:
                 raise FileNotFoundError(
-                    "The file could not be found on the local filesystem."
+                    f"The file could not be found on the local filesystem. {value}"
                 )
         self._source = value
 
