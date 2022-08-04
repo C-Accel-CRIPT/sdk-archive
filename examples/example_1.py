@@ -34,6 +34,8 @@ for material in materials:
 
 inventory = c.Inventory(group=group, collection=collection, name="Tutorial Materials", materials=materials)
 api.save(inventory)
+collection.experiments = [inventory]
+api.save(collection)
 ###########################################################
 
 ingr_tol = c.Ingredient(material=inventory["toluene"], keyword="solvent",
