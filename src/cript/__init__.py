@@ -41,6 +41,7 @@ from cript.nodes import (  # noqa 402
     Inventory,
     Quantity,
     Ingredient,
+    Equipment,
     Process,
     Experiment,
 )
@@ -61,6 +62,7 @@ NODE_CLASSES = [
     Inventory,
     Quantity,
     Ingredient,
+    Equipment,
     Process,
     Experiment,
 ]
