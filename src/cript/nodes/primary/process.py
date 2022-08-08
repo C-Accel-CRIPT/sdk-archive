@@ -42,7 +42,7 @@ class Process(BasePrimary):
         description: Union[str, None] = None,
         prerequisite_processes: list[Union[BasePrimary, str]] = None,
         ingredients: list[Union[Ingredient, dict]] = None,
-        equipment: list[Union[Equipment, str]] = None,
+        equipment: list[Union[Equipment, dict]] = None,
         properties: list[Union[Property, dict]] = None,
         conditions: list[Union[Condition, dict]] = None,
         set_id: Union[int, None] = None,
