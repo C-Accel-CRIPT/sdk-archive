@@ -24,7 +24,7 @@ class File(BasePrimary):
     slug = "file"
     list_name = "files"
     required = ["group", "project", "data", "source", "type"]
-    unique_together = ["checksum", "created_by"]
+    unique_together = ["project", "checksum"]
 
     @beartype
     def __init__(
@@ -37,7 +37,7 @@ class File(BasePrimary):
         type: str = "data",
         checksum: Union[str, None] = None,
         extension: Union[str, None] = None,
-        unique_name: str = None,
+        unique_name: Union[str, None] = None,
         external_source: Union[str, None] = None,
         public: bool = False,
     ):
