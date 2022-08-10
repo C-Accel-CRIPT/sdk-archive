@@ -38,7 +38,6 @@ class File(BasePrimary):
         checksum: Union[str, None] = None,
         extension: Union[str, None] = None,
         unique_name: Union[str, None] = None,
-        external_source: Union[str, None] = None,
         public: bool = False,
     ):
         super().__init__(public=public)
@@ -50,7 +49,6 @@ class File(BasePrimary):
         self.unique_name = unique_name
         self.source = source
         self.extension = extension
-        self.external_source = external_source
         self.type = type
         validate_required(self)
 
