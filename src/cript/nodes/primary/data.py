@@ -5,7 +5,7 @@ from beartype import beartype
 
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes import Group, Citation
-from cript.validators import validate_required, validate_key
+from cript.validators import validate_key
 from cript.utils import auto_assign_group
 
 
@@ -21,16 +21,14 @@ class Data(BasePrimary):
     node_name = "Data"
     slug = "data"
     list_name = "data"
-    required = ["group", "experiment", "name", "type"]
     unique_together = ["experiment", "name"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str] = None,
-        experiment: Union[BasePrimary, str] = None,
-        name: str = None,
-        type: str = None,
+        experiment: Union[BasePrimary, str],
+        name: str,
+        type: str,
         files=None,
         sample_preparation: Union[BasePrimary, str, None] = None,
         calibration: Union[str, None] = None,
@@ -40,9 +38,9 @@ class Data(BasePrimary):
         notes: Union[str, None] = None,
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
+        group: Union[Group, str] = None,
     ):
         super().__init__(public=public)
-        self.group = auto_assign_group(group, experiment)
         self.experiment = experiment
         self.name = name
         self.files = files
@@ -54,7 +52,7 @@ class Data(BasePrimary):
         self.processes = processes if processes else []
         self.citations = citations if citations else []
         self.notes = notes
-        validate_required(self)
+        self.group = auto_assign_group(group, experiment)
 
     @property
     def type(self):

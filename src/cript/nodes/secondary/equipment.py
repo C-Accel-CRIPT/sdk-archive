@@ -6,7 +6,7 @@ from beartype import beartype
 from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.nodes.secondary.condition import Condition
 from cript.nodes.secondary.citation import Citation
-from cript.validators import validate_required, validate_key
+from cript.validators import validate_key
 
 
 logger = getLogger(__name__)
@@ -19,7 +19,6 @@ class Equipment(BaseSecondary):
 
     node_name = "Equipment"
     list_name = "equipment"
-    required = ["key"]
 
     @beartype
     def __init__(
@@ -34,7 +33,6 @@ class Equipment(BaseSecondary):
         self.description = description
         self.conditions = conditions if conditions else []
         self.citations = citations if citations else []
-        validate_required(self)
 
     @property
     def key(self):

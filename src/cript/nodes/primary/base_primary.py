@@ -9,15 +9,16 @@ from cript.nodes.base import Base
 class BasePrimary(Base, abc.ABC):
     slug = None
     source = None
-    required = None
     unique_together = None
 
-    def __init__(self,
-                 url: str = None,
-                 uid: str = None,
-                 public: bool = False,
-                 created_at: str = None,
-                 updated_at: str = None):
+    def __init__(
+        self,
+        url: str = None,
+        uid: str = None,
+        public: bool = False,
+        created_at: str = None,
+        updated_at: str = None,
+    ):
         super().__init__()
         self.url = url
         self.uid = uid
@@ -89,4 +90,6 @@ class BasePrimary(Base, abc.ABC):
             # for BaseSecondary
             attribute.remove(node)
         else:
-            raise RemoveNodeError(f"{self.node_name} nodes do not contain {node.node_name} nodes.")
+            raise RemoveNodeError(
+                f"{self.node_name} nodes do not contain {node.node_name} nodes."
+            )

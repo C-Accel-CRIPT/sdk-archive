@@ -12,7 +12,7 @@ from cript.nodes.secondary.equipment import Equipment
 from cript.nodes.secondary.property import Property
 from cript.nodes.secondary.condition import Condition
 from cript.nodes.secondary.citation import Citation
-from cript.validators import validate_required, validate_key
+from cript.validators import validate_key
 from cript.utils import auto_assign_group
 
 
@@ -28,16 +28,14 @@ class Process(BasePrimary):
     node_name = "Process"
     slug = "process"
     list_name = "processes"
-    required = ["group", "experiment", "name", "type"]
     unique_together = ["experiment", "name"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str] = None,
-        experiment: Union[Experiment, str] = None,
-        name: str = None,
-        type: str = None,
+        experiment: Union[Experiment, str],
+        name: str,
+        type: str,
         keywords: Union[list[str], None] = None,
         description: Union[str, None] = None,
         prerequisite_processes: list[Union[BasePrimary, str]] = None,
@@ -51,9 +49,9 @@ class Process(BasePrimary):
         citations: list[Union[Citation, dict]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
+        group: Union[Group, str] = None,
     ):
         super().__init__(public=public)
-        self.group = auto_assign_group(group, experiment)
         self.experiment = experiment
         self.name = name
         self.type = type
@@ -71,7 +69,7 @@ class Process(BasePrimary):
         self.waste = waste if waste else []
         self.citations = citations if citations else []
         self.notes = notes
-        validate_required(self)
+        self.group = auto_assign_group(group, experiment)
 
     @property
     def type(self):

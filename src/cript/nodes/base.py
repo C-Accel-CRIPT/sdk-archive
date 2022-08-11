@@ -18,7 +18,6 @@ class Base(abc.ABC):
 
     node_name = None
     list_name = None
-    required = None
 
     def __init__(self):
         self.__refs__.add(self)  # Add instance to __refs__

@@ -5,7 +5,7 @@ from beartype import beartype
 
 from cript.nodes.primary.reference import Reference
 from cript.nodes.secondary.base_secondary import BaseSecondary
-from cript.validators import validate_required, validate_key
+from cript.validators import validate_key
 
 
 logger = getLogger(__name__)
@@ -19,12 +19,11 @@ class Citation(BaseSecondary):
 
     node_name = "Citation"
     list_name = "citations"
-    required = ["reference"]
 
     @beartype
     def __init__(
         self,
-        reference: Union[Reference, str] = None,
+        reference: Union[Reference, str],
         type: Union[str, None] = "reference",
         notes: Union[str, None] = None,
     ):
@@ -32,7 +31,6 @@ class Citation(BaseSecondary):
         self.reference = reference
         self.type = type
         self.notes = notes
-        validate_required(self)
 
     @property
     def type(self):
