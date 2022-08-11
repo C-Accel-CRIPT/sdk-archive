@@ -556,12 +556,20 @@ class API:
             raise APIGetError(display_errors(response.content))
 
     @beartype
-    def search(self, node_class: Type[BasePrimary], query: dict):
+    def search(
+        self,
+        node_class: Type[BasePrimary],
+        query: dict,
+        limit: Union[int, None] = None,
+        offset: Union[int, None] = None,
+    ):
         """
         Send a query to the API and print the results.
 
         :param node_class: The class of the node type to query for.
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
+        :param limit: The max number of items to return.
+        :param offset: The starting position of the query.
         :return: A :class:`SearchPaginator` object containing the results.
         :rtype: cript.session.SearchPaginator
         """
@@ -570,11 +578,16 @@ class API:
                 f"{node_class.node_name} is a secondary node, thus cannot be searched."
             )
 
+        # Generate URL
+        url = f"{self.api_url}/search/{node_class.slug}/?"
+        if limit:
+            url += f"limit={str(limit)}&"
+        if offset:
+            url += f"offset={str(offset)}"
+
         if isinstance(query, dict):
             payload = json.dumps(query)
-            response = self.session.post(
-                url=f"{self.api_url}/search/{node_class.slug}/", data=payload
-            )
+            response = self.session.post(url=url, data=payload)
         else:
             raise APISearchError(f"'{query}' is not a valid query.")
 
@@ -769,8 +782,8 @@ class SearchPaginator:
 
     def __init__(self, session, content, payload):
         self._session = session
-        self.current = content
         self.payload = payload
+        self.current = content
         self.count = self.current["count"]
 
     def __repr__(self):
@@ -795,7 +808,7 @@ class SearchPaginator:
             response = self._session.post(url=next_url, data=self.payload)
             self.current = response.content
         else:
-            raise AttributeError("You're currently on the final page.")
+            raise AttributeError("You've reached the end of the query.")
 
     @property
     def previous(self):
@@ -805,26 +818,4 @@ class SearchPaginator:
             response = self._session.post(url=previous_url, data=self.payload)
             self.current = response.content
         else:
-            raise AttributeError("You're currently on the first page.")
-
-    def to_page(self, page_number: int):
-        """
-        Navigate to a specific page in the results.
-
-        :param page_number: The page number to turn to.
-        """
-        if self.current["next"]:
-            url = self.current["next"]
-        elif self.current["previous"]:
-            url = self.current["previous"]
-        else:
-            raise ValueError(f"{page_number} is not a valid page number.")
-
-        url = url.split("?page=")[0]
-        url += f"?page={str(page_number)}"
-
-        response = self._session.post(url=url, data=self.payload)
-        if response.status_code == 200:
-            self.current = response.content
-        else:
-            raise ValueError(f"{page_number} is not a valid page number.")
+            raise AttributeError("You've reached the beginning of the query.")
