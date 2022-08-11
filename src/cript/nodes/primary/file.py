@@ -24,7 +24,6 @@ class File(BasePrimary):
     node_name = "File"
     slug = "file"
     list_name = "files"
-    unique_together = ["project", "checksum"]
 
     @beartype
     def __init__(

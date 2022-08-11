@@ -18,7 +18,6 @@ class Inventory(BasePrimary):
 
     node_name = "Inventory"
     slug = "inventory"
-    unique_together = ["collection", "name"]
 
     @beartype
     def __init__(

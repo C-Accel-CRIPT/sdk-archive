@@ -21,7 +21,6 @@ class Material(BasePrimary):
     node_name = "Material"
     slug = "material"
     list_name = "materials"
-    unique_together = ["project", "name"]
 
     @beartype
     def __init__(

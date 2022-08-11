@@ -15,7 +15,6 @@ class Group(BasePrimary):
 
     node_name = "Group"
     slug = "group"
-    unique_together = ["name"]
 
     @beartype
     def __init__(

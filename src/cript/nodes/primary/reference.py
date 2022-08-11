@@ -15,7 +15,6 @@ class Reference(BasePrimary):
 
     node_name = "Reference"
     slug = "reference"
-    unique_together = ["title", "created_by"]
 
     @beartype
     def __init__(

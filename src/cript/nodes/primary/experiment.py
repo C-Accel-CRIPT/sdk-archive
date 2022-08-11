@@ -20,7 +20,6 @@ class Experiment(BasePrimary):
     node_name = "Experiment"
     slug = "experiment"
     list_name = "experiments"
-    unique_together = ["collection", "name"]
 
     @beartype
     def __init__(

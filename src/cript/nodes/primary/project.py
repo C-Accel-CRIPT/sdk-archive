@@ -18,7 +18,6 @@ class Project(BasePrimary):
 
     node_name = "Project"
     slug = "project"
-    unique_together = ["name"]
 
     @beartype
     def __init__(

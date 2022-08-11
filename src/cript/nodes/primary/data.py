@@ -21,7 +21,6 @@ class Data(BasePrimary):
     node_name = "Data"
     slug = "data"
     list_name = "data"
-    unique_together = ["experiment", "name"]
 
     @beartype
     def __init__(

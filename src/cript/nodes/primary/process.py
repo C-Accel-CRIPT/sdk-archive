@@ -28,7 +28,6 @@ class Process(BasePrimary):
     node_name = "Process"
     slug = "process"
     list_name = "processes"
-    unique_together = ["experiment", "name"]
 
     @beartype
     def __init__(

@@ -21,7 +21,6 @@ class Collection(BasePrimary):
 
     node_name = "Collection"
     slug = "collection"
-    unique_together = ["project", "name"]
 
     @beartype
     def __init__(

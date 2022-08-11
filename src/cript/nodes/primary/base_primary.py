@@ -9,7 +9,6 @@ from cript.nodes.base import Base
 class BasePrimary(Base, abc.ABC):
     slug = None
     source = None
-    unique_together = None
 
     def __init__(
         self,
