@@ -113,13 +113,15 @@ class API:
             )
 
     @beartype
-    def save(self, node: BasePrimary, max_level: int = 1, use_duplicate: bool = False):
+    def save(
+        self, node: BasePrimary, max_level: int = 1, update_existing: bool = False
+    ):
         """
         Create or update a node in the database.
 
         :param node: The node to be saved.
         :param max_level: Max depth to recursively generate nested nodes.
-        :param use_duplicate: Flag indicating whether to convert the node into an existing duplicate or raise an error.
+        :param update_existing: Indicates whether to update an existing node with the same unique fields.
         """
         if not isinstance(node, BasePrimary):
             raise APISaveError(
@@ -157,16 +159,14 @@ class API:
                 response_dict = json.loads(response.content)
                 if "duplicate" in response_dict:
                     duplicate_url = response_dict.pop("duplicate")
-
-                    if use_duplicate == True and duplicate_url is not None:
-                        # Convert node into the existing duplicate
+                    if update_existing == True and duplicate_url is not None:
+                        # Update existing duplicate node
                         node.url = duplicate_url
-                        self.refresh(node)
+                        self.save(node)
                         return
                     else:
                         response_content = json.dumps(response_dict)
                         raise DuplicateNodeError(display_errors(response_content))
-
             except json.decoder.JSONDecodeError:
                 pass
             raise APISaveError(display_errors(response.content))
