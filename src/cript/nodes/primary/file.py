@@ -1,6 +1,7 @@
 import os
 from typing import Union
 from logging import getLogger
+from urllib.parse import urlparse
 
 from beartype import beartype
 
@@ -66,13 +67,21 @@ class File(BasePrimary):
     def source(self, value):
         if value != "Invalid":
             if os.path.exists(value):
+                # Clean path
                 value = value.replace("\\", "/")
+
+                # Generate checksum
                 logger.info(f"Generating checksum for {value}.")
                 self.checksum = sha256_hash(value)
                 logger.info("Checksum generated successfully.")
+
                 self.name = os.path.basename(value)
-            elif value.startswith(("http", "https")):
-                pass
+                self.extension = os.path.splitext(value)[-1]
+
+            elif value.startswith(("http://", "https://")):
+                parsed_url = urlparse(value)
+                self.name = parsed_url.netloc + parsed_url.path
+
             else:
                 raise FileNotFoundError(
                     "The file could not be found on the local filesystem."
