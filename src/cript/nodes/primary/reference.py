@@ -5,7 +5,6 @@ from beartype import beartype
 
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
-from cript.validators import validate_required
 
 
 logger = getLogger(__name__)
@@ -16,14 +15,12 @@ class Reference(BasePrimary):
 
     node_name = "Reference"
     slug = "reference"
-    required = ["group", "title"]
-    unique_together = ["title", "created_by"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str] = None,
-        title: str = None,
+        group: Union[Group, str],
+        title: str,
         doi: Union[str, None] = None,
         authors: Union[list[str], None] = None,
         journal: Union[str, None] = None,
@@ -40,7 +37,6 @@ class Reference(BasePrimary):
         public: bool = False,
     ):
         super().__init__(public=public)
-        self.group = group
         self.title = title
         self.doi = doi
         self.authors = authors if authors else []
@@ -55,4 +51,4 @@ class Reference(BasePrimary):
         self.pmid = pmid
         self.website = website
         self.notes = notes
-        validate_required(self)
+        self.group = group

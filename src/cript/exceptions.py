@@ -209,14 +209,3 @@ class FileSizeLimitError(CRIPTError):
 
     def __str__(self):
         return f"The file size exceeds the maximum limit of {self.max_size}."
-
-
-class RequiredFieldsError(CRIPTError):
-    """Raised when an object attempts to instantiate without defined required fields."""
-
-    def __init__(self, node_name, required_fields_list):
-        self.node_name = node_name
-        self.required_fields_str = ", ".join(required_fields_list)
-
-    def __str__(self):
-        return f"{self.node_name} node is missing required field(s): {self.required_fields_str}"

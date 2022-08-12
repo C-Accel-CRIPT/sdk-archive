@@ -6,7 +6,6 @@ from beartype import beartype
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
 from cript.nodes.primary.collection import Collection
-from cript.validators import validate_required
 from cript.utils import auto_assign_group
 
 
@@ -21,27 +20,24 @@ class Experiment(BasePrimary):
     node_name = "Experiment"
     slug = "experiment"
     list_name = "experiments"
-    required = ["group", "collection", "name"]
-    unique_together = ["collection", "name"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str] = None,
-        collection: Union[Collection, str] = None,
-        name: str = None,
+        collection: Union[Collection, str],
+        name: str,
         processes=None,
         data=None,
         funding: list[Union[str, None]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
+        group: Union[Group, str] = None,
     ):
         super().__init__(public=public)
-        self.group = auto_assign_group(group, collection)
         self.collection = collection
         self.name = name
         self.funding = funding if funding else []
         self.processes = processes if processes else []
         self.data = data if data else []
         self.notes = notes
-        validate_required(self)
+        self.group = auto_assign_group(group, collection)
