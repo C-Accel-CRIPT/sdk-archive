@@ -18,7 +18,12 @@ from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.user import User
 from cript.nodes.primary.file import File
 from cript.nodes.secondary.base_secondary import BaseSecondary
-from cript.utils import get_api_url, convert_file_size, display_errors
+from cript.utils import (
+    get_api_url,
+    convert_to_api_url,
+    convert_file_size,
+    display_errors,
+)
 from cript.exceptions import (
     APIAuthError,
     APIRefreshError,
@@ -615,6 +620,7 @@ class API:
         """
         # Get node with a URL
         if isinstance(obj, str):
+            obj = convert_to_api_url(obj)
             if self.api_url not in obj:
                 raise APIGetError("Please enter a valid node URL.")
             response = self.session.get(obj)
