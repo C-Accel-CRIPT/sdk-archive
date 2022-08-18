@@ -1,7 +1,6 @@
 import os
 from typing import Union
 from logging import getLogger
-from urllib.parse import urlparse
 
 from beartype import beartype
 
@@ -76,11 +75,8 @@ class File(BasePrimary):
 
                 self.name = os.path.basename(value)
                 self.extension = os.path.splitext(value)[-1]
-
             elif value.startswith(("http://", "https://")):
-                parsed_url = urlparse(value)
-                self.name = parsed_url.netloc + parsed_url.path
-
+                pass
             else:
                 raise FileNotFoundError(
                     "The file could not be found on the local filesystem."
