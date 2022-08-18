@@ -31,6 +31,7 @@ class Condition(BaseSecondary):
         uncertainty: Union[float, int, None] = None,
         uncertainty_type: Union[str, None] = None,
         material: Union[BasePrimary, str, None] = None,
+        descriptor: Union[str, None] = None,
         set_id: Union[int, None] = None,
         measurement_id: Union[int, None] = None,
         data: Union[Data, str, None] = None,
@@ -43,6 +44,7 @@ class Condition(BaseSecondary):
         self.uncertainty = uncertainty
         self.uncertainty_type = uncertainty_type
         self.material = material
+        self.descriptor = descriptor
         self.set_id = set_id
         self.measurement_id = measurement_id
         self.data = data
