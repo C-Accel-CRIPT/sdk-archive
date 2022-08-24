@@ -35,9 +35,12 @@ def convert_to_api_url(url: str):
     scheme = parsed_url.scheme
     netloc = parsed_url.netloc
     path = parsed_url.path
-    if not path.startswith("/api/"):
-        return f"{scheme}://{netloc}/api{path}"
-    return url
+
+    # Return original URL if in correct format
+    if path.startswith("/api/"):
+        return url
+
+    return f"{scheme}://{netloc}/api{path}"
 
 
 def auto_assign_group(group, parent):
