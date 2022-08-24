@@ -2,7 +2,7 @@
 
 Prerequisites:
 > - *Python 3.9+*
-> - *Outbound Internet access*
+> - *Internet access*
 
 Install with pip:
 ```

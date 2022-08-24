@@ -35,6 +35,11 @@ def convert_to_api_url(url: str):
     scheme = parsed_url.scheme
     netloc = parsed_url.netloc
     path = parsed_url.path
+
+    # Return original URL if in correct format
+    if path.startswith("/api/"):
+        return url
+
     return f"{scheme}://{netloc}/api{path}"
 
 
