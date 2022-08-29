@@ -22,16 +22,16 @@ class Project(BasePrimary):
     @beartype
     def __init__(
         self,
-        group: Union[Group, str],
         name: str,
         materials=None,
         files=None,
         collections=None,
         public: bool = False,
+        group: Union[Group, str] = None,
     ):
         super().__init__(public=public)
-        self.group = group
         self.name = name
         self.materials = materials if materials else []
         self.files = files if files else []
         self.collections = collections if collections else []
+        self.group = group
