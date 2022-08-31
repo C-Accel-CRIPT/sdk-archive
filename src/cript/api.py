@@ -101,7 +101,7 @@ class API:
         Overwrite a node's attributes with the latest values from the database.
 
         :param node: The node to refresh.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         """
         if not isinstance(node, BasePrimary):
             raise APIRefreshError(
@@ -125,7 +125,7 @@ class API:
         Create or update a node in the database.
 
         :param node: The node to be saved.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         :param update_existing: Indicates whether to update an existing node with the same unique fields.
         """
         if not isinstance(node, BasePrimary):
@@ -614,7 +614,7 @@ class API:
         :param obj: The node's URL or class type.
         :param query: Search query if obj argument is a class type.
         :param level: Current nested node level.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         :return: The generated node object.
         :rtype: cript.nodes.Base
         """
@@ -663,14 +663,15 @@ class API:
 
         :param node: The parent node.
         :param level: Current nested node level.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         """
         if level <= max_level:
             level += 1
 
-        # Limit recursion to one level
+        # Limit recursive primary node generation
+        skip_primary = False
         if level > max_level:
-            return
+            skip_primary = True
 
         node_dict = node.__dict__
         for key, value in node_dict.items():
@@ -678,7 +679,11 @@ class API:
             if not value or key == "url":
                 continue
             # Generate primary nodes
-            if isinstance(value, str) and self.api_url in value:
+            if (
+                isinstance(value, str)
+                and self.api_url in value
+                and skip_primary == False
+            ):
                 # Check if node already exists in memory
                 local_node = self._get_local_primary_node(value)
                 if local_node:
@@ -701,7 +706,11 @@ class API:
             elif isinstance(value, list):
                 for i in range(len(value)):
                     # Generate primary nodes
-                    if isinstance(value[i], str) and self.api_url in value[i]:
+                    if (
+                        isinstance(value[i], str)
+                        and self.api_url in value[i]
+                        and skip_primary == False
+                    ):
                         # Check if node already exists in memory
                         local_node = self._get_local_primary_node(value[i])
                         if local_node:
