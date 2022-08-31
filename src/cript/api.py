@@ -5,14 +5,14 @@ import warnings
 from typing import Union
 from getpass import getpass
 from logging import getLogger
-
+from packaging.version import Version
 import requests
 from beartype import beartype
 from beartype.typing import Type
 import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
-from cript import VERSION, NODE_CLASSES
+from cript import NODE_CLASSES
 from cript.nodes.base import Base
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.user import User
@@ -44,7 +44,7 @@ logger = getLogger(__name__)
 class API:
     """The entry point for interacting with the CRIPT API."""
 
-    version = VERSION
+    api_version = "0.4.3"
     keys = None
 
     def __init__(self, host: str = None, token: str = None, tls: bool = True):
@@ -60,7 +60,7 @@ class API:
         if token is None:
             token = getpass("API Token: ")
         self.api_url = get_api_url(host, tls)
-        self.latest_version = None
+        self.latest_api_version = None
         self.user = None
         self.storage_info = None
 
@@ -68,13 +68,13 @@ class API:
         self.session.headers = {
             "Authorization": token,
             "Content-Type": "application/json",
-            "Accept": f"application/json; version={self.version}",
+            "Accept": f"application/json; version={self.api_version}",
         }
 
         # Test API authentication by fetching session info and keys
         response = self.session.get(f"{self.api_url}/session-info/")
         if response.status_code == 200:
-            self.latest_version = response.json()["latest_version"]
+            self.latest_api_version = response.json()["latest_version"]
             self.user = self._create_node(User, response.json()["user_info"])
             self.storage_info = response.json()["storage_info"]
             API.keys = response.json()["keys"]  # For use by validators
@@ -86,7 +86,7 @@ class API:
         logger.info(f"Connection to {self.api_url} API was successful!")
 
         # Warn user if an update is required
-        if self.version != self.latest_version:
+        if Version(self.api_version) < Version(self.latest_api_version):
             warnings.warn(response.json()["version_warning"], stacklevel=2)
 
     def __repr__(self):
