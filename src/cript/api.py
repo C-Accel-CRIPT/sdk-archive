@@ -9,6 +9,7 @@ from logging import getLogger
 import requests
 from beartype import beartype
 from beartype.typing import Type
+from distutils.version import StrictVersion
 import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
@@ -86,7 +87,7 @@ class API:
         logger.info(f"Connection to {self.api_url} API was successful!")
 
         # Warn user if an update is required
-        if self.version != self.latest_version:
+        if StrictVersion(self.version) < StrictVersion(self.latest_version):
             warnings.warn(response.json()["version_warning"], stacklevel=2)
 
     def __repr__(self):

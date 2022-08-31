@@ -1,0 +1,41 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5433:5432"
+  web:
+    image: brilant/criptapp:2022-08-24.1
+    command: sh -c "python manage.py migrate && python manage.py loaddata ./seed/test_data.yaml && python manage.py runserver 0.0.0.0:8000"
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_TYPE=postgresql
+      - DB_NAME=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_HOST=db
+      - DB_PORT=5432
+      - ENV=${ENV}
+      - DEBUG=${DEBUG}
+      - ALLOWED_HOSTS=*
+      - SECRET_KEY=${SECRET_KEY}
+      - GLOBUS_AUTH_CLIENT_ID=${GLOBUS_AUTH_CLIENT_ID}
+      - GLOBUS_AUTH_SECRET=${GLOBUS_AUTH_SECRET}
+      - GLOBUS_ACCESS_MANAGER_CLIENT_ID=${GLOBUS_ACCESS_MANAGER_CLIENT_ID}
+      - GLOBUS_ACCESS_MANAGER_SECRET=${GLOBUS_ACCESS_MANAGER_SECRET}
+      - GLOBUS_NATIVE_CLIENT_ID=${GLOBUS_NATIVE_CLIENT_ID}
+      - GLOBUS_ENDPOINT_ID=${GLOBUS_ENDPOINT_ID}
+      - STORAGE_PROVIDER=${STORAGE_PROVIDER}
+      - STORAGE_PATH=${STORAGE_PATH}
+    depends_on:
+      - db
+volumes:
+    postgres:
