@@ -5,7 +5,8 @@ import warnings
 from typing import Union
 from getpass import getpass
 from logging import getLogger
-from packaging.version import Version
+from distutils.version import StrictVersion
+
 import requests
 from beartype import beartype
 from beartype.typing import Type
@@ -86,7 +87,7 @@ class API:
         logger.info(f"Connection to {self.api_url} API was successful!")
 
         # Warn user if an update is required
-        if Version(self.api_version) < Version(self.latest_api_version):
+        if StrictVersion(self.api_version) < StrictVersion(self.latest_api_version):
             warnings.warn(response.json()["version_warning"], stacklevel=2)
 
     def __repr__(self):
