@@ -5,14 +5,14 @@ import warnings
 from typing import Union
 from getpass import getpass
 from logging import getLogger
-
+from packaging.version import Version
 import requests
 from beartype import beartype
 from beartype.typing import Type
 import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
-from cript import VERSION, NODE_CLASSES
+from cript import NODE_CLASSES
 from cript.nodes.base import Base
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.user import User
@@ -44,7 +44,7 @@ logger = getLogger(__name__)
 class API:
     """The entry point for interacting with the CRIPT API."""
 
-    version = VERSION
+    api_version = "0.4.3"
     keys = None
 
     def __init__(self, host: str = None, token: str = None, tls: bool = True):
@@ -60,7 +60,7 @@ class API:
         if token is None:
             token = getpass("API Token: ")
         self.api_url = get_api_url(host, tls)
-        self.latest_version = None
+        self.latest_api_version = None
         self.user = None
         self.storage_info = None
 
@@ -68,13 +68,13 @@ class API:
         self.session.headers = {
             "Authorization": token,
             "Content-Type": "application/json",
-            "Accept": f"application/json; version={self.version}",
+            "Accept": f"application/json; version={self.api_version}",
         }
 
         # Test API authentication by fetching session info and keys
         response = self.session.get(f"{self.api_url}/session-info/")
         if response.status_code == 200:
-            self.latest_version = response.json()["latest_version"]
+            self.latest_api_version = response.json()["latest_version"]
             self.user = self._create_node(User, response.json()["user_info"])
             self.storage_info = response.json()["storage_info"]
             API.keys = response.json()["keys"]  # For use by validators
@@ -86,7 +86,7 @@ class API:
         logger.info(f"Connection to {self.api_url} API was successful!")
 
         # Warn user if an update is required
-        if self.version != self.latest_version:
+        if Version(self.api_version) < Version(self.latest_api_version):
             warnings.warn(response.json()["version_warning"], stacklevel=2)
 
     def __repr__(self):
@@ -101,7 +101,7 @@ class API:
         Overwrite a node's attributes with the latest values from the database.
 
         :param node: The node to refresh.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         """
         if not isinstance(node, BasePrimary):
             raise APIRefreshError(
@@ -125,7 +125,7 @@ class API:
         Create or update a node in the database.
 
         :param node: The node to be saved.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         :param update_existing: Indicates whether to update an existing node with the same unique fields.
         """
         if not isinstance(node, BasePrimary):
@@ -614,7 +614,7 @@ class API:
         :param obj: The node's URL or class type.
         :param query: Search query if obj argument is a class type.
         :param level: Current nested node level.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         :return: The generated node object.
         :rtype: cript.nodes.Base
         """
@@ -663,14 +663,15 @@ class API:
 
         :param node: The parent node.
         :param level: Current nested node level.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         """
         if level <= max_level:
             level += 1
 
-        # Limit recursion to one level
+        # Limit recursive primary node generation
+        skip_primary = False
         if level > max_level:
-            return
+            skip_primary = True
 
         node_dict = node.__dict__
         for key, value in node_dict.items():
@@ -678,7 +679,11 @@ class API:
             if not value or key == "url":
                 continue
             # Generate primary nodes
-            if isinstance(value, str) and self.api_url in value:
+            if (
+                isinstance(value, str)
+                and self.api_url in value
+                and skip_primary == False
+            ):
                 # Check if node already exists in memory
                 local_node = self._get_local_primary_node(value)
                 if local_node:
@@ -701,7 +706,11 @@ class API:
             elif isinstance(value, list):
                 for i in range(len(value)):
                     # Generate primary nodes
-                    if isinstance(value[i], str) and self.api_url in value[i]:
+                    if (
+                        isinstance(value[i], str)
+                        and self.api_url in value[i]
+                        and skip_primary == False
+                    ):
                         # Check if node already exists in memory
                         local_node = self._get_local_primary_node(value[i])
                         if local_node:
