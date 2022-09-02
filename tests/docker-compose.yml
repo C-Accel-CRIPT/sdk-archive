@@ -12,7 +12,7 @@ services:
     ports:
       - "5433:5432"
   web:
-    image: brilant/criptapp:2022-08-24.1
+    image: brilant/criptapp:latest
     command: sh -c "python manage.py migrate && python manage.py loaddata ./seed/test_data.yaml && python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"

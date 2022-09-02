@@ -7,7 +7,8 @@ import psycopg2
 import cript
 
 from requests.exceptions import ConnectionError
-
+from tempfile import NamedTemporaryFile
+from unittest import mock
 
 MY_GROUP = "MyGroup"
 MY_PROJECT = "MyProject"
@@ -15,6 +16,7 @@ MY_COLLECTION = "Test"
 MY_EXPERIMENT = "Anionic Polymerization of Styrene with SecBuLi"
 MY_INVENTORY = "Test"
 MY_PROCESS = "Test"
+
 
 def is_responsive(url):
     try:
@@ -154,8 +156,7 @@ def test_get_material(criptapp_api, http_service, db_connection):
         inventory_uid = cursor.fetchone()[0]
         url = f"{http_service}/inventory/{inventory_uid}/"
         inv = criptapp_api.get(url)
-        # print(type(inv.materials[0]))
-        # print(inv.materials)
+        assert type(inv.materials[0]) is cript.nodes.Material
 
 
 def test_add_ingredient_to_process_node(criptapp_api, http_service, db_connection):
@@ -174,12 +175,14 @@ def test_add_ingredient_to_process_node(criptapp_api, http_service, db_connectio
     butanol = next((mat for mat in inv.materials if mat.name == '1-butanol'), None)
     methanol = next((mat for mat in inv.materials if mat.name == 'methanol'), None)
 
+    # define Quantity nodes indicating the amount of each Ingredient.
     initiator_qty = cript.Quantity(key="volume", value=0.017, unit="ml")
     solvent_qty = cript.Quantity(key="volume", value=10, unit="ml")
     monomer_qty = cript.Quantity(key="mass", value=0.455, unit="g")
     quench_qty = cript.Quantity(key="volume", value=5, unit="ml")
     workup_qty = cript.Quantity(key="volume", value=100, unit="ml")
 
+    # create Ingredient nodes for each.
     initiator = cript.Ingredient(
         keyword="initiator",
         material=solution,
@@ -212,3 +215,88 @@ def test_add_ingredient_to_process_node(criptapp_api, http_service, db_connectio
     prcs.add_ingredient(quench)
     prcs.add_ingredient(workup)
 
+    # add the Ingredient nodes to the Process node.
+    prcs.add_ingredient(initiator)
+    prcs.add_ingredient(solvent)
+    prcs.add_ingredient(monomer)
+    prcs.add_ingredient(quench)
+    prcs.add_ingredient(workup)
+
+
+def test_add_condition_nodes_to_process_nodes(criptapp_api):
+    prcs = criptapp_api.get(cript.Process, {"name": MY_PROCESS})
+    temp = cript.Condition(key="temperature", value=25, unit="celsius")
+    time = cript.Condition(key="time_duration", value=60, unit="min")
+    prcs.add_condition(temp)
+    prcs.add_condition(time)
+
+
+def test_add_property_node_to_process_node(criptapp_api):
+    prcs = criptapp_api.get(cript.Process, {"name": MY_PROCESS})
+    yield_mass = cript.Property(
+        key="yield_mass",
+        value=0.47,
+        unit="g",
+        method="scale"
+    )
+    prcs.add_property(yield_mass)
+
+
+def test_create_material_process_product(criptapp_api):
+    proj = criptapp_api.get(cript.Project, {"name": MY_PROJECT})
+    prcs = criptapp_api.get(cript.Process, {"name": MY_PROCESS})
+    polystyrene = cript.Material(project=proj, name="polystyrene")
+
+    names = cript.Identifier(
+        key="names",
+        value=["poly(styrene)", "poly(vinylbenzene)"]
+    )
+    bigsmiles = cript.Identifier(
+        key="bigsmiles",
+        value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
+    )
+    chem_repeat = cript.Identifier(key="chem_repeat", value="C8H8")
+    cas = cript.Identifier(key="cas", value="100-42-5")
+
+    polystyrene.add_identifier(names)
+    polystyrene.add_identifier(chem_repeat)
+    polystyrene.add_identifier(bigsmiles)
+    polystyrene.add_identifier(cas)
+
+    phase = cript.Property(key="phase", value="solid")
+    color = cript.Property(key="color", value="white")
+
+    polystyrene.add_property(phase)
+    polystyrene.add_property(color)
+
+    criptapp_api.save(polystyrene)
+    prcs.add_product(polystyrene)
+    criptapp_api.save(prcs)
+
+
+def test_create_data_node(criptapp_api):
+    expt = criptapp_api.get(cript.Experiment, {"name": MY_EXPERIMENT})
+    polystyrene = criptapp_api.get(cript.Material, {"name": "polystyrene"})
+    # polystyrene = cript.Material(project=proj, name="polystyrene")
+
+    sec = cript.Data(
+        experiment=expt,
+        name="Crude SEC of polystyrene",
+        type="sec_trace",
+    )
+    criptapp_api.save(sec)
+
+    # Associate a Data node with a Property node
+    mw_n = cript.Property(key="mw_n", value=5200, unit="g/mol")
+    mw_n.data = sec
+    polystyrene.add_property(mw_n)
+    criptapp_api.save(polystyrene)
+
+
+def test_create_file_node_and_upload(criptapp_api):
+    with mock.patch.object(cript.API, 'save', new=lambda *args: None):
+        with NamedTemporaryFile(suffix='.csv') as tmp:
+            proj = criptapp_api.get(cript.Project, {"name": MY_PROJECT})
+            sec = criptapp_api.get(cript.Data, {"name": "Crude SEC of polystyrene"})
+            f = cript.File(project=proj, data=[sec], source=tmp.name)
+            criptapp_api.save(f)
