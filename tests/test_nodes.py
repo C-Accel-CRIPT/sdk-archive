@@ -1,5 +1,3 @@
-import json
-
 import pytest
 import requests
 import psycopg2
@@ -76,38 +74,49 @@ def test_status_code(http_service):
     assert response.status_code == status
 
 
+def pytest_configure():
+    pytest.group = None
+    pytest.project = None
+    pytest.collection = None
+    pytest.experiment = None
+    pytest.process = None
+    pytest.polystyrene = None
+    pytest.sec = None
+
+    pytest.solution = None
+    pytest.toluene = None
+    pytest.styrene = None
+    pytest.butanol = None
+    pytest.methanol = None
+
+
 @pytest.mark.filterwarnings("error::UserWarning")
 def test_create_group_success(criptapp_api):
-    group = cript.Group(name=MY_GROUP)
-    criptapp_api.save(group)
+    pytest.group = cript.Group(name=MY_GROUP)
+    criptapp_api.save(pytest.group)
 
 
 def test_create_project_success(criptapp_api):
-    group = criptapp_api.get(cript.Group, {"name": MY_GROUP})
-    project = cript.Project(group=group, name=MY_PROJECT)
-    criptapp_api.save(project)
+    pytest.project = cript.Project(group=pytest.group, name=MY_PROJECT)
+    criptapp_api.save(pytest.project)
 
 
 def test_create_collection_success(criptapp_api):
-    proj = criptapp_api.get(cript.Project, {"name": MY_PROJECT})
-    coll = cript.Collection(project=proj, name=MY_COLLECTION)
-    criptapp_api.save(coll)
+    pytest.collection = cript.Collection(project=pytest.project, name=MY_COLLECTION)
+    criptapp_api.save(pytest.collection)
 
 
 def test_create_experiment_success(criptapp_api):
-    coll = criptapp_api.get(cript.Collection, {"name": MY_COLLECTION})
-    expt = cript.Experiment(
-        collection=coll,
+    pytest.experiment = cript.Experiment(
+        collection=pytest.collection,
         name=MY_EXPERIMENT
     )
-    criptapp_api.save(expt)
+    criptapp_api.save(pytest.experiment)
 
 
 def test_create_process_success(criptapp_api):
-    expt = criptapp_api.get(cript.Experiment, {"name": MY_EXPERIMENT})
-
-    process = cript.Process(
-        experiment=expt,
+    pytest.process = cript.Process(
+        experiment=pytest.experiment,
         name=MY_PROCESS,
         type="multistep",
         description="In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
@@ -116,35 +125,30 @@ def test_create_process_success(criptapp_api):
                     "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
                     "precipitation in methanol 3 times and dried under vacuum."
     )
-    criptapp_api.save(process)
+    criptapp_api.save(pytest.process)
 
 
 def test_create_material(criptapp_api):
-    proj = criptapp_api.get(cript.Project, {"name": MY_PROJECT})
-    solution = cript.Material(project=proj, name="SecBuLi solution 1.4M cHex")
-    criptapp_api.save(solution)
+    pytest.solution = cript.Material(project=pytest.project, name="SecBuLi solution 1.4M cHex")
+    criptapp_api.save(pytest.solution)
 
-    toluene = cript.Material(project=proj, name="toluene")
-    criptapp_api.save(toluene)
+    pytest.toluene = cript.Material(project=pytest.project, name="toluene")
+    criptapp_api.save(pytest.toluene)
 
-    styrene = cript.Material(project=proj, name="styrene")
-    criptapp_api.save(styrene)
+    pytest.styrene = cript.Material(project=pytest.project, name="styrene")
+    criptapp_api.save(pytest.styrene)
 
-    butanol = cript.Material(project=proj, name="1-butanol")
-    criptapp_api.save(butanol)
+    pytest.butanol = cript.Material(project=pytest.project, name="1-butanol")
+    criptapp_api.save(pytest.butanol)
 
-    methanol = cript.Material(project=proj, name="methanol")
-    criptapp_api.save(methanol)
+    pytest.methanol = cript.Material(project=pytest.project, name="methanol")
+    criptapp_api.save(pytest.methanol)
 
 
 def test_create_inventory(criptapp_api):
-    coll = criptapp_api.get(cript.Collection, {"name": MY_COLLECTION})
-    solution = criptapp_api.get(cript.Material, {"name": "SecBuLi solution 1.4M cHex"})
-    toluene = criptapp_api.get(cript.Material, {"name": "toluene"})
-    styrene = criptapp_api.get(cript.Material, {"name": "styrene"})
-    butanol = criptapp_api.get(cript.Material, {"name": "1-butanol"})
-    methanol = criptapp_api.get(cript.Material, {"name": "methanol"})
-    inv = cript.Inventory(collection=coll, name=MY_INVENTORY, materials=[solution, toluene, styrene, butanol, methanol])
+    inv = cript.Inventory(collection=pytest.collection, name=MY_INVENTORY, materials=[
+        pytest.solution, pytest.toluene, pytest.styrene, pytest.butanol, pytest.methanol
+    ])
     criptapp_api.save(inv)
 
 
@@ -168,7 +172,6 @@ def test_add_ingredient_to_process_node(criptapp_api, http_service, db_connectio
         url = f"{http_service}/inventory/{inventory_uid}/"
         inv = criptapp_api.get(url)
 
-    prcs = criptapp_api.get(cript.Process, {"name": MY_PROCESS})
     solution = next((mat for mat in inv.materials if mat.name == 'SecBuLi solution 1.4M cHex'), None)
     toluene = next((mat for mat in inv.materials if mat.name == 'toluene'), None)
     styrene = next((mat for mat in inv.materials if mat.name == 'styrene'), None)
@@ -209,43 +212,39 @@ def test_add_ingredient_to_process_node(criptapp_api, http_service, db_connectio
         quantities=[workup_qty]
     )
 
-    prcs.add_ingredient(initiator)
-    prcs.add_ingredient(solvent)
-    prcs.add_ingredient(monomer)
-    prcs.add_ingredient(quench)
-    prcs.add_ingredient(workup)
+    pytest.process.add_ingredient(initiator)
+    pytest.process.add_ingredient(solvent)
+    pytest.process.add_ingredient(monomer)
+    pytest.process.add_ingredient(quench)
+    pytest.process.add_ingredient(workup)
 
     # add the Ingredient nodes to the Process node.
-    prcs.add_ingredient(initiator)
-    prcs.add_ingredient(solvent)
-    prcs.add_ingredient(monomer)
-    prcs.add_ingredient(quench)
-    prcs.add_ingredient(workup)
+    pytest.process.add_ingredient(initiator)
+    pytest.process.add_ingredient(solvent)
+    pytest.process.add_ingredient(monomer)
+    pytest.process.add_ingredient(quench)
+    pytest.process.add_ingredient(workup)
 
 
 def test_add_condition_nodes_to_process_nodes(criptapp_api):
-    prcs = criptapp_api.get(cript.Process, {"name": MY_PROCESS})
     temp = cript.Condition(key="temperature", value=25, unit="celsius")
     time = cript.Condition(key="time_duration", value=60, unit="min")
-    prcs.add_condition(temp)
-    prcs.add_condition(time)
+    pytest.process.add_condition(temp)
+    pytest.process.add_condition(time)
 
 
 def test_add_property_node_to_process_node(criptapp_api):
-    prcs = criptapp_api.get(cript.Process, {"name": MY_PROCESS})
     yield_mass = cript.Property(
         key="yield_mass",
         value=0.47,
         unit="g",
         method="scale"
     )
-    prcs.add_property(yield_mass)
+    pytest.process.add_property(yield_mass)
 
 
 def test_create_material_process_product(criptapp_api):
-    proj = criptapp_api.get(cript.Project, {"name": MY_PROJECT})
-    prcs = criptapp_api.get(cript.Process, {"name": MY_PROCESS})
-    polystyrene = cript.Material(project=proj, name="polystyrene")
+    pytest.polystyrene = cript.Material(project=pytest.project, name="polystyrene")
 
     names = cript.Identifier(
         key="names",
@@ -258,45 +257,39 @@ def test_create_material_process_product(criptapp_api):
     chem_repeat = cript.Identifier(key="chem_repeat", value="C8H8")
     cas = cript.Identifier(key="cas", value="100-42-5")
 
-    polystyrene.add_identifier(names)
-    polystyrene.add_identifier(chem_repeat)
-    polystyrene.add_identifier(bigsmiles)
-    polystyrene.add_identifier(cas)
+    pytest.polystyrene.add_identifier(names)
+    pytest.polystyrene.add_identifier(chem_repeat)
+    pytest.polystyrene.add_identifier(bigsmiles)
+    pytest.polystyrene.add_identifier(cas)
 
     phase = cript.Property(key="phase", value="solid")
     color = cript.Property(key="color", value="white")
 
-    polystyrene.add_property(phase)
-    polystyrene.add_property(color)
+    pytest.polystyrene.add_property(phase)
+    pytest.polystyrene.add_property(color)
 
-    criptapp_api.save(polystyrene)
-    prcs.add_product(polystyrene)
-    criptapp_api.save(prcs)
+    criptapp_api.save(pytest.polystyrene)
+    pytest.process.add_product(pytest.polystyrene)
+    criptapp_api.save(pytest.process)
 
 
 def test_create_data_node(criptapp_api):
-    expt = criptapp_api.get(cript.Experiment, {"name": MY_EXPERIMENT})
-    polystyrene = criptapp_api.get(cript.Material, {"name": "polystyrene"})
-    # polystyrene = cript.Material(project=proj, name="polystyrene")
-
-    sec = cript.Data(
-        experiment=expt,
+    pytest.sec = cript.Data(
+        experiment=pytest.experiment,
         name="Crude SEC of polystyrene",
         type="sec_trace",
     )
-    criptapp_api.save(sec)
+    criptapp_api.save(pytest.sec)
 
     # Associate a Data node with a Property node
     mw_n = cript.Property(key="mw_n", value=5200, unit="g/mol")
-    mw_n.data = sec
-    polystyrene.add_property(mw_n)
-    criptapp_api.save(polystyrene)
+    mw_n.data = pytest.sec
+    pytest.polystyrene.add_property(mw_n)
+    criptapp_api.save(pytest.polystyrene)
 
 
 def test_create_file_node_and_upload(criptapp_api):
     with mock.patch.object(cript.API, 'save', new=lambda *args: None):
         with NamedTemporaryFile(suffix='.csv') as tmp:
-            proj = criptapp_api.get(cript.Project, {"name": MY_PROJECT})
-            sec = criptapp_api.get(cript.Data, {"name": "Crude SEC of polystyrene"})
-            f = cript.File(project=proj, data=[sec], source=tmp.name)
+            f = cript.File(project=pytest.project, data=[pytest.sec], source=tmp.name)
             criptapp_api.save(f)
