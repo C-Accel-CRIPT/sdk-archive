@@ -29,6 +29,27 @@ logger = getLogger(__name__)
 ENCODING = "UTF-8"
 
 
+def dict_remove_none(ddict: dict) -> dict:
+    """Remove 'key, value' pair form dictionary if value is None or []."""
+    _dict = {}
+    for k, v in ddict.items():
+        if v is None or v == []:
+            continue
+        elif isinstance(v, dict):
+            _dict[k] = dict_remove_none(v)
+        elif isinstance(v, list):
+            _list = []
+            for obj in v:
+                if isinstance(obj, dict):
+                    obj = dict_remove_none(obj)
+                _list.append(obj)
+            _dict[k] = _list
+        else:
+            _dict[k] = v
+
+    return _dict
+
+
 def _generate_file_name(node: BasePrimary) -> str:
     return f"{node.slug}_{node.uid}"
 
@@ -172,9 +193,7 @@ class APILocal:
             # update
             if node.uid in self.database_by_uid:
                 node.updated_at = datetime.datetime.now().isoformat()
-                with open(self.folder / (_generate_file_name(node) + ".json"), "w", encoding=ENCODING) as f:
-                    f.write(node._to_json())
-                logger.info(f"Update: {node.node_name}({node.uid}) node has been updated in the database.")
+                self._do_save(node)
             else:
                 raise APISaveError(f"The node you are saving has a uid, but it is not in the database, "
                                    f"so it can't be updated. {node.node_name}")
@@ -185,10 +204,7 @@ class APILocal:
             node.updated_at = datetime.datetime.now().isoformat()
             node.created_at = datetime.datetime.now().isoformat()
             node.model_version = self.version
-            file_name = self.folder / (_generate_file_name(node) + ".json")
-            with open(file_name, "w", encoding=ENCODING) as f:
-                f.write(node._to_json())
-            logger.info(f"{node.node_name}({node.uid})  node has been saved to the database.")
+            file_name = self._do_save(node)
 
             # add node to api database list
             self.database_by_uid[node.uid] = node
@@ -200,12 +216,13 @@ class APILocal:
         if isinstance(node, File) and os.path.exists(node.source):
             move_copy_file(node.source, self.data_folder)
 
-        # self._set_node_attributes(node, response.json())
-        # self._generate_nodes(node, max_level=max_level)
+    def _do_save(self, node: BasePrimary):
+        file_name = self.folder / (_generate_file_name(node) + ".json")
+        with open(file_name, "w", encoding=ENCODING) as f:
+            f.write(node._to_json())
+        logger.info(f"Update: {node.node_name}({node.uid}) node has been updated in the database.")
 
-        # Update File node source field
-        # if node.slug == "file":
-        #     self.refresh(node, max_level=max_level)
+        return file_name
 
     @beartype
     def refresh(self, node: Base, max_level: int = 1):
@@ -222,7 +239,7 @@ class APILocal:
         :param node: The :class:`File` node object.
         :param path: Path where the file should go.
         """
-        pass
+        raise NotImplementedError
 
     def delete(self, obj: Union[BasePrimary, str, type], query: dict = None):
         """
