@@ -330,17 +330,17 @@ def define_materials(project: c.Project) -> list[c.Material]:
 def main():
     api = c.APILocal(folder="database")
 
-    # group = c.Group(name="example_group")
-    # api.save(group)
+    group = c.Group(name="example_group")
+    api.save(group)
     # group = api.get("d9fa4092-97af-4abd-84ac-6a82ba7fca32")
-    # project = c.Project(group=group, name="testing_project")
-    # api.save(project)
-    project = api.get("03c79d57-5ccc-4617-a1d7-fd49c638cb8a")
+    project = c.Project(group=group, name="testing_project")
+    api.save(project)
+    # project = api.get("03c79d57-5ccc-4617-a1d7-fd49c638cb8a")
 
     materials = define_materials(project)
 
-    # for material in materials:
-    #     api.save(material)
+    for material in materials:
+        api.save(material)
 
 
 if __name__ == "__main__":
