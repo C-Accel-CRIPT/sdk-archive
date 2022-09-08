@@ -5,6 +5,7 @@ import warnings
 from typing import Union
 from getpass import getpass
 from logging import getLogger
+from distutils.version import StrictVersion
 
 import requests
 from beartype import beartype
@@ -12,13 +13,18 @@ from beartype.typing import Type
 import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
-from cript import VERSION, NODE_CLASSES
+from cript import NODE_CLASSES
 from cript.nodes.base import Base
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.user import User
 from cript.nodes.primary.file import File
 from cript.nodes.secondary.base_secondary import BaseSecondary
-from cript.utils import get_api_url, convert_file_size, display_errors
+from cript.utils import (
+    get_api_url,
+    convert_to_api_url,
+    convert_file_size,
+    display_errors,
+)
 from cript.exceptions import (
     APIAuthError,
     APIRefreshError,
@@ -39,7 +45,7 @@ logger = getLogger(__name__)
 class API:
     """The entry point for interacting with the CRIPT API."""
 
-    version = VERSION
+    api_version = "0.4.3"
     keys = None
 
     def __init__(self, host: str = None, token: str = None, tls: bool = True):
@@ -55,7 +61,7 @@ class API:
         if token is None:
             token = getpass("API Token: ")
         self.api_url = get_api_url(host, tls)
-        self.latest_version = None
+        self.latest_api_version = None
         self.user = None
         self.storage_info = None
 
@@ -63,13 +69,13 @@ class API:
         self.session.headers = {
             "Authorization": token,
             "Content-Type": "application/json",
-            "Accept": f"application/json; version={self.version}",
+            "Accept": f"application/json; version={self.api_version}",
         }
 
         # Test API authentication by fetching session info and keys
         response = self.session.get(f"{self.api_url}/session-info/")
         if response.status_code == 200:
-            self.latest_version = response.json()["latest_version"]
+            self.latest_api_version = response.json()["latest_version"]
             self.user = self._create_node(User, response.json()["user_info"])
             self.storage_info = response.json()["storage_info"]
             API.keys = response.json()["keys"]  # For use by validators
@@ -81,7 +87,7 @@ class API:
         logger.info(f"Connection to {self.api_url} API was successful!")
 
         # Warn user if an update is required
-        if self.version != self.latest_version:
+        if StrictVersion(self.api_version) < StrictVersion(self.latest_api_version):
             warnings.warn(response.json()["version_warning"], stacklevel=2)
 
     def __repr__(self):
@@ -96,7 +102,7 @@ class API:
         Overwrite a node's attributes with the latest values from the database.
 
         :param node: The node to refresh.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         """
         if not isinstance(node, BasePrimary):
             raise APIRefreshError(
@@ -113,12 +119,15 @@ class API:
             )
 
     @beartype
-    def save(self, node: BasePrimary, max_level: int = 1):
+    def save(
+        self, node: BasePrimary, max_level: int = 1, update_existing: bool = False
+    ):
         """
         Create or update a node in the database.
 
         :param node: The node to be saved.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
+        :param update_existing: Indicates whether to update an existing node with the same unique fields.
         """
         if not isinstance(node, BasePrimary):
             raise APISaveError(
@@ -152,12 +161,18 @@ class API:
 
         else:
             try:
-                # Raise error if duplicate node is found
+                # Check if a duplicate error was returned
                 response_dict = json.loads(response.content)
                 if "duplicate" in response_dict:
-                    response_dict.pop("duplicate")  # Pop flag for display purposes
-                    response_content = json.dumps(response_dict)
-                    raise DuplicateNodeError(display_errors(response_content))
+                    duplicate_url = response_dict.pop("duplicate")
+                    if update_existing == True and duplicate_url is not None:
+                        # Update existing duplicate node
+                        node.url = duplicate_url
+                        self.save(node)
+                        return
+                    else:
+                        response_content = json.dumps(response_dict)
+                        raise DuplicateNodeError(display_errors(response_content))
             except json.decoder.JSONDecodeError:
                 pass
             raise APISaveError(display_errors(response.content))
@@ -547,12 +562,20 @@ class API:
             raise APIGetError(display_errors(response.content))
 
     @beartype
-    def search(self, node_class: Type[BasePrimary], query: dict):
+    def search(
+        self,
+        node_class: Type[BasePrimary],
+        query: dict,
+        limit: Union[int, None] = None,
+        offset: Union[int, None] = None,
+    ):
         """
         Send a query to the API and print the results.
 
         :param node_class: The class of the node type to query for.
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
+        :param limit: The max number of items to return.
+        :param offset: The starting position of the query.
         :return: A :class:`SearchPaginator` object containing the results.
         :rtype: cript.session.SearchPaginator
         """
@@ -561,11 +584,16 @@ class API:
                 f"{node_class.node_name} is a secondary node, thus cannot be searched."
             )
 
+        # Generate URL
+        url = f"{self.api_url}/search/{node_class.slug}/?"
+        if limit:
+            url += f"limit={str(limit)}&"
+        if offset:
+            url += f"offset={str(offset)}"
+
         if isinstance(query, dict):
             payload = json.dumps(query)
-            response = self.session.post(
-                url=f"{self.api_url}/search/{node_class.slug}/", data=payload
-            )
+            response = self.session.post(url=url, data=payload)
         else:
             raise APISearchError(f"'{query}' is not a valid query.")
 
@@ -587,12 +615,13 @@ class API:
         :param obj: The node's URL or class type.
         :param query: Search query if obj argument is a class type.
         :param level: Current nested node level.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         :return: The generated node object.
         :rtype: cript.nodes.Base
         """
         # Get node with a URL
         if isinstance(obj, str):
+            obj = convert_to_api_url(obj)
             if self.api_url not in obj:
                 raise APIGetError("Please enter a valid node URL.")
             response = self.session.get(obj)
@@ -635,14 +664,15 @@ class API:
 
         :param node: The parent node.
         :param level: Current nested node level.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         """
         if level <= max_level:
             level += 1
 
-        # Limit recursion to one level
+        # Limit recursive primary node generation
+        skip_primary = False
         if level > max_level:
-            return
+            skip_primary = True
 
         node_dict = node.__dict__
         for key, value in node_dict.items():
@@ -650,7 +680,11 @@ class API:
             if not value or key == "url":
                 continue
             # Generate primary nodes
-            if isinstance(value, str) and self.api_url in value:
+            if (
+                isinstance(value, str)
+                and self.api_url in value
+                and skip_primary == False
+            ):
                 # Check if node already exists in memory
                 local_node = self._get_local_primary_node(value)
                 if local_node:
@@ -673,7 +707,11 @@ class API:
             elif isinstance(value, list):
                 for i in range(len(value)):
                     # Generate primary nodes
-                    if isinstance(value[i], str) and self.api_url in value[i]:
+                    if (
+                        isinstance(value[i], str)
+                        and self.api_url in value[i]
+                        and skip_primary == False
+                    ):
                         # Check if node already exists in memory
                         local_node = self._get_local_primary_node(value[i])
                         if local_node:
@@ -760,8 +798,8 @@ class SearchPaginator:
 
     def __init__(self, session, content, payload):
         self._session = session
-        self.current = content
         self.payload = payload
+        self.current = content
         self.count = self.current["count"]
 
     def __repr__(self):
@@ -786,7 +824,7 @@ class SearchPaginator:
             response = self._session.post(url=next_url, data=self.payload)
             self.current = response.content
         else:
-            raise AttributeError("You're currently on the final page.")
+            raise AttributeError("You've reached the end of the query.")
 
     @property
     def previous(self):
@@ -796,26 +834,4 @@ class SearchPaginator:
             response = self._session.post(url=previous_url, data=self.payload)
             self.current = response.content
         else:
-            raise AttributeError("You're currently on the first page.")
-
-    def to_page(self, page_number: int):
-        """
-        Navigate to a specific page in the results.
-
-        :param page_number: The page number to turn to.
-        """
-        if self.current["next"]:
-            url = self.current["next"]
-        elif self.current["previous"]:
-            url = self.current["previous"]
-        else:
-            raise ValueError(f"{page_number} is not a valid page number.")
-
-        url = url.split("?page=")[0]
-        url += f"?page={str(page_number)}"
-
-        response = self._session.post(url=url, data=self.payload)
-        if response.status_code == 200:
-            self.current = response.content
-        else:
-            raise ValueError(f"{page_number} is not a valid page number.")
+            raise AttributeError("You've reached the beginning of the query.")

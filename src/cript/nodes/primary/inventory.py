@@ -7,7 +7,6 @@ from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
 from cript.nodes.primary.collection import Collection
 from cript.nodes.primary.material import Material
-from cript.validators import validate_required
 from cript.utils import auto_assign_group
 
 
@@ -19,26 +18,24 @@ class Inventory(BasePrimary):
 
     node_name = "Inventory"
     slug = "inventory"
-    required = ["group", "collection", "name"]
-    unique_together = ["collection", "name"]
 
     @beartype
     def __init__(
         self,
-        group: Union[Group, str] = None,
-        collection: Union[Collection, str] = None,
-        name: str = None,
+        collection: Union[Collection, str],
+        name: str,
         materials: list[Union[Material, str]] = None,
         description: Union[str, None] = None,
         public: bool = False,
+        group: Union[Group, str] = None,
     ):
         super().__init__(public=public)
-        self.group = auto_assign_group(group, collection)
         self.collection = collection
         self.name = name
         self.description = description
         self.materials = materials if materials else []
-        validate_required(self)
+        self.group = auto_assign_group(group, collection)
+
         self.__index_table = dict()
         self.__degenerate_index_table = set()
 
@@ -55,7 +52,7 @@ class Inventory(BasePrimary):
                 return self.materials[self.__index_table[obj]]
             if obj in self.__degenerate_index_table:
                 raise ValueError("Multiple materials share this index. Try another.")
-            raise ValueError(f"'{obj}' not found. (exact match required, case sensitive)")
+            raise ValueError(f"'{obj}' not found in Inventory: {self.name}. (exact match required, case sensitive)")
 
         raise TypeError("Invalid object for indexing.")
 

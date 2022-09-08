@@ -6,19 +6,7 @@ from cript.exceptions import (
     InvalidUnitError,
     RequiredUnitError,
     APISessionRequiredError,
-    RequiredFieldsError,
 )
-
-
-def validate_required(node):
-    """
-    Validate that required fields are defined.
-
-    :param node: The node to validate.
-    """
-    for field in node.required:
-        if not hasattr(node, field) or getattr(node, field) is None:
-            raise RequiredFieldsError(node.node_name, node.required)
 
 
 def validate_key(key_category, key):

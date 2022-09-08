@@ -1,5 +1,5 @@
 import logging
-import pkg_resources
+import importlib.metadata
 
 import pint
 
@@ -9,12 +9,9 @@ logging.basicConfig(level=logging.WARNING)
 logging.captureWarnings(True)
 pint.util.logger.setLevel(logging.ERROR)  # Mute Pint warnings
 
-# Single-sourcing the package version
-version_file = pkg_resources.resource_filename("cript", "VERSION.txt")
-with open(version_file, "r") as fr:
-    __version__ = fr.read().strip()
 
-VERSION = __version__
+# Single-sourcing the package version
+__version__ = importlib.metadata.version("cript")
 __short_version__ = __version__.rpartition(".")[0]
 
 
@@ -41,6 +38,7 @@ from cript.nodes import (  # noqa 402
     Inventory,
     Quantity,
     Ingredient,
+    Equipment,
     Process,
     Experiment,
 )
@@ -61,6 +59,7 @@ NODE_CLASSES = [
     Inventory,
     Quantity,
     Ingredient,
+    Equipment,
     Process,
     Experiment,
 ]

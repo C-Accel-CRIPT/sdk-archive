@@ -4,12 +4,7 @@ from logging import getLogger
 from beartype import beartype
 
 from cript.nodes.secondary.base_secondary import BaseSecondary
-from cript.validators import (
-    validate_required,
-    validate_key,
-    validate_value,
-    validate_unit,
-)
+from cript.validators import validate_key, validate_value, validate_unit
 
 
 logger = getLogger(__name__)
@@ -23,13 +18,12 @@ class Quantity(BaseSecondary):
 
     node_name = "Quantity"
     list_name = "quantities"
-    required = ["key", "value"]
 
     @beartype
     def __init__(
         self,
-        key: str = None,
-        value: Union[int, float] = None,
+        key: str,
+        value: Union[int, float],
         unit: Union[str, None] = None,
         uncertainty: Union[float, None] = None,
         uncertainty_type: Union[str, None] = None,
@@ -40,7 +34,6 @@ class Quantity(BaseSecondary):
         self.value = value
         self.uncertainty = uncertainty
         self.uncertainty_type = uncertainty_type
-        validate_required(self)
 
     @property
     def key(self):

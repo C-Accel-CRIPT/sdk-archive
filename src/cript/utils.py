@@ -2,6 +2,7 @@ import re
 import hashlib
 import math
 import json
+from urllib.parse import urlparse
 
 
 def get_api_url(host: str, tls: bool = True):
@@ -19,6 +20,27 @@ def get_api_url(host: str, tls: bool = True):
     else:
         protocol = "http"
     return f"{protocol}://{host}/api"
+
+
+def convert_to_api_url(url: str):
+    """
+    Convert a UI URL to an API URL.
+    e.g., https://criptapp.org/material/ --> https://criptapp.org/api/material/
+
+    :param url: The original UI URL that will be converted.
+    :return: The converted API URL.
+    :rtype: str
+    """
+    parsed_url = urlparse(url)
+    scheme = parsed_url.scheme
+    netloc = parsed_url.netloc
+    path = parsed_url.path
+
+    # Return original URL if in correct format
+    if path.startswith("/api/"):
+        return url
+
+    return f"{scheme}://{netloc}/api{path}"
 
 
 def auto_assign_group(group, parent):

@@ -4,7 +4,7 @@ from logging import getLogger
 from beartype import beartype
 
 from cript.nodes.secondary.base_secondary import BaseSecondary
-from cript.validators import validate_required, validate_key, validate_value
+from cript.validators import validate_key, validate_value
 
 
 logger = getLogger(__name__)
@@ -18,14 +18,12 @@ class Identifier(BaseSecondary):
 
     node_name = "Identifier"
     list_name = "identifiers"
-    required = ["key", "value"]
 
     @beartype
-    def __init__(self, key: str = None, value: Union[str, int, float, list] = None):
+    def __init__(self, key: str, value: Union[str, int, float, list]):
         super().__init__()
         self.key = key
         self.value = value
-        validate_required(self)
 
     @property
     def key(self):

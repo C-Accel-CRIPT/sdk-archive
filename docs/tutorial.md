@@ -12,18 +12,9 @@ api = cript.API(host, token)
     Your API token can be found in the UI under [Account Settings](https://criptapp.org/settings/).
 
 
-### Create a Group node
-``` py
-group = cript.Group(name="MyGroup")
-api.save(group)
-```
-!!! note
-    Group names are globally unique.
-
-
 ### Create a Project node
 ``` py
-proj = cript.Project(group=group, name="MyProject")
+proj = cript.Project(name="MyProject")
 api.save(project)
 ```
 !!! note
@@ -80,11 +71,11 @@ api.save(prcs)
 ### Add Ingredient nodes to the Process node
 First, let's grab the Material nodes we need from the Inventory node.
 ``` py
-solution = next((mat for mat in inv.materials if mat.name == 'SecBuLi solution 1.4M cHex'), None)
-toluene = next((mat for mat in inv.materials if mat.name == 'toluene'), None)
-styrene = next((mat for mat in inv.materials if mat.name == 'styrene'), None)
-butanol = next((mat for mat in inv.materials if mat.name == '1-butanol'), None)
-methanol = next((mat for mat in inv.materials if mat.name == 'methanol'), None)
+solution = inv['SecBuLi solution 1.4M cHex']
+toluene = inv['toluene']
+styrene = inv['styrene']
+butanol = inv['1-butanol']
+methanol = inv['methanol']
 ```
 Next, we'll define Quantity nodes indicating the amount of each Ingredient.
 ``` py

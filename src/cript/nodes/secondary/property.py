@@ -8,12 +8,7 @@ from cript.nodes.primary.data import Data
 from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.nodes.secondary.condition import Condition
 from cript.nodes.secondary.citation import Citation
-from cript.validators import (
-    validate_required,
-    validate_key,
-    validate_value,
-    validate_unit,
-)
+from cript.validators import validate_key, validate_value, validate_unit
 
 
 logger = getLogger(__name__)
@@ -27,12 +22,11 @@ class Property(BaseSecondary):
 
     node_name = "Property"
     list_name = "properties"
-    required = ["key"]
 
     @beartype
     def __init__(
         self,
-        key: str = None,
+        key: str,
         value: Union[str, int, float, list, None] = None,
         unit: Union[str, None] = None,
         type: Union[str, None] = None,
@@ -68,7 +62,6 @@ class Property(BaseSecondary):
         self.data = data
         self.citations = citations if citations else []
         self.notes = notes
-        validate_required(self)
 
     @property
     def key(self):

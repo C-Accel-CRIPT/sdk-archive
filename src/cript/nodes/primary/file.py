@@ -9,7 +9,7 @@ from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
 from cript.nodes.primary.project import Project
 from cript.nodes.primary.data import Data
-from cript.validators import validate_required, validate_key
+from cript.validators import validate_key
 from cript.utils import sha256_hash
 from cript.utils import auto_assign_group
 
@@ -23,36 +23,31 @@ class File(BasePrimary):
     node_name = "File"
     slug = "file"
     list_name = "files"
-    required = ["group", "project", "data", "source", "type"]
-    unique_together = ["checksum", "created_by"]
 
     @beartype
     def __init__(
         self,
-        name: str = None,
-        group: Union[Group, str] = None,
-        project: Union[Project, str] = None,
-        data: list[Union[Data, str]] = None,
-        source: str = None,
+        project: Union[Project, str],
+        data: list[Union[Data, str]],
+        source: str,
         type: str = "data",
+        name: str = None,
         checksum: Union[str, None] = None,
+        unique_name: Union[str, None] = None,
         extension: Union[str, None] = None,
-        unique_name: str = None,
-        external_source: Union[str, None] = None,
         public: bool = False,
+        group: Union[Group, str] = None,
     ):
         super().__init__(public=public)
-        self.group = auto_assign_group(group, project)
         self.project = project
         self.data = data
-        self.checksum = checksum
-        self.name = name
-        self.unique_name = unique_name
-        self.source = source
-        self.extension = extension
-        self.external_source = external_source
         self.type = type
-        validate_required(self)
+        self.name = name
+        self.checksum = checksum
+        self.unique_name = unique_name
+        self.extension = extension
+        self.source = source
+        self.group = auto_assign_group(group, project)
 
     @property
     def type(self):
@@ -70,12 +65,17 @@ class File(BasePrimary):
     def source(self, value):
         if value != "Invalid":
             if os.path.exists(value):
+                # Clean path
                 value = value.replace("\\", "/")
+
+                # Generate checksum
                 logger.info(f"Generating checksum for {value}.")
                 self.checksum = sha256_hash(value)
                 logger.info("Checksum generated successfully.")
+
                 self.name = os.path.basename(value)
-            elif value.startswith(("http", "https")):
+                self.extension = os.path.splitext(value)[-1]
+            elif value.startswith(("http://", "https://")):
                 pass
             else:
                 raise FileNotFoundError(

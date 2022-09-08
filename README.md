@@ -1,6 +1,19 @@
-# CRIPT (A Community Resource for Innovation in Polymer Technology)
+# CRIPT Python SDK
 
-CRIPT is an ecosystem of data standards, web-based applications, and software
-frameworks for polymers. More information here: http://cript.mit.edu.
+**CRIPT** (the _Community Resource for Innovation in Polymer Technology_) is a web-based platform for capturing and sharing polymer data. In addition to a user interface, CRIPT enables programmatic access to the platform through the CRIPT Python SDK.
 
-`cript` is the Python SDK for the CRIPT ecosystem.
+## Quickstart
+
+### Prerequisites
+- Python 3.9+
+- Internet access
+
+### Install with pip
+```bash
+pip install cript
+```
+
+## Links
+- SDK documentation: https://c-accel-cript.github.io/cript/
+- Platform: https://criptapp.org
+- Blog: https://blog.criptapp.org
