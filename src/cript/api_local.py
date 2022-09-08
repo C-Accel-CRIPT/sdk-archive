@@ -115,6 +115,24 @@ def move_copy_file(old_location: Union[pathlib.Path, str], new_location: Union[p
     shutil.copy2(old_location, new_location)
 
 
+def prepare_node_for_saving(node: BasePrimary, version: str) -> BasePrimary:
+    node.uid = str(uuid.uuid4())
+    node.url = str(f"local://cript/{node.slug}/{node.uid}/")
+    node.updated_at = datetime.datetime.now().isoformat()
+    node.created_at = datetime.datetime.now().isoformat()
+    node.model_version = version
+
+    # automatically assign group base on project node
+    if hasattr(node, "project") and hasattr(node, "group"):
+        if node.project is None:
+            raise ValueError(f"{node.node_name} needs project to be defined.")
+
+        if node.group is None:
+            node.group = node.project.group
+
+    return node
+
+
 class APILocal:
     """The entry point for interacting with the CRIPT API."""
 
@@ -199,11 +217,7 @@ class APILocal:
                                    f"so it can't be updated. {node.node_name}")
         else:
             # save
-            node.uid = str(uuid.uuid4())
-            node.url = str(f"local://cript/{node.slug}/{node.uid}/")
-            node.updated_at = datetime.datetime.now().isoformat()
-            node.created_at = datetime.datetime.now().isoformat()
-            node.model_version = self.version
+            node = prepare_node_for_saving(node, self.version)
             file_name = self._do_save(node)
 
             # add node to api database list
