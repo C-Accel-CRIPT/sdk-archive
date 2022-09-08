@@ -12,18 +12,9 @@ api = cript.API(host, token)
     Your API token can be found in the UI under [Account Settings](https://criptapp.org/settings/).
 
 
-### Create a Group node
-``` py
-group = cript.Group(name="MyGroup")
-api.save(group)
-```
-!!! note
-    Group names are globally unique.
-
-
 ### Create a Project node
 ``` py
-proj = cript.Project(group=group, name="MyProject")
+proj = cript.Project(name="MyProject")
 api.save(project)
 ```
 !!! note

@@ -27,14 +27,9 @@ api = cript.API(host, token)
 # Example Tasks
 
 ## Create a node
-For example, create a Group:
+For example, create a Project:
 ``` py
-group = cript.Group(name="MyGroup")
-api.save(group)
-```
-... then a Project:
-``` py
-project = cript.Project(group=group, name="MyProject")
+project = cript.Project(name="MyProject")
 api.save(project)
 ```
 ... then a Collection:
