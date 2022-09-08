@@ -2365,5 +2365,16 @@
         "si_unit": null,
         "value_length": null,
         "value_type": null
+    },
+    {
+        "description": null,
+        "methods": null,
+        "name": "+vmon",
+        "names": [],
+        "prefer_unit": null,
+        "range": null,
+        "si_unit": null,
+        "value_length": null,
+        "value_type": null
     }
 ]
