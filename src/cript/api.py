@@ -13,7 +13,7 @@ from beartype.typing import Type
 import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
-from cript import NODE_CLASSES
+from cript import NODE_CLASSES, __data_model_version__
 from cript.nodes.base import Base
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.user import User
@@ -45,7 +45,7 @@ logger = getLogger(__name__)
 class API:
     """The entry point for interacting with the CRIPT API."""
 
-    api_version = "0.4.3"
+    api_version = __data_model_version__
     keys = None
 
     def __init__(self, host: str = None, token: str = None, tls: bool = True):

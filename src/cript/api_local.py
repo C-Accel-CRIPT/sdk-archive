@@ -12,7 +12,7 @@ from logging import getLogger
 from beartype import beartype
 from beartype.typing import Type
 
-from cript import NODE_CLASSES, NODE_NAMES
+from cript import NODE_CLASSES, NODE_NAMES, __data_model_version__
 from cript.nodes.base import Base
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.file import File
@@ -136,7 +136,7 @@ def prepare_node_for_saving(node: BasePrimary, version: str) -> BasePrimary:
 class APILocal:
     """The entry point for interacting with the CRIPT API."""
 
-    version = "0.4.3"
+    version = __data_model_version__
     keys = {}
 
     def __init__(self, folder: Union[str, pathlib.Path], data_folder: Union[str, pathlib.Path] = None):
