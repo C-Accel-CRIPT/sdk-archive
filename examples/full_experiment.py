@@ -5,9 +5,9 @@ Anionic Polymerization of styrene
 """
 import cript as c
 
-
 api = c.APILocal(folder="database")
 
+########################################
 # Permission and Organization nodes
 user = c.User(
     username="Dylan Walsh",
@@ -27,7 +27,10 @@ api.save(expt)
 collection.experiments = [expt]
 api.save(collection)
 
+##############################################
+# load materials from other example
 from create_materials import define_materials
+
 materials = define_materials(project)
 for material in materials:
     api.save(material)
@@ -36,17 +39,21 @@ inventory = c.Inventory(group=group, collection=collection, name="Tutorial Mater
 api.save(inventory)
 collection.experiments = [inventory]
 api.save(collection)
-###########################################################
 
+
+###########################################################
+# process
 ingr_tol = c.Ingredient(material=inventory["toluene"], keyword="solvent",
                         quantities=[c.Quantity(key="volume", value=10, unit="ml")])
 ingr_st = c.Ingredient(material=inventory["styrene"], quantities=[c.Quantity(key="mass", value=0.455, unit="g")],
                        keyword="monomer")
 ingr_meoh = c.Ingredient(material=inventory["methanol"], quantities=[c.Quantity(key="volume", value=0.1, unit="ml")],
-                       keyword="workup")
+                         keyword="workup")
 ingr_meoh2 = c.Ingredient(material=inventory["methanol"], quantities=[c.Quantity(key="volume", value=100, unit="ml")],
-                       keyword="quench")
-ingr_secBuLi = c.Ingredient(material=inventory["SecBuLi solution 1.4M cHex"], quantities=[c.Quantity(key="volume", value=1, unit="ml")], keyword="initiator")  # {"mat_id": "secBuLi"}
+                          keyword="quench")
+ingr_secBuLi = c.Ingredient(material=inventory["SecBuLi solution 1.4M cHex"],
+                            quantities=[c.Quantity(key="volume", value=1, unit="ml")],
+                            keyword="initiator")  # {"mat_id": "secBuLi"}
 
 process = c.Process(
     group=group,
@@ -55,10 +62,10 @@ process = c.Process(
     type="multistep",
     ingredients=[ingr_secBuLi, ingr_tol, ingr_st, ingr_meoh, ingr_meoh, ingr_meoh2],
     description="In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
-              "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
-              "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
-              "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
-              "precipitation in methanol 3 times and dried under vacuum.",
+                "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
+                "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
+                "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
+                "precipitation in methanol 3 times and dried under vacuum.",
     conditions=[
         c.Condition(key="temperature", value=25, unit="degC"),
         c.Condition(key="time_duration", value=60, unit="min"),
@@ -72,7 +79,7 @@ process = c.Process(
 api.save(process)
 
 ###########################################################
-
+# data/file node
 import os
 
 file_path = os.getcwd() + "\\test_data"
@@ -104,11 +111,12 @@ sec_data.file = [file]
 api.save(sec_data)
 
 ###########################################################
+# final material
 
 mat_poly = c.Material(
-    group =group,
-    project = project,
-    name = "polystyrene",
+    group=group,
+    project=project,
+    name="polystyrene",
     identifiers=[
         c.Identifier(key="preferred_name", value="polystyrene"),
         c.Identifier(key="names", value=["poly(styrene)", "poly(vinylbenzene)"]),

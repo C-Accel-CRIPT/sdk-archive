@@ -33,7 +33,7 @@ def _generate_file_name(node: BasePrimary) -> str:
     return f"{node.slug}_{node.uid}"
 
 
-def _split_filename(filename: str) -> tuple[str, str]:
+def _parse_filename(filename: str) -> tuple[str, str]:
     # parsing
     filename = pathlib.Path(filename)
     split = filename.stem.split("_")
@@ -62,6 +62,9 @@ def _validate_uid_bool(uid: str) -> bool:
 
 
 def _format_folder(folder: Union[str, pathlib.Path]) -> pathlib.Path:
+    """
+    Converts various folder inputs into an absolute pathlib.Path.
+    """
     if isinstance(folder, pathlib.Path):
         return folder
 
@@ -80,6 +83,9 @@ def make_new_folder(folder: pathlib.Path):
 
 
 def move_copy_file(old_location: Union[pathlib.Path, str], new_location: Union[pathlib.Path, str]):
+    """
+    Copies files from one location to a new one
+    """
     if not isinstance(old_location, pathlib.Path):
         old_location = pathlib.Path(old_location)
     if not isinstance(new_location, pathlib.Path):
@@ -141,7 +147,7 @@ class APILocal:
 
         for file in files:
             try:
-                node, uid = _split_filename(file)
+                node, uid = _parse_filename(file)
             except ValueError:
                 logger.warning(f"Unrecognized file found in database and will be skipped. {file}")
                 continue
@@ -178,6 +184,7 @@ class APILocal:
             node.url = str(f"local://cript/{node.slug}/{node.uid}/")
             node.updated_at = datetime.datetime.now().isoformat()
             node.created_at = datetime.datetime.now().isoformat()
+            node.model_version = self.version
             file_name = self.folder / (_generate_file_name(node) + ".json")
             with open(file_name, "w", encoding=ENCODING) as f:
                 f.write(node._to_json())
@@ -316,7 +323,7 @@ class APILocal:
         with open(self.database_by_uid[obj], 'r', encoding=ENCODING) as f:
             obj_json = json.load(f)
 
-        node_class = self._define_node_class(_split_filename(self.database_by_uid[obj])[0])
+        node_class = self._define_node_class(_parse_filename(self.database_by_uid[obj])[0])
 
         return obj_json, node_class
 
@@ -419,6 +426,7 @@ class APILocal:
         uid = obj_json.pop("uid")
         created_at = obj_json.pop("created_at")
         updated_at = obj_json.pop("updated_at")
+        model_version = obj_json.pop("model_version")
 
         # Create node
         node = node_class(**obj_json)
@@ -428,6 +436,7 @@ class APILocal:
         node.uid = uid
         node.created_at = created_at
         node.updated_at = updated_at
+        node.model_version = model_version
 
         return node
 
