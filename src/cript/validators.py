@@ -190,7 +190,9 @@ def _get_key_parameters(key_category, key):
         # Fetch relevant keys
         if key_category == "property-key":
             keys_info = (
-                API.keys["material-property-key"] + API.keys["process-property-key"]
+                API.keys["material-property-key"]
+                + API.keys["process-property-key"]
+                + API.keys["computational-process-property-key"]
             )
         else:
             keys_info = API.keys[key_category]
