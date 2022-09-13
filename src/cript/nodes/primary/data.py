@@ -30,8 +30,8 @@ class Data(BasePrimary):
         type: str,
         files=None,
         sample_preparation: Union[BasePrimary, str, None] = None,
-        calibration: Union[str, None] = None,
-        configuration: Union[str, None] = None,
+        computations: list[Union[BasePrimary, str]] = None,
+        computational_process: Union[BasePrimary, str, None] = None,
         materials=None,
         processes=None,
         notes: Union[str, None] = None,
@@ -45,8 +45,8 @@ class Data(BasePrimary):
         self.files = files
         self.type = type
         self.sample_preparation = sample_preparation
-        self.calibration = calibration
-        self.configuration = configuration
+        self.computations = computations if computations else []
+        self.computational_processes = computational_process
         self.materials = materials if materials else []
         self.processes = processes if processes else []
         self.citations = citations if citations else []
@@ -60,6 +60,14 @@ class Data(BasePrimary):
     @type.setter
     def type(self, value):
         self._type = validate_key("data-type", value)
+
+    @beartype
+    def add_computation(self, computation: Union[BasePrimary, dict]):
+        self._add_node(computation, "computations")
+
+    @beartype
+    def remove_computation(self, computation: Union[BasePrimary, int]):
+        self._remove_node(computation, "computations")
 
     @beartype
     def add_citation(self, citation: Union[Citation, dict]):
