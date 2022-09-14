@@ -25,14 +25,14 @@ class Inventory(BasePrimary):
         collection: Union[Collection, str],
         name: str,
         materials: list[Union[Material, str]] = None,
-        description: Union[str, None] = None,
+        notes: Union[str, None] = None,
         public: bool = False,
         group: Union[Group, str] = None,
     ):
         super().__init__(public=public)
         self.collection = collection
         self.name = name
-        self.description = description
+        self.notes = notes
         self.materials = materials if materials else []
         self.group = auto_assign_group(group, collection)
 
@@ -52,7 +52,9 @@ class Inventory(BasePrimary):
                 return self.materials[self.__index_table[obj]]
             if obj in self.__degenerate_index_table:
                 raise ValueError("Multiple materials share this index. Try another.")
-            raise ValueError(f"'{obj}' not found in Inventory: {self.name}. (exact match required, case sensitive)")
+            raise ValueError(
+                f"'{obj}' not found in Inventory: {self.name}. (exact match required, case sensitive)"
+            )
 
         raise TypeError("Invalid object for indexing.")
 
