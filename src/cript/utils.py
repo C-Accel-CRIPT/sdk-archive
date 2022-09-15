@@ -50,7 +50,7 @@ def auto_assign_group(group, parent):
 
     :param group: Current value of the node's group field.
     :param parent: The parent node of the relevant node.
-    :return: The :class:`Group` object that will be assigned to the node.
+    :return: The `Group` object that will be assigned to the node.
     :rtype: cript.nodes.Group
     """
     if parent and not group:

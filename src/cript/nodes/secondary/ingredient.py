@@ -14,8 +14,8 @@ logger = getLogger(__name__)
 
 class Ingredient(BaseSecondary):
     """
-    Object representing a :class:`Material` object being used
-    as an input to a :class:`Process` object.
+    Object representing a `Material` object being used
+    as an input to a `Process` object.
     """
 
     node_name = "Ingredient"

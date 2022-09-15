@@ -15,8 +15,8 @@ logger = getLogger(__name__)
 
 class Collection(BasePrimary):
     """
-    Object representing a logical grouping of :class:`Experiment` and
-    :class:`Inventory` objects.
+    Object representing a logical grouping of `Experiment` and
+    `Inventory` objects.
     """
 
     node_name = "Collection"

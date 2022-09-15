@@ -15,7 +15,7 @@ logger = getLogger(__name__)
 class Condition(BaseSecondary):
     """
     Object representing a condition (e.g., temperature).
-    These are used as modifiers for :class:`Property` and :class:`Process` objects.
+    These are used as modifiers for `Property` and `Process` objects.
     """
 
     node_name = "Condition"

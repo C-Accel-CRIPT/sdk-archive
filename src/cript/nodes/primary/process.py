@@ -22,7 +22,7 @@ logger = getLogger(__name__)
 class Process(BasePrimary):
     """
     Object representing a process of creating or transforming
-    a :class:`Material` object.
+    a `Material` object.
     """
 
     node_name = "Process"
