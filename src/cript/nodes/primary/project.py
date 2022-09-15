@@ -26,6 +26,7 @@ class Project(BasePrimary):
         materials=None,
         files=None,
         collections=None,
+        notes: Union[str, None] = None,
         public: bool = False,
         group: Union[Group, str] = None,
     ):
@@ -34,4 +35,5 @@ class Project(BasePrimary):
         self.materials = materials if materials else []
         self.files = files if files else []
         self.collections = collections if collections else []
+        self.notes = notes
         self.group = group
