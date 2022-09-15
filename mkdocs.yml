@@ -18,11 +18,11 @@ plugins:
         default_handler: python
         handlers:
             python:
+                setup_commands:
+                    - import sys
+                    - sys.path.append("src")
                 selection:
-                    docstring_style: "restructured-text"
-                rendering:
-                    show_source: true
-                    heading_level: 3
+                    docstring_style: restructured-text
 
 nav:
     - Home: index.md
