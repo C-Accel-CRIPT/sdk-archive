@@ -17,7 +17,7 @@ logger = getLogger(__name__)
 class Property(BaseSecondary):
     """
     Object representing an observed or measured attribute
-    of a :class:`Material` or :class:`Process` object.
+    of a `Material` or `Process` object.
     """
 
     node_name = "Property"

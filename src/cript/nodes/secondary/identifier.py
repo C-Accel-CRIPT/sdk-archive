@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 
 class Identifier(BaseSecondary):
     """
-    Object representing an identifier of a :class:`Material` object
+    Object representing an identifier of a `Material` object
     (e.g., CAS, BigSMILES).
     """
 

@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 
 
 class Inventory(BasePrimary):
-    """Object representing a logical grouping of :class:`Material` objects."""
+    """Object representing a logical grouping of `Material` objects."""
 
     node_name = "Inventory"
     slug = "inventory"
@@ -52,7 +52,9 @@ class Inventory(BasePrimary):
                 return self.materials[self.__index_table[obj]]
             if obj in self.__degenerate_index_table:
                 raise ValueError("Multiple materials share this index. Try another.")
-            raise ValueError(f"'{obj}' not found in Inventory: {self.name}. (exact match required, case sensitive)")
+            raise ValueError(
+                f"'{obj}' not found in Inventory: {self.name}. (exact match required, case sensitive)"
+            )
 
         raise TypeError("Invalid object for indexing.")
 

@@ -12,8 +12,8 @@ logger = getLogger(__name__)
 
 class Project(BasePrimary):
     """
-    Object representing a logical grouping of :class:`Material`, :class:`File`,
-    and :class:`Collection` objects.
+    Object representing a logical grouping of `Material`, `File`,
+    and `Collection` objects.
     """
 
     node_name = "Project"

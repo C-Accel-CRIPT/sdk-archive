@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 
 class Equipment(BaseSecondary):
     """
-    Object representing equipment used in a :class:`Process`.
+    Object representing equipment used in a `Process`.
     """
 
     node_name = "Equipment"
