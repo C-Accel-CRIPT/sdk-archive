@@ -149,8 +149,7 @@ def define_materials(project: c.Project) -> list[c.Material]:
                        )
         ],
         keywords=["styrene"],
-        notes="{storage: [c.Condition(key='temperature', value=-20, unit='degC'), c.Condition(key='atm', "
-              "value='argon')]}"
+        notes=""
     )
 
     toluene = c.Material(

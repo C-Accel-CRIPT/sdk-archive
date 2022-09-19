@@ -32,6 +32,21 @@ def create_nodes(api, project):
     api.save(collection)
 
     ###########################################################
+    # reference
+
+    reference_node = c.Reference(group=project.group,
+                                 title="Kinetics of Anionic Polymerization of Styrene in Tetrahydrofuran",
+                                 authors=["Geacintov, C.", "Smid, J.", "Szwarc, M."],
+                                 journal="Journal of the American Chemical Society",
+                                 year=1962,
+                                 issue=13,
+                                 volume=84,
+                                 pages=[2508],
+                                 doi="10.1021/ja00872a012"
+                                 )
+    api.save(reference_node)
+
+    ###########################################################
     # process
     ingr_tol = c.Ingredient(material=inventory["toluene"], keyword="solvent",
                             quantities=[c.Quantity(key="volume", value=10, unit="ml")])
@@ -63,7 +78,8 @@ def create_nodes(api, project):
         properties=[
             c.Property(key="yield_mass", value=0.47, unit="g", uncertainty=0.02, uncertainty_type="stdev", method="scale")
         ],
-        keywords=["polymerization", "living_poly", "anionic", "solution"]
+        keywords=["polymerization", "living_poly", "anionic", "solution"],
+        citations=[c.Citation(type="reference", reference=reference_node)]
     )
     api.save(process)
 
@@ -153,6 +169,6 @@ def main_web_api():
 
 
 if __name__ == "__main__":
-    # main_local_api()
-    main_web_api()
+    main_local_api()
+    # main_web_api()
 
