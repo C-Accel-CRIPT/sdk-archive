@@ -46,7 +46,6 @@ class Process(BasePrimary):
         products: list[Union[Material, str]] = None,
         waste: list[Union[Material, str]] = None,
         citations: list[Union[Citation, dict]] = None,
-        notes: Union[str, None] = None,
         public: bool = False,
         group: Union[Group, str] = None,
     ):
@@ -67,7 +66,6 @@ class Process(BasePrimary):
         self.products = products if products else []
         self.waste = waste if waste else []
         self.citations = citations if citations else []
-        self.notes = notes
         self.group = auto_assign_group(group, experiment)
 
     @property
