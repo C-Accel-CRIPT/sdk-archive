@@ -35,7 +35,7 @@ def http_service(docker_ip, docker_services):
     port = docker_services.port_for("web", 8000)
     url = "http://{}:{}".format(docker_ip, port)
     docker_services.wait_until_responsive(
-        timeout=30.0, pause=0.1, check=lambda: is_responsive(url)
+        timeout=600.0, pause=0.1, check=lambda: is_responsive(url)
     )
     return url
 
@@ -83,8 +83,7 @@ def test_create_group_success(criptapp_api):
 
 
 def test_create_project_success(criptapp_api):
-    group = criptapp_api.get(cript.Group, {"name": MY_GROUP})
-    project = cript.Project(group=group, name=MY_PROJECT)
+    project = cript.Project(name=MY_PROJECT)
     criptapp_api.save(project)
 
 

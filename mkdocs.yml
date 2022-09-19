@@ -13,16 +13,15 @@ theme:
 
 plugins:
     - search
-    - mkdocs-jupyter
     - mkdocstrings:
         default_handler: python
         handlers:
             python:
+                paths: [src]
                 selection:
-                    docstring_style: "restructured-text"
-                rendering:
-                    show_source: true
-                    heading_level: 3
+                    docstring_style: sphinx
+                options:
+                    show_bases: false
 
 nav:
     - Home: index.md

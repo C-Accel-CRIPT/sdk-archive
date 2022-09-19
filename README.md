@@ -1,6 +1,8 @@
 # CRIPT Python SDK
 
-**CRIPT** (the _Community Resource for Innovation in Polymer Technology_) is a web-based platform for capturing and sharing polymer data. In addition to a user interface, CRIPT enables programmatic access to the platform through the CRIPT Python SDK.
+**CRIPT** (the _Community Resource for Innovation in Polymer Technology_) is a web-based platform for capturing and sharing polymer data. 
+
+Programmatic access to the platform is enabled through the CRIPT Python SDK.
 
 ## Quickstart
 

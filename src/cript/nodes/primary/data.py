@@ -14,7 +14,7 @@ logger = getLogger(__name__)
 
 class Data(BasePrimary):
     """
-    Object representing a set of :class:`File` objects and
+    Object representing a set of `File` objects and
     related meta-data.
     """
 

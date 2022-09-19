@@ -193,7 +193,7 @@ class API:
         """
         Download a file from the defined storage provider.
 
-        :param node: The :class:`File` node object.
+        :param node: The `File` node object.
         :param path: Path where the file should go.
         """
         storage_provider = self.storage_info["provider"]
@@ -209,7 +209,7 @@ class API:
         """
         Download a file from a Globus endpoint.
 
-        :param node: The :class:`File` node object.
+        :param node: The `File` node object.
         :param path: Path where the file should go.
         """
         endpoint_id = self.storage_info["endpoint_id"]
@@ -244,7 +244,7 @@ class API:
         """
         Sends a POST to the API to stage the Globus endpoint for download.
 
-        :param file_uid: UID of the :class:`File` node object.
+        :param file_uid: UID of the `File` node object.
         :return: The Globus download URL.
         :rtype: str
         """
@@ -260,9 +260,9 @@ class API:
         """
         Upload a file to the defined storage provider.
 
-        :param file_uid: UID of the :class:`File` node object.
-        :param file_url: URL of the :class:`File` node object.
-        :param node: The :class:`File` node object.
+        :param file_uid: UID of the `File` node object.
+        :param file_url: URL of the `File` node object.
+        :param node: The `File` node object.
         """
         storage_provider = self.storage_info["provider"]
         max_file_size = self.storage_info["max_file_size"]
@@ -286,9 +286,9 @@ class API:
         """
         Upload a file to a Globus endpoint via HTTPS.
 
-        :param file_url: URL of the :class:`File` node object.
-        :param file_uid: UID of the :class:`File` node object.
-        :param node: The :class:`File` node object.
+        :param file_url: URL of the `File` node object.
+        :param file_uid: UID of the `File` node object.
+        :param node: The `File` node object.
         """
         endpoint_id = self.storage_info["endpoint_id"]
         native_client_id = self.storage_info["native_client_id"]
@@ -376,7 +376,7 @@ class API:
         Initialize and save the transfer client so the user doesn't have to
         auth for each upload.
 
-        :param auth_client: Instance of :class:`globus_sdk.NativeAppAuthClient`
+        :param auth_client: Instance of `globus_sdk.NativeAppAuthClient`
         :param tokens: The relevant auth, transfer, and refresh tokens.
         """
         # Initialize transfer client
@@ -396,7 +396,7 @@ class API:
         """
         Sends a POST to the API to stage the Globus endpoint for upload.
 
-        :param file_uid: UID of the :class:`File` node object.
+        :param file_uid: UID of the `File` node object.
         :file_checksum: The checksum of the raw file.
         :return: The unique file name to be used for upload.
         :rtype: str
@@ -414,8 +414,8 @@ class API:
         """
         Performs a single file upload to AWS S3.
 
-        :param file_uid: UID of the :class:`File` node object.
-        :param node: The :class:`File` node object.
+        :param file_uid: UID of the `File` node object.
+        :param node: The `File` node object.
         """
         # Generate signed URL for uploading
         payload = {
@@ -443,7 +443,7 @@ class API:
         Performs a multipart file upload to AWS S3.
 
         :param file_uid: UID of the File node.
-        :param node: The :class:`File` node object.
+        :param node: The `File` node object.
         """
         chunk_size = 500 * 1024**2
 
@@ -576,7 +576,7 @@ class API:
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
         :param limit: The max number of items to return.
         :param offset: The starting position of the query.
-        :return: A :class:`SearchPaginator` object containing the results.
+        :return: A `SearchPaginator` object containing the results.
         :rtype: cript.session.SearchPaginator
         """
         if not issubclass(node_class, BasePrimary):

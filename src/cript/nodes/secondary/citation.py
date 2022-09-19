@@ -13,7 +13,7 @@ logger = getLogger(__name__)
 
 class Citation(BaseSecondary):
     """
-    Object representing how a :class:`Reference` object
+    Object representing how a `Reference` object
     is applied in a given context.
     """
 

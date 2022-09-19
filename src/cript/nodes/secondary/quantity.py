@@ -12,8 +12,8 @@ logger = getLogger(__name__)
 
 class Quantity(BaseSecondary):
     """
-    Object representing a specified amount of an :class:`Ingredient`
-    object used as input to a :class:`Process` object.
+    Object representing a specified amount of an `Ingredient`
+    object used as input to a `Process` object.
     """
 
     node_name = "Quantity"
