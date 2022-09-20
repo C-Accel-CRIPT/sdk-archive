@@ -62,7 +62,7 @@ class Property(BaseSecondary):
         self.set_id = set_id
         self.conditions = conditions if conditions else []
         self.data = data
-        self.computations = computations if computations else computations
+        self.computations = computations if computations else []
         self.citations = citations if citations else []
         self.notes = notes
 
