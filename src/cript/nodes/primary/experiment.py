@@ -40,10 +40,10 @@ class Experiment(BasePrimary):
         self.name = name
         self.funding = funding if funding else []
         self.processes = processes if processes else []
+        self.computations = computations if computations else []
         self.computational_processes = (
             computational_processes if computational_processes else []
         )
-        self.computations = computations if computations else []
         self.data = data if data else []
         self.notes = notes
         self.group = auto_assign_group(group, collection)
