@@ -46,7 +46,7 @@ class Data(BasePrimary):
         self.type = type
         self.sample_preparation = sample_preparation
         self.computations = computations if computations else []
-        self.computational_processes = computational_process
+        self.computational_process = computational_process
         self.materials = materials if materials else []
         self.processes = processes if processes else []
         self.citations = citations if citations else []
