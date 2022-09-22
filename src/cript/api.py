@@ -630,8 +630,8 @@ class API:
             else:
                 raise APIGetError("The specified node was not found.")
             # Define node class from URL slug
-            node_slug = obj.rstrip("/").rsplit("/")[-2]
-            node_class = self._define_node_class(node_slug)
+            node_attr_name = obj.rstrip("/").rsplit("/")[-2].replace("-", "_")
+            node_class = self._define_node_class(node_attr_name)
 
         # Get node with a search query
         elif issubclass(obj, BasePrimary) and query:
@@ -743,8 +743,8 @@ class API:
         :rtype: cript.nodes.Base
         """
         for node_cls in NODE_CLASSES:
-            # Use node slug
-            if hasattr(node_cls, "slug") and node_cls.slug == key:
+            # Use node name
+            if node_cls.node_name.lower() == key.replace("_", ""):
                 return node_cls
             # Use node list name (e.g., properties)
             if hasattr(node_cls, "list_name") and node_cls.list_name == key:
