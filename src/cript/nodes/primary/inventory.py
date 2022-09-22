@@ -25,14 +25,14 @@ class Inventory(BasePrimary):
         collection: Union[Collection, str],
         name: str,
         materials: list[Union[Material, str]] = None,
-        description: Union[str, None] = None,
+        notes: Union[str, None] = None,
         public: bool = False,
         group: Union[Group, str] = None,
     ):
         super().__init__(public=public)
         self.collection = collection
         self.name = name
-        self.description = description
+        self.notes = notes
         self.materials = materials if materials else []
         self.group = auto_assign_group(group, collection)
 

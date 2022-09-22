@@ -32,6 +32,8 @@ from cript.nodes import (  # noqa 402
     File,
     Data,
     Condition,
+    SoftwareConfiguration,
+    Computation,
     Property,
     Identifier,
     Material,
@@ -41,6 +43,11 @@ from cript.nodes import (  # noqa 402
     Equipment,
     Process,
     Experiment,
+    Software,
+    Parameter,
+    Algorithm,
+    ComputationalProcess,
+    ComputationalForcefield,
 )
 
 NODE_CLASSES = [
@@ -53,6 +60,8 @@ NODE_CLASSES = [
     File,
     Data,
     Condition,
+    SoftwareConfiguration,
+    Computation,
     Property,
     Identifier,
     Material,
@@ -62,6 +71,11 @@ NODE_CLASSES = [
     Equipment,
     Process,
     Experiment,
+    Software,
+    Parameter,
+    Algorithm,
+    ComputationalProcess,
+    ComputationalForcefield,
 ]
 
 from cript.api import API  # noqa 401 402

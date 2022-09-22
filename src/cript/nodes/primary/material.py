@@ -8,6 +8,7 @@ from cript.nodes.primary.group import Group
 from cript.nodes.primary.project import Project
 from cript.nodes.secondary.identifier import Identifier
 from cript.nodes.secondary.property import Property
+from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.validators import validate_key
 from cript.utils import auto_assign_group
 
@@ -30,8 +31,9 @@ class Material(BasePrimary):
         identifiers: list[Union[Identifier, dict]] = None,
         components: list[Union[BasePrimary, str]] = None,
         keywords: Union[list[str], None] = None,
-        process: Union[BasePrimary, str, None] = None,
         properties: list[Union[Property, dict]] = None,
+        process: Union[BasePrimary, str, None] = None,
+        computational_forcefield: Union[BaseSecondary, dict, None] = None,
         notes: Union[str, None] = None,
         public: bool = False,
         group: Union[Group, str] = None,
@@ -42,8 +44,9 @@ class Material(BasePrimary):
         self.identifiers = identifiers if identifiers else []
         self.components = components if components else []
         self.keywords = keywords if keywords else []
-        self.process = process
         self.properties = properties if properties else []
+        self.process = process
+        self.computational_forcefield = computational_forcefield
         self.notes = notes
         self.group = auto_assign_group(group, project)
 

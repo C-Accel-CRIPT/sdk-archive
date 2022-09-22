@@ -22,7 +22,6 @@ def validate_key(key_category, key):
     if not key or key[0] == "+":
         return key
 
-    key = key.strip().lower()
     key_parameters = _get_key_parameters(key_category, key)
     return key_parameters["name"]
 
@@ -191,14 +190,16 @@ def _get_key_parameters(key_category, key):
         # Fetch relevant keys
         if key_category == "property-key":
             keys_info = (
-                API.keys["material-property-key"] + API.keys["process-property-key"]
+                API.keys["material-property-key"]
+                + API.keys["process-property-key"]
+                + API.keys["computational-process-property-key"]
             )
         else:
             keys_info = API.keys[key_category]
 
         key = key.strip().lower()
         for key_info in keys_info:
-            if key == key_info["name"]:
+            if key == key_info["name"].lower():
                 return key_info
 
         raise InvalidKeyError(key, key_category.replace("-", " "))
