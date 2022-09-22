@@ -14,6 +14,7 @@ pint.util.logger.setLevel(logging.ERROR)  # Mute Pint warnings
 __version__ = importlib.metadata.version("cript")
 __short_version__ = __version__.rpartition(".")[0]
 
+__api_version__ = "0.4.3"
 
 # Instantiate the Pint unit registry
 # https://pint.readthedocs.io/en/stable/tutorial.html#using-pint-in-your-projects
@@ -78,4 +79,7 @@ NODE_CLASSES = [
     ComputationalForcefield,
 ]
 
+NODE_NAMES: list[str] = [node.node_name.lower() for node in NODE_CLASSES]
+
 from cript.api import API  # noqa 401 402
+from cript.api_local import APILocal

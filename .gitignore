@@ -149,6 +149,9 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+# Custom
+api_key.txt
+
 .idea/
 
 # PyCharm
