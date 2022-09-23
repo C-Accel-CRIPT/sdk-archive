@@ -23,6 +23,7 @@ pint_ureg = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
 
 
 from cript import exceptions  # noqa 401 402
+from cript.paginators import SearchPaginator
 from cript.nodes import (  # noqa 402
     User,
     Group,
