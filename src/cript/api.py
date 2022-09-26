@@ -39,8 +39,7 @@ from cript.exceptions import (
     DuplicateNodeError,
     FileSizeLimitError,
 )
-from cript.paginators import SearchPaginator
-from cript.paginators import Paginator
+from cript.paginator import Paginator
 
 
 logger = getLogger(__name__)
@@ -310,30 +309,20 @@ class API:
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
         :param limit: The max number of items to return.
         :param offset: The starting position of the query.
-        :return: A `SearchPaginator` object containing the results.
-        :rtype: cript.session.SearchPaginator
+        :return: A `Paginator` object.
+        :rtype: cript.session.Paginator
         """
         if not issubclass(node_class, BasePrimary):
             raise APISearchError(
                 f"{node_class.node_name} is a secondary node, thus cannot be searched."
             )
 
-        # Generate URL
-        url = f"{self.api_url}/search/{node_class.slug}/?"
-        if limit:
-            url += f"limit={str(limit)}&"
-        if offset:
-            url += f"offset={str(offset)}"
-
         if isinstance(query, dict):
+            url = f"{self.api_url}/search/{node_class.slug}/"
             payload = json.dumps(query)
-            response = self.session.post(url=url, data=payload)
+            return Paginator(api=self, url=url, payload=payload, obj_class=node_class)
         else:
             raise APISearchError(f"'{query}' is not a valid query.")
-
-        if response.status_code != 200:
-            raise APISearchError(display_errors(response.content))
-        return SearchPaginator(self.session, response.content, payload)
 
     @beartype
     def get(
