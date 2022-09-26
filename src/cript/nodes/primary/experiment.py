@@ -7,6 +7,7 @@ from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
 from cript.nodes.primary.collection import Collection
 from cript.utils import auto_assign_group
+from cript.paginators import Paginator
 
 
 logger = getLogger(__name__)
@@ -26,10 +27,10 @@ class Experiment(BasePrimary):
         self,
         collection: Union[Collection, str],
         name: str,
-        processes=None,
-        computations: list[Union[BasePrimary, str]] = None,
-        computational_processes: list[Union[BasePrimary, str]] = None,
-        data=None,
+        processes: str = None,
+        computations: str = None,
+        computational_processes: str = None,
+        data: str = None,
         funding: list[Union[str, None]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
@@ -39,31 +40,41 @@ class Experiment(BasePrimary):
         self.collection = collection
         self.name = name
         self.funding = funding if funding else []
-        self.processes = processes if processes else []
-        self.computations = computations if computations else []
-        self.computational_processes = (
-            computational_processes if computational_processes else []
-        )
-        self.data = data if data else []
+        self.processes = processes
+        self.computations = computations
+        self.computational_processes = computational_processes
+        self.data = data
         self.notes = notes
         self.group = auto_assign_group(group, collection)
 
-    @beartype
-    def add_computation(self, computation: Union[BasePrimary, dict]):
-        self._add_node(computation, "computations")
+    @property
+    def processes(self):
+        return self._processes
 
-    @beartype
-    def remove_computation(self, computation: Union[BasePrimary, int]):
-        self._remove_node(computation, "computations")
+    @processes.setter
+    def processes(self, value):
+        self._processes = Paginator(url=value)
 
-    @beartype
-    def add_computational_process(
-        self, computational_process: Union[BasePrimary, dict]
-    ):
-        self._add_node(computational_process, "computational_processes")
+    @property
+    def computational_processes(self):
+        return self._computational_processes
 
-    @beartype
-    def remove_computational_process(
-        self, computational_process: Union[BasePrimary, int]
-    ):
-        self._remove_node(computational_process, "computational_processes")
+    @computational_processes.setter
+    def computational_processes(self, value):
+        self._computational_processes = Paginator(url=value)
+
+    @property
+    def computations(self):
+        return self._computations
+
+    @computations.setter
+    def computations(self, value):
+        self._computations = Paginator(url=value)
+
+    @property
+    def data(self):
+        return self._data
+
+    @data.setter
+    def data(self, value):
+        self._data = Paginator(url=value)
