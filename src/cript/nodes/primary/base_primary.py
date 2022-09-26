@@ -4,6 +4,7 @@ import json
 
 from cript.exceptions import UnsavedNodeError, AddNodeError, RemoveNodeError
 from cript.nodes.base import Base
+from cript.paginators import Paginator
 
 
 class BasePrimary(Base, abc.ABC):
@@ -27,8 +28,11 @@ class BasePrimary(Base, abc.ABC):
 
     def _to_json(self):
         node_dict = copy.deepcopy(self._clean_dict())
+
         for key, value in node_dict.items():
-            if hasattr(value, "_prep_for_upload"):
+            if isinstance(value, Paginator):
+                node_dict[key] = value.url
+            elif hasattr(value, "_prep_for_upload"):
                 node_dict[key] = value._prep_for_upload()
             elif isinstance(value, list):
                 for i in range(len(value)):

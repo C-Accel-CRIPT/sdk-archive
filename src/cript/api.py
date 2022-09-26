@@ -1,6 +1,5 @@
 import os
 import json
-import urllib
 import warnings
 from typing import Union
 from getpass import getpass
@@ -10,36 +9,29 @@ from distutils.version import StrictVersion
 import requests
 from beartype import beartype
 from beartype.typing import Type
-import globus_sdk
-from globus_sdk.scopes import ScopeBuilder
 
-from cript import NODE_CLASSES, __api_version__
+from cript import __api_version__
+from cript import NODE_CLASSES
 from cript.nodes.base import Base
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.user import User
 from cript.nodes.primary.file import File
 from cript.nodes.secondary.base_secondary import BaseSecondary
-from cript.utils import (
-    get_api_url,
-    convert_to_api_url,
-    convert_file_size,
-    display_errors,
-)
+from cript.utils import get_api_url
+from cript.utils import convert_to_api_url
+from cript.utils import convert_file_size
+from cript.utils import display_errors
 from cript.storage_clients import GlobusClient
 from cript.storage_clients import AmazonS3Client
-from cript.exceptions import (
-    APIAuthError,
-    APIRefreshError,
-    APISaveError,
-    APIDeleteError,
-    APISearchError,
-    APIGetError,
-    APIFileUploadError,
-    APIFileDownloadError,
-    DuplicateNodeError,
-    FileSizeLimitError,
-)
-from cript.paginators import SearchPaginator
+from cript.paginator import Paginator
+from cript.exceptions import APIAuthError
+from cript.exceptions import APIRefreshError
+from cript.exceptions import APISaveError
+from cript.exceptions import APIDeleteError
+from cript.exceptions import APISearchError
+from cript.exceptions import APIGetError
+from cript.exceptions import DuplicateNodeError
+from cript.exceptions import FileSizeLimitError
 
 
 logger = getLogger(__name__)
@@ -309,30 +301,20 @@ class API:
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
         :param limit: The max number of items to return.
         :param offset: The starting position of the query.
-        :return: A `SearchPaginator` object containing the results.
-        :rtype: cript.session.SearchPaginator
+        :return: A `Paginator` object.
+        :rtype: cript.session.Paginator
         """
         if not issubclass(node_class, BasePrimary):
             raise APISearchError(
                 f"{node_class.node_name} is a secondary node, thus cannot be searched."
             )
 
-        # Generate URL
-        url = f"{self.api_url}/search/{node_class.slug}/?"
-        if limit:
-            url += f"limit={str(limit)}&"
-        if offset:
-            url += f"offset={str(offset)}"
-
         if isinstance(query, dict):
+            url = f"{self.api_url}/search/{node_class.slug}/"
             payload = json.dumps(query)
-            response = self.session.post(url=url, data=payload)
+            return Paginator(api=self, url=url, payload=payload, obj_class=node_class)
         else:
             raise APISearchError(f"'{query}' is not a valid query.")
-
-        if response.status_code != 200:
-            raise APISearchError(display_errors(response.content))
-        return SearchPaginator(self.session, response.content, payload)
 
     @beartype
     def get(
@@ -412,6 +394,7 @@ class API:
             # Skip empty values and the url field
             if not value or key == "url":
                 continue
+
             # Generate primary nodes
             if (
                 isinstance(value, str)
@@ -430,12 +413,20 @@ class API:
                     except APIGetError:
                         # Leave the URL if node is not viewable
                         pass
+
             # Generate secondary nodes
             elif isinstance(value, dict):
                 node_class = self._define_node_class(key)
                 secondary_node = node_class(**value)
                 node_dict[key] = secondary_node
                 self._generate_nodes(secondary_node, level=level, max_level=max_level)
+
+            # Define Paginator attributes
+            elif isinstance(value, Paginator):
+                value.api = self
+                value.obj_class = self._define_node_class(key.lstrip("_"))
+                value.max_level = max_level
+
             # Handle lists
             elif isinstance(value, list):
                 for i in range(len(value)):
@@ -457,6 +448,7 @@ class API:
                             except APIGetError:
                                 # Leave the URL if node is not viewable
                                 pass
+
                     # Generate secondary nodes
                     elif isinstance(value[i], dict):
                         node_class = self._define_node_class(key)
@@ -477,7 +469,7 @@ class API:
         """
         for node_cls in NODE_CLASSES:
             # Use node name
-            if node_cls.node_name.lower() == key.replace("_", ""):
+            if node_cls.node_name.lower() == key.replace("_", "").lower():
                 return node_cls
             # Use node list name (e.g., properties)
             if hasattr(node_cls, "list_name") and node_cls.list_name == key:

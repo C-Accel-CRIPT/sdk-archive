@@ -209,3 +209,13 @@ class FileSizeLimitError(CRIPTError):
 
     def __str__(self):
         return f"The file size exceeds the maximum limit of {self.max_size}."
+
+
+class InvalidPage(CRIPTError):
+    """Raised when attempting to get an invalid page via a paginator."""
+
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return self.message

@@ -4,7 +4,9 @@ from logging import getLogger
 from beartype import beartype
 
 from cript.nodes.primary.base_primary import BasePrimary
-from cript.nodes import Group, Citation
+from cript.nodes.primary.group import Group
+from cript.nodes.primary.file import File
+from cript.nodes.secondary.citation import Citation
 from cript.validators import validate_key
 from cript.utils import auto_assign_group
 
@@ -28,7 +30,7 @@ class Data(BasePrimary):
         experiment: Union[BasePrimary, str],
         name: str,
         type: str,
-        files=None,
+        files: list[Union[File, str]] = None,
         sample_preparation: Union[BasePrimary, str, None] = None,
         computations: list[Union[BasePrimary, str]] = None,
         computational_process: Union[BasePrimary, str, None] = None,
@@ -42,7 +44,7 @@ class Data(BasePrimary):
         super().__init__(public=public)
         self.experiment = experiment
         self.name = name
-        self.files = files
+        self.files = files if files else []
         self.type = type
         self.sample_preparation = sample_preparation
         self.computations = computations if computations else []
@@ -60,6 +62,14 @@ class Data(BasePrimary):
     @type.setter
     def type(self, value):
         self._type = validate_key("data-type", value)
+
+    @beartype
+    def add_file(self, file: Union[File, dict]):
+        self._add_node(file, "files")
+
+    @beartype
+    def remove_file(self, file: Union[File, int]):
+        self._remove_node(file, "files")
 
     @beartype
     def add_computation(self, computation: Union[BasePrimary, dict]):
