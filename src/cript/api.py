@@ -40,6 +40,7 @@ from cript.exceptions import (
     FileSizeLimitError,
 )
 from cript.paginators import SearchPaginator
+from cript.paginators import Paginator
 
 
 logger = getLogger(__name__)
@@ -412,6 +413,7 @@ class API:
             # Skip empty values and the url field
             if not value or key == "url":
                 continue
+
             # Generate primary nodes
             if (
                 isinstance(value, str)
@@ -430,12 +432,20 @@ class API:
                     except APIGetError:
                         # Leave the URL if node is not viewable
                         pass
+
             # Generate secondary nodes
             elif isinstance(value, dict):
                 node_class = self._define_node_class(key)
                 secondary_node = node_class(**value)
                 node_dict[key] = secondary_node
                 self._generate_nodes(secondary_node, level=level, max_level=max_level)
+
+            # Define Paginator attributes
+            elif isinstance(value, Paginator):
+                value.api = self
+                value.obj_class = self._define_node_class(key.lstrip("_"))
+                value.max_level = max_level
+
             # Handle lists
             elif isinstance(value, list):
                 for i in range(len(value)):
@@ -457,6 +467,7 @@ class API:
                             except APIGetError:
                                 # Leave the URL if node is not viewable
                                 pass
+
                     # Generate secondary nodes
                     elif isinstance(value[i], dict):
                         node_class = self._define_node_class(key)
@@ -477,7 +488,7 @@ class API:
         """
         for node_cls in NODE_CLASSES:
             # Use node name
-            if node_cls.node_name.lower() == key.replace("_", ""):
+            if node_cls.node_name.lower() == key.replace("_", "").lower():
                 return node_cls
             # Use node list name (e.g., properties)
             if hasattr(node_cls, "list_name") and node_cls.list_name == key:
