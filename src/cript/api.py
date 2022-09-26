@@ -1,6 +1,5 @@
 import os
 import json
-import urllib
 import warnings
 from typing import Union
 from getpass import getpass
@@ -10,36 +9,29 @@ from distutils.version import StrictVersion
 import requests
 from beartype import beartype
 from beartype.typing import Type
-import globus_sdk
-from globus_sdk.scopes import ScopeBuilder
 
-from cript import NODE_CLASSES, __api_version__
+from cript import __api_version__
+from cript import NODE_CLASSES
 from cript.nodes.base import Base
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.user import User
 from cript.nodes.primary.file import File
 from cript.nodes.secondary.base_secondary import BaseSecondary
-from cript.utils import (
-    get_api_url,
-    convert_to_api_url,
-    convert_file_size,
-    display_errors,
-)
+from cript.utils import get_api_url
+from cript.utils import convert_to_api_url
+from cript.utils import convert_file_size
+from cript.utils import display_errors
 from cript.storage_clients import GlobusClient
 from cript.storage_clients import AmazonS3Client
-from cript.exceptions import (
-    APIAuthError,
-    APIRefreshError,
-    APISaveError,
-    APIDeleteError,
-    APISearchError,
-    APIGetError,
-    APIFileUploadError,
-    APIFileDownloadError,
-    DuplicateNodeError,
-    FileSizeLimitError,
-)
 from cript.paginator import Paginator
+from cript.exceptions import APIAuthError
+from cript.exceptions import APIRefreshError
+from cript.exceptions import APISaveError
+from cript.exceptions import APIDeleteError
+from cript.exceptions import APISearchError
+from cript.exceptions import APIGetError
+from cript.exceptions import DuplicateNodeError
+from cript.exceptions import FileSizeLimitError
 
 
 logger = getLogger(__name__)
