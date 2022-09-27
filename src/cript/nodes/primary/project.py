@@ -5,7 +5,7 @@ from beartype import beartype
 
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
-from cript.paginators import Paginator
+from cript.paginator import Paginator
 
 logger = getLogger(__name__)
 

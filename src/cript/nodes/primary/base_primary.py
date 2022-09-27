@@ -4,7 +4,7 @@ import json
 
 from cript.exceptions import UnsavedNodeError, AddNodeError, RemoveNodeError
 from cript.nodes.base import Base
-from cript.paginators import Paginator
+from cript.paginator import Paginator
 
 
 class BasePrimary(Base, abc.ABC):
