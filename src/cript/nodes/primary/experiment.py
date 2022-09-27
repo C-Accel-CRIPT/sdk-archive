@@ -7,7 +7,7 @@ from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
 from cript.nodes.primary.collection import Collection
 from cript.utils import auto_assign_group
-from cript.paginators import Paginator
+from cript.paginator import Paginator
 
 
 logger = getLogger(__name__)

@@ -8,7 +8,7 @@ from cript.nodes.primary.group import Group
 from cript.nodes.primary.project import Project
 from cript.nodes.secondary.citation import Citation
 from cript.utils import auto_assign_group
-from cript.paginators import Paginator
+from cript.paginator import Paginator
 
 
 logger = getLogger(__name__)
