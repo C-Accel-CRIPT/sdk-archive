@@ -31,13 +31,13 @@ class GlobusClient:
         :param path: Path where the file should go.
         """
         if self.transfer_client is None:
-            auth_client, tokens = self._globus_user_auth(
+            auth_client, tokens = self._user_auth(
                 self.endpoint_id, self.native_client_id
             )
-            self._globus_set_transfer_client(auth_client, tokens)
+            self._set_transfer_client(auth_client, tokens)
 
         # Stage the transfer
-        globus_url = self._globus_stage_download(node.uid)
+        globus_url = self._stage_download(node.uid)
         logger.info(f"Download of file {node.uid} from Globus endpoint in progress.")
 
         # Perform transfer
@@ -57,7 +57,7 @@ class GlobusClient:
         else:
             raise APIFileDownloadError
 
-    def _globus_stage_download(self, file_uid):
+    def _stage_download(self, file_uid):
         """
         Sends a POST to the API to stage the Globus endpoint for download.
         :param file_uid: UID of the `File` node object.
@@ -80,13 +80,13 @@ class GlobusClient:
         :param node: The `File` node object.
         """
         if self.transfer_client is None:
-            auth_client, tokens = self._globus_user_auth(
+            auth_client, tokens = self._user_auth(
                 self.endpoint_id, self.native_client_id
             )
-            self._globus_set_transfer_client(auth_client, tokens)
+            self._set_transfer_client(auth_client, tokens)
 
         # Stage the transfer
-        unique_file_name = self._globus_stage_upload(file_uid, node.checksum)
+        unique_file_name = self._stage_upload(file_uid, node.checksum)
         logger.info(f"Upload of file {file_uid} to Globus endpoint in progress.")
 
         # Get endpoint URL
@@ -116,7 +116,7 @@ class GlobusClient:
             raise APIFileUploadError
 
     @staticmethod
-    def _globus_user_auth(endpoint_id, client_id):
+    def _user_auth(endpoint_id, client_id):
         """
         Prompts a user authorize using their Globus credentials.
         :param endpoint_id: ID of the Globus endpoint.
@@ -157,7 +157,7 @@ class GlobusClient:
 
         return auth_client, tokens
 
-    def _globus_set_transfer_client(self, auth_client, tokens):
+    def _set_transfer_client(self, auth_client, tokens):
         """
         Initialize and save the transfer client so the user doesn't have to
         auth for each upload.
@@ -177,7 +177,7 @@ class GlobusClient:
         self.transfer_client = transfer_client
         self.tokens = tokens
 
-    def _globus_stage_upload(self, file_uid, file_checksum):
+    def _stage_upload(self, file_uid, file_checksum):
         """
         Sends a POST to the API to stage the Globus endpoint for upload.
         :param file_uid: UID of the `File` node object.
