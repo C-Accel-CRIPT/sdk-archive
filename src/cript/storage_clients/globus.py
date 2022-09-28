@@ -31,9 +31,7 @@ class GlobusClient:
         :param path: Path where the file should go.
         """
         if self.transfer_client is None:
-            auth_client, tokens = self._user_auth(
-                self.endpoint_id, self.native_client_id
-            )
+            auth_client, tokens = self._user_auth()
             self._set_transfer_client(auth_client, tokens)
 
         # Stage the transfer
@@ -80,9 +78,7 @@ class GlobusClient:
         :param node: The `File` node object.
         """
         if self.transfer_client is None:
-            auth_client, tokens = self._user_auth(
-                self.endpoint_id, self.native_client_id
-            )
+            auth_client, tokens = self._user_auth()
             self._set_transfer_client(auth_client, tokens)
 
         # Stage the transfer
@@ -115,21 +111,18 @@ class GlobusClient:
             logger.info(f"Upload of file {file_uid} failed: {error}")
             raise APIFileUploadError
 
-    @staticmethod
-    def _user_auth(endpoint_id, client_id):
+    def _user_auth(self):
         """
         Prompts a user authorize using their Globus credentials.
-        :param endpoint_id: ID of the Globus endpoint.
-        :param client_id: ID of the Globus Native Client.
         :return: A tuple of the auth client and generated tokens.
         :rtype: (globus_sdk.NativeAppAuthClient, dict)
         """
-        auth_client = globus_sdk.NativeAppAuthClient(client_id)
+        auth_client = globus_sdk.NativeAppAuthClient(self.native_client_id)
 
         # Define scopes
         auth_scopes = "openid profile email"
         transfer_scopes = "urn:globus:auth:scope:transfer.api.globus.org:all"
-        https_scopes = ScopeBuilder(endpoint_id).url_scope_string("https")
+        https_scopes = ScopeBuilder(self.endpoint_id).url_scope_string("https")
 
         # Initiate auth flow
         auth_client.oauth2_start_flow(
@@ -146,7 +139,7 @@ class GlobusClient:
         # Get tokens
         auth_data = token_response.by_resource_server["auth.globus.org"]
         transfer_data = token_response.by_resource_server["transfer.api.globus.org"]
-        https_transfer_data = token_response.by_resource_server[endpoint_id]
+        https_transfer_data = token_response.by_resource_server[self.endpoint_id]
         tokens = {
             "auth_token": auth_data["access_token"],
             "transfer_access_token": transfer_data["access_token"],
