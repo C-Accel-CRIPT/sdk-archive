@@ -261,11 +261,12 @@ class API:
         # Delete with search query
         elif issubclass(obj, BasePrimary) and isinstance(query, dict):
             results = self.search(node_class=obj, query=query)
-            if results.count == 1:
-                url = results.current["results"][0]["url"]
-            elif results.count < 1:
+            count = results.count()
+            if count == 1:
+                url = results.raw()["results"][0]["url"]
+            elif count < 1:
                 raise APIGetError("Your query did not match any existing nodes.")
-            elif results.count > 1:
+            elif count > 1:
                 raise APIGetError("Your query matched more than one node.")
         else:
             raise APIDeleteError(
@@ -351,12 +352,13 @@ class API:
         # Get node with a search query
         elif issubclass(obj, BasePrimary) and query:
             results = self.search(node_class=obj, query=query)
-            if results.count < 1:
+            count = results.count()
+            if count < 1:
                 raise APIGetError("Your query did not match any existing nodes.")
-            elif results.count > 1:
+            elif count > 1:
                 raise APIGetError("Your query matched more than one node.")
             else:
-                obj_json = results.current["results"][0]
+                obj_json = results.raw()["results"][0]
                 node_class = obj
         else:
             raise APIGetError(
