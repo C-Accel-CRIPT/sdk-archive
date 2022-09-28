@@ -95,9 +95,10 @@ results =  api.search(cript.Material, query)
 
 ... then paginate through the results.
 ``` py
-results.next         # Flip to the next page
-results.previous     # Flip to the previous page
-results.to_page(10)  # Flip to page 10 (or any other)
+results.raw()               # View the raw JSON for the query
+results.objects()           # Generate objects for the current page
+results.next_page()         # Flip to the next page
+results.previous_page()     # Flip to the previous page
 ```
 
 ## Upload a file
