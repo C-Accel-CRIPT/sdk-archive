@@ -21,18 +21,22 @@ class GlobusClient:
         self.endpoint_id = self.api.storage_info["endpoint_id"]
         self.native_client_id = self.api.storage_info["native_client_id"]
         self.storage_path = self.api.storage_info["path"]
-        self.transfer_client = None
+        self.auth_client = None
         self.tokens = None
+        self.transfer_client = None
 
     def https_download(self, node: File, path: str):
         """
         Download a file from a Globus endpoint.
+
         :param node: The `File` node object.
         :param path: Path where the file should go.
         """
         if self.transfer_client is None:
-            auth_client, tokens = self._user_auth()
-            self._set_transfer_client(auth_client, tokens)
+            if self.tokens is None:
+                authorize_url = self.get_authorize_url()
+                self.set_tokens(authorize_url)
+            self._initialize_transfer_client()
 
         # Stage the transfer
         globus_url = self._stage_download(node.uid)
@@ -58,6 +62,7 @@ class GlobusClient:
     def _stage_download(self, file_uid):
         """
         Sends a POST to the API to stage the Globus endpoint for download.
+
         :param file_uid: UID of the `File` node object.
         :return: The Globus download URL.
         :rtype: str
@@ -73,13 +78,16 @@ class GlobusClient:
     def https_upload(self, file_url, file_uid, node):
         """
         Upload a file to a Globus endpoint via HTTPS.
+
         :param file_url: URL of the `File` node object.
         :param file_uid: UID of the `File` node object.
         :param node: The `File` node object.
         """
         if self.transfer_client is None:
-            auth_client, tokens = self._user_auth()
-            self._set_transfer_client(auth_client, tokens)
+            if self.tokens is None:
+                authorize_url = self.get_authorize_url()
+                self.set_tokens(authorize_url)
+            self._initialize_transfer_client()
 
         # Stage the transfer
         unique_file_name = self._stage_upload(file_uid, node.checksum)
@@ -111,13 +119,15 @@ class GlobusClient:
             logger.info(f"Upload of file {file_uid} failed: {error}")
             raise APIFileUploadError
 
-    def _user_auth(self):
+    def get_authorize_url(self):
         """
-        Prompts a user authorize using their Globus credentials.
-        :return: A tuple of the auth client and generated tokens.
-        :rtype: (globus_sdk.NativeAppAuthClient, dict)
+        Get the authorization URL.
+
+        :return: Authorization URL
+        :rtype: str
         """
-        auth_client = globus_sdk.NativeAppAuthClient(self.native_client_id)
+        if self.auth_client is None:
+            self.auth_client = globus_sdk.NativeAppAuthClient(self.native_client_id)
 
         # Define scopes
         auth_scopes = "openid profile email"
@@ -125,22 +135,30 @@ class GlobusClient:
         https_scopes = ScopeBuilder(self.endpoint_id).url_scope_string("https")
 
         # Initiate auth flow
-        auth_client.oauth2_start_flow(
+        self.auth_client.oauth2_start_flow(
             requested_scopes=[auth_scopes, transfer_scopes, https_scopes],
             refresh_tokens=True,
         )
-        authorize_url = auth_client.oauth2_get_authorize_url()
+        return self.auth_client.oauth2_get_authorize_url()
 
-        # Prompt user to login and enter code
-        print(f"Please go to this URL and login:\n\n{authorize_url}\n")
-        auth_code = input("Enter the code here: ").strip()
-        token_response = auth_client.oauth2_exchange_code_for_tokens(auth_code)
+    def set_tokens(self, authorize_url, auth_code=None):
+        """
+        Uses the authorization code to retrieve and save the tokens.
+
+        :param authorize_url: The authorization URL to which users should be sent.
+        :param auth_code: The authorization code copied from the web UI.
+        """
+        if auth_code is None:
+            # Prompt user to login and enter code
+            print(f"\nPlease go to this URL and login:\n\n{authorize_url}\n")
+            auth_code = input("Enter the code here: ").strip()
 
         # Get tokens
+        token_response = self.auth_client.oauth2_exchange_code_for_tokens(auth_code)
         auth_data = token_response.by_resource_server["auth.globus.org"]
         transfer_data = token_response.by_resource_server["transfer.api.globus.org"]
         https_transfer_data = token_response.by_resource_server[self.endpoint_id]
-        tokens = {
+        self.tokens = {
             "auth_token": auth_data["access_token"],
             "transfer_access_token": transfer_data["access_token"],
             "transfer_refresh_token": transfer_data["refresh_token"],
@@ -148,31 +166,30 @@ class GlobusClient:
             "https_auth_token": https_transfer_data["access_token"],
         }
 
-        return auth_client, tokens
-
-    def _set_transfer_client(self, auth_client, tokens):
+    def _initialize_transfer_client(self):
         """
         Initialize and save the transfer client so the user doesn't have to
         auth for each upload.
+
         :param auth_client: Instance of `globus_sdk.NativeAppAuthClient`
         :param tokens: The relevant auth, transfer, and refresh tokens.
         """
         # Initialize transfer client
         transfer_authorizer = globus_sdk.RefreshTokenAuthorizer(
-            tokens["transfer_refresh_token"],
-            auth_client,
-            access_token=tokens["transfer_access_token"],
-            expires_at=tokens["transfer_expiration"],
+            self.tokens["transfer_refresh_token"],
+            self.auth_client,
+            access_token=self.tokens["transfer_access_token"],
+            expires_at=self.tokens["transfer_expiration"],
         )
         transfer_client = globus_sdk.TransferClient(authorizer=transfer_authorizer)
 
         # Save the transfer client and tokens as object attributes
         self.transfer_client = transfer_client
-        self.tokens = tokens
 
     def _stage_upload(self, file_uid, file_checksum):
         """
         Sends a POST to the API to stage the Globus endpoint for upload.
+
         :param file_uid: UID of the `File` node object.
         :file_checksum: The checksum of the raw file.
         :return: The unique file name to be used for upload.
