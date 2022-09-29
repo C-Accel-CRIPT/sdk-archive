@@ -15,7 +15,7 @@ logger = getLogger(__name__)
 class Algorithm(BaseSecondary):
     """
     Object that represents an algorithm used in :class:`Computation` and
-    :class:ComputationalProcess. objects.
+    `ComputationalProcess` objects.
     """
 
     node_name = "Algorithm"

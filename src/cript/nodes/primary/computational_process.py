@@ -22,7 +22,7 @@ logger = getLogger(__name__)
 class ComputationalProcess(BasePrimary):
     """
     Object representing a simulation that processes or changes a
-    virtual :class:`Material`.
+    virtual `Material`.
     """
 
     node_name = "ComputationalProcess"

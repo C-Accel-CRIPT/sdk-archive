@@ -15,7 +15,7 @@ logger = getLogger(__name__)
 class ComputationalForcefield(BaseSecondary):
     """
     Object representing the computational forcefield of a
-    virtual :class:`Material`.
+    virtual `Material`.
     """
 
     node_name = "ComputationalForcefield"

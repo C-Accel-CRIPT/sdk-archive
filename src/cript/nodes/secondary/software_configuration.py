@@ -14,8 +14,8 @@ logger = getLogger(__name__)
 
 class SoftwareConfiguration(BaseSecondary):
     """
-    Object representing the :class:`Software` and set of :class:`Algorithm` objects
-    used to execute a :class:`Computation` or :class:`ComputationalProcess`.
+    Object representing the `Software` and set of `Algorithm` objects
+    used to execute a `Computation` or `ComputationalProcess`.
     """
 
     node_name = "SoftwareConfiguration"
