@@ -9,6 +9,8 @@ from cript.exceptions import InvalidPage
 
 
 class Paginator:
+    """Paginator for object lists and raw JSON."""
+
     def __init__(
         self,
         url,
@@ -20,7 +22,7 @@ class Paginator:
         max_level=0,
     ):
         """
-        Paginator for raw JSON and object lists.
+        Initializes a Paginator object.
 
         :param url: Query URL
         :param api: API object instance
@@ -41,7 +43,7 @@ class Paginator:
         self._count = None
 
     def raw(self):
-        """Get the raw JSON from the API."""
+        """Get the raw JSON."""
         if self.api is None:
             raise AttributeError("The 'api' attribute must be defined.")
 
@@ -114,6 +116,7 @@ class Paginator:
             raise InvalidPage("You've reached the end of the query.")
 
     def count(self):
+        """Get the total number of objects."""
         if self._count is None:
             self._count = self.raw()["count"]
         return self._count
