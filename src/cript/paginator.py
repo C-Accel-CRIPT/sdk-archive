@@ -123,6 +123,10 @@ class Paginator:
 
     def count(self):
         """Get the total number of objects."""
+        if self._raw is None:
+            self.json()
+
         if self._count is None:
-            self._count = self.json()["count"]
+            self._count = self._raw["count"]
+
         return self._count
