@@ -263,7 +263,7 @@ class API:
             results = self.search(node_class=obj, query=query)
             count = results.count()
             if count == 1:
-                url = results.raw()["results"][0]["url"]
+                url = results.json()[0]["url"]
             elif count < 1:
                 raise APIGetError("Your query did not match any existing nodes.")
             elif count > 1:
@@ -358,7 +358,7 @@ class API:
             elif count > 1:
                 raise APIGetError("Your query matched more than one node.")
             else:
-                obj_json = results.raw()["results"][0]
+                obj_json = results.json()[0]
                 node_class = obj
         else:
             raise APIGetError(

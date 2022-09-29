@@ -95,7 +95,7 @@ results =  api.search(cript.Material, query)
 
 ... then paginate through the results.
 ``` py
-results.raw()               # View the raw JSON for the query
+results.json()              # View the raw JSON for the query
 results.objects()           # Generate objects for the current page
 results.next_page()         # Flip to the next page
 results.previous_page()     # Flip to the previous page

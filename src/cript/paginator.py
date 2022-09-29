@@ -42,14 +42,14 @@ class Paginator:
         self._raw = None
         self._count = None
 
-    def raw(self):
+    def json(self):
         """Get the raw JSON."""
         if self.api is None:
             raise AttributeError("The 'api' attribute must be defined.")
 
         # Return previous raw if nothing changed
         if self._raw:
-            return self._raw
+            return self._raw["results"]
 
         # Construct URL
         parsed_url = urlparse(self.url)
@@ -63,19 +63,19 @@ class Paginator:
         new_parts[4] = query
         self.url = urlunparse(new_parts)
 
-        # Get JSON
+        # Get JSON response
         if self.payload:
             response = self.api.session.post(self.url, data=self.payload)
         else:
             response = self.api.session.get(self.url)
 
         self._raw = response.json()
-        return self._raw
+        return self._raw["results"]
 
     def objects(self):
         """Use the current raw JSON to generate a list of objects."""
         if self._raw is None:
-            self._raw = self.raw()
+            self.json()
 
         if self.obj_class is None:
             raise AttributeError("The 'obj_class' attribute must be defined.")
@@ -97,26 +97,32 @@ class Paginator:
 
     def next_page(self):
         """Flip to the next page."""
-        next_url = self.raw()["next"]
+        if self._raw is None:
+            self.json()
+
+        next_url = self._raw["next"]
         if next_url:
             self.url = next_url
             self._raw = None
-            self.raw()
+            self.json()
         else:
             raise InvalidPage("You've reached the end of the query.")
 
     def previous_page(self):
         """Flip to the previous page."""
-        previous_url = self.raw()["previous"]
+        if self._raw is None:
+            self.json()
+
+        previous_url = self._raw["previous"]
         if previous_url:
             self.url = previous_url
             self._raw = None
-            self.raw()
+            self.json()
         else:
             raise InvalidPage("You've reached the end of the query.")
 
     def count(self):
         """Get the total number of objects."""
         if self._count is None:
-            self._count = self.raw()["count"]
+            self._count = self.json()["count"]
         return self._count
