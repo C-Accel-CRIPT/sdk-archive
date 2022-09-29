@@ -296,14 +296,14 @@ class API:
         offset: Union[int, None] = None,
     ):
         """
-        Send a query to the API and print the results.
+        Send a query to the API and display the results.
 
         :param node_class: The class of the node type to query for.
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
         :param limit: The max number of items to return.
         :param offset: The starting position of the query.
         :return: A `Paginator` object.
-        :rtype: cript.session.Paginator
+        :rtype: cript.paginator.Paginator
         """
         if not issubclass(node_class, BasePrimary):
             raise APISearchError(
