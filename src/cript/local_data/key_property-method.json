@@ -1,0 +1,186 @@
+[
+    {
+        "description": "a value that can be defined, (Ex. calculating MW from molecular formula)",
+        "name": "prescribed"
+    },
+    {
+        "description": "computation or simulation",
+        "name": "comp"
+    },
+    {
+        "description": "nuclear magnetic resonance",
+        "name": "nmr"
+    },
+    {
+        "description": "size exclusion chromatography / gel permeation chromatography (GPC)",
+        "name": "sec"
+    },
+    {
+        "description": "gas chromatography",
+        "name": "gc"
+    },
+    {
+        "description": "general chromatography",
+        "name": "chrom"
+    },
+    {
+        "description": "general mass spectrometry",
+        "name": "ms"
+    },
+    {
+        "description": "matrix assisted laser desorption ionization",
+        "name": "maldi"
+    },
+    {
+        "description": "ultra centrifugation",
+        "name": "ultra_centr"
+    },
+    {
+        "description": "osmotic pressure",
+        "name": "osmtic_pres"
+    },
+    {
+        "description": "calorimetry",
+        "name": "calorimetry"
+    },
+    {
+        "description": "cryoscopy",
+        "name": "cryoscopy"
+    },
+    {
+        "description": "ebullioscopy",
+        "name": "ebullioscopy"
+    },
+    {
+        "description": "viscometer",
+        "name": "viscometer"
+    },
+    {
+        "description": "universal testing machine",
+        "name": "utm"
+    },
+    {
+        "description": "dynamic mechanical analysis",
+        "name": "dma"
+    },
+    {
+        "description": "differential scanning calorimetry",
+        "name": "dsc"
+    },
+    {
+        "description": "thermogravimetric analysis",
+        "name": "tga"
+    },
+    {
+        "description": "raman spectroscopy",
+        "name": "raman"
+    },
+    {
+        "description": "infrared spectroscopy",
+        "name": "ir"
+    },
+    {
+        "description": "ultraviolet-visible spectroscopy",
+        "name": "uv_vis"
+    },
+    {
+        "description": "x-ray spectroscopy",
+        "name": "x_ray"
+    },
+    {
+        "description": "small-angle x-ray scattering",
+        "name": "saxs"
+    },
+    {
+        "description": "wide-angle x-ray scattering",
+        "name": "waxs"
+    },
+    {
+        "description": "neutron scattering",
+        "name": "neutron"
+    },
+    {
+        "description": "static light scattering",
+        "name": "ls"
+    },
+    {
+        "description": "dynamic light scattering",
+        "name": "dls"
+    },
+    {
+        "description": "confocal microscopy",
+        "name": "confocal"
+    },
+    {
+        "description": "atomic force microscopy",
+        "name": "afm"
+    },
+    {
+        "description": "transmission electron microscopy",
+        "name": "tem"
+    },
+    {
+        "description": "scanning electron microscopy",
+        "name": "sem"
+    },
+    {
+        "description": "scale",
+        "name": "scale"
+    },
+    {
+        "description": "infrared spectroscopy",
+        "name": "near-ir"
+    },
+    {
+        "description": null,
+        "name": "+ir"
+    },
+    {
+        "description": null,
+        "name": "+mals"
+    },
+    {
+        "description": null,
+        "name": "+viscometer"
+    },
+    {
+        "description": null,
+        "name": "+membrane_osmometer"
+    },
+    {
+        "description": null,
+        "name": "+sec_ir"
+    },
+    {
+        "description": null,
+        "name": "+sec_mals"
+    },
+    {
+        "description": null,
+        "name": "+sec_visco"
+    },
+    {
+        "description": null,
+        "name": "+archimedes principle"
+    },
+    {
+        "description": null,
+        "name": "+debugging"
+    },
+    {
+        "description": null,
+        "name": "+size exclusion chromatography with infrared"
+    },
+    {
+        "description": null,
+        "name": "+size exclusion chromatography with multiangle light scattering"
+    },
+    {
+        "description": null,
+        "name": "+size exclusion chromatography with viscometry"
+    },
+    {
+        "description": null,
+        "name": "+aamd simulation"
+    }
+]

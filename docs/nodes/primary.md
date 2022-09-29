@@ -1,11 +1,5 @@
 # Primary Nodes
 
-### User
-::: cript.nodes.User
-
-### Group
-::: cript.nodes.Group
-
 ### Project
 ::: cript.nodes.Project
 
@@ -27,8 +21,23 @@
 ### Process
 ::: cript.nodes.Process
 
+### ComputationalProcess
+::: cript.nodes.ComputationalProcess
+
+### Computation
+::: cript.nodes.Computation
+
 ### Material
 ::: cript.nodes.Material
 
 ### Reference
 ::: cript.nodes.Reference
+
+### Software
+::: cript.nodes.Software
+
+### User
+::: cript.nodes.User
+
+### Group
+::: cript.nodes.Group

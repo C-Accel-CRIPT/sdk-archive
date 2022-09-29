@@ -5,7 +5,7 @@ from beartype import beartype
 
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
-
+from cript.paginator import Paginator
 
 logger = getLogger(__name__)
 
@@ -23,17 +23,41 @@ class Project(BasePrimary):
     def __init__(
         self,
         name: str,
-        materials=None,
-        files=None,
-        collections=None,
+        collections: str = None,
+        materials: str = None,
+        files: str = None,
         notes: Union[str, None] = None,
         public: bool = False,
         group: Union[Group, str] = None,
     ):
         super().__init__(public=public)
         self.name = name
-        self.materials = materials if materials else []
-        self.files = files if files else []
-        self.collections = collections if collections else []
+        self.collections = collections
+        self.materials = materials
+        self.files = files
         self.notes = notes
         self.group = group
+
+    @property
+    def collections(self):
+        return self._collections
+
+    @collections.setter
+    def collections(self, value):
+        self._collections = Paginator(url=value)
+
+    @property
+    def materials(self):
+        return self._materials
+
+    @materials.setter
+    def materials(self, value):
+        self._materials = Paginator(url=value)
+
+    @property
+    def files(self):
+        return self._files
+
+    @files.setter
+    def files(self, value):
+        self._files = Paginator(url=value)

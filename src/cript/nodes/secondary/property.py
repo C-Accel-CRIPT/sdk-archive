@@ -5,6 +5,7 @@ from beartype import beartype
 
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.data import Data
+from cript.nodes.primary.computation import Computation
 from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.nodes.secondary.condition import Condition
 from cript.nodes.secondary.citation import Citation
@@ -41,6 +42,7 @@ class Property(BaseSecondary):
         set_id: Union[int, None] = None,
         conditions: list[Union[Condition, dict]] = None,
         data: Union[Data, str, None] = None,
+        computations: list[Union[Computation, str]] = None,
         citations: list[Union[Citation, dict]] = None,
         notes: Union[str, None] = None,
     ):
@@ -60,6 +62,7 @@ class Property(BaseSecondary):
         self.set_id = set_id
         self.conditions = conditions if conditions else []
         self.data = data
+        self.computations = computations if computations else []
         self.citations = citations if citations else []
         self.notes = notes
 
@@ -128,8 +131,16 @@ class Property(BaseSecondary):
         self._remove_node(component, "components_relative")
 
     @beartype
-    def add_condition(self, condition: Union[Condition, dict]):
-        self._add_node(condition, "conditions")
+    def add_computation(self, computation: Union[Condition, dict]):
+        self._add_node(computation, "computations")
+
+    @beartype
+    def remove_computation(self, computation: Union[Condition, int]):
+        self._remove_node(computation, "computations")
+
+    @beartype
+    def add_citation(self, citation: Union[Citation, dict]):
+        self._add_node(citation, "citations")
 
     @beartype
     def remove_condition(self, condition: Union[Condition, int]):
