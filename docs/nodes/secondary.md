@@ -18,5 +18,17 @@
 ### Equipment
 ::: cript.nodes.Equipment
 
+### ComputationalForcefield
+::: cript.nodes.ComputationalForcefield
+
+### SoftwareConfiguration
+::: cript.nodes.SoftwareConfiguration
+
+### Algorithm
+::: cript.nodes.Algorithm
+
+### Parameter
+::: cript.nodes.Parameter
+
 ### Citation
 ::: cript.nodes.Citation
