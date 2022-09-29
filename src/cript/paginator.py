@@ -106,7 +106,7 @@ class Paginator:
             self._raw = None
             self.json()
         else:
-            raise InvalidPage("You've reached the end of the query.")
+            raise InvalidPage("You're currently on the last page.")
 
     def previous_page(self):
         """Flip to the previous page."""
@@ -119,7 +119,7 @@ class Paginator:
             self._raw = None
             self.json()
         else:
-            raise InvalidPage("You've reached the end of the query.")
+            raise InvalidPage("You're currently on the first page.")
 
     def count(self):
         """Get the total number of objects."""
