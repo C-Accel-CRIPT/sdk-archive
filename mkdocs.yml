@@ -31,6 +31,7 @@ nav:
         - Primary: nodes/primary.md
         - Secondary: nodes/secondary.md
     - API: api.md
+    - Paginator: paginator.md
     - Exceptions: exceptions.md
 
 markdown_extensions:
