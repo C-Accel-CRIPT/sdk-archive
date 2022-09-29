@@ -36,7 +36,7 @@ class Computation(BasePrimary):
         software_configurations: list[Union[SoftwareConfiguration, dict]] = None,
         conditions: list[Union[Condition, dict]] = None,
         output_data: list[Union[Data, str]] = None,
-        prerequisite_computation: Union[BasePrimary, str] = None,
+        prerequisite_computation: Union[BasePrimary, str, None] = None,
         citations: list[Union[Citation, dict]] = None,
         notes: Union[str, None] = None,
         public: bool = False,
