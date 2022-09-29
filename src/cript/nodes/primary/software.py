@@ -18,6 +18,7 @@ class Software(BasePrimary):
 
     node_name = "Software"
     slug = "software"
+    list_name = "software"
 
     @beartype
     def __init__(

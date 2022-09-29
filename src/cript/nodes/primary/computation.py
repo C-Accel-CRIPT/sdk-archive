@@ -24,6 +24,7 @@ class Computation(BasePrimary):
 
     node_name = "Computation"
     slug = "computation"
+    list_name = "computations"
 
     @beartype
     def __init__(
