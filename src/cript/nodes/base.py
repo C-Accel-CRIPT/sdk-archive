@@ -28,9 +28,6 @@ class Base(abc.ABC):
     def __str__(self):
         return self._to_json()
 
-    def print_json(self):
-        print(self._to_json())
-
     def _to_json(self):
         return json.dumps(self._prep_for_upload(), indent=4)
 
