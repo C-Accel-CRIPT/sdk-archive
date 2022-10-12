@@ -9,7 +9,6 @@ from cript.paginator import Paginator
 
 class BasePrimary(Base, abc.ABC):
     slug = None
-    source = None
 
     def __init__(
         self,
