@@ -25,7 +25,7 @@ class Ingredient(BaseSecondary):
     def __init__(
         self,
         material: Union[Material, str],
-        keyword: str = None,
+        keyword: str,
         quantities: list[Union[Quantity, dict]] = None,
     ):
         super().__init__()
