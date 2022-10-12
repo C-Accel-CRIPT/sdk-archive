@@ -16,7 +16,9 @@ def save_keys(api):
 
 def main():
     host = "criptapp.org"
-    with open(str(pathlib.Path(__file__).parent.parent.parent.parent) + "\\api_key.txt", "r") as f:
+    with open(
+        str(pathlib.Path(__file__).parent.parent.parent.parent) + "\\api_key.txt", "r"
+    ) as f:
         token = f.read()
     api = cript.API(host, token)
     save_keys(api)

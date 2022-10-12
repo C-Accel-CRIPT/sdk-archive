@@ -79,7 +79,15 @@ def _validate_uid(uid: str):
 
 
 def _validate_uid_bool(uid: str) -> bool:
-    return len(re.findall("^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$", uid)) == 1
+    return (
+        len(
+            re.findall(
+                "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                uid,
+            )
+        )
+        == 1
+    )
 
 
 def _format_folder(folder: Union[str, pathlib.Path]) -> pathlib.Path:
@@ -103,7 +111,9 @@ def make_new_folder(folder: pathlib.Path):
         os.makedirs(folder)
 
 
-def move_copy_file(old_location: Union[pathlib.Path, str], new_location: Union[pathlib.Path, str]):
+def move_copy_file(
+    old_location: Union[pathlib.Path, str], new_location: Union[pathlib.Path, str]
+):
     """
     Copies files from one location to a new one
     """
@@ -139,7 +149,11 @@ class APILocal:
     version = __api_version__
     keys = {}
 
-    def __init__(self, folder: Union[str, pathlib.Path], data_folder: Union[str, pathlib.Path] = None):
+    def __init__(
+        self,
+        folder: Union[str, pathlib.Path],
+        data_folder: Union[str, pathlib.Path] = None,
+    ):
         """
         Establishes a session with a local CRIPT API.
         """
@@ -172,7 +186,9 @@ class APILocal:
         """
         Load keys from file
         """
-        key_files = glob.glob(str(pathlib.Path(__file__).parent) + "\\local_data\\key_*.json")
+        key_files = glob.glob(
+            str(pathlib.Path(__file__).parent) + "\\local_data\\key_*.json"
+        )
         for file in key_files:
             with open(file, "r", encoding=ENCODING) as f:
                 key_name = pathlib.Path(file).stem.replace("key_", "")
@@ -188,7 +204,9 @@ class APILocal:
             try:
                 node, uid = _parse_filename(file)
             except ValueError:
-                logger.warning(f"Unrecognized file found in database and will be skipped. {file}")
+                logger.warning(
+                    f"Unrecognized file found in database and will be skipped. {file}"
+                )
                 continue
 
             self.database_by_uid[uid] = file
@@ -205,7 +223,9 @@ class APILocal:
         :param max_level: Max depth to recursively generate nested nodes.
         """
         if not isinstance(node, BasePrimary):
-            raise APISaveError(f"The save() method cannot be called on secondary nodes such as {node.node_name}")
+            raise APISaveError(
+                f"The save() method cannot be called on secondary nodes such as {node.node_name}"
+            )
 
         if node.uid:
             # update
@@ -213,8 +233,10 @@ class APILocal:
                 node.updated_at = datetime.datetime.now().isoformat()
                 self._do_save(node)
             else:
-                raise APISaveError(f"The node you are saving has a uid, but it is not in the database, "
-                                   f"so it can't be updated. {node.node_name}")
+                raise APISaveError(
+                    f"The node you are saving has a uid, but it is not in the database, "
+                    f"so it can't be updated. {node.node_name}"
+                )
         else:
             # save
             node = prepare_node_for_saving(node, self.version)
@@ -234,7 +256,9 @@ class APILocal:
         file_name = self.folder / (_generate_file_name(node) + ".json")
         with open(file_name, "w", encoding=ENCODING) as f:
             f.write(node._to_json())
-        logger.info(f"Update: {node.node_name}({node.uid}) node has been updated in the database.")
+        logger.info(
+            f"Update: {node.node_name}({node.uid}) node has been updated in the database."
+        )
 
         return file_name
 
@@ -273,7 +297,9 @@ class APILocal:
             if obj.uid:
                 uid = obj.uid
             else:
-                raise APIDeleteError(f"This {obj.node_name} node has not been saved to the database.")
+                raise APIDeleteError(
+                    f"This {obj.node_name} node has not been saved to the database."
+                )
 
         # Delete with UID
         elif isinstance(obj, str):
@@ -287,7 +313,9 @@ class APILocal:
         elif issubclass(obj, BasePrimary) and isinstance(query, dict):
             raise NotImplementedError
         else:
-            raise APIDeleteError("Please enter a node, valid node URL, or a node class and search query.")
+            raise APIDeleteError(
+                "Please enter a node, valid node URL, or a node class and search query."
+            )
 
         # delete the file
         os.remove(self.database_by_uid[uid])
@@ -303,17 +331,19 @@ class APILocal:
         :rtype: cript.session.JSONPaginator
         """
         if not isinstance(node_class, BasePrimary):
-            raise APISearchError(f"{node_class.node_name} is a secondary node, thus cannot be searched.")
+            raise APISearchError(
+                f"{node_class.node_name} is a secondary node, thus cannot be searched."
+            )
 
         raise NotImplementedError
 
     @beartype
     def get(
-            self,
-            obj: Union[str, Type[Base]],
-            query: dict = None,
-            level: int = 0,
-            max_level: int = 1,
+        self,
+        obj: Union[str, Type[Base]],
+        query: dict = None,
+        level: int = 0,
+        max_level: int = 1,
     ):
         """
         Get the JSON for a node and use it to generate a local node object.
@@ -334,7 +364,9 @@ class APILocal:
             raise NotImplementedError
             # results = self.search(node_class=obj, query=query)
         else:
-            raise APIGetError("Please enter a node UID.")  # or a node class with a search query
+            raise APIGetError(
+                "Please enter a node UID."
+            )  # or a node class with a search query
 
         # Return the local node object if it already exists
         # Otherwise, create a new node
@@ -351,10 +383,12 @@ class APILocal:
         if obj not in self.database_by_uid:
             raise APIGetError("The specified node was not found.")
 
-        with open(self.database_by_uid[obj], 'r', encoding=ENCODING) as f:
+        with open(self.database_by_uid[obj], "r", encoding=ENCODING) as f:
             obj_json = json.load(f)
 
-        node_class = self._define_node_class(_parse_filename(self.database_by_uid[obj])[0])
+        node_class = self._define_node_class(
+            _parse_filename(self.database_by_uid[obj])[0]
+        )
 
         return obj_json, node_class
 

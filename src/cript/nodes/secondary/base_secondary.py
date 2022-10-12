@@ -7,7 +7,6 @@ from cript.nodes.primary.base_primary import BasePrimary
 
 
 class BaseSecondary(Base, abc.ABC):
-
     def _prep_for_upload(self):
         """
         Convert a node into a dict that can be sent to the API.
@@ -67,4 +66,6 @@ class BaseSecondary(Base, abc.ABC):
             # for BaseSecondary
             attribute.remove(node)
         else:
-            raise RemoveNodeError(f"{self.node_name} nodes do not contain {node.node_name} nodes.")
+            raise RemoveNodeError(
+                f"{self.node_name} nodes do not contain {node.node_name} nodes."
+            )

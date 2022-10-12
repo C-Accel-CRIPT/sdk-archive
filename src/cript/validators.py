@@ -189,11 +189,15 @@ def _get_key_parameters(key_category, key):
 
     if not API.keys:
         from cript.api_local import APILocal
+
         APILocal._load_keys()
         API = APILocal
         import warnings
-        warnings.warn("Using local version of keys. If you are wanting to use the web API, "
-                      "a session must be established first.")
+
+        warnings.warn(
+            "Using local version of keys. If you are wanting to use the web API, "
+            "a session must be established first."
+        )
 
     # Fetch relevant keys
     if key_category == "property-key":

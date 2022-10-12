@@ -44,7 +44,11 @@ def http_service(docker_ip, docker_services):
 def db_connection(docker_ip, docker_services):
     port = docker_services.port_for("db", 5432)
     conn = psycopg2.connect(
-        database="postgres", user='postgres', password='postgres', host=docker_ip, port=port
+        database="postgres",
+        user="postgres",
+        password="postgres",
+        host=docker_ip,
+        port=port,
     )
     return conn
 
@@ -52,13 +56,15 @@ def db_connection(docker_ip, docker_services):
 @pytest.fixture(scope="session")
 def web_token(docker_ip, docker_services, db_connection):
     with db_connection.cursor() as cursor:
-        cursor.execute("""
+        cursor.execute(
+            """
             SELECT 
                 t.key
             FROM authtoken_token t
             JOIN accounts_user a ON a.id=t.user_id
             WHERE a.email='test@test.com'
-        """)
+        """
+        )
 
         data = cursor.fetchone()
         return data[0]
@@ -95,10 +101,7 @@ def test_create_collection_success(criptapp_api):
 
 def test_create_experiment_success(criptapp_api):
     coll = criptapp_api.get(cript.Collection, {"name": MY_COLLECTION})
-    expt = cript.Experiment(
-        collection=coll,
-        name=MY_EXPERIMENT
-    )
+    expt = cript.Experiment(collection=coll, name=MY_EXPERIMENT)
     criptapp_api.save(expt)
 
 
@@ -110,10 +113,10 @@ def test_create_process_success(criptapp_api):
         name=MY_PROCESS,
         type="multistep",
         description="In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
-                    "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
-                    "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
-                    "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
-                    "precipitation in methanol 3 times and dried under vacuum."
+        "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
+        "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
+        "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
+        "precipitation in methanol 3 times and dried under vacuum.",
     )
     criptapp_api.save(process)
 
@@ -143,15 +146,21 @@ def test_create_inventory(criptapp_api):
     styrene = criptapp_api.get(cript.Material, {"name": "styrene"})
     butanol = criptapp_api.get(cript.Material, {"name": "1-butanol"})
     methanol = criptapp_api.get(cript.Material, {"name": "methanol"})
-    inv = cript.Inventory(collection=coll, name=MY_INVENTORY, materials=[solution, toluene, styrene, butanol, methanol])
+    inv = cript.Inventory(
+        collection=coll,
+        name=MY_INVENTORY,
+        materials=[solution, toluene, styrene, butanol, methanol],
+    )
     criptapp_api.save(inv)
 
 
 def test_get_material(criptapp_api, http_service, db_connection):
     with db_connection.cursor() as cursor:
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             SELECT uid from core_inventory WHERE name='{MY_INVENTORY}'
-        """)
+        """
+        )
         inventory_uid = cursor.fetchone()[0]
         url = f"{http_service}/inventory/{inventory_uid}/"
         inv = criptapp_api.get(url)
@@ -160,19 +169,23 @@ def test_get_material(criptapp_api, http_service, db_connection):
 
 def test_add_ingredient_to_process_node(criptapp_api, http_service, db_connection):
     with db_connection.cursor() as cursor:
-        cursor.execute(f"""
+        cursor.execute(
+            f"""
             SELECT uid from core_inventory WHERE name='{MY_INVENTORY}'
-        """)
+        """
+        )
         inventory_uid = cursor.fetchone()[0]
         url = f"{http_service}/inventory/{inventory_uid}/"
         inv = criptapp_api.get(url)
 
     prcs = criptapp_api.get(cript.Process, {"name": MY_PROCESS})
-    solution = next((mat for mat in inv.materials if mat.name == 'SecBuLi solution 1.4M cHex'), None)
-    toluene = next((mat for mat in inv.materials if mat.name == 'toluene'), None)
-    styrene = next((mat for mat in inv.materials if mat.name == 'styrene'), None)
-    butanol = next((mat for mat in inv.materials if mat.name == '1-butanol'), None)
-    methanol = next((mat for mat in inv.materials if mat.name == 'methanol'), None)
+    solution = next(
+        (mat for mat in inv.materials if mat.name == "SecBuLi solution 1.4M cHex"), None
+    )
+    toluene = next((mat for mat in inv.materials if mat.name == "toluene"), None)
+    styrene = next((mat for mat in inv.materials if mat.name == "styrene"), None)
+    butanol = next((mat for mat in inv.materials if mat.name == "1-butanol"), None)
+    methanol = next((mat for mat in inv.materials if mat.name == "methanol"), None)
 
     # define Quantity nodes indicating the amount of each Ingredient.
     initiator_qty = cript.Quantity(key="volume", value=0.017, unit="ml")
@@ -183,29 +196,19 @@ def test_add_ingredient_to_process_node(criptapp_api, http_service, db_connectio
 
     # create Ingredient nodes for each.
     initiator = cript.Ingredient(
-        keyword="initiator",
-        material=solution,
-        quantities=[initiator_qty]
+        keyword="initiator", material=solution, quantities=[initiator_qty]
     )
     solvent = cript.Ingredient(
-        keyword="solvent",
-        material=toluene,
-        quantities=[solvent_qty]
+        keyword="solvent", material=toluene, quantities=[solvent_qty]
     )
     monomer = cript.Ingredient(
-        keyword="monomer",
-        material=styrene,
-        quantities=[monomer_qty]
+        keyword="monomer", material=styrene, quantities=[monomer_qty]
     )
     quench = cript.Ingredient(
-        keyword="quench",
-        material=butanol,
-        quantities=[quench_qty]
+        keyword="quench", material=butanol, quantities=[quench_qty]
     )
     workup = cript.Ingredient(
-        keyword="workup",
-        material=methanol,
-        quantities=[workup_qty]
+        keyword="workup", material=methanol, quantities=[workup_qty]
     )
 
     prcs.add_ingredient(initiator)
@@ -232,12 +235,7 @@ def test_add_condition_nodes_to_process_nodes(criptapp_api):
 
 def test_add_property_node_to_process_node(criptapp_api):
     prcs = criptapp_api.get(cript.Process, {"name": MY_PROCESS})
-    yield_mass = cript.Property(
-        key="yield_mass",
-        value=0.47,
-        unit="g",
-        method="scale"
-    )
+    yield_mass = cript.Property(key="yield_mass", value=0.47, unit="g", method="scale")
     prcs.add_property(yield_mass)
 
 
@@ -246,13 +244,9 @@ def test_create_material_process_product(criptapp_api):
     prcs = criptapp_api.get(cript.Process, {"name": MY_PROCESS})
     polystyrene = cript.Material(project=proj, name="polystyrene")
 
-    names = cript.Identifier(
-        key="names",
-        value=["poly(styrene)", "poly(vinylbenzene)"]
-    )
+    names = cript.Identifier(key="names", value=["poly(styrene)", "poly(vinylbenzene)"])
     bigsmiles = cript.Identifier(
-        key="bigsmiles",
-        value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
+        key="bigsmiles", value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
     )
     chem_repeat = cript.Identifier(key="chem_repeat", value="C8H8")
     cas = cript.Identifier(key="cas", value="100-42-5")
@@ -293,8 +287,8 @@ def test_create_data_node(criptapp_api):
 
 
 def test_create_file_node_and_upload(criptapp_api):
-    with mock.patch.object(cript.API, 'save', new=lambda *args: None):
-        with NamedTemporaryFile(suffix='.csv') as tmp:
+    with mock.patch.object(cript.API, "save", new=lambda *args: None):
+        with NamedTemporaryFile(suffix=".csv") as tmp:
             proj = criptapp_api.get(cript.Project, {"name": MY_PROJECT})
             sec = criptapp_api.get(cript.Data, {"name": "Crude SEC of polystyrene"})
             f = cript.File(project=proj, data=[sec], source=tmp.name)
