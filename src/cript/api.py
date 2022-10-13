@@ -198,7 +198,6 @@ class API:
         :param node: The `File` node object.
         :param path: Path where the file should go.
         """
-        storage_provider = self.storage_info["provider"]
         if not path:
             path = f"./{node.name}"
 
