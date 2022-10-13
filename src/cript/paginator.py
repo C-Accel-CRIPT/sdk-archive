@@ -1,4 +1,3 @@
-import json
 import copy
 from urllib.parse import urlparse
 from urllib.parse import urlunparse
@@ -6,6 +5,8 @@ from urllib.parse import parse_qs
 from urllib.parse import urlencode
 
 from cript.exceptions import InvalidPage
+from cript.exceptions import APISearchError
+from cript.utils import display_errors
 
 
 class Paginator:
@@ -69,7 +70,11 @@ class Paginator:
         else:
             response = self.api.session.get(self.url)
 
-        self._raw = response.json()
+        response_json = response.json()
+        if "results" not in response_json:
+            raise APISearchError(display_errors(response.content))
+
+        self._raw = response_json
         return self._raw["results"]
 
     def objects(self):
