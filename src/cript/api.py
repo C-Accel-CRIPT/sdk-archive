@@ -293,6 +293,7 @@ class API:
         query: dict,
         limit: Union[int, None] = None,
         offset: Union[int, None] = None,
+        max_level: int = 1,
     ):
         """
         Send a query to the API and display the results.
@@ -301,6 +302,7 @@ class API:
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
         :param limit: The max number of items to return.
         :param offset: The starting position of the query.
+        :param max_level: Max depth to recursively generate nested primary nodes.
         :return: A `Paginator` object.
         :rtype: cript.paginator.Paginator
         """
@@ -312,7 +314,15 @@ class API:
         if isinstance(query, dict):
             url = f"{self.api_url}/search/{node_class.slug}/"
             payload = json.dumps(query)
-            return Paginator(api=self, url=url, payload=payload, obj_class=node_class)
+            return Paginator(
+                api=self,
+                url=url,
+                obj_class=node_class,
+                limit=limit,
+                offset=offset,
+                max_level=max_level,
+                payload=payload,
+            )
         else:
             raise APISearchError(f"'{query}' is not a valid query.")
 
