@@ -30,7 +30,7 @@ from cript.exceptions import APISaveError
 from cript.exceptions import APIDeleteError
 from cript.exceptions import APISearchError
 from cript.exceptions import APIGetError
-from cript.exceptions import DuplicateNodeError
+from cript.exceptions import UniqueNodeError
 from cript.exceptions import FileSizeLimitError
 
 
@@ -163,20 +163,20 @@ class API:
 
         else:
             try:
-                # Check if a duplicate error was returned
                 response_dict = json.loads(response.content)
-                if "duplicate" in response_dict:
-                    duplicate_url = response_dict.pop("duplicate")
-                    if update_existing == True and duplicate_url is not None:
-                        # Update existing duplicate node
-                        node.url = duplicate_url
+            except json.decoder.JSONDecodeError:
+                pass
+            else:
+                # Check if a unique error was returned
+                if "unique" in response_dict:
+                    unique_url = response_dict.pop("unique")
+                    if unique_url and update_existing == True:
+                        # Update existing unique node
+                        node.url = unique_url
                         self.save(node)
                         return
                     else:
-                        response_content = json.dumps(response_dict)
-                        raise DuplicateNodeError(display_errors(response_content))
-            except json.decoder.JSONDecodeError:
-                pass
+                        raise UniqueNodeError(display_errors(response.content))
             raise APISaveError(display_errors(response.content))
 
     @staticmethod

@@ -94,7 +94,7 @@ class APISessionRequiredError(CRIPTError):
         return "An API session must be established before you can perform this action."
 
 
-class DuplicateNodeError(CRIPTError):
+class UniqueNodeError(CRIPTError):
     """
     Raised when a node is saved using a combination of field
     values that the database enforces as a unique set.
