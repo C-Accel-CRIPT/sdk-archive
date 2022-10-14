@@ -12,7 +12,6 @@ from cript.nodes.secondary.equipment import Equipment
 from cript.nodes.secondary.property import Property
 from cript.nodes.secondary.condition import Condition
 from cript.nodes.secondary.citation import Citation
-from cript.validators import validate_key
 from cript.utils import auto_assign_group
 
 
@@ -67,25 +66,6 @@ class Process(BasePrimary):
         self.waste = waste if waste else []
         self.citations = citations if citations else []
         self.group = auto_assign_group(group, experiment)
-
-    @property
-    def type(self):
-        return self._type
-
-    @type.setter
-    def type(self, value):
-        self._type = validate_key("process-type", value)
-
-    @property
-    def keywords(self):
-        return self._keywords
-
-    @keywords.setter
-    def keywords(self, value):
-        if value:
-            for i in range(len(value)):
-                value[i] = validate_key("process-keyword", value[i])
-        self._keywords = value
 
     @beartype
     def add_equipment(self, piece: Union[Equipment, dict]):

@@ -7,7 +7,6 @@ from cript.nodes.primary.file import File
 from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.nodes.secondary.condition import Condition
 from cript.nodes.secondary.citation import Citation
-from cript.validators import validate_key
 
 
 logger = getLogger(__name__)
@@ -36,11 +35,3 @@ class Equipment(BaseSecondary):
         self.conditions = conditions if conditions else []
         self.files = files if files else []
         self.citations = citations if citations else []
-
-    @property
-    def key(self):
-        return self._key
-
-    @key.setter
-    def key(self, value):
-        self._key = validate_key("equipment-key", value)

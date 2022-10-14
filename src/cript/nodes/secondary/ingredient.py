@@ -6,7 +6,6 @@ from beartype import beartype
 from cript.nodes.primary.material import Material
 from cript.nodes.secondary.quantity import Quantity
 from cript.nodes.secondary.base_secondary import BaseSecondary
-from cript.validators import validate_key
 
 
 logger = getLogger(__name__)
@@ -32,14 +31,6 @@ class Ingredient(BaseSecondary):
         self.material = material
         self.keyword = keyword
         self.quantities = quantities if quantities else []
-
-    @property
-    def keyword(self):
-        return self._keyword
-
-    @keyword.setter
-    def keyword(self, value):
-        self._keyword = validate_key("ingredient-keyword", value)
 
     @beartype
     def add_quantity(self, quantity: Union[Quantity, dict]):

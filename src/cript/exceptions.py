@@ -146,61 +146,6 @@ class RemoveNodeError(CRIPTError):
         return self.message
 
 
-class InvalidKeyError(CRIPTError):
-    """Raised when a key is used that does not exist."""
-
-    def __init__(self, key, category):
-        self.key = key
-        self.category = category
-
-    def __str__(self):
-        return f"'{self.key}' is not a valid {self.category}."
-
-
-class InvalidValueTypeError(CRIPTError):
-    """Raised when a value is an incorrect type."""
-
-    def __init__(self, key):
-        self.key = key
-
-    def __str__(self):
-        return f"{self.key} is using an incorrect value type."
-
-
-class InvalidValueRangeError(CRIPTError):
-    """Raised when a value falls outside the defined range."""
-
-    def __init__(self, key, value, min_, max_, unit):
-        self.key = key
-        self.value = value
-        self.min = min_
-        self.max = max_
-        self.unit = unit
-
-    def __str__(self):
-        return f"{self.key} values must be between {self.min} {self.unit} and {self.max} {self.unit}"
-
-
-class InvalidUnitError(CRIPTError):
-    """Raised when a unit is invalid."""
-
-    def __init__(self, message):
-        self.message = message
-
-    def __str__(self):
-        return self.message
-
-
-class RequiredUnitError(CRIPTError):
-    """Raised when a unit is expected but not provided or vice versa."""
-
-    def __init__(self, message):
-        self.message = message
-
-    def __str__(self):
-        return self.message
-
-
 class FileSizeLimitError(CRIPTError):
     """Raised when a file size exceeds the defined limit."""
 
