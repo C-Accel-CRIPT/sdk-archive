@@ -6,7 +6,6 @@ from beartype import beartype
 from cript.nodes.primary.data import Data
 from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.nodes.secondary.citation import Citation
-from cript.validators import validate_key
 
 
 logger = getLogger(__name__)
@@ -41,19 +40,3 @@ class ComputationalForcefield(BaseSecondary):
         self.source = source
         self.data = data
         self.citations = citations if citations else []
-
-    @property
-    def key(self):
-        return self._key
-
-    @key.setter
-    def key(self, value):
-        self._key = validate_key("computational-forcefield-key", value)
-
-    @property
-    def building_block(self):
-        return self._building_block
-
-    @building_block.setter
-    def building_block(self, value):
-        self._building_block = validate_key("building-block", value)

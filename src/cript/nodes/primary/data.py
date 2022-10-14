@@ -7,7 +7,6 @@ from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
 from cript.nodes.primary.file import File
 from cript.nodes.secondary.citation import Citation
-from cript.validators import validate_key
 from cript.utils import auto_assign_group
 
 
@@ -54,14 +53,6 @@ class Data(BasePrimary):
         self.citations = citations if citations else []
         self.notes = notes
         self.group = auto_assign_group(group, experiment)
-
-    @property
-    def type(self):
-        return self._type
-
-    @type.setter
-    def type(self, value):
-        self._type = validate_key("data-type", value)
 
     @beartype
     def add_file(self, file: Union[File, dict]):

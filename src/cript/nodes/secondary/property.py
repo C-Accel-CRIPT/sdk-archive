@@ -9,7 +9,6 @@ from cript.nodes.primary.computation import Computation
 from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.nodes.secondary.condition import Condition
 from cript.nodes.secondary.citation import Citation
-from cript.validators import validate_key, validate_value, validate_unit
 
 
 logger = getLogger(__name__)
@@ -65,54 +64,6 @@ class Property(BaseSecondary):
         self.computations = computations if computations else []
         self.citations = citations if citations else []
         self.notes = notes
-
-    @property
-    def key(self):
-        return self._key
-
-    @key.setter
-    def key(self, value):
-        self._key = validate_key("property-key", value)
-
-    @property
-    def value(self):
-        return self._value
-
-    @value.setter
-    def value(self, value):
-        self._value = validate_value("property-key", self.key, value, self.unit)
-
-    @property
-    def unit(self):
-        return self._unit
-
-    @unit.setter
-    def unit(self, value):
-        self._unit = validate_unit("property-key", self.key, value)
-
-    @property
-    def type(self):
-        return self._type
-
-    @type.setter
-    def type(self, value):
-        self._type = validate_key("set-type", value)
-
-    @property
-    def method(self):
-        return self._method
-
-    @method.setter
-    def method(self, value):
-        self._method = validate_key("property-method", value)
-
-    @property
-    def uncertainty_type(self):
-        return self._uncertainty_type
-
-    @uncertainty_type.setter
-    def uncertainty_type(self, value):
-        self._uncertainty_type = validate_key("uncertainty-type", value)
 
     @beartype
     def add_components(self, component: Union[BasePrimary, dict]):

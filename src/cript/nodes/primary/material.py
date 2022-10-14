@@ -9,7 +9,6 @@ from cript.nodes.primary.project import Project
 from cript.nodes.secondary.identifier import Identifier
 from cript.nodes.secondary.property import Property
 from cript.nodes.secondary.base_secondary import BaseSecondary
-from cript.validators import validate_key
 from cript.utils import auto_assign_group
 
 
@@ -49,17 +48,6 @@ class Material(BasePrimary):
         self.computational_forcefield = computational_forcefield
         self.notes = notes
         self.group = auto_assign_group(group, project)
-
-    @property
-    def keywords(self):
-        return self._keywords
-
-    @keywords.setter
-    def keywords(self, value):
-        if value:
-            for i in range(len(value)):
-                value[i] = validate_key("material-keyword", value[i])
-        self._keywords = value
 
     @beartype
     def add_identifier(self, identifier: Union[Identifier, dict]):

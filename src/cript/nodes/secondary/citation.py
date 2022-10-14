@@ -5,7 +5,6 @@ from beartype import beartype
 
 from cript.nodes.primary.reference import Reference
 from cript.nodes.secondary.base_secondary import BaseSecondary
-from cript.validators import validate_key
 
 
 logger = getLogger(__name__)
@@ -31,11 +30,3 @@ class Citation(BaseSecondary):
         self.reference = reference
         self.type = type
         self.notes = notes
-
-    @property
-    def type(self):
-        return self._type
-
-    @type.setter
-    def type(self, value):
-        self._type = validate_key("citation-type", value)

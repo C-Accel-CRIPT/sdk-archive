@@ -6,7 +6,6 @@ from beartype import beartype
 from cript.nodes.secondary.base_secondary import BaseSecondary
 from cript.nodes.secondary.parameter import Parameter
 from cript.nodes.secondary.citation import Citation
-from cript.validators import validate_key
 
 
 logger = getLogger(__name__)
@@ -34,14 +33,6 @@ class Algorithm(BaseSecondary):
         self.type = type
         self.parameters = parameters if parameters else []
         self.citations = citations if citations else []
-
-    @property
-    def key(self):
-        return self._key
-
-    @key.setter
-    def key(self, value):
-        self._key = validate_key("algorithm-key", value)
 
     @beartype
     def add_parameter(self, parameter: Union[Parameter, dict]):

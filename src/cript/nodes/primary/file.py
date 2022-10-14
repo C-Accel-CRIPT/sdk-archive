@@ -8,7 +8,6 @@ from beartype import beartype
 from cript.nodes.primary.base_primary import BasePrimary
 from cript.nodes.primary.group import Group
 from cript.nodes.primary.project import Project
-from cript.validators import validate_key
 from cript.utils import sha256_hash
 from cript.utils import auto_assign_group
 
@@ -45,14 +44,6 @@ class File(BasePrimary):
         self.extension = extension
         self.source = source
         self.group = auto_assign_group(group, project)
-
-    @property
-    def type(self):
-        return self._type
-
-    @type.setter
-    def type(self, value):
-        self._type = validate_key("file-type", value)
 
     @property
     def source(self):
