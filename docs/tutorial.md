@@ -15,7 +15,7 @@ api = cript.API(host, token)
 ### Create a Project node
 ``` py
 proj = cript.Project(name="MyProject")
-api.save(project)
+api.save(proj)
 ```
 !!! note
     Project names are globally unique.
