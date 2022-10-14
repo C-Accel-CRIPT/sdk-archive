@@ -164,7 +164,7 @@ def test_get_material(criptapp_api, http_service, db_connection):
         inventory_uid = cursor.fetchone()[0]
         url = f"{http_service}/inventory/{inventory_uid}/"
         inv = criptapp_api.get(url)
-        assert type(inv.materials[0]) is cript.nodes.Material
+        assert type(inv.materials[0]) is cript.data_model.nodes.Material
 
 
 def test_add_ingredient_to_process_node(criptapp_api, http_service, db_connection):

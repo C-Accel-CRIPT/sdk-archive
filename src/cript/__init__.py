@@ -18,13 +18,13 @@ __api_version__ = "0.5.0"
 
 # Instantiate the Pint unit registry
 # https://pint.readthedocs.io/en/stable/tutorial.html#using-pint-in-your-projects
-# Note that this needs to be before the node imports below
+# Note that this needs to be before the data model imports below
 pint_ureg = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
 
 
 from cript import exceptions  # noqa 401 402
 from cript.paginator import Paginator
-from cript.nodes import (  # noqa 402
+from cript.data_model import (  # noqa 402
     User,
     Group,
     Project,
@@ -52,7 +52,7 @@ from cript.nodes import (  # noqa 402
     ComputationalForcefield,
 )
 
-NODE_CLASSES = [
+DATA_MODEL_CLASSES = [
     User,
     Group,
     Project,
@@ -80,7 +80,7 @@ NODE_CLASSES = [
     ComputationalForcefield,
 ]
 
-NODE_NAMES: list[str] = [node.node_name.lower() for node in NODE_CLASSES]
+DATA_MODEL_NAMES: list[str] = [node.node_name.lower() for node in DATA_MODEL_CLASSES]
 
 from cript.api import API  # noqa 401 402
 from cript.api_local import APILocal

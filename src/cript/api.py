@@ -11,12 +11,12 @@ from beartype import beartype
 from beartype.typing import Type
 
 from cript import __api_version__
-from cript import NODE_CLASSES
-from cript.nodes.base import Base
-from cript.nodes.primary.base_primary import BasePrimary
-from cript.nodes.primary.user import User
-from cript.nodes.primary.file import File
-from cript.nodes.secondary.base_secondary import BaseSecondary
+from cript import DATA_MODEL_CLASSES
+from cript.data_model.base import Base
+from cript.data_model.nodes.base_node import BaseNode
+from cript.data_model.nodes.user import User
+from cript.data_model.nodes.file import File
+from cript.data_model.subobjects.base_subobject import BaseSubobject
 from cript.utils import get_api_url
 from cript.utils import convert_to_api_url
 from cript.utils import convert_file_size
@@ -99,16 +99,16 @@ class API:
         return f"Connected to {self.api_url}"
 
     @beartype
-    def refresh(self, node: BasePrimary, max_level: int = 1):
+    def refresh(self, node: BaseNode, max_level: int = 1):
         """
         Overwrite a node's attributes with the latest values from the database.
 
         :param node: The node to refresh.
-        :param max_level: Max depth to recursively generate nested primary nodes.
+        :param max_level: Max depth to recursively generate nested nodes.
         """
-        if not isinstance(node, BasePrimary):
+        if not isinstance(node, BaseNode):
             raise APIRefreshError(
-                f"{node.node_name} is a secondary node, thus cannot be refreshed."
+                f"{node.node_name} is a subobject, thus cannot be refreshed."
             )
 
         if node.url:
@@ -121,19 +121,17 @@ class API:
             )
 
     @beartype
-    def save(
-        self, node: BasePrimary, max_level: int = 1, update_existing: bool = False
-    ):
+    def save(self, node: BaseNode, max_level: int = 1, update_existing: bool = False):
         """
         Create or update a node in the database.
 
         :param node: The node to be saved.
-        :param max_level: Max depth to recursively generate nested primary nodes.
+        :param max_level: Max depth to recursively generate nested nodes.
         :param update_existing: Indicates whether to update an existing node with the same unique fields.
         """
-        if not isinstance(node, BasePrimary):
+        if not isinstance(node, BaseNode):
             raise APISaveError(
-                f"The save() method cannot be called on secondary nodes such as {node.node_name}"
+                f"The save() method cannot be called on subobjects such as {node.node_name}"
             )
 
         if node.url:
@@ -230,20 +228,20 @@ class API:
                 # Ref: https://docs.aws.amazon.com/AmazonS3/latest/userguide/qfacts.html
                 self.storage_client.multipart_file_upload(file_uid, node)
 
-    def delete(self, obj: Union[BasePrimary, str, type], query: dict = None):
+    def delete(self, obj: Union[BaseNode, str, type], query: dict = None):
         """
         Delete a node in the database and clear it locally.
 
         :param obj: The node to be deleted itself or its class.
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"})
         """
-        if isinstance(obj, BaseSecondary):
+        if isinstance(obj, BaseSubobject):
             raise APIDeleteError(
-                f"The delete() method cannot be called on secondary nodes such as {obj.node_name}"
+                f"The delete() method cannot be called on subobjects such as {obj.node_name}"
             )
 
         # Delete with node
-        if isinstance(obj, BasePrimary):
+        if isinstance(obj, BaseNode):
             if obj.url:
                 url = obj.url
             else:
@@ -258,7 +256,7 @@ class API:
                 raise APIDeleteError("Invalid URL provided.")
 
         # Delete with search query
-        elif issubclass(obj, BasePrimary) and isinstance(query, dict):
+        elif issubclass(obj, BaseNode) and isinstance(query, dict):
             results = self.search(node_class=obj, query=query)
             count = results.count()
             if count == 1:
@@ -276,7 +274,7 @@ class API:
         if response.status_code == 204:
             # Check if node exists locally
             # If it does, clear fields to indicate it has been deleted
-            local_node = self._get_local_primary_node(url)
+            local_node = self._get_local_node(url)
             if local_node:
                 local_node.url = None
                 local_node.uid = None
@@ -289,7 +287,7 @@ class API:
     @beartype
     def search(
         self,
-        node_class: Type[BasePrimary],
+        node_class: Type[BaseNode],
         query: dict,
         limit: Union[int, None] = None,
         offset: Union[int, None] = None,
@@ -302,13 +300,13 @@ class API:
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
         :param limit: The max number of items to return.
         :param offset: The starting position of the query.
-        :param max_level: Max depth to recursively generate nested primary nodes.
+        :param max_level: Max depth to recursively generate nested nodes.
         :return: A `Paginator` object.
         :rtype: cript.paginator.Paginator
         """
-        if not issubclass(node_class, BasePrimary):
+        if not issubclass(node_class, BaseNode):
             raise APISearchError(
-                f"{node_class.node_name} is a secondary node, thus cannot be searched."
+                f"{node_class.node_name} is a subobject, thus cannot be searched."
             )
 
         if isinstance(query, dict):
@@ -329,7 +327,7 @@ class API:
     @beartype
     def get(
         self,
-        obj: Union[str, Type[BasePrimary]],
+        obj: Union[str, Type[BaseNode]],
         query: dict = None,
         level: int = 0,
         max_level: int = 1,
@@ -340,7 +338,7 @@ class API:
         :param obj: The node's URL or class type.
         :param query: Search query if obj argument is a class type.
         :param level: Current nested node level.
-        :param max_level: Max depth to recursively generate nested primary nodes.
+        :param max_level: Max depth to recursively generate nested nodes.
         :return: The generated node object.
         :rtype: cript.nodes.Base
         """
@@ -359,7 +357,7 @@ class API:
             node_class = self._define_node_class(node_attr_name)
 
         # Get node with a search query
-        elif issubclass(obj, BasePrimary) and query:
+        elif issubclass(obj, BaseNode) and query:
             results = self.search(node_class=obj, query=query)
             count = results.count()
             if count < 1:
@@ -376,7 +374,7 @@ class API:
 
         # Return the local node object if it already exists
         # Otherwise, create a new node
-        local_node = self._get_local_primary_node(obj_json["url"])
+        local_node = self._get_local_node(obj_json["url"])
         if local_node:
             return local_node
         else:
@@ -390,15 +388,15 @@ class API:
 
         :param node: The parent node.
         :param level: Current nested node level.
-        :param max_level: Max depth to recursively generate nested primary nodes.
+        :param max_level: Max depth to recursively generate nested nodes.
         """
         if level <= max_level:
             level += 1
 
-        # Limit recursive primary node generation
-        skip_primary = False
+        # Limit recursive node generation
+        skip_nodes = False
         if level > max_level:
-            skip_primary = True
+            skip_nodes = True
 
         node_dict = node.__dict__
         for key, value in node_dict.items():
@@ -406,14 +404,10 @@ class API:
             if not value or key == "url":
                 continue
 
-            # Generate primary nodes
-            if (
-                isinstance(value, str)
-                and self.api_url in value
-                and skip_primary == False
-            ):
+            # Generate nodes
+            if isinstance(value, str) and self.api_url in value and skip_nodes == False:
                 # Check if node already exists in memory
-                local_node = self._get_local_primary_node(value)
+                local_node = self._get_local_node(value)
                 if local_node:
                     node_dict[key] = local_node
                 else:
@@ -425,12 +419,12 @@ class API:
                         # Leave the URL if node is not viewable
                         pass
 
-            # Generate secondary nodes
+            # Generate subobjects
             elif isinstance(value, dict):
                 node_class = self._define_node_class(key)
-                secondary_node = node_class(**value)
-                node_dict[key] = secondary_node
-                self._generate_nodes(secondary_node, level=level, max_level=max_level)
+                subobject = node_class(**value)
+                node_dict[key] = subobject
+                self._generate_nodes(subobject, level=level, max_level=max_level)
 
             # Define Paginator attributes
             elif isinstance(value, Paginator):
@@ -441,14 +435,14 @@ class API:
             # Handle lists
             elif isinstance(value, list):
                 for i in range(len(value)):
-                    # Generate primary nodes
+                    # Generate nodes
                     if (
                         isinstance(value[i], str)
                         and self.api_url in value[i]
-                        and skip_primary == False
+                        and skip_nodes == False
                     ):
                         # Check if node already exists in memory
-                        local_node = self._get_local_primary_node(value[i])
+                        local_node = self._get_local_node(value[i])
                         if local_node:
                             value[i] = local_node
                         else:
@@ -460,13 +454,13 @@ class API:
                                 # Leave the URL if node is not viewable
                                 pass
 
-                    # Generate secondary nodes
+                    # Generate subobjects
                     elif isinstance(value[i], dict):
                         node_class = self._define_node_class(key)
-                        secondary_node = node_class(**value[i])
-                        value[i] = secondary_node
+                        subobject = node_class(**value[i])
+                        value[i] = subobject
                         self._generate_nodes(
-                            secondary_node, level=level, max_level=max_level
+                            subobject, level=level, max_level=max_level
                         )
 
     @staticmethod
@@ -478,13 +472,13 @@ class API:
         :return: The correct node class.
         :rtype: cript.nodes.Base
         """
-        for node_cls in NODE_CLASSES:
+        for cls in DATA_MODEL_CLASSES:
             # Use node name
-            if node_cls.node_name.lower() == key.replace("_", "").lower():
-                return node_cls
+            if cls.node_name.lower() == key.replace("_", "").lower():
+                return cls
             # Use node list name (e.g., properties)
-            if hasattr(node_cls, "list_name") and node_cls.list_name == key:
-                return node_cls
+            if hasattr(cls, "list_name") and cls.list_name == key:
+                return cls
         return None
 
     @staticmethod
@@ -515,9 +509,9 @@ class API:
         return node
 
     @staticmethod
-    def _get_local_primary_node(url: str):
+    def _get_local_node(url: str):
         """
-        Use a URL to get a primary node object stored in memory.
+        Use a URL to get a node object stored in memory.
 
         :param url: The URL to match against existing node objects.
         :return: The matching object or None.

@@ -12,11 +12,11 @@ from logging import getLogger
 from beartype import beartype
 from beartype.typing import Type
 
-from cript import NODE_CLASSES, NODE_NAMES, __api_version__
-from cript.nodes.base import Base
-from cript.nodes.primary.base_primary import BasePrimary
-from cript.nodes.primary.file import File
-from cript.nodes.secondary.base_secondary import BaseSecondary
+from cript import DATA_MODEL_CLASSES, DATA_MODEL_NAMES, __api_version__
+from cript.data_model.base import Base
+from cript.data_model.nodes.base_node import BaseNode
+from cript.data_model.nodes.file import File
+from cript.data_model.subobjects.base_subobject import BaseSubobject
 from cript.exceptions import (
     APISaveError,
     APIDeleteError,
@@ -50,7 +50,7 @@ def dict_remove_none(ddict: dict) -> dict:
     return _dict
 
 
-def _generate_file_name(node: BasePrimary) -> str:
+def _generate_file_name(node: BaseNode) -> str:
     return f"{node.slug}_{node.uid}"
 
 
@@ -69,7 +69,7 @@ def _parse_filename(filename: str) -> tuple[str, str]:
 
 
 def _validate_node_name(node: str):
-    if node not in NODE_NAMES:
+    if node not in DATA_MODEL_NAMES:
         raise ValueError(f"Invalid node: {node}")
 
 
@@ -125,7 +125,7 @@ def move_copy_file(
     shutil.copy2(old_location, new_location)
 
 
-def prepare_node_for_saving(node: BasePrimary, version: str) -> BasePrimary:
+def prepare_node_for_saving(node: BaseNode, version: str) -> BaseNode:
     node.uid = str(uuid.uuid4())
     node.url = str(f"local://cript/{node.slug}/{node.uid}/")
     node.updated_at = datetime.datetime.now().isoformat()
@@ -198,16 +198,16 @@ class APILocal:
             self.database_by_node[node][uid] = file
 
     @beartype
-    def save(self, node: BasePrimary, max_level: int = 1):
+    def save(self, node: BaseNode, max_level: int = 1):
         """
         Create or update a node in the database.
 
         :param node: The node to be saved.
         :param max_level: Max depth to recursively generate nested nodes.
         """
-        if not isinstance(node, BasePrimary):
+        if not isinstance(node, BaseNode):
             raise APISaveError(
-                f"The save() method cannot be called on secondary nodes such as {node.node_name}"
+                f"The save() method cannot be called on subobjects such as {node.node_name}"
             )
 
         if node.uid:
@@ -235,7 +235,7 @@ class APILocal:
         if isinstance(node, File) and os.path.exists(node.source):
             move_copy_file(node.source, self.data_folder)
 
-    def _do_save(self, node: BasePrimary):
+    def _do_save(self, node: BaseNode):
         file_name = self.folder / (_generate_file_name(node) + ".json")
         with open(file_name, "w", encoding=ENCODING) as f:
             f.write(node._to_json())
@@ -262,7 +262,7 @@ class APILocal:
         """
         raise NotImplementedError
 
-    def delete(self, obj: Union[BasePrimary, str, type], query: dict = None):
+    def delete(self, obj: Union[BaseNode, str, type], query: dict = None):
         """
         Delete a node in the database and clear it locally.
 
@@ -270,13 +270,13 @@ class APILocal:
         :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"})
         """
         # Delete with node
-        if isinstance(obj, BaseSecondary):
+        if isinstance(obj, BaseSubobject):
             raise APIDeleteError(
-                f"The delete() method cannot be called on secondary nodes such as {obj.node_name}"
+                f"The delete() method cannot be called on subobjects such as {obj.node_name}"
             )
 
         # Delete with node
-        if isinstance(obj, BasePrimary):
+        if isinstance(obj, BaseNode):
             if obj.uid:
                 uid = obj.uid
             else:
@@ -293,7 +293,7 @@ class APILocal:
                 raise APIDeleteError(f"UID not found in database. '{uid}'")
 
         # Delete with search query
-        elif issubclass(obj, BasePrimary) and isinstance(query, dict):
+        elif issubclass(obj, BaseNode) and isinstance(query, dict):
             raise NotImplementedError
         else:
             raise APIDeleteError(
@@ -313,9 +313,9 @@ class APILocal:
         :return: A :class:`JSONPaginator` object containing the results.
         :rtype: cript.session.JSONPaginator
         """
-        if not isinstance(node_class, BasePrimary):
+        if not isinstance(node_class, BaseNode):
             raise APISearchError(
-                f"{node_class.node_name} is a secondary node, thus cannot be searched."
+                f"{node_class.node_name} is a subobject, thus cannot be searched."
             )
 
         raise NotImplementedError
@@ -343,7 +343,7 @@ class APILocal:
             obj_json, node_class = self._get_by_uid(obj)
 
         # Get node with a search query
-        elif issubclass(obj, BasePrimary) and query:
+        elif issubclass(obj, BaseNode) and query:
             raise NotImplementedError
             # results = self.search(node_class=obj, query=query)
         else:
@@ -353,7 +353,7 @@ class APILocal:
 
         # Return the local node object if it already exists
         # Otherwise, create a new node
-        local_node = self._get_local_primary_node(obj_json["uid"])
+        local_node = self._get_local_node(obj_json["uid"])
         if local_node:
             return local_node
         else:
@@ -361,7 +361,7 @@ class APILocal:
             self._generate_nodes(node, level=level, max_level=max_level)
             return node
 
-    def _get_by_uid(self, obj) -> tuple[dict, BasePrimary]:
+    def _get_by_uid(self, obj) -> tuple[dict, BaseNode]:
         _validate_uid(obj)
         if obj not in self.database_by_uid:
             raise APIGetError("The specified node was not found.")
@@ -395,10 +395,10 @@ class APILocal:
             # Skip the url field
             if key in ("url", "uid"):
                 continue
-            # Generate primary nodes
+            # Generate nodes
             if isinstance(value, str) and _validate_uid_bool(value):
                 # Check if node already exists in memory
-                local_node = self._get_local_primary_node(value)
+                local_node = self._get_local_node(value)
                 if local_node:
                     node_dict[key] = local_node
                 else:
@@ -409,19 +409,19 @@ class APILocal:
                     except APIGetError:
                         # Leave the URL if node is not viewable
                         pass
-            # Generate secondary nodes
+            # Generate subobjects
             elif isinstance(value, dict):
                 node_class = self._define_node_class(key)
-                secondary_node = node_class(**value)
-                node_dict[key] = secondary_node
-                self._generate_nodes(secondary_node, level=level, max_level=max_level)
+                subobject = node_class(**value)
+                node_dict[key] = subobject
+                self._generate_nodes(subobject, level=level, max_level=max_level)
             # Handle lists
             elif isinstance(value, list):
                 for i in range(len(value)):
-                    # Generate primary nodes
+                    # Generate nodes
                     if isinstance(value[i], str) and _validate_uid_bool(value[i]):
                         # Check if node already exists in memory
-                        local_node = self._get_local_primary_node(value[i])
+                        local_node = self._get_local_node(value[i])
                         if local_node:
                             value[i] = local_node
                         else:
@@ -432,13 +432,13 @@ class APILocal:
                             except APIGetError:
                                 # Leave the URL if node is not viewable
                                 pass
-                    # Generate secondary nodes
+                    # Generate subobjects
                     elif isinstance(value[i], dict):
                         node_class = self._define_node_class(key)
-                        secondary_node = node_class(**value[i])
-                        value[i] = secondary_node
+                        subobject = node_class(**value[i])
+                        value[i] = subobject
                         self._generate_nodes(
-                            secondary_node, level=level, max_level=max_level
+                            subobject, level=level, max_level=max_level
                         )
 
     @staticmethod
@@ -450,13 +450,13 @@ class APILocal:
         :return: The correct node class.
         :rtype: cript.nodes.Base
         """
-        for node_cls in NODE_CLASSES:
+        for cls in DATA_MODEL_CLASSES:
             # Use node slug
-            if hasattr(node_cls, "slug") and node_cls.slug == key:
-                return node_cls
+            if hasattr(cls, "slug") and cls.slug == key:
+                return cls
             # Use node list name (e.g., properties)
-            if hasattr(node_cls, "list_name") and node_cls.list_name == key:
-                return node_cls
+            if hasattr(cls, "list_name") and cls.list_name == key:
+                return cls
         return None
 
     @staticmethod
@@ -489,9 +489,9 @@ class APILocal:
         return node
 
     @staticmethod
-    def _get_local_primary_node(uid: str):
+    def _get_local_node(uid: str):
         """
-        Use a URL to get a primary node object stored in memory.
+        Use a URL to get a node object stored in memory.
 
         :param uid: The URL to match against existing node objects.
         :return: The matching object or None.

@@ -5,7 +5,7 @@ from logging import getLogger
 import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
-from cript.nodes.primary.file import File
+from cript.data_model.nodes.file import File
 from cript.exceptions import APIFileUploadError
 from cript.exceptions import APIFileDownloadError
 

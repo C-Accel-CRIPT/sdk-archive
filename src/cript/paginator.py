@@ -30,7 +30,7 @@ class Paginator:
         :param obj_class: Relevant class for object generation
         :param limit: The max number of items per page.
         :param offset: The starting position of the paginator.
-        :param max_level: Max depth to recursively generate nested primary objects.
+        :param max_level: Max depth to recursively generate nested nodes.
         :param payload: POST request payload
         """
         self.url = url
@@ -90,7 +90,7 @@ class Paginator:
         for obj_json in objs_json:
             # Use the local object if it's in memory
             # Otherwise, create a new object
-            local_obj = self.api._get_local_primary_node(obj_json["url"])
+            local_obj = self.api._get_local_node(obj_json["url"])
             if local_obj:
                 obj = local_obj
             else:
