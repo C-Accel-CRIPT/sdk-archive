@@ -12,7 +12,7 @@ services:
     ports:
       - "5433:5432"
   web:
-    image: brilant/criptapp:latest
+    image: criptapp/criptapp:${IMAGE_VERSION:-latest}
     command: sh -c "python manage.py migrate && python manage.py loaddata ./seed/test_data.yaml && python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
@@ -23,7 +23,7 @@ services:
       - DB_PASSWORD=postgres
       - DB_HOST=db
       - DB_PORT=5432
-      - ENV=${ENV}
+      - ENVIRONMENT=${ENVIRONMENT}
       - DEBUG=${DEBUG}
       - ALLOWED_HOSTS=*
       - SECRET_KEY=${SECRET_KEY}
