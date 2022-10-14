@@ -147,7 +147,6 @@ class APILocal:
     """The entry point for interacting with a local CRIPT API."""
 
     version = __api_version__
-    keys = {}
 
     def __init__(
         self,
@@ -157,9 +156,6 @@ class APILocal:
         """
         Establishes a session with a local CRIPT API.
         """
-        if not APILocal.keys:  # if empty
-            APILocal._load_keys()
-
         self.name = "local"
         # database folder
         self.folder: pathlib.Path = _format_folder(folder)
@@ -180,19 +176,6 @@ class APILocal:
 
     def __str__(self):
         return f"Connected to {self.name}"
-
-    @classmethod
-    def _load_keys(cls):
-        """
-        Load keys from file
-        """
-        key_files = glob.glob(
-            str(pathlib.Path(__file__).parent) + "\\local_data\\key_*.json"
-        )
-        for file in key_files:
-            with open(file, "r", encoding=ENCODING) as f:
-                key_name = pathlib.Path(file).stem.replace("key_", "")
-                cls.keys[key_name] = json.load(f)
 
     def _load_database(self):
         """
