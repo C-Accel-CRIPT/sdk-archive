@@ -27,9 +27,9 @@ nav:
     - Home: index.md
     - Quickstart: quickstart.md
     - Tutorial: tutorial.md
-    - Nodes:
-        - Primary: nodes/primary.md
-        - Secondary: nodes/secondary.md
+    - Data Model:
+        - Nodes: data_model/nodes.md
+        - Subobjects: data_model/subobjects.md
     - API: api.md
     - Paginator: paginator.md
     - Exceptions: exceptions.md

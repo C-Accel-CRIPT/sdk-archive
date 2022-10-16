@@ -47,7 +47,7 @@ inv = api.get(url)
 Notice that the Material node objects have been auto-generated.
 ``` py
 type(inv.materials[0])
-# <class 'cript.nodes.Material'>
+# <class 'cript.data_model.nodes.material.Material'>
 ```
 !!! note
     By default, nested node generation occurs one level deep. You can modify this with the `max_level` argument.
