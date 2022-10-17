@@ -64,7 +64,9 @@ def get_data_model_class(key: str):
         # Use node name
         if cls.node_name.lower() == key.replace("_", "").lower():
             return cls
-        # Use node list name (e.g., properties)
-        if hasattr(cls, "list_name") and cls.list_name == key:
-            return cls
+        # Use alternative names
+        if hasattr(cls, "alt_names"):
+            for alt_name in cls.alt_names:
+                if alt_name == key:
+                    return cls
     return None

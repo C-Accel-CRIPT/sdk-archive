@@ -21,7 +21,7 @@ class Data(BaseNode):
 
     node_name = "Data"
     slug = "data"
-    list_name = "data"
+    alt_names = ["data"]
 
     @beartype
     def __init__(

@@ -18,7 +18,7 @@ class Equipment(BaseSubobject):
     """
 
     node_name = "Equipment"
-    list_name = "equipment"
+    alt_names = ["equipment"]
 
     @beartype
     def __init__(

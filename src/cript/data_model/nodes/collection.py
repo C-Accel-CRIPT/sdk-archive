@@ -23,7 +23,7 @@ class Collection(BaseNode):
 
     node_name = "Collection"
     slug = "collection"
-    list_name = "collections"
+    alt_names = ["collections"]
 
     @beartype
     def __init__(

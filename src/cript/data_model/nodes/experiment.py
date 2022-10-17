@@ -21,7 +21,7 @@ class Experiment(BaseNode):
 
     node_name = "Experiment"
     slug = "experiment"
-    list_name = "experiments"
+    alt_names = ["experiments"]
 
     @beartype
     def __init__(

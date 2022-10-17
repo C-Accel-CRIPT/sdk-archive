@@ -26,7 +26,7 @@ class Process(BaseNode):
 
     node_name = "Process"
     slug = "process"
-    list_name = "processes"
+    alt_names = ["processes", "prerequisite_processes", "sample_preparation"]
 
     @beartype
     def __init__(

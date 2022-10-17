@@ -28,7 +28,7 @@ class Paginator:
         payload: Union[str, None] = None,
         limit: Union[int, None] = None,
         offset: Union[int, None] = None,
-        max_level: int = 0,
+        get_level: int = 0,
     ):
         """
         Initializes a Paginator object.
@@ -36,16 +36,16 @@ class Paginator:
         :param url: Query URL
         :param node_name: Name of the relevant node
         :param payload: POST request payload
-        :param limit: The max number of items per page
-        :param offset: The starting position of the paginator
-        :param max_level: Max depth to recursively generate nested nodes
+        :param limit: The max number of items per page.
+        :param offset: The starting position of the paginator.
+        :param get_level: Level to recursively get nested nodes.
         """
         self.url = url
         self.api = get_cached_api_session(url)
         self.node_class = get_data_model_class(node_name)
         self.limit = limit
         self.offset = offset
-        self.max_level = max_level
+        self.get_level = get_level
         self.payload = payload
         self._raw = None
         self._count = None
@@ -102,7 +102,7 @@ class Paginator:
                 obj = local_obj
             else:
                 obj = create_node(self.node_class, obj_json)
-                obj._generate_nested_nodes(max_level=self.max_level)
+                obj._generate_nested_nodes(get_level=self.get_level)
             obj_list.append(obj)
 
         return obj_list

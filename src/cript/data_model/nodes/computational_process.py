@@ -26,7 +26,7 @@ class ComputationalProcess(BaseNode):
 
     node_name = "ComputationalProcess"
     slug = "computational-process"
-    list_name = "computational_processes"
+    alt_names = ["computational_processes"]
 
     @beartype
     def __init__(

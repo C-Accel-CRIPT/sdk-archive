@@ -21,7 +21,7 @@ class Property(BaseSubobject):
     """
 
     node_name = "Property"
-    list_name = "properties"
+    alt_names = ["properties"]
 
     @beartype
     def __init__(

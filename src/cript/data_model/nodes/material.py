@@ -20,7 +20,7 @@ class Material(BaseNode):
 
     node_name = "Material"
     slug = "material"
-    list_name = "materials"
+    alt_names = ["materials", "components", "products", "waste"]
 
     @beartype
     def __init__(

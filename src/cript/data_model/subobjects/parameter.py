@@ -13,7 +13,7 @@ class Parameter(BaseSubobject):
     """Object representing a an input value to an :class:`Algorithm`."""
 
     node_name = "Parameter"
-    list_name = "parameters"
+    alt_names = ["parameters"]
 
     @beartype
     def __init__(

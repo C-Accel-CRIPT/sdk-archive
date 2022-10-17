@@ -23,7 +23,7 @@ class Computation(BaseNode):
 
     node_name = "Computation"
     slug = "computation"
-    list_name = "computations"
+    alt_names = ["computations"]
 
     @beartype
     def __init__(

@@ -18,7 +18,7 @@ class User(BaseNode):
 
     node_name = "User"
     slug = "user"
-    list_name = "users"
+    alt_names = ["users"]
 
     @beartype
     def __init__(

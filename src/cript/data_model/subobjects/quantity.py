@@ -16,7 +16,7 @@ class Quantity(BaseSubobject):
     """
 
     node_name = "Quantity"
-    list_name = "quantities"
+    alt_names = ["quantities"]
 
     @beartype
     def __init__(

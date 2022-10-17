@@ -18,7 +18,7 @@ class Algorithm(BaseSubobject):
     """
 
     node_name = "Algorithm"
-    list_name = "algorithms"
+    alt_names = ["algorithms"]
 
     @beartype
     def __init__(

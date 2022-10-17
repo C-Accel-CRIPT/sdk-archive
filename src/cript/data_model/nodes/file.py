@@ -26,7 +26,7 @@ class File(BaseNode):
 
     node_name = "File"
     slug = "file"
-    list_name = "files"
+    alt_names = ["files"]
 
     @beartype
     def __init__(
@@ -78,7 +78,7 @@ class File(BaseNode):
         self._source = value
 
     @beartype
-    def save(self, max_level: int = 0, update_existing: bool = False):
+    def save(self, get_level: int = 0, update_existing: bool = False):
         api = get_cached_api_session(self.url)
 
         if api.host == "localhost":
@@ -100,7 +100,7 @@ class File(BaseNode):
                 if unique_url and update_existing == True:
                     # Update existing unique node
                     self.url = unique_url
-                    self.save(max_level=max_level)
+                    self.save(get_level=get_level)
                     return
                 else:
                     raise UniqueNodeError(response["errors"][0])
@@ -113,10 +113,10 @@ class File(BaseNode):
             self._upload_file(api, url, uid)
 
         set_node_attributes(self, response)
-        self._generate_nested_nodes(max_level=max_level)
+        self._generate_nested_nodes(get_level=get_level)
         logger.info(f"{self.node_name} node has been saved to the database.")
 
-        self.refresh(max_level=max_level)
+        self.refresh(get_level=get_level)
 
     def _upload_file(self, api, url, uid):
         """
