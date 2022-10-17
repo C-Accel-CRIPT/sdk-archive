@@ -1,7 +1,12 @@
 import json
 import abc
-from weakref import WeakSet
 from logging import getLogger
+
+from cript.cache import get_cached_api_session
+from cript.cache import get_cached_node
+from cript.data_model.paginator import Paginator
+from cript.data_model.utils import get_data_model_class
+from cript.api.exceptions import APIError
 
 
 logger = getLogger(__name__)
@@ -9,18 +14,13 @@ logger = getLogger(__name__)
 
 class Base(abc.ABC):
     """
-    The base abstract class for a CRIPT node.
-    All nodes inherit from this class (note that this class cannot be directly
-    instantiated).
+    The base abstract class for a CRIPT data model object.
+    All data model objects inherit from this class (note that this class cannot
+    be directly instantiated).
     """
-
-    __refs__ = WeakSet()  # Stores all node instances in memory
 
     node_name = None
     list_name = None
-
-    def __init__(self):
-        self.__refs__.add(self)  # Add instance to __refs__
 
     def __repr__(self):
         return self._to_json()
@@ -53,3 +53,86 @@ class Base(abc.ABC):
     @abc.abstractmethod
     def _remove_node(self, node, attr):
         ...
+
+    def _generate_nested_nodes(self, level: int = 0, max_level: int = 1):
+        """
+        Generate nested node objects within a given node.
+
+        :param level: Current nested node level.
+        :param max_level: Max depth to recursively generate nested nodes.
+        """
+        if level <= max_level:
+            level += 1
+
+        # Limit recursive node generation
+        skip_nodes = False
+        if level > max_level:
+            skip_nodes = True
+
+        node_dict = self.__dict__
+        for key, value in node_dict.items():
+            # Skip empty values and the url field
+            if not value or key == "url":
+                continue
+
+            # Generate nodes
+            api = get_cached_api_session()
+            if isinstance(value, str) and api.url in value and skip_nodes == False:
+                # Check if node already exists in memory
+                local_node = get_cached_node(value)
+                if local_node:
+                    node_dict[key] = local_node
+                else:
+                    node_class = get_data_model_class(key)
+                    try:
+                        node_dict[key] = node_class.get(
+                            value, level=level, max_level=max_level
+                        )
+                    except APIError:
+                        # Leave the URL if node is not viewable
+                        pass
+
+            # Generate subobjects
+            elif isinstance(value, dict):
+                subobject_class = get_data_model_class(key)
+                subobject = subobject_class(**value)
+                node_dict[key] = subobject
+                subobject._generate_nested_nodes(level=level, max_level=max_level)
+
+            # Define Paginator attributes
+            elif isinstance(value, Paginator):
+                value.api = api
+                value.obj_class = get_data_model_class(key.lstrip("_"))
+                value.max_level = max_level
+
+            # Handle lists
+            elif isinstance(value, list):
+                for i in range(len(value)):
+                    # Generate nodes
+                    if (
+                        isinstance(value[i], str)
+                        and api.url in value[i]
+                        and skip_nodes == False
+                    ):
+                        # Check if node already exists in memory
+                        local_node = get_cached_node(value[i])
+                        if local_node:
+                            value[i] = local_node
+                        else:
+                            node_class = get_data_model_class(key)
+                            try:
+                                value[i] = node_class.get(
+                                    value[i], level=level, max_level=max_level
+                                )
+                            except APIError:
+                                # Leave the URL if node is not viewable
+                                pass
+
+                    # Generate subobjects
+                    elif isinstance(value[i], dict):
+                        node_class = get_data_model_class(key)
+                        subobject = node_class(**value[i])
+                        value[i] = subobject
+                        subobject._generate_nested_nodes(
+                            level=level, max_level=max_level
+                        )
