@@ -35,7 +35,7 @@ def http_service(docker_ip, docker_services):
     port = docker_services.port_for("web", 8000)
     url = "http://{}:{}".format(docker_ip, port)
     docker_services.wait_until_responsive(
-        timeout=600.0, pause=0.1, check=lambda: is_responsive(url)
+        timeout=6000.0, pause=0.1, check=lambda: is_responsive(url)
     )
     return url
 
@@ -259,11 +259,7 @@ def test_create_data_node(criptapp_api):
     expt = cript.Experiment.get(name=MY_EXPERIMENT)
     polystyrene = cript.Material.get(name="polystyrene")
 
-    sec = cript.Data(
-        experiment=expt,
-        name="Crude SEC of polystyrene",
-        type="sec_trace",
-    )
+    sec = cript.Data(experiment=expt, name="Crude SEC of polystyrene", type="sec_trace")
     sec.save()
 
     # Associate a Data node with a Property node
@@ -276,7 +272,6 @@ def test_create_data_node(criptapp_api):
 def test_create_file_node_and_upload(criptapp_api):
     with mock.patch.object(cript.API, "save", new=lambda *args: None):
         with NamedTemporaryFile(suffix=".csv") as tmp:
-            proj = cript.Project.get(name=MY_PROJECT)
-            sec = cript.Data.get(name="Crude SEC of polystyrene")
-            f = cript.File(project=proj, data=[sec], source=tmp.name)
-            f.save()
+            proj = criptapp_api.get(cript.Project, {"name": MY_PROJECT})
+            f = cript.File(project=proj, source=tmp.name)
+            criptapp_api.save(f)
