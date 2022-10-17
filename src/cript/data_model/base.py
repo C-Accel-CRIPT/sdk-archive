@@ -20,7 +20,7 @@ class Base(abc.ABC):
     """
 
     node_name = None
-    list_name = None
+    alt_names = list()
 
     def __repr__(self):
         return self._to_json()
@@ -54,19 +54,19 @@ class Base(abc.ABC):
     def _remove_node(self, node, attr):
         ...
 
-    def _generate_nested_nodes(self, level: int = 0, max_level: int = 1):
+    def _generate_nested_nodes(self, level: int = 0, get_level: int = 1):
         """
         Generate nested node objects within a given node.
 
         :param level: Current nested node level.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param get_level: Level to recursively get nested nodes.
         """
-        if level <= max_level:
+        if level <= get_level:
             level += 1
 
         # Limit recursive node generation
         skip_nodes = False
-        if level > max_level:
+        if level > get_level:
             skip_nodes = True
 
         node_dict = self.__dict__
@@ -86,7 +86,7 @@ class Base(abc.ABC):
                     node_class = get_data_model_class(key)
                     try:
                         node_dict[key] = node_class.get(
-                            url=value, level=level, max_level=max_level
+                            url=value, level=level, get_level=get_level
                         )
                     except APIError:
                         # Leave the URL if node is not viewable
@@ -97,13 +97,13 @@ class Base(abc.ABC):
                 subobject_class = get_data_model_class(key)
                 subobject = subobject_class(**value)
                 node_dict[key] = subobject
-                subobject._generate_nested_nodes(level=level, max_level=max_level)
+                subobject._generate_nested_nodes(level=level, get_level=get_level)
 
             # Define Paginator attributes
             elif isinstance(value, Paginator):
                 value.api = api
                 value.obj_class = get_data_model_class(key.lstrip("_"))
-                value.max_level = max_level
+                value.get_level = get_level
 
             # Handle lists
             elif isinstance(value, list):
@@ -122,7 +122,7 @@ class Base(abc.ABC):
                             node_class = get_data_model_class(key)
                             try:
                                 value[i] = node_class.get(
-                                    url=value[i], level=level, max_level=max_level
+                                    url=value[i], level=level, get_level=get_level
                                 )
                             except APIError:
                                 # Leave the URL if node is not viewable
@@ -134,5 +134,5 @@ class Base(abc.ABC):
                         subobject = node_class(**value[i])
                         value[i] = subobject
                         subobject._generate_nested_nodes(
-                            level=level, max_level=max_level
+                            level=level, get_level=get_level
                         )

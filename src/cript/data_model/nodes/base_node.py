@@ -45,12 +45,12 @@ class BaseNode(Base, abc.ABC):
         cache_node(self)
 
     @beartype
-    def save(self, max_level: int = 0, update_existing: bool = False):
+    def save(self, get_level: int = 0, update_existing: bool = False):
         """
         Create or update a node in the database.
 
         :param node: The node to be saved.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param get_level: Level to recursively get nested nodes.
         :param update_existing: Indicates whether to update an existing node with the same unique fields.
         """
         api = get_cached_api_session(self.url)
@@ -72,13 +72,13 @@ class BaseNode(Base, abc.ABC):
                 if unique_url and update_existing == True:
                     # Update existing unique node
                     self.url = unique_url
-                    self.save(max_level=max_level)
+                    self.save(get_level=get_level)
                     return
                 else:
                     raise UniqueNodeError(response["errors"][0])
 
         set_node_attributes(self, response)
-        self._generate_nested_nodes(max_level=max_level)
+        self._generate_nested_nodes(get_level=get_level)
         logger.info(f"{self.node_name} node has been saved to the database.")
 
     @beartype
@@ -100,11 +100,11 @@ class BaseNode(Base, abc.ABC):
         logger.info("The node has been deleted from the database.")
 
     @beartype
-    def refresh(self, max_level: int = 0):
+    def refresh(self, get_level: int = 0):
         """
         Overwrite a node's attributes with the latest values from the database.
 
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param get_level: Level to recursively get nested nodes.
         """
         if self.url is None:
             raise ValueError(
@@ -114,14 +114,14 @@ class BaseNode(Base, abc.ABC):
         api = get_cached_api_session(self.url)
         response = api.get(self.url)
         set_node_attributes(self, response)
-        self._generate_nested_nodes(max_level=max_level)
+        self._generate_nested_nodes(get_level=get_level)
 
     @beartype
-    def update(self, max_level: int = 0, **kwargs):
+    def update(self, get_level: int = 0, **kwargs):
         """
         Updates and immediately saves a node.
 
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param get_level: Level to recursively get nested nodes.
         :param **kwargs: Arguments to update the node.
         """
         if self.url is None:
@@ -130,32 +130,32 @@ class BaseNode(Base, abc.ABC):
             )
 
         set_node_attributes(self, kwargs)
-        self.save(max_level=max_level)
+        self.save(get_level=get_level)
 
     @classmethod
     @beartype
-    def create(cls, max_level: int = 0, update_existing: bool = False, **kwargs):
+    def create(cls, get_level: int = 0, update_existing: bool = False, **kwargs):
         """
         Immediately creates a node.
 
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param get_level: Level to recursively get nested nodes.
         :param update_existing: Indicates whether to update an existing node with the same unique fields.
         :param **kwargs: Arguments for the constructor.
         :return: The created node.
         :rtype: cript.data_model.nodes.BaseNode
         """
         node = cls(**kwargs)
-        node.save(max_level=max_level, update_existing=update_existing)
+        node.save(get_level=get_level, update_existing=update_existing)
         return node
 
     @classmethod
     @beartype
-    def get(cls, level: int = 0, max_level: int = 0, **kwargs):
+    def get(cls, level: int = 0, get_level: int = 0, **kwargs):
         """
         Get the JSON for a node and use it to generate a local node object.
 
         :param level: Current nested node level.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param get_level: Level to recursively get nested nodes.
         :param **kwargs: Query parameters.
         :return: The generated node object.
         :rtype: cript.data_model.nodes.BaseNode
@@ -184,7 +184,7 @@ class BaseNode(Base, abc.ABC):
             return local_node
         else:
             node = create_node(cls, obj_json)
-            node._generate_nested_nodes(level=level, max_level=max_level)
+            node._generate_nested_nodes(level=level, get_level=get_level)
             return node
 
     @classmethod
@@ -193,7 +193,7 @@ class BaseNode(Base, abc.ABC):
         cls,
         limit: Union[int, None] = None,
         offset: Union[int, None] = None,
-        max_level: int = 0,
+        get_level: int = 0,
         **kwargs,
     ):
         """
@@ -201,7 +201,7 @@ class BaseNode(Base, abc.ABC):
 
         :param limit: The max number of items to return.
         :param offset: The starting position of the query.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param get_level: Level to recursively get nested nodes.
         :param **kwargs: Query parameters.
         :return: A `Paginator` object.
         :rtype: cript.data_model.paginator.Paginator
@@ -217,7 +217,7 @@ class BaseNode(Base, abc.ABC):
             node_name=cls.node_name,
             limit=limit,
             offset=offset,
-            max_level=max_level,
+            get_level=get_level,
             payload=payload,
         )
 
