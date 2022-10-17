@@ -38,3 +38,11 @@ def convert_to_api_url(url: str):
         return url
 
     return f"{scheme}://{netloc}/api{path}"
+
+
+def get_slug_from_url(url: str):
+    """Get the node slug from a URL."""
+    path_list = urlparse(url).path.strip("/").split("/")
+    if path_list[0] == "api":
+        return path_list[1]
+    return path_list[0]
