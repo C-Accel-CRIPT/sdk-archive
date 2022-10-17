@@ -90,6 +90,7 @@ class API(APIBase):
 
     @beartype
     def get(self, url: str):
+        """Performs an HTTP GET request and handles errors."""
         url = convert_to_api_url(url)
         response = self.session.get(url=url)
         if response.status_code != 200:
@@ -98,6 +99,7 @@ class API(APIBase):
 
     @beartype
     def post(self, url: str, data: str = None, valid_codes: list = [201]):
+        """Performs an HTTP POST request and handles errors."""
         url = convert_to_api_url(url)
         response = self.session.post(url=url, data=data)
         if response.status_code not in valid_codes:
@@ -110,6 +112,7 @@ class API(APIBase):
 
     @beartype
     def put(self, url: str, data: str = None):
+        """Performs an HTTP PUT request and handles errors."""
         url = convert_to_api_url(url)
         response = self.session.put(url=url, data=data)
         if response.status_code != 200:
@@ -122,6 +125,7 @@ class API(APIBase):
 
     @beartype
     def delete(self, url: str):
+        """Performs an HTTP DELETE request and handles errors."""
         url = convert_to_api_url(url)
         response = self.session.delete(url)
         if response.status_code != 204:
