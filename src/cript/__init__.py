@@ -22,8 +22,7 @@ __api_version__ = "0.5.0"
 pint_ureg = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
 
 
-from cript import exceptions  # noqa 401 402
-from cript.paginator import Paginator
+from cript.data_model.paginator import Paginator
 from cript.data_model import (  # noqa 402
     User,
     Group,
@@ -82,5 +81,5 @@ DATA_MODEL_CLASSES = [
 
 DATA_MODEL_NAMES: list[str] = [node.node_name.lower() for node in DATA_MODEL_CLASSES]
 
-from cript.api import API  # noqa 401 402
-from cript.api_local import APILocal
+from cript.api.rest import API  # noqa 401 402
+from cript.api.local import APILocal
