@@ -9,7 +9,7 @@ from cript.data_model.nodes.project import Project
 from cript.data_model.subobjects.identifier import Identifier
 from cript.data_model.subobjects.property import Property
 from cript.data_model.subobjects.base_subobject import BaseSubobject
-from cript.utils import auto_assign_group
+from cript.data_model.utils import auto_assign_group
 
 
 logger = getLogger(__name__)

@@ -6,8 +6,9 @@ from beartype import beartype
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.collection import Collection
-from cript.utils import auto_assign_group
-from cript.paginator import Paginator
+from cript.data_model.utils import auto_assign_group
+from cript.data_model.paginator import Paginator
+from cript.cache import get_cached_api_session
 
 
 logger = getLogger(__name__)
@@ -53,7 +54,8 @@ class Experiment(BaseNode):
 
     @processes.setter
     def processes(self, value):
-        self._processes = Paginator(url=value)
+        if value:
+            self._processes = Paginator(url=value, node_name="Process")
 
     @property
     def computational_processes(self):
@@ -61,7 +63,10 @@ class Experiment(BaseNode):
 
     @computational_processes.setter
     def computational_processes(self, value):
-        self._computational_processes = Paginator(url=value)
+        if value:
+            self._computational_processes = Paginator(
+                url=value, node_name="ComputationalProcess"
+            )
 
     @property
     def computations(self):
@@ -69,7 +74,8 @@ class Experiment(BaseNode):
 
     @computations.setter
     def computations(self, value):
-        self._computations = Paginator(url=value)
+        if value:
+            self._computations = Paginator(url=value, node_name="Computation")
 
     @property
     def data(self):
@@ -77,4 +83,5 @@ class Experiment(BaseNode):
 
     @data.setter
     def data(self, value):
-        self._data = Paginator(url=value)
+        if value:
+            self._data = Paginator(url=value, node_name="Data")

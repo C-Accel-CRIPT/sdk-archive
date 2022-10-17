@@ -12,7 +12,7 @@ from cript.data_model.subobjects.equipment import Equipment
 from cript.data_model.subobjects.property import Property
 from cript.data_model.subobjects.condition import Condition
 from cript.data_model.subobjects.citation import Citation
-from cript.utils import auto_assign_group
+from cript.data_model.utils import auto_assign_group
 
 
 logger = getLogger(__name__)
