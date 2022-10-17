@@ -3,8 +3,8 @@ import json
 import requests
 from logging import getLogger
 
-from cript.exceptions import APIFileUploadError
-from cript.exceptions import APIFileDownloadError
+from cript.storage_clients.exceptions import FileUploadError
+from cript.storage_clients.exceptions import FileDownloadError
 
 
 logger = getLogger(__name__)
@@ -14,7 +14,7 @@ class AmazonS3Client:
     def __init__(self, api):
         self.api = api
         self.session = api.session
-        self.api_url = api.api_url
+        self.url = api.url
 
     def single_file_upload(self, file_uid, node):
         """
@@ -29,7 +29,7 @@ class AmazonS3Client:
             "file_checksum": node.checksum,
         }
         response = self.session.post(
-            url=f"{self.api_url}/s3-signed-url/", data=json.dumps(payload)
+            url=f"{self.url}/s3-signed-url/", data=json.dumps(payload)
         )
 
         # Upload file
@@ -39,9 +39,9 @@ class AmazonS3Client:
             files = {"file": open(node.source, "rb")}
             response = requests.put(url=url, files=files)
             if response.status_code != 200:
-                raise APIFileUploadError
+                raise FileUploadError
         else:
-            raise APIFileUploadError
+            raise FileUploadError
 
     def multipart_file_upload(self, file_uid, node):
         """
@@ -58,7 +58,7 @@ class AmazonS3Client:
             "file_checksum": node.checksum,
         }
         response = self.session.post(
-            url=f"{self.api_url}/s3-multipart-upload/",
+            url=f"{self.url}/s3-multipart-upload/",
             data=json.dumps(payload),
         )
         upload_id = json.loads(response.content)["UploadId"]
@@ -81,7 +81,7 @@ class AmazonS3Client:
                     "part_number": len(parts) + 1,
                 }
                 response = self.session.post(
-                    url=f"{self.api_url}/s3-signed-url/", data=json.dumps(data)
+                    url=f"{self.url}/s3-signed-url/", data=json.dumps(data)
                 )
 
                 # Upload file chunk
@@ -92,9 +92,9 @@ class AmazonS3Client:
                         etag = response.headers["ETag"]
                         parts.append({"ETag": etag, "PartNumber": len(parts) + 1})
                     else:
-                        raise APIFileUploadError
+                        raise FileUploadError
                 else:
-                    raise APIFileUploadError
+                    raise FileUploadError
 
         # Complete multipart upload
         data = {
@@ -104,8 +104,8 @@ class AmazonS3Client:
             "parts": parts,
         }
         response = self.session.post(
-            url=f"{self.api_url}/s3-multipart-upload/",
+            url=f"{self.url}/s3-multipart-upload/",
             data=json.dumps(data),
         )
         if response.status_code != 200:
-            raise APIFileUploadError
+            raise FileUploadError
