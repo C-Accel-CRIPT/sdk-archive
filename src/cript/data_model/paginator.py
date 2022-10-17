@@ -34,11 +34,11 @@ class Paginator:
         Initializes a Paginator object.
 
         :param url: Query URL
-        :param node_class: Relevant class for object generation
+        :param node_name: Name of the relevant node
         :param payload: POST request payload
-        :param limit: The max number of items per page.
-        :param offset: The starting position of the paginator.
-        :param max_level: Max depth to recursively generate nested nodes.
+        :param limit: The max number of items per page
+        :param offset: The starting position of the paginator
+        :param max_level: Max depth to recursively generate nested nodes
         """
         self.url = url
         self.api = get_cached_api_session(url)
