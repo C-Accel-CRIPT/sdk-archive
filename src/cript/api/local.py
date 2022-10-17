@@ -21,6 +21,7 @@ from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.file import File
 from cript.data_model.subobjects.base_subobject import BaseSubobject
 from cript.utils import is_valid_uid
+from cript.api.utils import get_slug_from_url
 
 logger = getLogger(__name__)
 
@@ -48,10 +49,6 @@ def dict_remove_none(ddict: dict) -> dict:
     return _dict
 
 
-def _generate_file_name(node: BaseNode) -> str:
-    return f"{node.slug}_{node.uid}"
-
-
 def _parse_filename(filename: str) -> tuple[str, str]:
     # parsing
     filename = pathlib.Path(filename)
@@ -74,6 +71,10 @@ def _validate_node_name(node: str):
 def _validate_uid(uid: str):
     if not is_valid_uid(uid):
         raise ValueError(f"Invalid uid: {uid}")
+
+
+def _get_uid_from_url(url: str):
+    return url.rstrip("/").split("/")[-1]
 
 
 def _format_folder(folder: Union[str, pathlib.Path]) -> pathlib.Path:
@@ -170,42 +171,54 @@ class APILocal(APIBase):
             self.database_by_node[node][uid] = file
 
     @beartype
-    def save_file(self, node: BaseNode):
-        node.group = "N/A"
-        if node.url:
-            node.updated_at = datetime.datetime.now().isoformat()
-        else:
-            node.uid = str(uuid.uuid4())
-            node.url = str(f"{self.url}/{node.slug}/{node.uid}/")
-            node.updated_at = datetime.datetime.now().isoformat()
-            node.created_at = datetime.datetime.now().isoformat()
-
-        # Save to local filesystem
-        file_name = self.folder / (_generate_file_name(node) + ".json")
-        with open(file_name, "w", encoding=ENCODING) as f:
-            f.write(node._to_json())
-        logger.info(
-            f"Update: {node.node_name}({node.uid}) node has been updated in the database."
-        )
-
-        # Add node to database list
-        self.database_by_uid[node.uid] = node
-        if node.slug not in self.database_by_node:
-            self.database_by_node[node.slug] = {node.uid: file_name}
-        else:
-            self.database_by_node[node.slug][node.uid] = file_name
-
-        return vars(node)
-
-    @beartype
-    def delete_file(self, node: BaseNode):
-        os.remove(self.database_by_uid[node.uid])
-
-    @beartype
-    def get_file(self, uid: str):
-        _validate_uid(uid)
+    def get(self, url: str):
+        """Simulates an HTTP GET request to the local filesystem."""
+        uid = _get_uid_from_url(url)
         if uid not in self.database_by_uid:
             raise APIError("The specified node was not found.")
 
         with open(self.database_by_uid[uid], "r", encoding=ENCODING) as f:
             return json.load(f)
+
+    @beartype
+    def post(self, url: str, data: str, *args, **kwargs):
+        """Simulates an HTTP POST request to the local filesystem."""
+        data_dict = json.loads(data)
+        slug = get_slug_from_url(url)
+        uid = str(uuid.uuid4())
+
+        # Prep for save
+        data_dict["uid"] = uid
+        data_dict["url"] = f"{self.url}/{slug}/{uid}/"
+        data_dict["updated_at"] = datetime.datetime.now().isoformat()
+        data_dict["created_at"] = datetime.datetime.now().isoformat()
+
+        # Save to local filesystem
+        file_name = self.folder / f"{slug}_{uid}.json"
+        with open(file_name, "w", encoding=ENCODING) as f:
+            f.write(data)
+
+        return data_dict
+
+    @beartype
+    def put(self, url: str, data: str, *args, **kwargs):
+        """Simulates an HTTP PUT request to the local filesystem."""
+        data_dict = json.loads(data)
+        uid = data_dict["uid"]
+        slug = get_slug_from_url(url)
+
+        # Prep for save
+        data_dict["updated_at"] = datetime.datetime.now().isoformat()
+
+        # Save to local filesystem
+        file_name = self.folder / f"{slug}_{uid}.json"
+        with open(file_name, "w", encoding=ENCODING) as f:
+            f.write(data)
+
+        return data_dict
+
+    @beartype
+    def delete(self, url: str):
+        """Simulates an HTTP DELETE request to the local filesystem."""
+        uid = _get_uid_from_url(url)
+        os.remove(self.database_by_uid[uid])
