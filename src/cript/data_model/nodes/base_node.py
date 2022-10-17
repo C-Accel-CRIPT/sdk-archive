@@ -150,16 +150,17 @@ class BaseNode(Base, abc.ABC):
 
     @classmethod
     @beartype
-    def get(cls, level: int = 0, get_level: int = 0, **kwargs):
+    def get(cls, get_level: int = 0, **kwargs):
         """
         Get the JSON for a node and use it to generate a local node object.
 
-        :param level: Current nested node level.
         :param get_level: Level to recursively get nested nodes.
         :param **kwargs: Query parameters.
         :return: The generated node object.
         :rtype: cript.data_model.nodes.BaseNode
         """
+        level = kwargs.pop("level", 0)
+
         if len(kwargs) == 0:
             raise AttributeError(f"Query arguments must be provided.")
 
@@ -184,7 +185,7 @@ class BaseNode(Base, abc.ABC):
             return local_node
         else:
             node = create_node(cls, obj_json)
-            node._generate_nested_nodes(level=level, get_level=get_level)
+            node._generate_nested_nodes(get_level=get_level, level=level)
             return node
 
     @classmethod

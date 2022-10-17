@@ -54,7 +54,7 @@ class Base(abc.ABC):
     def _remove_node(self, node, attr):
         ...
 
-    def _generate_nested_nodes(self, level: int = 0, get_level: int = 1):
+    def _generate_nested_nodes(self, get_level: int = 0, level: int = 0):
         """
         Generate nested node objects within a given node.
 
@@ -86,7 +86,7 @@ class Base(abc.ABC):
                     node_class = get_data_model_class(key)
                     try:
                         node_dict[key] = node_class.get(
-                            url=value, level=level, get_level=get_level
+                            url=value, get_level=get_level, level=level
                         )
                     except APIError:
                         # Leave the URL if node is not viewable
@@ -97,7 +97,7 @@ class Base(abc.ABC):
                 subobject_class = get_data_model_class(key)
                 subobject = subobject_class(**value)
                 node_dict[key] = subobject
-                subobject._generate_nested_nodes(level=level, get_level=get_level)
+                subobject._generate_nested_nodes(get_level=get_level, level=level)
 
             # Define Paginator attributes
             elif isinstance(value, Paginator):
@@ -122,7 +122,7 @@ class Base(abc.ABC):
                             node_class = get_data_model_class(key)
                             try:
                                 value[i] = node_class.get(
-                                    url=value[i], level=level, get_level=get_level
+                                    url=value[i], get_level=get_level, level=level
                                 )
                             except APIError:
                                 # Leave the URL if node is not viewable
@@ -134,5 +134,5 @@ class Base(abc.ABC):
                         subobject = node_class(**value[i])
                         value[i] = subobject
                         subobject._generate_nested_nodes(
-                            level=level, get_level=get_level
+                            get_level=get_level, level=level
                         )
