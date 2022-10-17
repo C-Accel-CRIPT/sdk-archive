@@ -78,7 +78,7 @@ class File(BaseNode):
         self._source = value
 
     @beartype
-    def save(self, max_level: int = 0, update_existing: bool = False, api=None):
+    def save(self, max_level: int = 0, update_existing: bool = False):
         api = get_cached_api_session(self.url)
 
         if api.host == "localhost":
@@ -100,7 +100,7 @@ class File(BaseNode):
                 if unique_url and update_existing == True:
                     # Update existing unique node
                     self.url = unique_url
-                    self.save(max_level=max_level, api=api)
+                    self.save(max_level=max_level)
                     return
                 else:
                     raise UniqueNodeError(response["errors"][0])

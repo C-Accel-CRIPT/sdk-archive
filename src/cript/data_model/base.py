@@ -86,7 +86,7 @@ class Base(abc.ABC):
                     node_class = get_data_model_class(key)
                     try:
                         node_dict[key] = node_class.get(
-                            value, level=level, max_level=max_level
+                            url=value, level=level, max_level=max_level
                         )
                     except APIError:
                         # Leave the URL if node is not viewable
@@ -122,7 +122,7 @@ class Base(abc.ABC):
                             node_class = get_data_model_class(key)
                             try:
                                 value[i] = node_class.get(
-                                    value[i], level=level, max_level=max_level
+                                    url=value[i], level=level, max_level=max_level
                                 )
                             except APIError:
                                 # Leave the URL if node is not viewable

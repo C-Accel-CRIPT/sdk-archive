@@ -12,7 +12,6 @@ from cript.data_model.paginator import Paginator
 from cript.cache import cache_node
 from cript.cache import get_cached_api_session
 from cript.cache import get_cached_node
-from cript.utils import is_valid_uid
 from cript.data_model.utils import set_node_attributes
 from cript.data_model.utils import create_node
 from cript.data_model.exceptions import UniqueNodeError
@@ -46,7 +45,7 @@ class BaseNode(Base, abc.ABC):
         cache_node(self)
 
     @beartype
-    def save(self, max_level: int = 0, update_existing: bool = False, api=None):
+    def save(self, max_level: int = 0, update_existing: bool = False):
         """
         Create or update a node in the database.
 
@@ -56,9 +55,7 @@ class BaseNode(Base, abc.ABC):
         """
         api = get_cached_api_session(self.url)
 
-        if api.host == "localhost":
-            response = api.save_file(self)
-        elif self.url:
+        if self.url:
             # Update an existing object via PUT
             response = api.put(self.url, data=self._to_json())
         else:
@@ -75,7 +72,7 @@ class BaseNode(Base, abc.ABC):
                 if unique_url and update_existing == True:
                     # Update existing unique node
                     self.url = unique_url
-                    self.save(max_level=max_level, api=api)
+                    self.save(max_level=max_level)
                     return
                 else:
                     raise UniqueNodeError(response["errors"][0])
@@ -122,9 +119,10 @@ class BaseNode(Base, abc.ABC):
     @beartype
     def update(self, max_level: int = 0, **kwargs):
         """
-        Update and and immediately save a node.
+        Updates and immediately saves a node.
 
         :param max_level: Max depth to recursively generate nested nodes.
+        :param **kwargs: Arguments to update the node.
         """
         if self.url is None:
             raise ValueError(
@@ -136,52 +134,41 @@ class BaseNode(Base, abc.ABC):
 
     @classmethod
     @beartype
-    def create(
-        cls, max_level: int = 0, update_existing: bool = False, api=None, **kwargs
-    ):
+    def create(cls, max_level: int = 0, update_existing: bool = False, **kwargs):
         """
         Immediately creates a node.
 
         :param max_level: Max depth to recursively generate nested nodes.
         :param update_existing: Indicates whether to update an existing node with the same unique fields.
+        :param **kwargs: Arguments for the constructor.
+        :return: The created node.
+        :rtype: cript.data_model.nodes.BaseNode
         """
         node = cls(**kwargs)
-        node.save(max_level=max_level, update_existing=update_existing, api=api)
+        node.save(max_level=max_level, update_existing=update_existing)
         return node
 
     @classmethod
     @beartype
-    def get(cls, query: Union[str, dict], level: int = 0, max_level: int = 0):
+    def get(cls, level: int = 0, max_level: int = 0, **kwargs):
         """
         Get the JSON for a node and use it to generate a local node object.
 
-        :param query: The node's URL, UID, or a query.
         :param level: Current nested node level.
         :param max_level: Max depth to recursively generate nested nodes.
+        :param **kwargs: Query parameters.
         :return: The generated node object.
-        :rtype: cript.nodes.BaseNode
+        :rtype: cript.data_model.nodes.BaseNode
         """
-        if isinstance(query, str):
-            if is_valid_uid(query):
-                api = get_cached_api_session()
-                # Get node with UID
-                if api.host == "localhost":
-                    obj_json = api.get_file(query)
-                else:
-                    query = f"{api.url}/{cls.slug}/{query}/"
-                    obj_json = api.get(query)
-            else:
-                # Get node with a URL
-                api = get_cached_api_session(query)
-                host = urlparse(query).netloc
-                if host != api.host:
-                    raise ValueError("Invalid URL")
-                obj_json = api.get(query)
+        if len(kwargs) == 0:
+            raise AttributeError(f"Query arguments must be provided.")
 
-        # Get node with a search query
-        elif isinstance(query, dict):
-            api = get_cached_api_session()
-            results = cls.search(query=query)
+        api = get_cached_api_session()
+
+        if "url" in kwargs:
+            obj_json = api.get(kwargs["url"])
+        else:
+            results = cls.search(**kwargs)
             count = results.count()
             if count < 1:
                 raise ValueError("Your query did not match any existing nodes.")
@@ -189,9 +176,6 @@ class BaseNode(Base, abc.ABC):
                 raise ValueError("Your query matched more than one node.")
             else:
                 obj_json = results.json()[0]
-
-        else:
-            raise TypeError("Please enter a valid node URL, UID or search query.")
 
         # Return the local node object if it already exists
         # Otherwise, create a new node
@@ -207,36 +191,35 @@ class BaseNode(Base, abc.ABC):
     @beartype
     def search(
         cls,
-        query: dict,
         limit: Union[int, None] = None,
         offset: Union[int, None] = None,
         max_level: int = 0,
+        **kwargs,
     ):
         """
         Send a query to the API and display the results.
 
-        :param query: A dictionary defining the query parameters (e.g., {"name": "NewMaterial"}).
         :param limit: The max number of items to return.
         :param offset: The starting position of the query.
         :param max_level: Max depth to recursively generate nested nodes.
+        :param **kwargs: Query parameters.
         :return: A `Paginator` object.
-        :rtype: cript.paginator.Paginator
+        :rtype: cript.data_model.paginator.Paginator
         """
-        if not isinstance(query, dict):
-            raise TypeError(f"Query must be a dict, not {type(query)}")
+        if len(kwargs) == 0:
+            raise AttributeError(f"Query arguments must be provided.")
 
-        if isinstance(query, dict):
-            api = get_cached_api_session()
-            url = f"{api.search_url}/{cls.slug}/"
-            payload = json.dumps(query)
-            return Paginator(
-                url=url,
-                node_name=cls.node_name,
-                limit=limit,
-                offset=offset,
-                max_level=max_level,
-                payload=payload,
-            )
+        api = get_cached_api_session()
+        url = f"{api.search_url}/{cls.slug}/"
+        payload = json.dumps(kwargs)
+        return Paginator(
+            url=url,
+            node_name=cls.node_name,
+            limit=limit,
+            offset=offset,
+            max_level=max_level,
+            payload=payload,
+        )
 
     def _to_json(self):
         node_dict = copy.deepcopy(self._clean_dict())
