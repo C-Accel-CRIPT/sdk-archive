@@ -7,7 +7,7 @@ from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.collection import Collection
 from cript.data_model.nodes.material import Material
-from cript.utils import auto_assign_group
+from cript.data_model.utils import auto_assign_group
 
 
 logger = getLogger(__name__)

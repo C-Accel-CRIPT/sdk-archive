@@ -18,7 +18,7 @@ class Condition(BaseSubobject):
     """
 
     node_name = "Condition"
-    list_name = "conditions"
+    alt_names = ["conditions"]
 
     @beartype
     def __init__(

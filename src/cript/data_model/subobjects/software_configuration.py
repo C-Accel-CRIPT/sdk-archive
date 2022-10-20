@@ -19,7 +19,7 @@ class SoftwareConfiguration(BaseSubobject):
     """
 
     node_name = "SoftwareConfiguration"
-    list_name = "software_configurations"
+    alt_names = ["software_configurations"]
 
     @beartype
     def __init__(

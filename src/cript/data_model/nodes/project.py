@@ -5,7 +5,8 @@ from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
-from cript.paginator import Paginator
+from cript.data_model.paginator import Paginator
+from cript.cache import get_cached_api_session
 
 logger = getLogger(__name__)
 
@@ -44,7 +45,8 @@ class Project(BaseNode):
 
     @collections.setter
     def collections(self, value):
-        self._collections = Paginator(url=value)
+        if value:
+            self._collections = Paginator(url=value, node_name="Collection")
 
     @property
     def materials(self):
@@ -52,7 +54,8 @@ class Project(BaseNode):
 
     @materials.setter
     def materials(self, value):
-        self._materials = Paginator(url=value)
+        if value:
+            self._materials = Paginator(url=value, node_name="Material")
 
     @property
     def files(self):
@@ -60,4 +63,5 @@ class Project(BaseNode):
 
     @files.setter
     def files(self, value):
-        self._files = Paginator(url=value)
+        if value:
+            self._files = Paginator(url=value, node_name="File")

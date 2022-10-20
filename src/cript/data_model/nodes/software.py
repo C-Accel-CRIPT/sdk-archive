@@ -18,7 +18,7 @@ class Software(BaseNode):
 
     node_name = "Software"
     slug = "software"
-    list_name = "software"
+    alt_names = ["software"]
 
     @beartype
     def __init__(

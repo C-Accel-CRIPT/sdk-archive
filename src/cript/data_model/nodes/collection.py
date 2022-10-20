@@ -7,8 +7,9 @@ from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.project import Project
 from cript.data_model.subobjects.citation import Citation
-from cript.utils import auto_assign_group
-from cript.paginator import Paginator
+from cript.data_model.utils import auto_assign_group
+from cript.data_model.paginator import Paginator
+from cript.cache import get_cached_api_session
 
 
 logger = getLogger(__name__)
@@ -22,7 +23,7 @@ class Collection(BaseNode):
 
     node_name = "Collection"
     slug = "collection"
-    list_name = "collections"
+    alt_names = ["collections"]
 
     @beartype
     def __init__(
@@ -51,7 +52,8 @@ class Collection(BaseNode):
 
     @experiments.setter
     def experiments(self, value):
-        self._experiments = Paginator(url=value)
+        if value:
+            self._experiments = Paginator(url=value, node_name="Experiment")
 
     @property
     def inventories(self):
@@ -59,7 +61,8 @@ class Collection(BaseNode):
 
     @inventories.setter
     def inventories(self, value):
-        self._inventories = Paginator(url=value)
+        if value:
+            self._inventories = Paginator(url=value, node_name="Inventory")
 
     @beartype
     def add_citation(self, citation: Union[Citation, dict]):

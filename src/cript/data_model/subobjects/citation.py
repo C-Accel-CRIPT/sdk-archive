@@ -17,7 +17,7 @@ class Citation(BaseSubobject):
     """
 
     node_name = "Citation"
-    list_name = "citations"
+    alt_names = ["citations"]
 
     @beartype
     def __init__(

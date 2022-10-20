@@ -12,7 +12,7 @@ from cript.data_model.subobjects.equipment import Equipment
 from cript.data_model.subobjects.property import Property
 from cript.data_model.subobjects.condition import Condition
 from cript.data_model.subobjects.citation import Citation
-from cript.utils import auto_assign_group
+from cript.data_model.utils import auto_assign_group
 
 
 logger = getLogger(__name__)
@@ -26,7 +26,7 @@ class Process(BaseNode):
 
     node_name = "Process"
     slug = "process"
-    list_name = "processes"
+    alt_names = ["processes", "prerequisite_processes", "sample_preparation"]
 
     @beartype
     def __init__(

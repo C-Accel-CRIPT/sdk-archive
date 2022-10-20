@@ -16,7 +16,7 @@ class Identifier(BaseSubobject):
     """
 
     node_name = "Identifier"
-    list_name = "identifiers"
+    alt_names = ["identifiers"]
 
     @beartype
     def __init__(self, key: str, value: Union[str, int, float, list]):

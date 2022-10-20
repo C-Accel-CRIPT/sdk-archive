@@ -18,7 +18,7 @@ class Ingredient(BaseSubobject):
     """
 
     node_name = "Ingredient"
-    list_name = "ingredients"
+    alt_names = ["ingredients"]
 
     @beartype
     def __init__(
