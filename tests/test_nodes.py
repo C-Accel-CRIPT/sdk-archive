@@ -270,8 +270,8 @@ def test_create_data_node(criptapp_api):
 
 
 def test_create_file_node_and_upload(criptapp_api):
-    with mock.patch.object(cript.API, "save", new=lambda *args: None):
+    with mock.patch.object(cript.File, "save", new=lambda *args: None):
         with NamedTemporaryFile(suffix=".csv") as tmp:
-            proj = criptapp_api.get(cript.Project, {"name": MY_PROJECT})
+            proj = cript.Project.get(name=MY_PROJECT)
             f = cript.File(project=proj, source=tmp.name)
-            criptapp_api.save(f)
+            f.save()
