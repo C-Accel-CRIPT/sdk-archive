@@ -17,6 +17,8 @@ from cript.api.utils import convert_to_api_url
 from cript.storage_clients import GlobusClient
 from cript.storage_clients import AmazonS3Client
 from cript.api.exceptions import APIError
+from cript.api.exceptions import _display_errors
+from cript.api.exceptions import UniqueNodeError
 
 
 logger = getLogger(__name__)
@@ -117,10 +119,22 @@ class API(APIBase):
         response = self.session.put(url=url, data=data)
         if response.status_code != 200:
             try:
-                error = json.loads(response.content)
+                # Check if a duplicate error was returned
+                response_dict = json.loads(response.content)
+                if "duplicate" in response_dict:
+                    duplicate_url = response_dict.pop("duplicate")
+                    if duplicate_url is not None:
+                        # Update existing duplicate node
+                        self.url = duplicate_url
+                        self.save()
+                        return
+                    else:
+                        response_content = json.dumps(response_dict)
+                        raise UniqueNodeError(_display_errors(response_content))
             except json.decoder.JSONDecodeError:
                 error = f"Server error {response.status_code}"
-            raise APIError(error)
+                raise APIError(error)
+
         return json.loads(response.content)
 
     @beartype
