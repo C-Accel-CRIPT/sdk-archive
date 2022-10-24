@@ -115,7 +115,7 @@ class API(APIBase):
         """Performs an HTTP PUT request and handles errors."""
         url = convert_to_api_url(url)
         response = self.session.put(url=url, data=data)
-        if response.status_code != 200:
+        if response.status_code not in valid_codes:
             try:
                 error = json.loads(response.content)
             except json.decoder.JSONDecodeError:
