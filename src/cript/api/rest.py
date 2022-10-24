@@ -17,8 +17,6 @@ from cript.api.utils import convert_to_api_url
 from cript.storage_clients import GlobusClient
 from cript.storage_clients import AmazonS3Client
 from cript.api.exceptions import APIError
-from cript.api.exceptions import _display_errors
-from cript.api.exceptions import UniqueNodeError
 
 
 logger = getLogger(__name__)
