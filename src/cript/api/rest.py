@@ -113,28 +113,16 @@ class API(APIBase):
         return json.loads(response.content)
 
     @beartype
-    def put(self, url: str, data: str = None):
+    def put(self, url: str, data: str = None,valid_codes: list = [200]):
         """Performs an HTTP PUT request and handles errors."""
         url = convert_to_api_url(url)
         response = self.session.put(url=url, data=data)
         if response.status_code != 200:
             try:
-                # Check if a duplicate error was returned
-                response_dict = json.loads(response.content)
-                if "duplicate" in response_dict:
-                    duplicate_url = response_dict.pop("duplicate")
-                    if duplicate_url is not None:
-                        # Update existing duplicate node
-                        self.url = duplicate_url
-                        self.save()
-                        return
-                    else:
-                        response_content = json.dumps(response_dict)
-                        raise UniqueNodeError(_display_errors(response_content))
+                error = json.loads(response.content)
             except json.decoder.JSONDecodeError:
                 error = f"Server error {response.status_code}"
-                raise APIError(error)
-
+            raise APIError(error)
         return json.loads(response.content)
 
     @beartype
