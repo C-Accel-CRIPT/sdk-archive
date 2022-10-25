@@ -23,16 +23,15 @@ logger = getLogger(__name__)
 
 
 class API(APIBase):
-    """The entry point for interacting with the CRIPT API."""
+    """
+    The entry point for interacting with the CRIPT REST API.
+
+    :param host: The hostname of the relevant CRIPT instance. (e.g., criptapp.org)
+    :param token: The API token used for authentication.
+    :param tls: Indicates whether to use TLS encryption for the API connection.
+    """
 
     def __init__(self, host: str = None, token: str = None, tls: bool = True):
-        """
-        Establishes a session with a CRIPT API endpoint.
-
-        :param host: The hostname of the relevant CRIPT instance. (e.g., criptapp.org)
-        :param token: The API token used for authentication.
-        :param tls: Indicates whether to use TLS encryption for the API connection.
-        """
         if host is None:
             host = input("Host: ")
         if token is None:

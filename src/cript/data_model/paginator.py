@@ -18,6 +18,13 @@ from cript.api.exceptions import APIError
 class Paginator:
     """
     Paginator for object lists and raw JSON.
+
+    :param url: Query URL
+    :param node_name: Name of the relevant node
+    :param payload: POST request payload
+    :param limit: The max number of items per page.
+    :param offset: The starting position of the paginator.
+    :param get_level: Level to recursively get nested nodes.
     """
 
     @beartype
@@ -30,16 +37,6 @@ class Paginator:
         offset: Union[int, None] = None,
         get_level: int = 0,
     ):
-        """
-        Initializes a Paginator object.
-
-        :param url: Query URL
-        :param node_name: Name of the relevant node
-        :param payload: POST request payload
-        :param limit: The max number of items per page.
-        :param offset: The starting position of the paginator.
-        :param get_level: Level to recursively get nested nodes.
-        """
         self.url = url
         self.api = get_cached_api_session(url)
         self.node_class = get_data_model_class(node_name)

@@ -22,14 +22,41 @@ plugins:
                     docstring_style: sphinx
                 options:
                     show_bases: false
+                    show_source: false
+
+options:
+    show_source: false
 
 nav:
     - Home: index.md
     - Quickstart: quickstart.md
     - Tutorial: tutorial.md
-    - Data Model:
-        - Nodes: data_model/nodes.md
-        - Subobjects: data_model/subobjects.md
+    - Nodes:
+        - Project: nodes/project.md
+        - Collection: nodes/collection.md
+        - Material: nodes/material.md
+        - File: nodes/file.md
+        - Experiment: nodes/experiment.md
+        - Inventory: nodes/inventory.md
+        - Process: nodes/process.md
+        - ComputationalProcess: nodes/computational_process.md
+        - Computation: nodes/computation.md
+        - Data: nodes/data.md
+        - Reference: nodes/reference.md
+        - Software: nodes/software.md
+        - User: nodes/user.md
+        - Group: nodes/group.md
+    - Subobjects:
+        - Property: subobjects/property.md
+        - Condition: subobjects/condition.md
+        - Identifier: subobjects/identifier.md
+        - Ingredient: subobjects/ingredient.md
+        - Quantity: subobjects/quantity.md
+        - Equipment: subobjects/equipment.md
+        - SoftwareConfiguration: subobjects/software_configuration.md
+        - Algorithm: subobjects/algorithm.md
+        - Parameter: subobjects/parameter.md
+        - Citation: subobjects/citation.md
     - API: api.md
     - Paginator: paginator.md
     - Exceptions: exceptions.md

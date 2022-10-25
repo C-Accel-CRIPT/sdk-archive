@@ -1,6 +1,5 @@
 import os
 import shutil
-import re
 import json
 import pathlib
 import glob
@@ -10,18 +9,14 @@ from typing import Union
 from logging import getLogger
 
 from beartype import beartype
-from beartype.typing import Type
 
 from cript import DATA_MODEL_NAMES
 from cript.api.base import APIBase
 from cript.api.exceptions import APIError
 from cript.cache import api_session_cache
-from cript.data_model.base import Base
-from cript.data_model.nodes.base_node import BaseNode
-from cript.data_model.nodes.file import File
-from cript.data_model.subobjects.base_subobject import BaseSubobject
 from cript.utils import is_valid_uid
 from cript.api.utils import get_slug_from_url
+
 
 logger = getLogger(__name__)
 
@@ -113,16 +108,17 @@ def move_copy_file(
 
 
 class APILocal(APIBase):
-    """The entry point for interacting with a local CRIPT API."""
+    """
+    The entry point for interacting with your local filesystem.
+
+    :param folder: Path to a folder on your local filesystem.
+    """
 
     def __init__(
         self,
         folder: Union[str, pathlib.Path],
         data_folder: Union[str, pathlib.Path] = None,
     ):
-        """
-        Establishes a session with a local CRIPT API.
-        """
         self.url = "http://localhost/api"
         self.host = "localhost"
         # database folder
