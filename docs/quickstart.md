@@ -17,7 +17,7 @@ import cript
 
 host = "<endpoint_hostname>"  # e.g., criptapp.org
 token = "<your_api_token>"
-api = cript.API(host, token)
+cript.API(host, token)
 ```
 !!! note
     Your API token can be found in the UI under Account Settings.
@@ -29,96 +29,94 @@ api = cript.API(host, token)
 ## Create a node
 For example, create a Project:
 ``` py
-project = cript.Project(name="MyProject")
-api.save(project)
+proj = cript.Project(name="MyProject")
+proj.save()
 ```
 ... then a Collection:
 ``` py
-collection = cript.Collection(project=project, name="MyCollection")
-api.save(collection)
+coll = cript.Collection.create(project=proj, name="MyCollection")
 ```
 !!! note
-    By default, all nodes are private. You can make them public with the `public=True` argument.
+    Notice the use of `create()` here, which instantiates and saves the object in one go.
 
 ## Update a node
-For example, update the Collection node created above:
+For example, update the Project node created above:
 ``` py
-collection.name = "OurCollection"
-api.save(collection)
+proj.name = "OurProject"
+proj.save()
 ```
+... then the Collection:
+```python
+coll.update(name="OurCollection")
+```
+!!! note
+    Notice the use of `update()` here, which updates and saves a node in one go.
 
 ## Delete a node
 For example, delete the Collection node created above:
 ``` py
-api.delete(collection)
+coll.delete()
 ```
 
 ## Get an existing node
 For example, get the official CRIPT Project node:
 ``` py
-project = api.get(cript.Project, {"name": "CRIPT"})
+proj = cript.Project.get(name="CRIPT")
 ```
-... then get the official styrene Material node via CAS number:
+... then get the official styrene Material node via name:
 ``` py
-query = {
-    "project": project.uid,
-    "identifiers": [
-        {
-            "key": "cas",
-            "value": "100-42-5"
-        }
-    ]
-}
-styrene =  api.get(cript.Material, query)
+styrene =  cript.Material.get(project=proj.uid, name="Styrene")
 ```
-... or get it via URL:
+... or via UID
 ``` py
-url = "https://criptapp.org/api/material/8edbde8a-edce-4ad8-bf52-bd1ef81ba399/"
-styrene =  api.get(url)
+styrene =  cript.Material.get(uid="<material_uid>")
+```
+... or via URL
+```python
+styrene =  cript.Material.get(url="<material_url>")
 ```
 
 
 ## Run a search query
 For example, search for Material nodes with a molar mass less than 10 g/mol:
 ``` py
-query = {
-    "properties": [
+res =  cript.Material.search(
+    properties = [
         {
             "key": "molar_mass",
             "value__lt": 10,
             "unit": "g/mol"
         }
     ]
-}
-results =  api.search(cript.Material, query)
+)
 ```
 
 ... then paginate through the results.
 ``` py
-results.json()              # View the raw JSON for the query
-results.objects()           # Generate objects for the current page
-results.next_page()         # Flip to the next page
-results.previous_page()     # Flip to the previous page
+res.json()              # View the raw JSON for the query
+res.objects()           # Generate objects for the current page
+res.next_page()         # Flip to the next page
+res.previous_page()     # Flip to the previous page
 ```
 
 ## Upload a file
 First, you'll need a Project and Data node:
 ``` py
-project = api.get("<project_url>")
-data = api.get("<data_url>")
+proj = cript.Project.get(uid="<project_uid>")
+data = cript.Data.get(uid="<data_uid>")
 ```
 Next, create a File node that points to your local file:
 ``` py
 path = "path/to/local/file"
-f = cript.File(project=project, data=[data], source=path)
-api.save(file)
+f = cript.File(project=proj, source=path)
+file.save()
 ```
 
 ## Download a file
 For example, download the file you uploaded above.
 ``` py
 path = "path/to/local/file"
-api.download_file(f, path=path)
+f.download_file(path=path)
 ```
 !!! note
     The default path for a download is your current directory.
