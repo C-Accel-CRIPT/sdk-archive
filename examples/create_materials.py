@@ -18,17 +18,28 @@ def define_materials(project: c.Project) -> list[c.Material]:
         properties=[
             c.Property(key="phase", value="liquid"),
             c.Property(key="color", value="colorless"),
-            c.Property(key="molar_mass", value=18.015, unit="g/mol", method="prescribed"),
-            c.Property(key="density", value=1.0, unit="g/ml",
-                       conditions=[c.Condition(key="temperature", value=4, unit="degC")]
-                       ),
-            c.Property(key="+temp_boiling", value=100, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="atm")]
-                       ),
-            c.Property(key="temp_melt", value=0, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="bar")]
-                       )
-        ]
+            c.Property(
+                key="molar_mass", value=18.015, unit="g/mol", method="prescribed"
+            ),
+            c.Property(
+                key="density",
+                value=1.0,
+                unit="g/ml",
+                conditions=[c.Condition(key="temperature", value=4, unit="degC")],
+            ),
+            c.Property(
+                key="+temp_boiling",
+                value=100,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="atm")],
+            ),
+            c.Property(
+                key="temp_melt",
+                value=0,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="bar")],
+            ),
+        ],
     )
 
     dueterated_chloroform = c.Material(
@@ -37,7 +48,10 @@ def define_materials(project: c.Project) -> list[c.Material]:
         name="deuterated chloroform",
         identifiers=[
             c.Identifier("preferred_name", "deuterated chloroform"),
-            c.Identifier("names", ["chloroform-d", "deuterochloroform", "trichloro(deuterio)methane"]),
+            c.Identifier(
+                "names",
+                ["chloroform-d", "deuterochloroform", "trichloro(deuterio)methane"],
+            ),
             c.Identifier("cas", "865-49-6"),
             c.Identifier("smiles", "[2H]C(Cl)(Cl)Cl"),
             c.Identifier("chem_formula", "CDCl3"),
@@ -47,17 +61,28 @@ def define_materials(project: c.Project) -> list[c.Material]:
         properties=[
             c.Property(key="phase", value="liquid"),
             c.Property(key="color", value="colorless"),
-            c.Property(key="molar_mass", value=120.384, unit="g/mol", method="prescribed"),
-            c.Property(key="density", value=1.5, unit="g/ml",
-                       conditions=[c.Condition(key="temperature", value=25, unit="degC")]
-                       ),
-            c.Property(key="+temp_boiling", value=61, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="atm")]
-                       ),
-            c.Property(key="temp_melt", value=-64, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="bar")]
-                       )
-        ]
+            c.Property(
+                key="molar_mass", value=120.384, unit="g/mol", method="prescribed"
+            ),
+            c.Property(
+                key="density",
+                value=1.5,
+                unit="g/ml",
+                conditions=[c.Condition(key="temperature", value=25, unit="degC")],
+            ),
+            c.Property(
+                key="+temp_boiling",
+                value=61,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="atm")],
+            ),
+            c.Property(
+                key="temp_melt",
+                value=-64,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="bar")],
+            ),
+        ],
     )
 
     nitrogen = c.Material(
@@ -76,17 +101,28 @@ def define_materials(project: c.Project) -> list[c.Material]:
         properties=[
             c.Property(key="phase", value="gas"),
             c.Property(key="color", value="colorless"),
-            c.Property(key="molar_mass", value=28.014, unit="g/mol", method="prescribed"),
-            c.Property(key="density", value=1.25, unit="g/l",
-                       conditions=[c.Condition(key="temperature", value=4, unit="degC")]
-                       ),
-            c.Property(key="+temp_boiling", value=77.355, unit="K",
-                       conditions=[c.Condition(key="pressure", value=1, unit="atm")]
-                       ),
-            c.Property(key="temp_melt", value=63.23, unit="K",
-                       conditions=[c.Condition(key="pressure", value=1, unit="bar")]
-                       )
-        ]
+            c.Property(
+                key="molar_mass", value=28.014, unit="g/mol", method="prescribed"
+            ),
+            c.Property(
+                key="density",
+                value=1.25,
+                unit="g/l",
+                conditions=[c.Condition(key="temperature", value=4, unit="degC")],
+            ),
+            c.Property(
+                key="+temp_boiling",
+                value=77.355,
+                unit="K",
+                conditions=[c.Condition(key="pressure", value=1, unit="atm")],
+            ),
+            c.Property(
+                key="temp_melt",
+                value=63.23,
+                unit="K",
+                conditions=[c.Condition(key="pressure", value=1, unit="bar")],
+            ),
+        ],
     )
 
     argon = c.Material(
@@ -105,20 +141,31 @@ def define_materials(project: c.Project) -> list[c.Material]:
         properties=[
             c.Property(key="phase", value="gas"),
             c.Property(key="color", value="colorless"),
-            c.Property(key="molar_mass", value=39.95, unit="g/mol", method="prescribed"),
-            c.Property(key="density", value=1.784, unit="g/l",
-                       conditions=[
-                           c.Condition(key="temperature", value=0, unit="degC"),
-                           c.Condition(key="pressure", value=1, unit="bar")
-                       ]
-                       ),
-            c.Property(key="+temp_boiling", value=87.3, unit="K",
-                       conditions=[c.Condition(key="pressure", value=1, unit="atm")]
-                       ),
-            c.Property(key="temp_melt", value=83.81, unit="K",
-                       conditions=[c.Condition(key="pressure", value=1, unit="bar")]
-                       )
-        ]
+            c.Property(
+                key="molar_mass", value=39.95, unit="g/mol", method="prescribed"
+            ),
+            c.Property(
+                key="density",
+                value=1.784,
+                unit="g/l",
+                conditions=[
+                    c.Condition(key="temperature", value=0, unit="degC"),
+                    c.Condition(key="pressure", value=1, unit="bar"),
+                ],
+            ),
+            c.Property(
+                key="+temp_boiling",
+                value=87.3,
+                unit="K",
+                conditions=[c.Condition(key="pressure", value=1, unit="atm")],
+            ),
+            c.Property(
+                key="temp_melt",
+                value=83.81,
+                unit="K",
+                conditions=[c.Condition(key="pressure", value=1, unit="bar")],
+            ),
+        ],
     )
 
     styrene = c.Material(
@@ -137,19 +184,30 @@ def define_materials(project: c.Project) -> list[c.Material]:
         properties=[
             c.Property(key="phase", value="liquid"),
             c.Property(key="color", value="colorless"),
-            c.Property(key="molar_mass", value=104.15, unit="g/mol", method="prescribed"),
-            c.Property(key="density", value=0.906, unit="g/ml",
-                       conditions=[c.Condition(key="temperature", value=25, unit="degC")]
-                       ),
-            c.Property(key="+temp_boiling", value=145, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="atm")]
-                       ),
-            c.Property(key="temp_melt", value=-30, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="bar")]
-                       )
+            c.Property(
+                key="molar_mass", value=104.15, unit="g/mol", method="prescribed"
+            ),
+            c.Property(
+                key="density",
+                value=0.906,
+                unit="g/ml",
+                conditions=[c.Condition(key="temperature", value=25, unit="degC")],
+            ),
+            c.Property(
+                key="+temp_boiling",
+                value=145,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="atm")],
+            ),
+            c.Property(
+                key="temp_melt",
+                value=-30,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="bar")],
+            ),
         ],
         keywords=["styrene"],
-        notes=""
+        notes="",
     )
 
     toluene = c.Material(
@@ -168,23 +226,37 @@ def define_materials(project: c.Project) -> list[c.Material]:
         properties=[
             c.Property(key="phase", value="liquid"),
             c.Property(key="color", value="colorless"),
-            c.Property(key="molar_mass", value=92.141, unit="g/mol", method="prescribed"),
-            c.Property(key="density", value=0.87, unit="g/ml",
-                       conditions=[c.Condition(key="temperature", value=25, unit="degC")]
-                       ),
-            c.Property(key="+temp_boiling", value=111, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="atm")]
-                       ),
-            c.Property(key="temp_melt", value=-95, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="bar")]
-                       ),
-            c.Property(key="solubility", value=0.52, unit="g/L",
-                       conditions=[
-                           c.Condition(key="temperature", value=20, unit="degC"),
-                           #c.Condition(key="temperature", value=water),
-                       ]
-                       )
-        ]
+            c.Property(
+                key="molar_mass", value=92.141, unit="g/mol", method="prescribed"
+            ),
+            c.Property(
+                key="density",
+                value=0.87,
+                unit="g/ml",
+                conditions=[c.Condition(key="temperature", value=25, unit="degC")],
+            ),
+            c.Property(
+                key="+temp_boiling",
+                value=111,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="atm")],
+            ),
+            c.Property(
+                key="temp_melt",
+                value=-95,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="bar")],
+            ),
+            c.Property(
+                key="solubility",
+                value=0.52,
+                unit="g/L",
+                conditions=[
+                    c.Condition(key="temperature", value=20, unit="degC"),
+                    # c.Condition(key="temperature", value=water),
+                ],
+            ),
+        ],
     )
 
     thf = c.Material(
@@ -193,8 +265,17 @@ def define_materials(project: c.Project) -> list[c.Material]:
         name="thf",
         identifiers=[
             c.Identifier("preferred_name", "tetrahydrofuran"),
-            c.Identifier("names", ["oxolane", "1,4-epoxybutane", "oxacyclopentane", "THF", "butylene oxide",
-                                   "cyclotetramethylene oxide"]),
+            c.Identifier(
+                "names",
+                [
+                    "oxolane",
+                    "1,4-epoxybutane",
+                    "oxacyclopentane",
+                    "THF",
+                    "butylene oxide",
+                    "cyclotetramethylene oxide",
+                ],
+            ),
             c.Identifier("cas", "109-99-9"),
             c.Identifier("smiles", "C1CCOC1"),
             c.Identifier("chem_formula", "C4H8O"),
@@ -204,23 +285,37 @@ def define_materials(project: c.Project) -> list[c.Material]:
         properties=[
             c.Property(key="phase", value="liquid"),
             c.Property(key="color", value="colorless"),
-            c.Property(key="molar_mass", value=72.107, unit="g/mol", method="prescribed"),
-            c.Property(key="density", value=0.8876, unit="g/ml",
-                       conditions=[c.Condition(key="temperature", value=20, unit="degC")]
-                       ),
-            c.Property(key="+temp_boiling", value=66, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="atm")]
-                       ),
-            c.Property(key="temp_melt", value=-108, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="bar")]
-                       ),
-            c.Property(key="+solubility", value=-1, unit="g/ml",
-                       conditions=[
-                           c.Condition(key="temperature", value=20, unit="degC"),
-                           c.Condition(key="+solvent", material=water),
-                       ]
-                       )
-        ]
+            c.Property(
+                key="molar_mass", value=72.107, unit="g/mol", method="prescribed"
+            ),
+            c.Property(
+                key="density",
+                value=0.8876,
+                unit="g/ml",
+                conditions=[c.Condition(key="temperature", value=20, unit="degC")],
+            ),
+            c.Property(
+                key="+temp_boiling",
+                value=66,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="atm")],
+            ),
+            c.Property(
+                key="temp_melt",
+                value=-108,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="bar")],
+            ),
+            c.Property(
+                key="+solubility",
+                value=-1,
+                unit="g/ml",
+                conditions=[
+                    c.Condition(key="temperature", value=20, unit="degC"),
+                    c.Condition(key="+solvent", material=water),
+                ],
+            ),
+        ],
     )
 
     butanol = c.Material(
@@ -229,7 +324,9 @@ def define_materials(project: c.Project) -> list[c.Material]:
         name="nbutanol",
         identifiers=[
             c.Identifier("preferred_name", "1-butanol"),
-            c.Identifier("names", ["n-butanol", "n-butyl alcohol", "1-butyl alcohol", "nBuOH"]),
+            c.Identifier(
+                "names", ["n-butanol", "n-butyl alcohol", "1-butyl alcohol", "nBuOH"]
+            ),
             c.Identifier("cas", "71-36-3"),
             c.Identifier("smiles", "OCCCC"),
             c.Identifier("chem_formula", "C4H10O"),
@@ -239,17 +336,28 @@ def define_materials(project: c.Project) -> list[c.Material]:
         properties=[
             c.Property(key="phase", value="liquid"),
             c.Property(key="color", value="colorless"),
-            c.Property(key="molar_mass", value=74.123, unit="g/mol", method="prescribed"),
-            c.Property(key="density", value=0.81, unit="g/ml",
-                       conditions=[c.Condition(key="temperature", value=20, unit="degC")]
-                       ),
-            c.Property(key="+temp_boiling", value=117.7, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="atm")]
-                       ),
-            c.Property(key="temp_melt", value=-89.9, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="bar")]
-                       )
-        ]
+            c.Property(
+                key="molar_mass", value=74.123, unit="g/mol", method="prescribed"
+            ),
+            c.Property(
+                key="density",
+                value=0.81,
+                unit="g/ml",
+                conditions=[c.Condition(key="temperature", value=20, unit="degC")],
+            ),
+            c.Property(
+                key="+temp_boiling",
+                value=117.7,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="atm")],
+            ),
+            c.Property(
+                key="temp_melt",
+                value=-89.9,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="bar")],
+            ),
+        ],
     )
 
     methanol = c.Material(
@@ -269,16 +377,25 @@ def define_materials(project: c.Project) -> list[c.Material]:
             c.Property(key="phase", value="liquid"),
             c.Property(key="color", value="colorless"),
             c.Property(key="molar_mass", value=32.0, unit="g/mol", method="prescribed"),
-            c.Property(key="density", value=0.792, unit="g/ml",
-                       conditions=[c.Condition(key="temperature", value=20, unit="degC")]
-                       ),
-            c.Property(key="+temp_boiling", value=64.7, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="atm")]
-                       ),
-            c.Property(key="temp_melt", value=-97.6, unit="degC",
-                       conditions=[c.Condition(key="pressure", value=1, unit="bar")]
-                       )
-        ]
+            c.Property(
+                key="density",
+                value=0.792,
+                unit="g/ml",
+                conditions=[c.Condition(key="temperature", value=20, unit="degC")],
+            ),
+            c.Property(
+                key="+temp_boiling",
+                value=64.7,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="atm")],
+            ),
+            c.Property(
+                key="temp_melt",
+                value=-97.6,
+                unit="degC",
+                conditions=[c.Condition(key="pressure", value=1, unit="bar")],
+            ),
+        ],
     )
 
     secBuLi = c.Material(
@@ -287,7 +404,9 @@ def define_materials(project: c.Project) -> list[c.Material]:
         name="secBuLi",
         identifiers=[
             c.Identifier("preferred_name", "sec-butyllithium"),
-            c.Identifier("names", ["butan-2-yllithium", "sBuLi", "secBuLi", "s-butyllithium"]),
+            c.Identifier(
+                "names", ["butan-2-yllithium", "sBuLi", "secBuLi", "s-butyllithium"]
+            ),
             c.Identifier("cas", "598-30-1"),
             c.Identifier("smiles", "[Li]C(C)CC"),
             c.Identifier("chem_formula", "C4H9Li"),
@@ -295,8 +414,10 @@ def define_materials(project: c.Project) -> list[c.Material]:
             c.Identifier("inchi_key", "VATDYQWILMGLEW-UHFFFAOYSA-N"),
         ],
         properties=[
-            c.Property(key="molar_mass", value=64.06, unit="g/mol", method="prescribed"),
-        ]
+            c.Property(
+                key="molar_mass", value=64.06, unit="g/mol", method="prescribed"
+            ),
+        ],
     )
 
     secBuLi_solution = c.Material(
@@ -306,7 +427,9 @@ def define_materials(project: c.Project) -> list[c.Material]:
         components=[secBuLi, toluene],
         identifiers=[
             c.Identifier("preferred_name", "sec-butyllithium"),
-            c.Identifier("names", ["butan-2-yllithium", "sBuLi", "secBuLi", "s-butyllithium"]),
+            c.Identifier(
+                "names", ["butan-2-yllithium", "sBuLi", "secBuLi", "s-butyllithium"]
+            ),
             c.Identifier("cas", "598-30-1"),
             c.Identifier("smiles", "[Li]C(C)CC"),
             c.Identifier("chem_formula", "C4H9Li"),
@@ -315,15 +438,35 @@ def define_materials(project: c.Project) -> list[c.Material]:
         ],
         properties=[
             c.Property(key="phase", value="solution"),
-            c.Property(key="density", value=0.769, unit="g/ml",
-                       conditions=[c.Condition(key="pressure", value=1, unit="bar")]
-                       ),
-            c.Property(key="conc_molar", value=1.4, unit="M", components=[secBuLi], components_relative=[toluene])
-        ]
+            c.Property(
+                key="density",
+                value=0.769,
+                unit="g/ml",
+                conditions=[c.Condition(key="pressure", value=1, unit="bar")],
+            ),
+            c.Property(
+                key="conc_molar",
+                value=1.4,
+                unit="M",
+                components=[secBuLi],
+                components_relative=[toluene],
+            ),
+        ],
     )
 
-    return [water, dueterated_chloroform, nitrogen, argon, styrene, toluene, thf, butanol, methanol, secBuLi,
-            secBuLi_solution]
+    return [
+        water,
+        dueterated_chloroform,
+        nitrogen,
+        argon,
+        styrene,
+        toluene,
+        thf,
+        butanol,
+        methanol,
+        secBuLi,
+        secBuLi_solution,
+    ]
 
 
 def main2():

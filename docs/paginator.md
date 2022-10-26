@@ -1,1 +1,1 @@
-::: cript.paginator.Paginator
+::: cript.data_model.paginator.Paginator

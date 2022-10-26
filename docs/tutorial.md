@@ -6,7 +6,7 @@ import cript
 
 host = "criptapp.org"
 token = "<your_api_token>"  
-api = cript.API(host, token)
+cript.API(host, token)
 ```
 !!! note
     Your API token can be found in the UI under [Account Settings](https://criptapp.org/settings/).
@@ -14,8 +14,8 @@ api = cript.API(host, token)
 
 ### Create a Project node
 ``` py
-proj = cript.Project(name="MyProject")
-api.save(project)
+proj = cript.Project(name="<your_project_name>")
+proj.save()
 ```
 !!! note
     Project names are globally unique.
@@ -23,9 +23,10 @@ api.save(project)
 
 ### Create a Collection node
 ``` py
-coll = cript.Collection(project=proj, name="Tutorial")
-api.save(coll)
+coll = cript.Collection.create(project=proj, name="Tutorial")
 ```
+!!! note
+    Notice the use of `create()` here, which instantiates and saves the object in one go.
 
 ### Create an Experiment node
 ``` py
@@ -33,25 +34,24 @@ expt = cript.Experiment(
     collection=coll, 
     name="Anionic Polymerization of Styrene with SecBuLi"
 )
-api.save(expt)
+expt.save()
 ```
 
 ### Get Material nodes
 For this tutorial, we will get an existing Inventory node from the database.  
 This contains all of the Material nodes we will be using.
 ``` py
-url = "https://criptapp.org/api/inventory/134f2658-6245-42d8-a47e-6424aa3472b4/"
-inv = api.get(url)
+uid = "134f2658-6245-42d8-a47e-6424aa3472b4"
+inv = cript.Inventory.get(uid=uid, get_level=1)
 ```
+!!! note
+    We are setting `get_level` to `1` so that the Material nodes are auto-generated. This parameter defaults to `0`, but can be set to any integer.
 
 Notice that the Material node objects have been auto-generated.
 ``` py
 type(inv.materials[0])
-# <class 'cript.nodes.Material'>
+# <class 'cript.data_model.nodes.material.Material'>
 ```
-!!! note
-    By default, nested node generation occurs one level deep. You can modify this with the `max_level` argument.
-
 
 ### Create a Process node
 ``` py
@@ -65,7 +65,7 @@ prcs = cript.Process(
                   "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
                   "precipitation in methanol 3 times and dried under vacuum."
 )
-api.save(prcs)
+prcs.save()
 ```
 
 ### Add Ingredient nodes to the Process node
@@ -157,12 +157,10 @@ bigsmiles = cript.Identifier(
     value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
 )
 chem_repeat = cript.Identifier(key="chem_repeat", value="C8H8")
-cas = cript.Identifier(key="cas", value="100-42-5")
 
 polystyrene.add_identifier(names)
 polystyrene.add_identifier(chem_repeat)
 polystyrene.add_identifier(bigsmiles)
-polystyrene.add_identifier(cas)
 ```
 Next, we'll add some Property nodes.
 ``` py
@@ -174,29 +172,19 @@ polystyrene.add_property(color)
 ```
 Now we can save the Material and add it to the Process node as a product.
 ``` py
-api.save(polystyrene)
+polystyrene.save()
 prcs.add_product(polystyrene)
 ```
 Last, we can save the Process node.
 ``` py
-api.save(prcs)
-```
-
-### Create a Data node
-``` py
-sec = cript.Data(
-    experiment=expt, 
-    name="Crude SEC of polystyrene", 
-    type="sec_trace",
-)
-api.save(sec)
+prcs.save()
 ```
 
 ### Create a File node and upload a file
 First, we'll instantiate a File node and associate with the Data node created above.
 ``` py
 path = "path/to/local/file"
-f = cript.File(project=proj, data=[sec], source=path)
+f = cript.File(project=proj, source=path)
 ```
 !!! note
     The `source` field should point to a file on your local filesystem. 
@@ -206,6 +194,20 @@ f = cript.File(project=proj, data=[sec], source=path)
 Next, we'll upload the local file by saving the File node. Follow all prompts that appear.
 ``` py
 api.save(f)
+```
+
+### Create a Data node
+``` py
+sec = cript.Data(
+    experiment=expt, 
+    name="Crude SEC of polystyrene", 
+    type="sec_trace",
+)
+```
+.. then add the uploaded File to it:
+```python
+sec.add_file(f)
+sec.save()
 ```
 
 ### Associate a Data node with a Property node
@@ -220,7 +222,7 @@ mw_n.data = sec
 Last, we'll add the new Property node to polystyrene then save it.
 ``` py
 polystyrene.add_property(mw_n)
-api.save(polystyrene)
+polystyrene.save()
 ```
 
 ### Conclusion

@@ -5,9 +5,9 @@ from logging import getLogger
 import globus_sdk
 from globus_sdk.scopes import ScopeBuilder
 
-from cript.nodes.primary.file import File
-from cript.exceptions import APIFileUploadError
-from cript.exceptions import APIFileDownloadError
+from cript.data_model.nodes.base_node import BaseNode
+from cript.storage_clients.exceptions import FileUploadError
+from cript.storage_clients.exceptions import FileDownloadError
 
 
 logger = getLogger(__name__)
@@ -17,7 +17,7 @@ class GlobusClient:
     def __init__(self, api):
         self.api = api
         self.session = self.api.session
-        self.api_url = self.api.api_url
+        self.url = self.api.url
         self.endpoint_id = self.api.storage_info["endpoint_id"]
         self.native_client_id = self.api.storage_info["native_client_id"]
         self.storage_path = self.api.storage_info["path"]
@@ -25,7 +25,7 @@ class GlobusClient:
         self.tokens = None
         self.transfer_client = None
 
-    def https_download(self, node: File, path: str):
+    def https_download(self, node: BaseNode, path: str):
         """
         Download a file from a Globus endpoint.
 
@@ -57,7 +57,7 @@ class GlobusClient:
             f.write(response.content)
             f.close()
         else:
-            raise APIFileDownloadError
+            raise FileDownloadError
 
     def _stage_download(self, file_uid):
         """
@@ -69,10 +69,10 @@ class GlobusClient:
         """
         payload = {"file_uid": file_uid}
         response = self.session.post(
-            url=f"{self.api_url}/globus-stage-download/", data=json.dumps(payload)
+            url=f"{self.url}/globus-stage-download/", data=json.dumps(payload)
         )
         if response.status_code != 200:
-            raise APIFileDownloadError
+            raise FileDownloadError
         return json.loads(response.content)
 
     def https_upload(self, file_url, file_uid, node):
@@ -115,9 +115,9 @@ class GlobusClient:
             if error is None:
                 error = response.status_code
             node.url = file_url
-            self.api.delete(node)
+            node.delete()
             logger.info(f"Upload of file {file_uid} failed: {error}")
-            raise APIFileUploadError
+            raise FileUploadError
 
     def get_authorize_url(self):
         """
@@ -197,9 +197,9 @@ class GlobusClient:
         """
         payload = {"file_uid": file_uid, "file_checksum": file_checksum}
         response = self.session.post(
-            url=f"{self.api_url}/globus-stage-upload/",
+            url=f"{self.url}/globus-stage-upload/",
             data=json.dumps(payload),
         )
         if response.status_code != 200:
-            raise APIFileUploadError
+            raise FileUploadError
         return json.loads(response.content)["unique_file_name"]

@@ -1,61 +1,6 @@
-import re
 import hashlib
 import math
-import json
-from urllib.parse import urlparse
-
-
-def get_api_url(host: str, tls: bool = True):
-    """
-    Clean the hostname provided by the user and generate a URL.
-
-    :param host: Hostname of the CRIPT endpoint.
-    :param tls: Indicates whether to use TLS encryption for the API connection.
-    :return: The API URL that will be used to connect.
-    :rtype: str
-    """
-    host = re.sub("https://|http://", "", host).rstrip("/")
-    if tls:
-        protocol = "https"
-    else:
-        protocol = "http"
-    return f"{protocol}://{host}/api"
-
-
-def convert_to_api_url(url: str):
-    """
-    Convert a UI URL to an API URL.
-    e.g., https://criptapp.org/material/ --> https://criptapp.org/api/material/
-
-    :param url: The original UI URL that will be converted.
-    :return: The converted API URL.
-    :rtype: str
-    """
-    parsed_url = urlparse(url)
-    scheme = parsed_url.scheme
-    netloc = parsed_url.netloc
-    path = parsed_url.path
-
-    # Return original URL if in correct format
-    if path.startswith("/api/"):
-        return url
-
-    return f"{scheme}://{netloc}/api{path}"
-
-
-def auto_assign_group(group, parent):
-    """
-    Decide whether to inherit the group from a node's parent.
-    e.g., Experiment could inherit the group of it's parent Collection.
-
-    :param group: Current value of the node's group field.
-    :param parent: The parent node of the relevant node.
-    :return: The `Group` object that will be assigned to the node.
-    :rtype: cript.nodes.Group
-    """
-    if parent and not group:
-        return parent.group
-    return group
+import re
 
 
 def sha256_hash(file_path):
@@ -91,24 +36,14 @@ def convert_file_size(size_bytes):
     return f"{s} {size_name[i]}"
 
 
-def display_errors(response):
-    """
-    Prep errors sent from API for display.
-
-    :param response: The API error response.
-    :return: The error message as JSON.
-    :rtype: str
-    """
-    try:
-        response_dict = json.loads(response)
-    except json.decoder.JSONDecodeError:
-        return "Server error."
-
-    if "detail" in response_dict:
-        ret = response_dict["detail"]
-    elif "errors" in response_dict:
-        ret = response_dict["errors"]
-    else:
-        ret = response_dict
-
-    return json.dumps(ret, indent=4)
+def is_valid_uid(string: str) -> bool:
+    """Checks if a given string is a valid UID."""
+    return (
+        len(
+            re.findall(
+                "^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
+                string,
+            )
+        )
+        == 1
+    )
