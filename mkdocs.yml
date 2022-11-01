@@ -30,7 +30,9 @@ options:
 nav:
     - Home: index.md
     - Quickstart: quickstart.md
-    - Tutorial: tutorial.md
+    - Tutorials:
+        - Synthesis: tutorials/synthesis.md
+        - Simulation: tutorials/simulation.md
     - Nodes:
         - Project: nodes/project.md
         - Collection: nodes/collection.md
