@@ -57,7 +57,7 @@ class BaseNode(Base, abc.ABC):
 
         if self.url:
             # Update an existing object via PUT
-            response = api.put(self.url, data=self._to_json())
+            response = api.put(self.url, data=self._to_json(),valid_codes=[200,400])
         else:
             # Create a new object via POST
             response = api.post(

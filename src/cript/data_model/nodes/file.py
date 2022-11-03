@@ -107,7 +107,7 @@ class File(BaseNode):
 
         if api.host == "localhost":
             api.move_copy_file(self.source, api.data_folder)
-        else:
+        elif os.path.exists(self.source):
             url = response["url"]
             uid = response["uid"]
             self._upload_file(api, url, uid)

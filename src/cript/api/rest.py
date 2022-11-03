@@ -110,11 +110,11 @@ class API(APIBase):
         return json.loads(response.content)
 
     @beartype
-    def put(self, url: str, data: str = None):
+    def put(self, url: str, data: str = None,valid_codes: list = [200]):
         """Performs an HTTP PUT request and handles errors."""
         url = convert_to_api_url(url)
         response = self.session.put(url=url, data=data)
-        if response.status_code != 200:
+        if response.status_code not in valid_codes:
             try:
                 error = json.loads(response.content)
             except json.decoder.JSONDecodeError:
