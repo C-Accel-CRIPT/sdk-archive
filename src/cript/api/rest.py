@@ -53,7 +53,10 @@ class API(APIBase):
         }
 
         # Test API authentication by fetching session info
-        response = self.session.get(f"{self.url}/session-info/")
+        try:
+            response = self.session.get(f"{self.url}/session-info/")
+        except Exception as e:
+            raise APIError("Connection API failed, please review your host and token")
         if response.status_code == 200:
             response_json = response.json()
             self.latest_api_version = response_json["latest_version"]
@@ -63,7 +66,7 @@ class API(APIBase):
         elif response.status_code == 404:
             raise APIError("Please provide a valid host.")
         else:
-            raise APIError(response.content)
+            raise APIError(str(response.content))
 
         logger.info(f"Connection to {self.url} API was successful!")
 
