@@ -54,7 +54,7 @@ class Base(abc.ABC):
     def _remove_node(self, node, attr):
         ...
 
-    def _generate_nested_nodes(self, get_level: int = 0, level: int = 0):
+    def _generate_nested_nodes(self, get_level: int = 1, level: int = 0):
         """
         Generate nested node objects within a given node.
 

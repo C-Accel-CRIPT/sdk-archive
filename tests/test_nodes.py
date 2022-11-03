@@ -153,7 +153,7 @@ def test_get_material(criptapp_api, http_service, db_connection):
         """
         )
         inventory_uid = cursor.fetchone()[0]
-        inv = cript.Inventory.get(uid=inventory_uid, get_level=1)
+        inv = cript.Inventory.get(uid=inventory_uid)
         assert type(inv.materials[0]) is cript.data_model.nodes.material.Material
 
 

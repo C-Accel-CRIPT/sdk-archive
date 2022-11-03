@@ -45,7 +45,7 @@ class BaseNode(Base, abc.ABC):
         cache_node(self)
 
     @beartype
-    def save(self, get_level: int = 0, update_existing: bool = False):
+    def save(self, get_level: int = 1, update_existing: bool = False):
         """
         Create or update a node in the database.
 
@@ -57,7 +57,7 @@ class BaseNode(Base, abc.ABC):
 
         if self.url:
             # Update an existing object via PUT
-            response = api.put(self.url, data=self._to_json(),valid_codes=[200,400])
+            response = api.put(self.url, data=self._to_json(), valid_codes=[200, 400])
         else:
             # Create a new object via POST
             response = api.post(
@@ -100,7 +100,7 @@ class BaseNode(Base, abc.ABC):
         logger.info("The node has been deleted from the database.")
 
     @beartype
-    def refresh(self, get_level: int = 0):
+    def refresh(self, get_level: int = 1):
         """
         Overwrite a node's attributes with the latest values from the database.
 
@@ -117,7 +117,7 @@ class BaseNode(Base, abc.ABC):
         self._generate_nested_nodes(get_level=get_level)
 
     @beartype
-    def update(self, get_level: int = 0, **kwargs):
+    def update(self, get_level: int = 1, **kwargs):
         """
         Updates and immediately saves a node.
 
@@ -134,7 +134,7 @@ class BaseNode(Base, abc.ABC):
 
     @classmethod
     @beartype
-    def create(cls, get_level: int = 0, update_existing: bool = False, **kwargs):
+    def create(cls, get_level: int = 1, update_existing: bool = False, **kwargs):
         """
         Immediately creates a node.
 
@@ -150,7 +150,7 @@ class BaseNode(Base, abc.ABC):
 
     @classmethod
     @beartype
-    def get(cls, get_level: int = 0, **kwargs):
+    def get(cls, get_level: int = 1, **kwargs):
         """
         Get the JSON for a node and use it to generate a local node object.
 
@@ -194,7 +194,7 @@ class BaseNode(Base, abc.ABC):
         cls,
         limit: Union[int, None] = None,
         offset: Union[int, None] = None,
-        get_level: int = 0,
+        get_level: int = 1,
         **kwargs,
     ):
         """
