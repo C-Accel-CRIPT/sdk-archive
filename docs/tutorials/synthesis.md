@@ -179,7 +179,7 @@ prcs.save()
 ```
 
 ### Create a File node and upload a file
-First, we'll instantiate a File node and associate with the Data node created above.
+First, we'll instantiate a File node and associate it with the Data node created above.
 ``` py
 path = "path/to/local/file"
 f = cript.File(project=proj, source=path)
@@ -217,7 +217,7 @@ Next, we'll add the Data node to the new Property node.
 ``` py
 mw_n.data = sec
 ```
-Last, we'll add the new Property node to polystyrene then save it.
+Last, we'll add the new Property node to polystyrene and then save it.
 ``` py
 polystyrene.add_property(mw_n)
 polystyrene.save()
