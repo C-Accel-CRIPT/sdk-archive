@@ -35,7 +35,7 @@ class Paginator:
         payload: Union[str, None] = None,
         limit: Union[int, None] = None,
         offset: Union[int, None] = None,
-        get_level: int = 0,
+        get_level: int = 1,
     ):
         self.url = url
         self.api = get_cached_api_session(url)

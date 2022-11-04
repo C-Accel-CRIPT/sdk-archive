@@ -56,7 +56,7 @@ class Reference(BaseNode):
         self.group = group
 
     @beartype
-    def save(self, get_level: int = 0, update_existing: bool = False):
+    def save(self, get_level: int = 1, update_existing: bool = False):
         """
         Create or update a node in the database.
 

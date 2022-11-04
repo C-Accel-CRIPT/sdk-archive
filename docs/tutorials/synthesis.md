@@ -42,10 +42,8 @@ For this tutorial, we will get an existing Inventory node from the database.
 This contains all of the Material nodes we will be using.
 ``` py
 uid = "134f2658-6245-42d8-a47e-6424aa3472b4"
-inv = cript.Inventory.get(uid=uid, get_level=1)
+inv = cript.Inventory.get(uid=uid)
 ```
-!!! note
-    We are setting `get_level` to `1` so that the Material nodes are auto-generated. This parameter defaults to `0`, but can be set to any integer.
 
 Notice that the Material node objects have been auto-generated.
 ``` py

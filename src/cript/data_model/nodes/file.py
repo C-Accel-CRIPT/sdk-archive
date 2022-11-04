@@ -78,7 +78,7 @@ class File(BaseNode):
         self._source = value
 
     @beartype
-    def save(self, get_level: int = 0, update_existing: bool = False):
+    def save(self, get_level: int = 1, update_existing: bool = False):
         api = get_cached_api_session(self.url)
 
         if api.host == "localhost":
