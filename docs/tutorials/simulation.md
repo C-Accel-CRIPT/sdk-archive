@@ -139,7 +139,7 @@ ana = cript.Computation.create(
 !!! note
     Notice the use of `create()` here, which instantiates and saves the object in one go.
 
-### Create and upload Files
+### Create and Upload Files
 First, we'll instantiate our File nodes.
 ``` py
 packing_file = cript.File(project=proj, source="path/to/local/file")
@@ -177,7 +177,7 @@ forcefield_data = cript.Data.create(
     type = "computation_forcefield",
     files = [forcefield_file],
     computations = [init],
-    notes = "Full forcefield defintiona and topology.",
+    notes = "Full forcefield definition and topology.",
 )
 equi_snap = cript.Data.create(
     experiment = expt,

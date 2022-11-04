@@ -66,7 +66,6 @@ class Reference(BaseNode):
         """
         api = get_cached_api_session(self.url)
 
-
         # Create a new object via POST
         response = api.post(
             url=f"{api.url}/{self.slug}/",
