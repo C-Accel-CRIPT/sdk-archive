@@ -32,31 +32,31 @@ nav:
     - Quickstart: quickstart.md
     - Tutorial: tutorial.md
     - Nodes:
-        - Project: nodes/project.md
         - Collection: nodes/collection.md
-        - Material: nodes/material.md
-        - File: nodes/file.md
-        - Experiment: nodes/experiment.md
-        - Inventory: nodes/inventory.md
-        - Process: nodes/process.md
-        - ComputationalProcess: nodes/computational_process.md
         - Computation: nodes/computation.md
+        - ComputationalProcess: nodes/computational_process.md
         - Data: nodes/data.md
+        - Experiment: nodes/experiment.md
+        - File: nodes/file.md
+        - Group: nodes/group.md
+        - Inventory: nodes/inventory.md
+        - Material: nodes/material.md
+        - Project: nodes/project.md
+        - Process: nodes/process.md
         - Reference: nodes/reference.md
         - Software: nodes/software.md
         - User: nodes/user.md
-        - Group: nodes/group.md
-    - Subobjects:
-        - Property: subobjects/property.md
+    - Sub-objects:
+        - Algorithm: subobjects/algorithm.md
+        - Citation: subobjects/citation.md
         - Condition: subobjects/condition.md
+        - Equipment: subobjects/equipment.md
         - Identifier: subobjects/identifier.md
         - Ingredient: subobjects/ingredient.md
-        - Quantity: subobjects/quantity.md
-        - Equipment: subobjects/equipment.md
-        - SoftwareConfiguration: subobjects/software_configuration.md
-        - Algorithm: subobjects/algorithm.md
         - Parameter: subobjects/parameter.md
-        - Citation: subobjects/citation.md
+        - Property: subobjects/property.md
+        - Quantity: subobjects/quantity.md
+        - SoftwareConfiguration: subobjects/software_configuration.md
     - API: api.md
     - Paginator: paginator.md
     - Exceptions: exceptions.md
