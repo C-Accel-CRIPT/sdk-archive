@@ -5,8 +5,8 @@ repo_name: C-Accel-CRIPT/cript
 
 nav:
     - Home: index.md
-    - Quickstart: quickstart.md
     - Tutorial: tutorial.md
+    - Quickstart: quickstart.md
     - Nodes:
         - Collection: nodes/collection.md
         - Computation: nodes/computation.md
