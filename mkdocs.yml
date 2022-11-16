@@ -3,30 +3,6 @@ site_name: CRIPT Python SDK
 repo_url: https://github.com/C-Accel-CRIPT/cript
 repo_name: C-Accel-CRIPT/cript
 
-theme:
-    name: material
-    palette:
-        primary: deep purple
-        accent: deep purple
-    icon:
-        repo: fontawesome/brands/github
-
-plugins:
-    - search
-    - mkdocstrings:
-        default_handler: python
-        handlers:
-            python:
-                paths: [src]
-                selection:
-                    docstring_style: sphinx
-                options:
-                    show_bases: false
-                    show_source: false
-
-options:
-    show_source: false
-
 nav:
     - Home: index.md
     - Quickstart: quickstart.md
@@ -60,6 +36,30 @@ nav:
     - API: api.md
     - Paginator: paginator.md
     - Exceptions: exceptions.md
+
+theme:
+    name: material
+    palette:
+        primary: deep purple
+        accent: deep purple
+    icon:
+        repo: fontawesome/brands/github
+
+plugins:
+    - search
+    - mkdocstrings:
+        default_handler: python
+        handlers:
+            python:
+                paths: [src]
+                selection:
+                    docstring_style: sphinx
+                options:
+                    show_bases: false
+                    show_source: false
+
+options:
+    show_source: false
 
 markdown_extensions:
     - toc:
