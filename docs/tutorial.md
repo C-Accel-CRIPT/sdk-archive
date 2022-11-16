@@ -1,4 +1,6 @@
-To get started with CRIPT, follow these steps:
+# Tutorial
+
+## Setup CRIPT
 
 1. Download and Install [Python 3.9+](https://www.python.org/downloads/)
 2. Create a virtual environment
@@ -24,24 +26,41 @@ To get started with CRIPT, follow these steps:
    ```bash
     pip install -U cript
    ```
+5. Work with CRIPT
+---
 
+## Learning CRIPT through the terminal
+### Launch python interpreter
+Open a terminal on your computer, I will be using Windows Powershell, and start the python interpreter by typing python
 
+```bash
+python
+```
 
-### Connect to the public API
-``` py
+<img alt="screenshot of python interpreter inside of the terminal" src="/assets/images/tutorial/terminal_python_interpreter.png">
+
+### Connect to CRIPT
+```python
 import cript
 
 host = "criptapp.org"
 token = "<your_api_token>"  
 cript.API(host, token)
 ```
+
+<img alt="screenshot of the connecting through CRIPT inside of the python interpreter" src="">
+
+
+---
+## Connect to CRIPT
+
 !!! note
     Input your own token in the place of: `<your_api_token>`
 
     Your API token can be found on cript under [Security Settings](https://criptapp.org/security/).
 
 
-### Create a Project node
+## Create a Project node
 ``` py
 proj = cript.Project(name="<your_project_name>")
 proj.save()
@@ -50,14 +69,14 @@ proj.save()
     Project names are globally unique.
 
 
-### Create a Collection node
+## Create a Collection node
 ``` py
 coll = cript.Collection.create(project=proj, name="Tutorial")
 ```
 !!! note
     Notice the use of `create()` here, which instantiates and saves the object in one go.
 
-### Create an Experiment node
+## Create an Experiment node
 ``` py
 expt = cript.Experiment(
     collection=coll, 
@@ -66,7 +85,7 @@ expt = cript.Experiment(
 expt.save()
 ```
 
-### Get Material nodes
+## Get Material nodes
 For this tutorial, we will get an existing Inventory node from the database.  
 This contains all of the Material nodes we will be using.
 ``` py
@@ -82,7 +101,7 @@ type(inv.materials[0])
 # <class 'cript.data_model.nodes.material.Material'>
 ```
 
-### Create a Process node
+## Create a Process node
 ``` py
 prcs = cript.Process(
     experiment=expt, 
@@ -97,7 +116,7 @@ prcs = cript.Process(
 prcs.save()
 ```
 
-### Add Ingredient nodes to the Process node
+## Add Ingredient nodes to the Process node
 First, let's grab the Material nodes we need from the Inventory node.
 ``` py
 solution = inv['SecBuLi solution 1.4M cHex']
@@ -151,7 +170,7 @@ prcs.add_ingredient(quench)
 prcs.add_ingredient(workup)
 ```
 
-### Add Condition nodes to the Process node
+## Add Condition nodes to the Process node
 ``` py
 temp = cript.Condition(key="temperature", value=25, unit="celsius")
 time = cript.Condition(key="time_duration", value=60, unit="min")
@@ -159,7 +178,7 @@ prcs.add_condition(temp)
 prcs.add_condition(time)
 ```
 
-### Add a Property node to the Process node
+## Add a Property node to the Process node
 ``` py
 yield_mass = cript.Property(
     key="yield_mass", 
@@ -170,7 +189,7 @@ yield_mass = cript.Property(
 prcs.add_property(yield_mass)
 ```
 
-### Create a Material node (process product)
+## Create a Material node (process product)
 First, we'll instantiate the node.
 ``` py
 polystyrene = cript.Material(project=proj, name="polystyrene")
@@ -209,7 +228,7 @@ Last, we can save the Process node.
 prcs.save()
 ```
 
-### Create a File node and upload a file
+## Create a File node and upload a file
 First, we'll instantiate a File node and associate with the Data node created above.
 ``` py
 path = "path/to/local/file"
@@ -225,7 +244,7 @@ Next, we'll upload the local file by saving the File node. Follow all prompts th
 api.save(f)
 ```
 
-### Create a Data node
+## Create a Data node
 ``` py
 sec = cript.Data(
     experiment=expt, 
@@ -239,7 +258,7 @@ sec.add_file(f)
 sec.save()
 ```
 
-### Associate a Data node with a Property node
+## Associate a Data node with a Property node
 First, we'll create one more Property node for polystyrene.
 ``` py
 mw_n = cript.Property(key="mw_n", value=5200, unit="g/mol")
@@ -254,7 +273,7 @@ polystyrene.add_property(mw_n)
 polystyrene.save()
 ```
 
-### Conclusion
+## Conclusion
 You made it! We hope this tutorial has been helpful.  
 
 Please let us know how you think it could be improved.
