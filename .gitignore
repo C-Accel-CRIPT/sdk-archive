@@ -152,7 +152,11 @@ cython_debug/
 # Custom
 api_key.txt
 
+# jet brains IDE config directory
 .idea/
+
+# vscode config directory
+.vscode/
 
 # PyCharm
 #  JetBrains specific template is maintainted in a separate JetBrains.gitignore that can
