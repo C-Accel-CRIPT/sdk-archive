@@ -1,4 +1,31 @@
-> Refer to [Quickstart](./quickstart.md) for installation instructions.
+To get started with CRIPT, follow these steps:
+
+1. Download and Install [Python 3.9+](https://www.python.org/downloads/)
+2. Create a virtual environment
+    * It is best practice to create a dedicated [python virtual environment](https://docs.python.org/3/library/venv.html) for each python project
+    * :fontawesome-brands-windows: **_Windows:_**
+   ```bash
+    python -m venv ./venv
+   ```
+    * :fontawesome-brands-apple: **_Mac_** & :fontawesome-brands-linux: **_Linux:_** 
+   ```bash
+    python3 -m venv ./venv
+   ```
+3. Activate your virtual environment
+    * :fontawesome-brands-windows: **_Windows:_**
+   ```bash
+    .\venv\Scripts\activate
+   ```
+    * :fontawesome-brands-apple: **_Mac_** & :fontawesome-brands-linux: **_Linux:_** 
+   ```bash
+    source venv/bin/activate
+   ```
+4. Install the [latest version of CRIPT](https://pypi.org/project/cript/)
+   ```bash
+    pip install -U cript
+   ```
+
+
 
 ### Connect to the public API
 ``` py
@@ -9,7 +36,9 @@ token = "<your_api_token>"
 cript.API(host, token)
 ```
 !!! note
-    Your API token can be found in the UI under [Account Settings](https://criptapp.org/settings/).
+    Input your own token in the place of: `<your_api_token>`
+
+    Your API token can be found on cript under [Security Settings](https://criptapp.org/security/).
 
 
 ### Create a Project node
