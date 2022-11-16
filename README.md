@@ -1,7 +1,4 @@
-# [CRIPT](https://criptapp.org): Community Resource for Innovation in Polymer Technology
-
-
-![CRIPT Logo](/CRIPT_full_logo_colored.png)
+![CRIPT Logo](/CRIPT_full_logo_colored_transparent.png)
 
 ## CRIPT Python SDK
 
