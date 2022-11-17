@@ -2,11 +2,11 @@
 
 # CRIPT Python SDK
 
-[![License](https://img.shields.io/github/license/C-Accel-CRIPT/cript-excel-uploader?style=flat-square)](https://github.com/C-Accel-CRIPT/cript-excel-uploader/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/C-Accel-CRIPT/cript?style=flat-square)](https://github.com/C-Accel-CRIPT/cript/blob/master/LICENSE.txt)
 [![Python](https://img.shields.io/badge/Language-Python%203.9+-blue?style=flat-square&logo=python)](https://www.python.org/)
 [![Code style is black](https://img.shields.io/badge/Code%20Style-black-000000.svg?style=flat-square&logo=python)](https://github.com/psf/black)
-[![Link to platform](https://img.shields.io/badge/platform-criptapp.org-blueviolet?style=flat-square)](https://criptapp.org/)
-[![Blog Link](https://img.shields.io/badge/Blog-blog.criptapp.org-blueviolet?style=flat-square)](https://blog.criptapp.org)
+[![Link to CRIPT website](https://img.shields.io/badge/platform-criptapp.org-blueviolet?style=flat-square)](https://criptapp.org/)
+[![CRIPT Blog Link](https://img.shields.io/badge/Blog-blog.criptapp.org-blueviolet?style=flat-square)](https://blog.criptapp.org)
 [![Material MkDocs](https://img.shields.io/badge/Docs-mkdocs--material-blueviolet?style=flat-square&logo=markdown)](https://squidfunk.github.io/mkdocs-material/)
 
 ## What is it?
@@ -15,7 +15,9 @@ The CRIPT Python SDK allows programmatic access to the [CRIPT platform](https://
 ---
 
 ## Installation
-The latest released of CRIPT python SDK is available on [Python Package Index (PyPI)](https://pypi.org/project/cript/)
+CRIPT Python SDK requires Python 3.9+
+
+The latest released of CRIPT Python SDK is available on [Python Package Index (PyPI)](https://pypi.org/project/cript/)
 
 ```bash
 pip install cript
@@ -24,7 +26,7 @@ pip install cript
 ---
 
 ## Documentation
-To learn more about the CRIPT python SDK please check the [CRIPT-SDK documentation](https://c-accel-cript.github.io/cript/)
+To learn more about the CRIPT Python SDK please check the [CRIPT-SDK documentation](https://c-accel-cript.github.io/cript/)
 
 ---
 
