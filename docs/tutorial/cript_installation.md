@@ -1,6 +1,7 @@
 # How to Install CRIPT
 
-This page will give you a step by step guide on how to install [CRIPT Python SDK](https://pypi.org/project/cript/) on your system.
+!!! abstract
+    This page will give you a through guide on how to set up [CRIPT Python SDK](https://pypi.org/project/cript/) on your system.
 
 
 ## Steps
