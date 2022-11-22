@@ -12,7 +12,8 @@ on how to install [CRIPT Python SDK](https://pypi.org/project/cript/) on your sy
 
 ### Launch python interpreter
 
-Open a terminal on your computer, I will be using Windows Powershell, and start the python interpreter by typing python
+Open a terminal on your computer, I will be using Windows Powershell in this tutorial. 
+Start the python interpreter by typing python
 
 #### Example
 My Input:
