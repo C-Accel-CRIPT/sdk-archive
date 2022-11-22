@@ -7,6 +7,7 @@ nav:
   - Home: index.md
   - Tutorial:
     - Installation: tutorial/cript_installation.md
+    - How to Get an API Token: tutorial/acquiring_api_token.md
     - Full Tutorial: tutorial/tutorial.md
   - Quickstart: quickstart.md
   - Nodes:
@@ -46,6 +47,9 @@ theme:
     accent: deep purple
   icon:
     repo: fontawesome/brands/github
+
+extra_css:
+  - assets/stylesheets/extra.css
 
 plugins:
   - search
