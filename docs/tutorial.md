@@ -12,13 +12,24 @@ on how to install [CRIPT Python SDK](https://pypi.org/project/cript/) on your sy
 
 Open a terminal on your computer, I will be using Windows Powershell, and start the python interpreter by typing python
 
+#### Example
+My Input:
 ```bash
 python
 ```
 
-<img alt="screenshot of python interpreter inside of the terminal" src="/assets/images/tutorial/terminal_python_interpreter.png">
+:octicons-terminal-16: Terminal Output:
+```bash
+Python 3.10.5 (tags/v3.10.5:f377153, Jun  6 2022, 16:14:13) [MSC v.1929 64 bit (AMD64)] on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>>
+```
+
+---
 
 ### Connect to CRIPT
+
+Connect to CRIPT by inputting your **host** and **token**
 
 ```python
 import cript
@@ -28,7 +39,19 @@ token = "<your_api_token>"
 cript.API(host, token)
 ```
 
-<img alt="screenshot of the connecting through CRIPT inside of the python interpreter" src="">
+#### Example
+My Input:
+```python
+import cript
+
+host = "criptapp.org"
+token = "Token 6a221fb9180e7751beb54db0c3a21777e7f05670"
+cript.API(host, token)
+```
+:octicons-terminal-16: Terminal Output:
+```bash
+Connected to https://criptapp.org/api
+```
 
 ---
 
