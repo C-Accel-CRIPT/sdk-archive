@@ -4,7 +4,7 @@
 
 1.  Download and Install [Python 3.9+](https://www.python.org/downloads/)
 2.  Create a virtual environment
-    It is best practice to create a dedicated [python virtual environment](https://docs.python.org/3/library/venv.html) for each python project
+    * It is best practice to create a dedicated [python virtual environment](https://docs.python.org/3/library/venv.html) for each python project
 
     === ":fontawesome-brands-windows: **_Windows:_**"
         ```bash 
@@ -32,7 +32,7 @@
     ```bash
      pip install -U cript
     ```
-5.  Work with CRIPT
+5.  Create your CRIPT Script!
 
 ---
 

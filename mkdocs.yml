@@ -5,6 +5,7 @@ repo_name: C-Accel-CRIPT/cript
 
 nav:
   - Home: index.md
+  - Installation: cript_installation.md
   - Tutorial: tutorial.md
   - Quickstart: quickstart.md
   - Nodes:
