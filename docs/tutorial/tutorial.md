@@ -31,6 +31,8 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 Connect to CRIPT by inputting your **host** and **token**
 
+Your API Token can be found under the profile icon on the top right on the [security settings]()
+
 ```python
 import cript
 
@@ -43,7 +45,6 @@ cript.API(host, token)
 My Input:
 ```python
 import cript
-
 host = "criptapp.org"
 token = "Token 6a221fb9180e7751beb54db0c3a21777e7f05670"
 cript.API(host, token)
@@ -59,7 +60,6 @@ Connected to https://criptapp.org/api
 
 !!! note
 Input your own token in the place of: `<your_api_token>`
-
     Your API token can be found on cript under [Security Settings](https://criptapp.org/security/).
 
 ## Create a Project node
