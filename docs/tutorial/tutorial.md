@@ -1,12 +1,14 @@
 # Tutorial
 
 ## Setup CRIPT
+Before proceeding CRIPT must be set up on your computer.
+
 Please refer to [installation docs](cript_installation.md) 
 on how to install [CRIPT Python SDK](https://pypi.org/project/cript/) on your system
 
 ---
 
-## Learning CRIPT through the terminal
+## :octicons-terminal-16: Learning CRIPT through the terminal
 
 ### Launch python interpreter
 
@@ -31,7 +33,8 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 Connect to CRIPT by inputting your **host** and **token**
 
-Your API Token can be found under the profile icon on the top right on the [security settings]()
+Your API Token can be found under the profile icon on the top right on the [security settings](https://criptapp.org/security/). 
+For further explanation please refer to [how to get an API Token](acquiring_api_token.md)
 
 ```python
 import cript
