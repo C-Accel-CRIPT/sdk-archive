@@ -6,9 +6,9 @@ repo_name: C-Accel-CRIPT/cript
 nav:
   - Home: index.md
   - Tutorial:
+    - Full Tutorial: tutorial/tutorial.md
     - Installation: tutorial/cript_installation.md
     - How to Get an API Token: tutorial/acquiring_api_token.md
-    - Full Tutorial: tutorial/tutorial.md
   - Quickstart: quickstart.md
   - Nodes:
       - Collection: nodes/collection.md
