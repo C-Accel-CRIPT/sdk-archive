@@ -1,10 +1,10 @@
 # Tutorial
 
 ## Setup CRIPT
-Before proceeding CRIPT must be set up on your computer.
+Before proceeding please be sure to `pip install cript`
 
-Please refer to [installation docs](cript_installation.md) 
-on how to install [CRIPT Python SDK](https://pypi.org/project/cript/) on your system
+Fore full documentation please refer to [installation docs](cript_installation.md) 
+on how to install [CRIPT Python SDK](https://pypi.org/project/cript/) on your system.
 
 ---
 
@@ -16,7 +16,7 @@ Open a terminal on your computer, I will be using Windows Powershell in this tut
 Start the python interpreter by typing python
 
 #### Example
-My Input:
+:fontawesome-regular-keyboard: My Input:
 ```bash
 python
 ```
@@ -31,22 +31,28 @@ Type "help", "copyright", "credits" or "license" for more information.
 ---
 
 ### Connect to CRIPT
+To connect to [CRIPT](https://criptapp.org) you must enter a `host` and an `API Token`
 
-Connect to CRIPT by inputting your **host** and **token**
+#### Host
 
-Your API Token can be found under the profile icon on the top right on the [security settings](https://criptapp.org/security/). 
-For further explanation please refer to [how to get an API Token](acquiring_api_token.md)
+Host indicates the CRIPT instance that you want to upload your data to whether that is CRIPT or a private instance. 
+
+For most users host will be `"criptapp.org"`
 
 ```python
-import cript
-
 host = "criptapp.org"
-token = "<your_api_token>"
-cript.API(host, token)
 ```
 
+#### API Token
+
+The token is needed because we need to authenticate the user before saving any of their data
+
+Replace `<your_api_token>` with your API Token that can be found in the [security settings](https://criptapp.org/security/) under the profile icon on the top right. For further explanation please refer to [how to get an API Token](acquiring_api_token.md)
+
+> Note: The "Token" in front of the random characters is part of the token as well 
+
 #### Example
-My Input:
+:fontawesome-regular-keyboard: My Input:
 ```python
 import cript
 host = "criptapp.org"
@@ -58,13 +64,10 @@ cript.API(host, token)
 Connected to https://criptapp.org/api
 ```
 
+??? "Private Instance of CRIPT"
+    If any user wants to connect to their own private instance of CRIPT, they can easily do that by just changing both the `Host` and `API Token` to whatever `Host` and `API Token` continue everything else as normal.
+
 ---
-
-## Connect to CRIPT
-
-!!! note
-Input your own token in the place of: `<your_api_token>`
-    Your API token can be found on cript under [Security Settings](https://criptapp.org/security/).
 
 ## Create a Project node
 
@@ -72,9 +75,10 @@ Input your own token in the place of: `<your_api_token>`
 proj = cript.Project(name="<your_project_name>")
 proj.save()
 ```
+!!! warning "Picking a Project Name"
+    Project names are globally unique.
 
-!!! note
-Project names are globally unique.
+---
 
 ## Create a Collection node
 
