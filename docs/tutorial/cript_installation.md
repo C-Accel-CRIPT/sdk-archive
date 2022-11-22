@@ -6,7 +6,8 @@ This page will give you a step by step guide on how to install [CRIPT Python SDK
 ## Steps
 1.  Install [Python 3.9+](https://www.python.org/downloads/)
 2.  Create a virtual environment
-    * It is best practice to create a dedicated [python virtual environment](https://docs.python.org/3/library/venv.html) for each python project
+
+    > It is best practice to create a dedicated [python virtual environment](https://docs.python.org/3/library/venv.html) for each python project
 
     === ":fontawesome-brands-windows: **_Windows:_**"
         ```bash 
@@ -30,8 +31,8 @@ This page will give you a step by step guide on how to install [CRIPT Python SDK
         source venv/bin/activate
         ```
 
-4.  Install the [latest version of CRIPT](https://pypi.org/project/cript/)
+4.  Install [CRIPT from Python Package Index (PyPI)](https://pypi.org/project/cript/)
     ```bash
-     pip install -U cript
+     pip install cript
     ```
 5.  Create your CRIPT Script!
