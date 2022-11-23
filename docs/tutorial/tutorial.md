@@ -66,7 +66,10 @@ Connected to https://criptapp.org/api
 
 ---
 ## What is a Node?
-Nodes are simply just CRIPT objects.
+* Nodes are simply just CRIPT objects.
+
+### How to know if a Node has been saved or not?
+* When a Node is saved a URL is created for it
 
 ---
 
@@ -84,7 +87,7 @@ A [`Project`](../nodes/project.md) can be thought of as a folder that contains [
 ```py
 Connected to https://criptapp.org/api
 
-proj = cript.Project(name="<Your Project Name>")
+proj = cript.Project.create(name="<Your Project Name>")
 proj.save()
 ```
 
@@ -153,7 +156,7 @@ coll = cript.Collection.create(project=proj, name="<Your Collection Name>")
 ## Create an Experiment node
 
 ```py
-expt = cript.Experiment(
+expt = cript.Experiment.create(
     collection=coll,
     name="Anionic Polymerization of Styrene with SecBuLi"
 )
@@ -183,7 +186,7 @@ type(inv.materials[0])
 ## Create a Process node
 
 ```py
-prcs = cript.Process(
+prcs = cript.Process.create(
     experiment=expt,
     name="Anionic of Styrene",
     type = "multistep",
