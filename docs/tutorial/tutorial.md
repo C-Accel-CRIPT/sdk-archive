@@ -127,12 +127,28 @@ print(proj)
 
 ## Create a Collection node
 
-```py
-coll = cript.Collection.create(project=proj, name="Tutorial")
-```
+A [Collection](../nodes/collection.md) can be thought of as a folder filled with experiments
 
 !!! note
-Notice the use of `create()` here, which instantiates and saves the object in one go.
+    Notice the use of `create()` here, which instantiates and saves the object in one go.
+
+:fontawesome-regular-keyboard: My Input:
+```py
+coll = cript.Collection.create(project=proj, name="<Your Collection Name>")
+```
+
+:octicons-terminal-16: Terminal Output:
+
+<small>
+    The terminal gives no output
+</small>
+
+```bash
+
+```
+
+
+---
 
 ## Create an Experiment node
 
