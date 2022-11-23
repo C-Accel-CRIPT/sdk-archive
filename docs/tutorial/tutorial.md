@@ -37,17 +37,14 @@ To connect to [CRIPT](https://criptapp.org) you must enter a `host` and an `API 
 
 Host indicates the CRIPT instance that you want to upload your data to whether that is CRIPT or a private instance. 
 
-For most users host will be `"criptapp.org"`
-
-```python
-host = "criptapp.org"
-```
+!!! note 
+    For most users host will be `"criptapp.org"`
 
 #### API Token
 
 The token is needed because we need to authenticate the user before saving any of their data
 
-Replace `<your_api_token>` with your API Token that can be found in the [security settings](https://criptapp.org/security/) under the profile icon on the top right. For further explanation please refer to [how to get an API Token](acquiring_api_token.md)
+Your API Token that can be found in the [security settings](https://criptapp.org/security/) under the profile icon on the top right. For further explanation please refer to [how to get an API Token](acquiring_api_token.md)
 
 > Note: The "Token" in front of the random characters is part of the token as well 
 
@@ -56,7 +53,7 @@ Replace `<your_api_token>` with your API Token that can be found in the [securit
 ```python
 import cript
 host = "criptapp.org"
-token = "Token 6a221fb9180e7751beb54db0c3a21777e7f05670"
+token = "<Your API Token>"
 cript.API(host, token)
 ```
 :octicons-terminal-16: Terminal Output:
@@ -65,18 +62,66 @@ Connected to https://criptapp.org/api
 ```
 
 ??? "Private Instance of CRIPT"
-    If any user wants to connect to their own private instance of CRIPT, they can easily do that by just changing both the `Host` and `API Token` to whatever `Host` and `API Token` continue everything else as normal.
+    If any user wants to connect to their own private instance of CRIPT, they can easily do that by just changing both the `Host` and `API Token` to their own `Host` and `API Token` continue everything else as normal.
+
+---
+## What is a Node?
+Nodes are simply just CRIPT objects.
 
 ---
 
-## Create a Project node
+## Create a [Project](../nodes/project.md) node
 
+A [`Project`](../nodes/project.md) can be thought of as a folder that contains [`Collections`](../nodes/collection.md). Each [`Collections`](../nodes/collection.md) must belong inside of a [`Project`](../nodes/project.md).
+
+!!! warning "Picking a Project Name"
+    **Project names are globally unique**, meaning no 2 projects on the entire system can have the same name
+
+### Example
+ _continuing the example from above..._
+
+:fontawesome-regular-keyboard: My Input:
 ```py
-proj = cript.Project(name="<your_project_name>")
+Connected to https://criptapp.org/api
+
+proj = cript.Project(name="<Your Project Name>")
 proj.save()
 ```
-!!! warning "Picking a Project Name"
-    Project names are globally unique.
+
+:octicons-terminal-16: Terminal Output:
+
+<small>
+    The terminal gives no output
+</small>
+
+```bash
+
+```
+
+!!! Info
+    Lets print the project to get a better view
+
+:fontawesome-regular-keyboard: My Input:
+```py
+print(proj)
+```
+
+:octicons-terminal-16: Terminal Output:
+```bash
+{
+    "url": "https://criptapp.org/api/project/910445b2-88ca-43ac-88cf-f6424e85b1ba/",
+    "uid": "910445b2-88ca-43ac-88cf-f6424e85b1ba",
+    "public": false,
+    "created_at": "2022-11-23T00:47:40.011485Z",
+    "updated_at": "2022-11-23T00:47:40.011507Z",
+    "name": "Navid's Project SDK",
+    "notes": null,
+    "group": "https://criptapp.org/api/group/68ed4c57-d1ca-4708-89b2-cb1c1609ace2/",
+    "collections": "https://criptapp.org/api/project/910445b2-88ca-43ac-88cf-f6424e85b1ba/collections/",
+    "materials": "https://criptapp.org/api/project/910445b2-88ca-43ac-88cf-f6424e85b1ba/materials/",
+    "files": "https://criptapp.org/api/project/910445b2-88ca-43ac-88cf-f6424e85b1ba/files/"
+}
+```
 
 ---
 
