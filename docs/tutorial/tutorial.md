@@ -77,7 +77,7 @@ Connected to https://criptapp.org/api
 
 A [`Project`](../nodes/project.md) can be thought of as a folder that contains [`Collections`](../nodes/collection.md). Each [`Collections`](../nodes/collection.md) must belong inside of a [`Project`](../nodes/project.md).
 
-!!! warning "Picking a Project Name"
+!!! warning "Project Name"
     **Project names are globally unique**, meaning no 2 projects on the entire system can have the same name
 
 ### Example
