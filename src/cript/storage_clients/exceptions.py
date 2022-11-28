@@ -1,6 +1,18 @@
 from cript.exceptions import CRIPTError
 
 
+class InvalidAuthCode(CRIPTError):
+    """
+    Raised when an Authentication code to connect to a storage client is invalid
+    """
+
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return "Unable to authenticate with storage client. Please use a valid authentication code"
+
+
 class FileUploadError(CRIPTError):
     """Raised when a file upload fails."""
 
