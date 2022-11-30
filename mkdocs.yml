@@ -9,7 +9,7 @@ nav:
     - Full Tutorial: tutorial/tutorial.md
     - Installation: tutorial/cript_installation.md
     - How to Get an API Token: tutorial/acquiring_api_token.md
-  - Quickstart: quickstart.md
+  - Quick Start: quickstart.md
   - Nodes:
       - Collection: nodes/collection.md
       - Computation: nodes/computation.md
@@ -63,9 +63,6 @@ plugins:
           options:
             show_bases: false
             show_source: false
-
-options:
-  show_source: false
 
 markdown_extensions:
   - toc:
