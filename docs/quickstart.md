@@ -1,7 +1,7 @@
 # Quick Start
 
 !!! abstract "Objective"
-    This quick start guide will take you through some common **CRUD** (Create Read Update Delete) commands of the CRIPT Python SDK. For more information please visit each node or the full tutorial.
+    This quick start guide will take you through some common commands of the CRIPT Python SDK. For more information please visit each node or the full tutorial.
 
 ---
 
@@ -101,7 +101,7 @@ results =  cript.Material.search(
 ```
 
 ??? Info "Pagination"
-    Then you can paginate through the results
+    Search returns a `Paginator` object. You can paginate through the results
 
     ``` python
     res.json()              # View the raw JSON for the query
