@@ -1,7 +1,7 @@
 # Crash Course
 
 ## Install CRIPT
-Install <a href="https://pypi.org/project/cript/" target="_blank">CRIPT</a>
+Install <a href="https://pypi.org/project/cript/" target="_blank">CRIPT</a> from Pypi
    ```bash
     pip install cript
    ```
@@ -132,7 +132,7 @@ file.save()
 <!-- TODO what is "path" is that the path you want to download from within CRIPT? -->
 ``` python
 file = cript.File(project=proj, source=path)
-path = "path/to/local/file"
+path = "path/to/store/downloaded/file"
 file.download_file(path=path)
 ```
 
