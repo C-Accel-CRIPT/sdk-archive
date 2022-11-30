@@ -1,4 +1,9 @@
-# Crash Course
+# Quick Start
+
+!!! abstract "Objective"
+    This quick start guide will take you through some common **CRUD** (Create Read Update Delete) commands of the CRIPT Python SDK. For more information please visit each node or the full tutorial.
+
+---
 
 ## Install CRIPT
 Install <a href="https://pypi.org/project/cript/" target="_blank">CRIPT</a> from Pypi
