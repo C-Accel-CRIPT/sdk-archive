@@ -1,6 +1,6 @@
 # Home
 
-<img alt="CRIPT logo" src="assets/images/cript_purple_full_logo.png">
+<img alt="CRIPT logo" src="assets/images/CRIPT_full_logo_colored_transparent.png">
 
 **CRIPT** (the _Community Resource for Innovation in Polymer Technology_) is a web-based platform for capturing and sharing polymer data. In addition to a user interface, CRIPT enables programmatic access to the platform through the CRIPT Python SDK, which interfaces with a REST API.
 
