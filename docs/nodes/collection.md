@@ -32,11 +32,12 @@ A collection node can be thought as a folder/bucket that can hold either an
 ---
 ## Methods
 
-### Create
-`.create(get_level=0, update_existing=False, **kwargs)`
+### Create Collection
 
 #### Definition
-This method can be used when creating a new `Collection` node
+The `.create()` method can be used to create a new Collection and save it in one line.
+
+`cript.Collection.create(get_level=0, update_existing=False, **kwargs)`
 
 #### Example
 
@@ -46,74 +47,156 @@ Creating a `Collection` called *"My Collection"*
 my_collection = cript.Collection.create(name="My collection")
 ```
 
+#### Returns
+Created Collection node of type `cript.data_model.nodes.BaseNode`
+
 ---
 
-### Save
+### Save Collection
 
 #### Definition
 By saving a node it will be committed to the CRIPT database and saved there
+`cript.Collection.create()`
+
 
 #### Example
+Creating a Collection node named _"My Collection"_ and saving it to CRIPT
+
 ```python
 my_collection = cript.Collection.create(name="My collection")
 my_collection.save()
 ```
 
+#### Returns
+None
+
+#### Parameters
+
+| Name              | Type    | Description                                                    | Default |
+|-------------------|---------|----------------------------------------------------------------|---------|
+| `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
+| `update_existing` | boolean | Indicates whether to update an existing node in CRIPT database | False   |
+| `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
+
 
 ---
-### Get
+### Get Collection
 
 #### Definition
 Get a Collection that has already been saved into CRIPT
 
-#### Example
+`cript.Collection.get(get_level=0, **kwargs)`
 
+<div style="margin-bottom: 2rem"></div>
+
+#### Get Collection Node via Name
 ``` python
 my_collection = cript.Collection.get(name="My collection")
 ```
 
+#### Get Collection Node via UID
+``` python
+my_collection = cript.Collection.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
+```
+
+#### Get Collection Node via URL
+``` python
+my_collection = cript.Collection.get(url="https://criptapp.org/material/015fc459-ea9f-4c37-80aa-f51d509095df/")
+```
+
+#### Returns
+CRIPT Collection node of type `cript.data_model.nodes.BaseNode`
+
+
+#### Parameters
+
+| Name              | Type    | Description                                                    | Default |
+|-------------------|---------|----------------------------------------------------------------|---------|
+| `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
+| `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
+
+
 ---
 
-### Update
+### Update Collection
 
 #### Definition
-Update a saved Collection node 
+Update a saved Collection node with new values
+
+`my_collection.update(get_level=0, **kwargs)`
 
 #### Example
 ```python
 my_collection.update(name="My new collection name")
 ```
 
+#### Returns
+None
+
+#### Parameters
+
+| Name              | Type    | Description                                                    | Default |
+|-------------------|---------|----------------------------------------------------------------|---------|
+| `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
+| `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
+
+
+
 ---
-### Refresh
+### Refresh Collection
 
 #### Definition
-Overwrite a node's attributes with the latest values from the database
+Refresh a node to get the latest saved values from CRIPT
+
+`my_collection.refresh(get_level=0)`
 
 #### Example
 ```python
-
+my_collection.refresh(name="My new collection name")
 ```
+
+#### Returns
+None
+
+#### Parameters
+
+| Name              | Type    | Description                                                    | Default |
+|-------------------|---------|----------------------------------------------------------------|---------|
+| `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
+| `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
 
 
 ---
 
-### Delete
+### Delete Collection
 
 #### Definition
-Delete a Collection node from CRIPT database 
+Delete a Collection node from CRIPT database
 
 #### Example
 ```python
 my_collection.delete()
 ```
 
+#### Returns
+None
+
+#### Parameters
+
+| Name              | Type    | Description                                                    | Default |
+|-------------------|---------|----------------------------------------------------------------|---------|
+| `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
+| `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
+
+
+
 ---
 
-### Search
+### Search Collection
 
 #### Definition
-Search for a Collection within CRIPT
+`cript.Collection.search(limit=None, offset=None, get_level=0, **kwargs)`
+Search for a Collection within CRIPT. This method returns a paginator object
 
 #### Example
 
@@ -121,22 +204,14 @@ Search for a Collection within CRIPT
 
 ```
 
+#### Returns
+A Paginator object of type `cript.data_model.paginator.Paginator`
 
-----
+#### Parameters
 
-
-
-
-
-### Other stuff
-
-::: cript.data_model.nodes.base_node.BaseNode
-    options:
-        members:
-            - save
-            - delete
-            - refresh
-            - update
-            - create
-            - get
-            - search
+| Name        | Type             | Description                           | Default |
+|-------------|------------------|---------------------------------------|---------|
+| `limit`     | Union[int, None] | The max number of items to return     | None    |
+| `offset`    | Union[int, None] | The starting position of the query    | None    |
+| `get_level` | int              | Level to recursively get nested nodes | 0       |
+| `**kwargs`  |                  | Arguments for the constructor.        | `{}`    |
