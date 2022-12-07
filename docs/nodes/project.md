@@ -43,18 +43,22 @@ Each [`Collection`](collection.md) belongs inside of a single `Project`
 
 ### Create Project
 
-#### Definition
-Creates a new Project node and saves it in one line 
+**Definition**
+
+Creates a new Project node and saves it in one line
+
 `cript.Project.create(get_level=0, update_existing=False, **kwargs)`
 
-#### Example
+**Example**
 ``` python
 my_project = cript.Project.create(name="My project")
 ```
-#### Returns
+**Returns**
+
 Created node of type `cript.data_model.nodes.BaseNode`
 
-#### Parameters
+**Parameters**
+
 | Name   | Type   | Description                  | Default |
 |--------|--------|------------------------------|---------|
 | `name` | string | name of the new Project node | " "     |
@@ -63,18 +67,21 @@ Created node of type `cript.data_model.nodes.BaseNode`
 
 ### Save Project
 
-#### Definition
+**Definition**
+
 Save a Project node to CRIPT
 
-#### Example
+**Example**
 ``` python
 cript.Project.save()
 ```
 
-#### Returns
+**Returns**
+
 None
 
-#### Parameters
+**Parameters**
+
 | Name              | Type    | Description                                                    | Default |
 |-------------------|---------|----------------------------------------------------------------|---------|
 | `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
@@ -86,26 +93,29 @@ None
 
 ### Get Project
 
-#### Definition
+**Definition**
 
-#### Get Project Node via Name
+
+**Get Project Node via Name**
 ``` python
 my_project = cript.Project.get(name="My project")
 ```
 
-#### Get Project Node via UID
+**Get Project Node via UID**
 ``` python
 my_project = cript.Project.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
 ```
 
-#### Get Project Node via URL
+**Get Project Node via URL**
 ``` python
 my_project = cript.Project.get(url="https://criptapp.org/project/015fc459-ea9f-4c37-80aa-f51d509095df/")
 ```
-#### Returns
+**Returns**
+
 CRIPT Project node of type `cript.data_model.nodes.BaseNode`
 
-#### Parameters
+**Parameters**
+
 | Name        | Type   | Description                           | Default |
 |-------------|--------|---------------------------------------|---------|
 | `name`      | string | name of the project to get            | " "     |
@@ -118,18 +128,21 @@ CRIPT Project node of type `cript.data_model.nodes.BaseNode`
 
 ### Refresh Project
 
-#### Definition
+**Definition**
+
 Refresh a node to get the latest saved values from CRIPT
 `cript.Project.refresh(get_level=0)`
 
-#### Example
+**Example**
 ```python
 my_project.refresh(name="My new project name")
 ```
-#### Returns
+**Returns**
+
 None
 
-#### Parameters
+**Parameters**
+
 | Name              | Type    | Description                                                    | Default |
 |-------------------|---------|----------------------------------------------------------------|---------|
 | `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
@@ -139,18 +152,22 @@ None
 
 ### Update Project
 
-#### Definition
+**Definition**
+
 Update a saved Project node with new values
+
 `cript.Project.update(get_level=0, **kwargs)`
 
-#### Example
+**Example**
 ``` python
 my_project.update(name="My new project name")
 ```
-#### Returns
+**Returns**
+
 None
 
-#### Parameters
+**Parameters**
+
 | Name              | Type    | Description                                                    | Default |
 |-------------------|---------|----------------------------------------------------------------|---------|
 | `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
@@ -160,18 +177,22 @@ None
 
 ### Delete Project
 
-#### Definition
+**Definition**
+
 Delete a Project node from CRIPT database
+
 `cript.Project.delete()`
 
-#### Example
+**Example**
 ``` python
 my_project.delete()
 ```
-#### Returns
+**Returns**
+
 None
 
-#### Parameters
+**Parameters**
+
 | Name              | Type    | Description                                                    | Default |
 |-------------------|---------|----------------------------------------------------------------|---------|
 | `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
@@ -181,20 +202,24 @@ None
 
 ### Search Project
 
-#### Definition
-`cript.Project.search(limit=None, offset=None, get_level=0, **kwargs)`
+**Definition**
+
 Search for a Project within CRIPT. This method returns a paginator object
 
-#### Example
+`cript.Project.search(limit=None, offset=None, get_level=0, **kwargs)`
+
+**Example**
 
 ```python
 
 ```
 
-#### Returns
+**Returns**
+
 A Paginator object of type `cript.data_model.paginator.Paginator`
 
-#### Parameters
+**Parameters**
+
 
 | Name        | Type             | Description                           | Default |
 |-------------|------------------|---------------------------------------|---------|
