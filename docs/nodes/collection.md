@@ -6,6 +6,15 @@ A collection node can be thought as a folder/bucket that can hold either an
 <a href="../experiment" target="_blank">Experiment</a> or 
 <a href="../inventory" target="_blank">Inventory</a> node.
 
+## Navigating to Collection
+`Collections` can be easily found on <a href="https://criptapp.org" target="_blank">CRIPT</a> home screen in the 
+<a href="https://criptapp.org/collection/" target="_blank">Collections link</a>
+
+<br/>
+
+!!! warning "Collection names"
+    Collection names Must be unique within a <a href="../project" target="_blank">Project</a>
+
 ---
 
 ## Collection Attributes
@@ -101,7 +110,7 @@ my_collection = cript.Collection.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
 
 #### Get Collection Node via URL
 ``` python
-my_collection = cript.Collection.get(url="https://criptapp.org/material/015fc459-ea9f-4c37-80aa-f51d509095df/")
+my_collection = cript.Collection.get(url="https://criptapp.org/collection/015fc459-ea9f-4c37-80aa-f51d509095df/")
 ```
 
 #### Returns
@@ -110,10 +119,13 @@ CRIPT Collection node of type `cript.data_model.nodes.BaseNode`
 
 #### Parameters
 
-| Name              | Type    | Description                                                    | Default |
-|-------------------|---------|----------------------------------------------------------------|---------|
-| `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
-| `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
+| Name        | Type   | Description                           | Default |
+|-------------|--------|---------------------------------------|---------|
+| `name`      | string | name of the Collection to get         | ""      |
+| `uid`       | string | UID of the specific Collection to get | ""      |
+| `url`       | string | URL of the specific Collection to get | ""      |
+| `get_level` | int    | Level to recursively get nested nodes | 0       |
+| `**kwargs`  |        | Arguments for the constructor.        | `{}`    |
 
 
 ---
@@ -123,7 +135,7 @@ CRIPT Collection node of type `cript.data_model.nodes.BaseNode`
 #### Definition
 Update a saved Collection node with new values
 
-`my_collection.update(get_level=0, **kwargs)`
+`cript.Collection.update(get_level=0, **kwargs)`
 
 #### Example
 ```python
@@ -140,15 +152,13 @@ None
 | `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
 | `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
 
-
-
 ---
 ### Refresh Collection
 
 #### Definition
 Refresh a node to get the latest saved values from CRIPT
 
-`my_collection.refresh(get_level=0)`
+`cript.Collection.refresh(get_level=0)`
 
 #### Example
 ```python
@@ -172,6 +182,7 @@ None
 
 #### Definition
 Delete a Collection node from CRIPT database
+`cript.Collection.delete()`
 
 #### Example
 ```python
