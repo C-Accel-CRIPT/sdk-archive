@@ -15,7 +15,7 @@ Each [`Collection`](collection.md) belongs inside of a single `Project`
 <br/>
 
 !!! warning "Project Name"
-    **Project names Must be globally unique**, meaning no 2 projects on the entire system can have the same name
+    _Project names Must be globally unique_, meaning no 2 projects on the entire system can have the same name
 
 ---
 
@@ -43,21 +43,22 @@ Each [`Collection`](collection.md) belongs inside of a single `Project`
 
 ### Create Project
 
-**Definition**
+_Definition:_
 
 Creates a new Project node and saves it in one line
 
 `cript.Project.create(get_level=0, update_existing=False, **kwargs)`
 
-**Example**
+_Example:_
 ``` python
 my_project = cript.Project.create(name="My project")
 ```
-**Returns**
+
+_Returns:_
 
 Created node of type `cript.data_model.nodes.BaseNode`
 
-**Parameters**
+_Parameters:_
 
 | Name   | Type   | Description                  | Default |
 |--------|--------|------------------------------|---------|
@@ -67,20 +68,20 @@ Created node of type `cript.data_model.nodes.BaseNode`
 
 ### Save Project
 
-**Definition**
+_Definition:_
 
 Save a Project node to CRIPT
 
-**Example**
+_Example:_
 ``` python
 cript.Project.save()
 ```
 
-**Returns**
+_Returns:_
 
 None
 
-**Parameters**
+_Parameters:_
 
 | Name              | Type    | Description                                                    | Default |
 |-------------------|---------|----------------------------------------------------------------|---------|
@@ -93,28 +94,29 @@ None
 
 ### Get Project
 
-**Definition**
+_Definition:_
 
 
-**Get Project Node via Name**
+_Get Project Node via Name:_
 ``` python
 my_project = cript.Project.get(name="My project")
 ```
 
-**Get Project Node via UID**
+_Get Project Node via UID:_
 ``` python
 my_project = cript.Project.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
 ```
 
-**Get Project Node via URL**
+_Get Project Node via URL:_
 ``` python
 my_project = cript.Project.get(url="https://criptapp.org/project/015fc459-ea9f-4c37-80aa-f51d509095df/")
 ```
-**Returns**
+
+_Returns:_
 
 CRIPT Project node of type `cript.data_model.nodes.BaseNode`
 
-**Parameters**
+_Parameters:_
 
 | Name        | Type   | Description                           | Default |
 |-------------|--------|---------------------------------------|---------|
@@ -128,20 +130,21 @@ CRIPT Project node of type `cript.data_model.nodes.BaseNode`
 
 ### Refresh Project
 
-**Definition**
+_Definition:_
 
 Refresh a node to get the latest saved values from CRIPT
 `cript.Project.refresh(get_level=0)`
 
-**Example**
+_Example:_
 ```python
 my_project.refresh(name="My new project name")
 ```
-**Returns**
+
+_Returns:_
 
 None
 
-**Parameters**
+_Parameters:_
 
 | Name              | Type    | Description                                                    | Default |
 |-------------------|---------|----------------------------------------------------------------|---------|
@@ -152,21 +155,22 @@ None
 
 ### Update Project
 
-**Definition**
+_Definition:_
 
 Update a saved Project node with new values
 
 `cript.Project.update(get_level=0, **kwargs)`
 
-**Example**
+_Example:_
 ``` python
 my_project.update(name="My new project name")
 ```
-**Returns**
+
+_Returns:_
 
 None
 
-**Parameters**
+_Parameters:_
 
 | Name              | Type    | Description                                                    | Default |
 |-------------------|---------|----------------------------------------------------------------|---------|
@@ -177,21 +181,22 @@ None
 
 ### Delete Project
 
-**Definition**
+_Definition:_
 
 Delete a Project node from CRIPT database
 
 `cript.Project.delete()`
 
-**Example**
+_Example:_
 ``` python
 my_project.delete()
 ```
-**Returns**
+
+_Returns:_
 
 None
 
-**Parameters**
+_Parameters:_
 
 | Name              | Type    | Description                                                    | Default |
 |-------------------|---------|----------------------------------------------------------------|---------|
@@ -202,23 +207,23 @@ None
 
 ### Search Project
 
-**Definition**
+_Definition:_
 
 Search for a Project within CRIPT. This method returns a paginator object
 
 `cript.Project.search(limit=None, offset=None, get_level=0, **kwargs)`
 
-**Example**
+_Example:_
 
 ```python
 
 ```
 
-**Returns**
+_Returns:_
 
 A Paginator object of type `cript.data_model.paginator.Paginator`
 
-**Parameters**
+_Parameters:_
 
 
 | Name        | Type             | Description                           | Default |

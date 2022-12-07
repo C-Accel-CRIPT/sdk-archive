@@ -43,13 +43,13 @@ A collection node can be thought as a folder/bucket that can hold either an
 
 ### Create Collection
 
-**Definition**
+_Definition:_
 
 The `.create()` method can be used to create a new Collection and save it in one line.
 
 `cript.Collection.create(get_level=0, update_existing=False, **kwargs)`
 
-**Example**
+_Example:_
 
 Creating a `Collection` called *"My Collection"*
 
@@ -57,7 +57,7 @@ Creating a `Collection` called *"My Collection"*
 my_collection = cript.Collection.create(name="My collection")
 ```
 
-**Returns**
+_Returns:_
 
 Created Collection node of type `cript.data_model.nodes.BaseNode`
 
@@ -65,13 +65,13 @@ Created Collection node of type `cript.data_model.nodes.BaseNode`
 
 ### Save Collection
 
-**Definition**
+_Definition:_
 
 By saving a node it will be committed to the CRIPT database and saved there
 `cript.Collection.create()`
 
 
-**Example**
+_Example:_
 
 Creating a Collection node named _"My Collection"_ and saving it to CRIPT
 
@@ -80,11 +80,11 @@ my_collection = cript.Collection.create(name="My collection")
 my_collection.save()
 ```
 
-**Returns**
+_Returns:_
 
 None
 
-**Parameters**
+_Parameters:_
 
 | Name              | Type    | Description                                                    | Default |
 |-------------------|---------|----------------------------------------------------------------|---------|
@@ -96,7 +96,7 @@ None
 ---
 ### Get Collection
 
-**Definition**
+_Definition:_
 
 Get a Collection that has already been saved into CRIPT
 
@@ -104,27 +104,27 @@ Get a Collection that has already been saved into CRIPT
 
 <div style="margin-bottom: 2rem"></div>
 
-**Get Collection Node via Name**
+_Get Collection Node via Name:_
 ``` python
 my_collection = cript.Collection.get(name="My collection")
 ```
 
-**Get Collection Node via UID**
+_Get Collection Node via UID:_
 ``` python
 my_collection = cript.Collection.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
 ```
 
-**Get Collection Node via URL**
+_Get Collection Node via URL:_
 ``` python
 my_collection = cript.Collection.get(url="https://criptapp.org/collection/015fc459-ea9f-4c37-80aa-f51d509095df/")
 ```
 
-**Returns**
+_Returns:_
 
 CRIPT Collection node of type `cript.data_model.nodes.BaseNode`
 
 
-**Parameters**
+_Parameters:_
 
 
 | Name        | Type   | Description                           | Default |
@@ -140,23 +140,23 @@ CRIPT Collection node of type `cript.data_model.nodes.BaseNode`
 
 ### Update Collection
 
-**Definition**
+_Definition:_
 
 Update a saved Collection node with new values
 
 `cript.Collection.update(get_level=0, **kwargs)`
 
-**Example**
+_Example:_
 
 ```python
 my_collection.update(name="My new collection name")
 ```
 
-**Returns**
+_Returns:_
 
 None
 
-**Parameters**
+_Parameters:_
 
 
 | Name              | Type    | Description                                                    | Default |
@@ -167,23 +167,23 @@ None
 ---
 ### Refresh Collection
 
-**Definition**
+_Definition:_
 
 Refresh a node to get the latest saved values from CRIPT
 
 `cript.Collection.refresh(get_level=0)`
 
-**Example**
+_Example:_
 
 ```python
 my_collection.refresh(name="My new collection name")
 ```
 
-**Returns**
+_Returns:_
 
 None
 
-**Parameters**
+_Parameters:_
 
 
 | Name              | Type    | Description                                                    | Default |
@@ -196,23 +196,23 @@ None
 
 ### Delete Collection
 
-**Definition**
+_Definition:_
 
 Delete a Collection node from CRIPT database
 
 `cript.Collection.delete()`
 
-**Example**
+_Example:_
 
 ```python
 my_collection.delete()
 ```
 
-**Returns**
+_Returns:_
 
 None
 
-**Parameters**
+_Parameters:_
 
 
 | Name              | Type    | Description                                                    | Default |
@@ -226,24 +226,24 @@ None
 
 ### Search Collection
 
-**Definition**
+_Definition:_
 
 Search for a Collection within CRIPT. This method returns a paginator object
 
 `cript.Collection.search(limit=None, offset=None, get_level=0, **kwargs)`
 
-**Example**
+_Example:_
 
 
 ```python
 
 ```
 
-**Returns**
+_Returns:_
 
 A Paginator object of type `cript.data_model.paginator.Paginator`
 
-**Parameters**
+_Parameters:_
 
 
 | Name        | Type             | Description                           | Default |
