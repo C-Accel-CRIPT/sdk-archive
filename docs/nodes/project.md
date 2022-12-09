@@ -1,10 +1,12 @@
 # Project
 
 ## Definition
+
+A `Project` is the highest level node that is **Not** nested inside of any other node.
 A `Project` can be thought of as a folder that can contain 
 <a href="../collection" target="_blank">`Collections`</a>, 
 <a href="../material" target="_blank">`Materials`</a>, and
-<a href="../file" target="_blank">`Files`</a>
+<a href="../file" target="_blank">`Files`</a>.
 
 ## Navigating to Projects
 `Projects` can be easily found on <a href="https://criptapp.org" target="_blank">CRIPT</a> home screen in the 
@@ -97,11 +99,6 @@ _Parameters:_
 _Definition:_
 
 
-_Get Project Node via Name:_
-``` python
-my_project = cript.Project.get(name="My project")
-```
-
 _Get Project Node via UID:_
 ``` python
 my_project = cript.Project.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
@@ -110,6 +107,11 @@ my_project = cript.Project.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
 _Get Project Node via URL:_
 ``` python
 my_project = cript.Project.get(url="https://criptapp.org/project/015fc459-ea9f-4c37-80aa-f51d509095df/")
+```
+
+_Get Project Node via Name:_
+``` python
+my_project = cript.Project.get(name="My project")
 ```
 
 _Returns:_
