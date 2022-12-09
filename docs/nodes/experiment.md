@@ -24,9 +24,22 @@ A `Experiment` node can be thought as a folder/bucket that can hold:
 ## Experiment Attributes
 
 ```json
-
-
-
+{
+    "url": "https://criptapp.org/api/experiment/2af8c9df-5aac-425a-9a7e-de853d3f4701/",
+    "uid": "2af8c9df-5aac-425a-9a7e-de853d3f4701",
+    "group": "https://criptapp.org/api/group/55469baa-997a-44de-8284-462524879c14/",
+    "name": "Navid's Test Experiment",
+    "funding": [],
+    "notes": null,
+    "collection": "https://criptapp.org/api/collection/20762529-b2a2-4e31-b722-5ecb5d4c8bf3/",
+    "processes": "https://criptapp.org/api/experiment/2af8c9df-5aac-425a-9a7e-de853d3f4701/processes/",
+    "computational_processes": "https://criptapp.org/api/experiment/2af8c9df-5aac-425a-9a7e-de853d3f4701/computational-processes/",
+    "computations": "https://criptapp.org/api/experiment/2af8c9df-5aac-425a-9a7e-de853d3f4701/computations/",
+    "data": "https://criptapp.org/api/experiment/2af8c9df-5aac-425a-9a7e-de853d3f4701/data/",
+    "public": false,
+    "created_at": "2022-12-07T20:48:20.450630Z",
+    "updated_at": "2022-12-07T20:48:20.572995Z"
+}
 ```
 
 ---
