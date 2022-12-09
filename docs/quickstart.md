@@ -42,11 +42,6 @@ proj.save()
 ---
 ## Get a Node
 
-### Get Node via Name
-```python
-proj = cript.Project.get(name="My project")
-```
-
 ### Get Node via UID
 ```python
 styrene = cript.Material.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
@@ -57,6 +52,23 @@ styrene = cript.Material.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
 styrene = cript.Material.get(url="https://criptapp.org/material/015fc459-ea9f-4c37-80aa-f51d509095df/")
 ```
 
+### Get Node via Name
+```python
+proj = cript.Project.get(name="My project")
+```
+
+??? tip "UID and URL are preferable"
+    Getting a node via UID and URL are preferred methods because they are unmistakable. 
+
+    When getting a node via `name` please be sure to also pass the node that it is nested under.
+
+    For example `Collection` is nested under `Project`:
+    ```python
+    project = cript.Project.get(name="My project")
+    collection = cript.Collection.get(name="My collection", project=project)
+    ```
+
+    Project does not need any other parameters because a project is the highest level node
 
 ---
 
@@ -124,6 +136,8 @@ path = "path/to/local/file"
 file = cript.File(project=proj, source=path)
 file.save()
 ```
+
+> When a node is saved it is given a URL and UID
 
 ---
 
