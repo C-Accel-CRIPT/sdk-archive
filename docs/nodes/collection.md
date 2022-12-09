@@ -2,7 +2,8 @@
 
 ## Definition
 
-A collection node can be thought as a folder/bucket that can hold either an 
+A `Collection` is nested inside of a `Project` node.
+A `Collection` node can be thought as a folder/bucket that can hold either an 
 <a href="../experiment" target="_blank">Experiment</a> or 
 <a href="../inventory" target="_blank">Inventory</a> node.
 
@@ -104,11 +105,6 @@ Get a Collection that has already been saved into CRIPT
 
 <div style="margin-bottom: 2rem"></div>
 
-_Get Collection Node via Name:_
-``` python
-my_collection = cript.Collection.get(name="My collection")
-```
-
 _Get Collection Node via UID:_
 ``` python
 my_collection = cript.Collection.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
@@ -119,6 +115,16 @@ _Get Collection Node via URL:_
 my_collection = cript.Collection.get(url="https://criptapp.org/collection/015fc459-ea9f-4c37-80aa-f51d509095df/")
 ```
 
+_Get Collection Node via Name:_
+
+``` python
+project = cript.Project.get(name="My project")
+collection = cript.Collection.get(name="My collection", project=project)
+```
+
+??? info "Why Project is needed"
+    When getting a Collection via name, the project must also be specified since collection is nested under project and the collection name is only unique among other collections within the project.
+
 _Returns:_
 
 CRIPT Collection node of type `cript.data_model.nodes.BaseNode`
@@ -127,13 +133,14 @@ CRIPT Collection node of type `cript.data_model.nodes.BaseNode`
 _Parameters:_
 
 
-| Name        | Type   | Description                           | Default |
-|-------------|--------|---------------------------------------|---------|
-| `name`      | string | name of the Collection to get         | ""      |
-| `uid`       | string | UID of the specific Collection to get | ""      |
-| `url`       | string | URL of the specific Collection to get | ""      |
-| `get_level` | int    | Level to recursively get nested nodes | 0       |
-| `**kwargs`  |        | Arguments for the constructor.        | `{}`    |
+| Name        | Type   | Description                                          | Default |
+|-------------|--------|------------------------------------------------------|---------|
+| `name`      | string | Name of the Collection to get                        | " "     |
+| `project`   | string | Project name that the Collection is nested inside of | " "     |
+| `uid`       | string | UID of the specific Collection to get                | " "     |
+| `url`       | string | URL of the specific Collection to get                | " "     |
+| `get_level` | int    | Level to recursively get nested nodes                | 0       |
+| `**kwargs`  |        | Arguments for the constructor.                       | `{}`    |
 
 
 ---
