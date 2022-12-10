@@ -1,14 +1,36 @@
 # Data
 
-::: cript.data_model.Data
+## Definition
 
-::: cript.data_model.nodes.base_node.BaseNode
-    options:
-        members:
-            - save
-            - delete
-            - refresh
-            - update
-            - create
-            - get
-            - search
+
+
+## 
+
+
+## Sub-Objects
+* <a href="../../subobjects/citation" target="_blank">Citation</a>
+
+
+## Attributes
+
+| Attribute | Type | Example                        | Description                     | Required |
+|-----------|------|--------------------------------|---------------------------------|----------|
+
+
+## data Node
+
+```json
+
+```
+
+
+
+## Navigating to data 
+
+## Create
+
+## Save
+
+## Get
+
+## Delete

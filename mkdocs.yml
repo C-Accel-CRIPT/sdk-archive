@@ -13,7 +13,7 @@ nav:
   - Nodes:
       - Collection: nodes/collection.md
       - Computation: nodes/computation.md
-      - ComputationalProcess: nodes/computational_process.md
+      - Computational Process: nodes/computational_process.md
       - Data: nodes/data.md
       - Experiment: nodes/experiment.md
       - Inventory: nodes/inventory.md
@@ -32,7 +32,7 @@ nav:
       - Parameter: subobjects/parameter.md
       - Property: subobjects/property.md
       - Quantity: subobjects/quantity.md
-      - SoftwareConfiguration: subobjects/software_configuration.md
+      - Software Configuration: subobjects/software_configuration.md
   - Supporting Nodes: 
     - File: supporting_nodes/file.md
     - Group: supporting_nodes/group.md

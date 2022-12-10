@@ -29,6 +29,10 @@ Propertys are a key-value pair, with ‘key’ specifying the type of Property a
 </a>
 
 
+## Sub-Objects of Property
+* <a href="../../subobjects/condition" target="_blank">Condition</a>
+* <a href="../../subobjects/citation" target="_blank">Citation</a>
+
 ## Code Example
 
 ### Adding Property to Material
