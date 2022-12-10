@@ -16,15 +16,12 @@ nav:
       - ComputationalProcess: nodes/computational_process.md
       - Data: nodes/data.md
       - Experiment: nodes/experiment.md
-      - File: nodes/file.md
-      - Group: nodes/group.md
       - Inventory: nodes/inventory.md
       - Material: nodes/material.md
       - Project: nodes/project.md
       - Process: nodes/process.md
       - Reference: nodes/reference.md
       - Software: nodes/software.md
-      - User: nodes/user.md
   - Sub-objects:
       - Algorithm: subobjects/algorithm.md
       - Citation: subobjects/citation.md
@@ -36,6 +33,10 @@ nav:
       - Property: subobjects/property.md
       - Quantity: subobjects/quantity.md
       - SoftwareConfiguration: subobjects/software_configuration.md
+  - Supporting Nodes: 
+    - File: supporting_nodes/file.md
+    - Group: supporting_nodes/group.md
+    - User: supporting_nodes/user.md
   - API: api.md
   - Paginator: paginator.md
   - Exceptions: exceptions.md
