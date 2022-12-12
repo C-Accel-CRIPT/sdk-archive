@@ -1,7 +1,10 @@
 # Citation
 
 ## Definition
-
+The citation sub-object provides a link to papers, books, or other scholarly work and allows users
+to specify in what way the work relates to that data. More specifically, users can specify that the
+data was directly extracted from, inspired by, derived from, etc. the 
+<a href="../../nodes/reference" target="_blank">Reference</a>.
 
 
 ## Super-Objects
@@ -14,26 +17,27 @@
 * <a href="../algorithm" target="_blank">Algorithm</a>
 * <a href="../software_configuration" target="_blank">Software Configuration</a>
 
-## Sub-Objects
-
 
 ## Attributes
 
-| Attribute | Type | Example                        | Description                     | Required |
-|-----------|------|--------------------------------|---------------------------------|----------|
+| Attribute | Type | Example               | Description                                                               | Required |
+|-----------|------|-----------------------|---------------------------------------------------------------------------|----------|
+| type      | str  | "derived_from"        | Pick from [CRIPT citation type](https://criptapp.org/keys/citation-type/) | True     |
+| reference | str  | "My Scholarly Article | Reference to a book, paper, or scholarly work                             | True     |
 
 
 ## Citation Node
 
-```json
+```json linenums="1" hl_lines="10"
 
 ```
 
-
-
-## Navigating to Citation 
+## Navigating to Citation
 
 ## Create
+```python
+my_citation = cript.citation(")
+```
 
 ## Save
 
