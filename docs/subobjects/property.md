@@ -2,7 +2,7 @@
 
 ## Definition
 
-A `Property` sub-object can exists for the following nodes:
+A `Property` sub-object and can be added to the following nodes:
 
 * <a href="../nodes/material" target="_blank">Material</a>
 * <a href="../nodes/process" target="_blank">Process</a>
@@ -35,19 +35,26 @@ Propertys are a key-value pair, with ‘key’ specifying the type of Property a
 
 ## Code Example
 
-### Adding Property to Material
+### Adding Property to node
 ```python
-
+my_property = cript.Property(
+    key="yield_mass", 
+    value=0.47, 
+    unit="g", 
+    method="scale"
+)
 ```
 
-### Adding Property to Process
+### Adding Property to node
 ```python
+material = cript.Material.get(uid="c27e320e-23f6-47d5-8348-1b842e7b9767")
 
+material.add_property(my_property)
 ```
 
-### Adding Property to Computational Process
+## Save Property
 ```python
-
+material.save()
 ```
 
 
