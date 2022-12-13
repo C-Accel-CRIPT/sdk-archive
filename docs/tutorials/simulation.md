@@ -1,6 +1,8 @@
+# Simulation example workflow
+
 > Refer to [Quickstart](./quickstart.md) for installation instructions.
 
-### Connect to the public API
+## Connect to the public API
 
 ```py
 import cript

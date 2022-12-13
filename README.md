@@ -1,6 +1,6 @@
-![CRIPT Logo](/CRIPT_full_logo_colored_transparent.png)
-
 # CRIPT Python SDK
+
+![CRIPT Logo](/CRIPT_full_logo_colored_transparent.png)
 
 [![License](https://img.shields.io/github/license/C-Accel-CRIPT/cript?style=flat-square)](https://github.com/C-Accel-CRIPT/cript/blob/master/LICENSE.txt)
 [![Python](https://img.shields.io/badge/Language-Python%203.9+-blue?style=flat-square&logo=python)](https://www.python.org/)

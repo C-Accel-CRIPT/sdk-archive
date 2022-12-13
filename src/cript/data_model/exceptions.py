@@ -19,8 +19,10 @@ class UniqueNodeError(CRIPTError):
         all_urls = re.findall(url_find_pattern, message)
         if len(all_urls) > 0:
             if len(all_urls) > 1:
-                warning.warn(
-                    "UniqueNodeError found more than one possible URL of a unique node. Please report this bug here: https://github.com/C-Accel-CRIPT/cript/issues Thank you."
+                warnings.warn(
+                    "UniqueNodeError found more than one possible URL of a unique node."
+                    " Please report this bug here:"
+                    " https://github.com/C-Accel-CRIPT/cript/issues Thank you."
                 )
             self.existing_url = all_urls[0]
             while self.existing_url[-1] == ".":
@@ -28,7 +30,9 @@ class UniqueNodeError(CRIPTError):
 
         if self.existing_url is None:
             warnings.warn(
-                "UniqueNodeError failed to extract unique URL of existing node, please report this bug here: https://github.com/C-Accel-CRIPT/cript/issues Thank you."
+                "UniqueNodeError failed to extract unique URL of existing node."
+                " Please report this bug here:"
+                " https://github.com/C-Accel-CRIPT/cript/issues Thank you."
             )
 
     def __str__(self):

@@ -75,7 +75,7 @@ class Base(abc.ABC):
 
             # Generate nodes
             api = get_cached_api_session()
-            if isinstance(value, str) and api.url in value and skip_nodes == False:
+            if isinstance(value, str) and api.url in value and not skip_nodes:
                 # Check if node already exists in memory
                 local_node = get_cached_node(value)
                 if local_node:
@@ -110,7 +110,7 @@ class Base(abc.ABC):
                     if (
                         isinstance(value[i], str)
                         and api.url in value[i]
-                        and skip_nodes == False
+                        and not skip_nodes
                     ):
                         # Check if node already exists in memory
                         local_node = get_cached_node(value[i])

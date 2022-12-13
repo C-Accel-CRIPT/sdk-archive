@@ -92,7 +92,7 @@ class File(BaseNode):
             # Check if a unique error was returned
             if "unique" in response:
                 unique_url = response.pop("unique")
-                if unique_url and update_existing == True:
+                if unique_url and update_existing:
                     # Update existing unique node
                     self.url = unique_url
                     self.save(get_level=get_level)

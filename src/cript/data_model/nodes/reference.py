@@ -62,7 +62,8 @@ class Reference(BaseNode):
 
         :param node: The node to be saved.
         :param get_level: Level to recursively get nested nodes.
-        :param update_existing: Indicates whether to update an existing node with the same unique fields.
+        :param update_existing: Indicates whether to update an existing node with
+                                the same unique fields.
         """
         api = get_cached_api_session(self.url)
 
@@ -76,7 +77,7 @@ class Reference(BaseNode):
         # Check if a unique error was returned
         if "unique" in response:
             unique_url = response.pop("unique")
-            if unique_url and update_existing == True:
+            if unique_url and update_existing:
                 # Update existing unique node
                 self.url = unique_url
                 self.save(get_level=get_level)
