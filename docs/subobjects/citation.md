@@ -23,7 +23,7 @@ data was directly extracted from, inspired by, derived from, etc. the
 | Attribute | Type | Example               | Description                                                               | Required |
 |-----------|------|-----------------------|---------------------------------------------------------------------------|----------|
 | type      | str  | "derived_from"        | Pick from [CRIPT citation type](https://criptapp.org/keys/citation-type/) | True     |
-| reference | str  | "My Scholarly Article | Reference to a book, paper, or scholarly work                             | True     |
+| reference | str  | "My Scholarly Article" | Reference to a book, paper, or scholarly work                             | True     |
 
 
 ## Citation Node

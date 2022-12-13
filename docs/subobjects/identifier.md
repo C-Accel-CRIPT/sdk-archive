@@ -17,7 +17,7 @@ Identifiers are a key-value pair, with ‘key’ specifying the type of identifi
 </a>
 
 
-## Code Example
+## Create Identifier
 
 ```python
 # get polystyrene from CRIPT
@@ -28,10 +28,16 @@ identifier_bigsmiles = cript.Identifier(
     key="bigsmiles", 
     value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
 )
+```
 
+## Add Identifier to Material
+```python
 # attach the identifiers to the material
 polystyrene.add_identifier(bigsmiles)
+```
 
+## Save Material with Identifier
+```python
 # save the node to CRIPT database
 polystyrene.save()
 ```

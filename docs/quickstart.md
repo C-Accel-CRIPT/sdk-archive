@@ -36,7 +36,7 @@ proj = cript.Project.create(name="My project")
 proj.save()
 ```
 
-??? note
+??? info
     `.create()` instantiates and saves the object in one go
 
 ---
@@ -57,7 +57,7 @@ styrene = cript.Material.get(url="https://criptapp.org/material/015fc459-ea9f-4c
 proj = cript.Project.get(name="My project")
 ```
 
-??? tip "UID and URL are preferable"
+??? note "UID and URL are preferable"
     Getting a node via UID and URL are preferred methods because they are unmistakable. 
 
     When getting a node via `name` please be sure to also pass the node that it is nested under.
