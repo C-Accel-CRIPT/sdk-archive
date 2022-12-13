@@ -1,22 +1,17 @@
 import os
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
+from cript.cache import get_cached_api_session
+from cript.data_model.exceptions import FileSizeLimitError, UniqueNodeError
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.project import Project
-from cript.storage_clients import GlobusClient
-from cript.storage_clients import AmazonS3Client
-from cript.utils import sha256_hash
-from cript.data_model.utils import auto_assign_group
-from cript.utils import convert_file_size
-from cript.data_model.utils import set_node_attributes
-from cript.cache import get_cached_api_session
-from cript.data_model.exceptions import FileSizeLimitError
-from cript.data_model.exceptions import UniqueNodeError
-
+from cript.data_model.utils import auto_assign_group, set_node_attributes
+from cript.storage_clients import AmazonS3Client, GlobusClient
+from cript.utils import convert_file_size, sha256_hash
 
 logger = getLogger(__name__)
 

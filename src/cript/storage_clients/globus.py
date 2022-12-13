@@ -1,17 +1,16 @@
 import json
-
-import requests
 from logging import getLogger
+
 import globus_sdk
+import requests
 from globus_sdk.scopes import ScopeBuilder
 
 from cript.data_model.nodes.base_node import BaseNode
 from cript.storage_clients.exceptions import (
-    InvalidAuthCode,
-    FileUploadError,
     FileDownloadError,
+    FileUploadError,
+    InvalidAuthCode,
 )
-
 
 logger = getLogger(__name__)
 

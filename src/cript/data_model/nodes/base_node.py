@@ -7,18 +7,16 @@ from urllib.parse import urlparse
 
 from beartype import beartype
 
+from cript.cache import cache_node, get_cached_api_session, get_cached_node
 from cript.data_model.base import Base
+from cript.data_model.exceptions import (
+    AddNodeError,
+    RemoveNodeError,
+    UniqueNodeError,
+    UnsavedNodeError,
+)
 from cript.data_model.paginator import Paginator
-from cript.cache import cache_node
-from cript.cache import get_cached_api_session
-from cript.cache import get_cached_node
-from cript.data_model.utils import set_node_attributes
-from cript.data_model.utils import create_node
-from cript.data_model.exceptions import UniqueNodeError
-from cript.data_model.exceptions import UnsavedNodeError
-from cript.data_model.exceptions import AddNodeError
-from cript.data_model.exceptions import RemoveNodeError
-
+from cript.data_model.utils import create_node, set_node_attributes
 
 logger = getLogger(__name__)
 

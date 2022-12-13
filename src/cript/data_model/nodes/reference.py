@@ -1,13 +1,13 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
+from cript.cache import get_cached_api_session
+from cript.data_model.exceptions import UniqueNodeError
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
-from cript.cache import get_cached_api_session
 from cript.data_model.utils import set_node_attributes
-from cript.data_model.exceptions import UniqueNodeError
 
 logger = getLogger(__name__)
 

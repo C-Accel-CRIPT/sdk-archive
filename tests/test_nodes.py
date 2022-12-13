@@ -1,14 +1,13 @@
 import json
-
-import pytest
-import requests
-import psycopg2
-
-import cript
-
-from requests.exceptions import ConnectionError
 from tempfile import NamedTemporaryFile
 from unittest import mock
+
+import psycopg2
+import pytest
+import requests
+from requests.exceptions import ConnectionError
+
+import cript
 
 MY_GROUP = "MyGroup"
 MY_PROJECT = "MyProject"
