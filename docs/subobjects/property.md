@@ -47,14 +47,14 @@ my_property = cript.Property(
 
 ### Adding Property to node
 ```python
-material = cript.Material.get(uid="c27e320e-23f6-47d5-8348-1b842e7b9767")
+material = cript.Material.get(uid="c27e320e-23f6-47d5-8348-1b842e7b9767") # get node
 
-material.add_property(my_property)
+material.add_property(my_property)  # add property to node
 ```
 
 ## Save Property
 ```python
-material.save()
+material.save() # save node to save property with it
 ```
 
 
