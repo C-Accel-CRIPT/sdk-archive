@@ -1,7 +1,10 @@
 # Process
 
 ## Definition
-<!-- TODO needs to be converted from software template to process -->
+The process node contains a list of ingredients, quantities, and procedure information for an
+experimental material transformation (chemical and physical).
+
+
 
 ## Nested Under
 
@@ -101,12 +104,31 @@
 
 
 
-## Navigating to Process 
+## Navigating to Process
+
+## Process Type
 
 ## Create Process Node
 
+```python
+expt = cript.Experiment.get(uid="e8ab6e1d-fd39-44c3-ac34-4d0a32296327")
+
+prcs = cript.Process(
+    experiment=expt, 
+    name="my process name",
+    type = "multistep",
+    description = "this is a description of my process"
+)
+```
+
 ## Save Process Node
+```python
+prcs.save()
+```
 
 ## Get Process Node
 
 ## Delete Process Node
+```python
+prcs.delete()
+```
