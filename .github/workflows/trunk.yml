@@ -3,11 +3,13 @@ name: trunk
 on:
   push:
     branches:
-      - main
+      - master
+      - develop
       - trunk-merge/**
   pull_request:
     branches:
-      - main
+      - master
+      - develop
   # Allows you (and trunk) to run this workflow
   workflow_dispatch:
   workflow_call:
