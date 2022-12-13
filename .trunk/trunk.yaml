@@ -25,8 +25,8 @@ runtimes:
     - python@3.10.8
 actions:
   disabled:
-    - trunk-check-pre-push
-    - trunk-fmt-pre-commit
   enabled:
     - trunk-announce
     - trunk-upgrade-available
+    - trunk-check-pre-push
+    - trunk-fmt-pre-commit
