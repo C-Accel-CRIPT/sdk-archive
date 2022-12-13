@@ -7,7 +7,7 @@ data was directly extracted from, inspired by, derived from, etc. the
 <a href="../../nodes/reference" target="_blank">Reference</a>.
 
 
-## Super-Objects
+## Can be added to
 * <a href="../../nodes/process" target="_blank">Process</a>
 * <a href="../../nodes/data" target="_blank">Data</a>
 * <a href="../../nodes/computational_process" target="_blank">Computational Process</a>
@@ -36,11 +36,20 @@ data was directly extracted from, inspired by, derived from, etc. the
 
 ## Create
 ```python
-my_citation = cript.citation(")
+my_citation = cript.citation(type="extracted_by_nlp", reference="https://myreference.com")
+```
+
+## Add Citation to Node
+```python
+data.add_citation(my_citation)
 ```
 
 ## Save
-
-## Get
+```python
+data.save()
+```
 
 ## Delete
+```python
+data.delete()
+```
