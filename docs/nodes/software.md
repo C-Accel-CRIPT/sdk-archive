@@ -5,6 +5,9 @@
 The `software` node contains metadata for a computation tool, code, programing language, or
 software package.
 
+Similar to the [reference](./reference.md) node, the software node does not contain the base
+attributes and is meant to always be public and static.
+
 ## 
 `software` is nested inside of 
 <a href="../computational_process" target="_blank">`computational_process`</a>
