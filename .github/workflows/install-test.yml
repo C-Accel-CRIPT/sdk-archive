@@ -28,7 +28,12 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install CRIPT
+      - name: Install python dependecies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest
+
+      - name: Install CRIPT Python SDK
         run: pip install .
 
       - name: Run pytest
