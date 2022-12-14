@@ -33,17 +33,17 @@ my_ingredient = cript.Ingredient(
 
 ## Add Ingredient to Process
 ```python
-prcs.add_ingredient(initiator)
+my_process.add_ingredient(initiator)
 ```
 
 ## Save Ingredient
 ```python
-prcs.save()
+my_process.save()
 ```
 
-## Delete
+## Remove Ingredient
 ```python
-prcs.delete()
+my_process.remove_ingredient(initiator)
 ```
 
 ## Ingredient Node
