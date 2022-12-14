@@ -11,7 +11,7 @@ Equipment are physical instruments, tools, glassware, etc. used in a process.
     equipment sub-object with the use of a [File](../supporting_nodes/file.md)
 
 
-## Super-Object
+## Equipment can be added to:
 * <a href="../../nodes/process" target="_blank">Process</a>
 
 
@@ -40,17 +40,17 @@ equipment = cript.Equipment(key="hot plate", description="Hot plate with silicon
 
 ## Add Equipment to Process
 ```python
-process.equipment.append(equipment)
+my_process.equipment.append(equipment)
 ```
 
 ## Save
 ```python
-process.save()
+my_process.save()
 ```
 
-## Delete
+## Remove Equipment from Node
 ```python
-equipment.delete()
+my_process.remove_equipment(equipment)
 ```
 
 
