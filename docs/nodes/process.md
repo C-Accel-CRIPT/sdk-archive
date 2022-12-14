@@ -27,10 +27,10 @@ experimental material transformation (chemical and physical).
 ??? tip "Process Node"
     ```json
     {
-        "url": "https://staging.criptapp.org/api/process/2d8c2248-e210-451f-b6f2-a76a690afa3e/",
+        "url": "https://criptapp.org/api/process/2d8c2248-e210-451f-b6f2-a76a690afa3e/",
         "uid": "2d8c2248-e210-451f-b6f2-a76a690afa3e",
-        "group": "https://staging.criptapp.org/api/group/ac0415e5-e8d2-485e-ad7d-5029b73dc3c1/",
-        "experiment": "https://staging.criptapp.org/api/experiment/57ebd710-a2fd-4b12-b386-b927260f6b76/",
+        "group": "https://criptapp.org/api/group/ac0415e5-e8d2-485e-ad7d-5029b73dc3c1/",
+        "experiment": "https://criptapp.org/api/experiment/57ebd710-a2fd-4b12-b386-b927260f6b76/",
         "name": "Anionic of Styrene - 1",
         "type": "no_op",
         "keywords": [
@@ -43,7 +43,7 @@ experimental material transformation (chemical and physical).
         "prerequisite_processes": [],
         "ingredients": [
             {
-                "material": "https://staging.criptapp.org/api/material/e3cd0a06-88a8-455e-bf94-74ed7a5d2c3d/",
+                "material": "https://criptapp.org/api/material/e3cd0a06-88a8-455e-bf94-74ed7a5d2c3d/",
                 "keyword": "solvent",
                 "quantities": [
                     {
