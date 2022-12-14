@@ -64,7 +64,7 @@ path = "C:\Users\navid\OneDrive\Desktop\CRIPT_Downloads"
 file.download_file(path=path)
 ```
 
-!!! note "Default Download"
+!!! info "Default Download"
     The default path for a download is your current directory
 
 ## Get
