@@ -42,6 +42,11 @@ polystyrene.add_identifier(bigsmiles)
 polystyrene.save()
 ```
 
+## Remove Identifier
+```python
+polystyrene.remove_identifier(bigsmiles)
+```
+
 <br/>
 
 ## Object Example
