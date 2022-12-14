@@ -1,23 +1,20 @@
-import warnings
 import json
+import warnings
+from distutils.version import StrictVersion
 from getpass import getpass
 from logging import getLogger
-from distutils.version import StrictVersion
 from urllib.parse import urlparse
 
 import requests
 from beartype import beartype
 
 from cript.api.base import APIBase
+from cript.api.exceptions import APIError
+from cript.api.utils import convert_to_api_url, get_api_url
+from cript.cache import cache_api_session
 from cript.data_model.nodes.user import User
 from cript.data_model.utils import create_node
-from cript.cache import cache_api_session
-from cript.api.utils import get_api_url
-from cript.api.utils import convert_to_api_url
-from cript.storage_clients import GlobusClient
-from cript.storage_clients import AmazonS3Client
-from cript.api.exceptions import APIError
-
+from cript.storage_clients import AmazonS3Client, GlobusClient
 
 logger = getLogger(__name__)
 

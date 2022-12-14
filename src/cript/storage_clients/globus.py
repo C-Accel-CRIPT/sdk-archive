@@ -1,17 +1,16 @@
 import json
-
-import requests
 from logging import getLogger
+
 import globus_sdk
+import requests
 from globus_sdk.scopes import ScopeBuilder
 
 from cript.data_model.nodes.base_node import BaseNode
 from cript.storage_clients.exceptions import (
-    InvalidAuthCode,
-    FileUploadError,
     FileDownloadError,
+    FileUploadError,
+    InvalidAuthCode,
 )
-
 
 logger = getLogger(__name__)
 
@@ -160,7 +159,7 @@ class GlobusClient:
         try:
             token_response = self.auth_client.oauth2_exchange_code_for_tokens(auth_code)
         except globus_sdk.services.auth.errors.AuthAPIError as error:
-            raise InvalidAuthCode
+            raise InvalidAuthCode from error
 
         auth_data = token_response.by_resource_server["auth.globus.org"]
         transfer_data = token_response.by_resource_server["transfer.api.globus.org"]

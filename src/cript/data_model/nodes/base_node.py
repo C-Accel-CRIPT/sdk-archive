@@ -3,22 +3,19 @@ import copy
 import json
 from logging import getLogger
 from typing import Union
-from urllib.parse import urlparse
 
 from beartype import beartype
 
+from cript.cache import cache_node, get_cached_api_session, get_cached_node
 from cript.data_model.base import Base
+from cript.data_model.exceptions import (
+    AddNodeError,
+    RemoveNodeError,
+    UniqueNodeError,
+    UnsavedNodeError,
+)
 from cript.data_model.paginator import Paginator
-from cript.cache import cache_node
-from cript.cache import get_cached_api_session
-from cript.cache import get_cached_node
-from cript.data_model.utils import set_node_attributes
-from cript.data_model.utils import create_node
-from cript.data_model.exceptions import UniqueNodeError
-from cript.data_model.exceptions import UnsavedNodeError
-from cript.data_model.exceptions import AddNodeError
-from cript.data_model.exceptions import RemoveNodeError
-
+from cript.data_model.utils import create_node, set_node_attributes
 
 logger = getLogger(__name__)
 
@@ -51,7 +48,8 @@ class BaseNode(Base, abc.ABC):
 
         :param node: The node to be saved.
         :param get_level: Level to recursively get nested nodes.
-        :param update_existing: Indicates whether to update an existing node with the same unique fields.
+        :param update_existing: Indicates whether to update an
+                                existing node with the same unique fields.
         """
         api = get_cached_api_session(self.url)
 
@@ -69,7 +67,7 @@ class BaseNode(Base, abc.ABC):
             # Check if a unique error was returned
             if "unique" in response:
                 unique_url = response.pop("unique")
-                if unique_url and update_existing == True:
+                if unique_url and update_existing:
                     # Update existing unique node
                     self.url = unique_url
                     self.save(get_level=get_level)
@@ -139,7 +137,8 @@ class BaseNode(Base, abc.ABC):
         Immediately creates a node.
 
         :param get_level: Level to recursively get nested nodes.
-        :param update_existing: Indicates whether to update an existing node with the same unique fields.
+        :param update_existing: Indicates whether to update an existing node with the
+                                same unique fields.
         :param **kwargs: Arguments for the constructor.
         :return: The created node.
         :rtype: cript.data_model.nodes.BaseNode
@@ -162,7 +161,7 @@ class BaseNode(Base, abc.ABC):
         level = kwargs.pop("level", 0)
 
         if len(kwargs) == 0:
-            raise AttributeError(f"Query arguments must be provided.")
+            raise AttributeError("Query arguments must be provided.")
 
         api = get_cached_api_session()
 
@@ -208,7 +207,7 @@ class BaseNode(Base, abc.ABC):
         :rtype: cript.data_model.paginator.Paginator
         """
         if len(kwargs) == 0:
-            raise AttributeError(f"Query arguments must be provided.")
+            raise AttributeError("Query arguments must be provided.")
 
         api = get_cached_api_session()
         url = f"{api.search_url}/{cls.slug}/"
