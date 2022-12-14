@@ -11,6 +11,11 @@ Some examples of identifiers include: _SMILES_, _BigSMILES_, _chemical_id_, etc.
 Identifiers are a key-value pair, with ‘key’ specifying the type of identifier and
 ‘value’ being the content
 
+## Attributes
+| Attribute   | Type                                         | Example                                         | Description                                                                    | Required |
+|-------------|----------------------------------------------|-------------------------------------------------|--------------------------------------------------------------------------------|----------|
+
+
 ## List of Material Identifier Keys
 <a href="https://criptapp.org/keys/material-identifier-key/" target="_blank">
   material identifier controlled vocabulary
