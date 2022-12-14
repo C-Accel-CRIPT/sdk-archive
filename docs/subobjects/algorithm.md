@@ -4,7 +4,8 @@
 
 
 
-## Super-Object
+## Can be added to
+* <a href="../software_configuration" target="_blank">Software Configuration</a>
 
 
 ## Sub-Objects
@@ -14,8 +15,49 @@
 
 ## Attributes
 
-| Attribute | Type | Example                        | Description                     | Required |
-|-----------|------|--------------------------------|---------------------------------|----------|
+| Attribute | Type                            | Example             | Description                                   | Required |
+|-----------|---------------------------------|---------------------|-----------------------------------------------|----------|
+| key       | str                             | "advanced_sampling" | type of algorithm                             | True     |
+| type      | str                             |                     | specific type of configuration, algorithm     | True     |
+| parameter | list[[Parameter](../parameter)] |                     | setup associated parameters                   | False    |
+| citation  | list[[Citation](../citation)]   |                     | reference to a book, paper, or scholarly work | False    |
+
+
+
+## Valid algorithm keys
+Please visit 
+<a href="https://criptapp.org/keys/algorithm-key/" target="_blank">CRIPT algorithm vocabulary</a>
+
+
+
+
+## Navigating to algorithm 
+
+## Create
+```python
+my_algorithm = cript.Algorithm(key="advanced_sampling", type="simple random sampling")
+```
+
+## Add to <a href="../software_configuration" target="_blank">Software Configuration</a>
+```python
+my_software_configuration.add_algorithm(my_algorithm)
+```
+
+## Remove from <a href="../software_configuration" target="_blank">Software Configuration</a>
+```python
+my_software_configuration.remove_algorithm(my_algorithm)
+```
+
+## Save
+```python
+my_computation.save()   # save the primary node
+```
+
+## Get
+```python
+
+```
+
 
 
 ## algorithm Node
@@ -23,15 +65,3 @@
 ```json
 
 ```
-
-
-
-## Navigating to algorithm 
-
-## Create
-
-## Save
-
-## Get
-
-## Delete
