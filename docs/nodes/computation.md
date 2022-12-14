@@ -248,3 +248,25 @@ _Parameters:_
 | `offset`    | Union[int, None] | The starting position of the query    | None    |
 | `get_level` | int              | Level to recursively get nested nodes | 0       |
 | `**kwargs`  |                  | Arguments for the constructor.        | `{}`    |
+
+## Computation Object
+```json
+{
+    "url": "https://criptapp.org/api/computation/e6984c14-f6c2-4729-9627-33048a6bdbbb/",
+    "uid": "e6984c14-f6c2-4729-9627-33048a6bdbbb",
+    "experiment": "https://criptapp.org/api/experiment/2af8c9df-5aac-425a-9a7e-de853d3f4701/",
+    "name": "My computation",
+    "type": "analysis",
+    "input_data": [],
+    "software_configurations": [],
+    "conditions": [],
+    "output_data": [],
+    "prerequisite_computation": null,
+    "citations": [],
+    "notes": null,
+    "created_at": "2022-12-07T20:49:12.670457Z",
+    "updated_at": "2022-12-07T20:49:12.811980Z",
+    "public": false,
+    "group": "https://criptapp.org/api/group/55469baa-997a-44de-8284-462524879c14/"
+}
+```
