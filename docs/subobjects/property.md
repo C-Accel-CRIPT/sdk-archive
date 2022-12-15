@@ -2,6 +2,8 @@
 
 ## Definition
 
+
+## Can be added to
 A `Property` sub-object and can be added to the following nodes:
 
 * <a href="../nodes/material" target="_blank">Material</a>
@@ -33,9 +35,37 @@ Propertys are a key-value pair, with ‘key’ specifying the type of Property a
 * <a href="../../subobjects/condition" target="_blank">Condition</a>
 * <a href="../../subobjects/citation" target="_blank">Citation</a>
 
+
+## Attributes
+
+| Attribute            | Type                                         | Example                                                 | Description                                                                  | Required |
+|----------------------|----------------------------------------------|---------------------------------------------------------|------------------------------------------------------------------------------|----------|
+| key                  | str                                          | modulus_shear                                           | type of property                                                             | **True** |
+| type                 | str                                          | min                                                     | type of value stored                                                         | **True** |
+| value                | Any                                          | 1.23                                                    | value or quantity                                                            | Cond*    |
+| unit                 | str                                          | gram                                                    | unit for value                                                               | Cond*    |
+| uncertainty          | Any                                          | 0.1                                                     | uncertainty of value                                                         | False    |
+| uncertainty_ type    | str                                          | standard_deviation                                      | type of uncertainty                                                          | False    |
+| components           | list[[Material](../nodes/material.md)]       |                                                         | material that the property relates to**                                      | False    |
+| components_ relative | list[[Material](../nodes/material.md)]       |                                                         | material that the property relative to**                                     | False    |
+| structure            | str                                          | {[][$][C:1][C:1][$],<br><br>[$][C:2][C:2]([C:2]) [$][]} | specific chemical structure associate with the property with atom mappings** | False    |
+| method               | str                                          | sec                                                     | approach or source of property data                                          | False    |
+| sample_preparation   | Process                                      |                                                         | sample preparation                                                           | False    |
+| conditions           | list[[Condition](./condition.md)]            |                                                         | conditions under which the property was measured                             | False    |
+| data                 | list[[Data](../nodes/data.md)]               |                                                         | data nodes                                                                   | False    |
+| computations         | list[[Computation](../nodes/computation.md)] |                                                         | computation method that produced property                                    | False    |
+| citations            | list[[Citation](./citation.md)]              |                                                         | reference to a book, paper, or scholarly work                                | False    |
+| notes                | str                                          |                                                         | miscellaneous information, or custom data structure (e.g.; JSON)             | False    |
+
+
+
+
+
+
+
 ## Code Example
 
-### Adding Property to node
+### Adding Property to [Node](#can-be-added-to)
 ```python
 my_property = cript.Property(
     key="yield_mass", 
@@ -45,7 +75,7 @@ my_property = cript.Property(
 )
 ```
 
-### Adding Property to node
+### Adding Property to [Node](#can-be-added-to)
 ```python
 material = cript.Material.get(uid="c27e320e-23f6-47d5-8348-1b842e7b9767") # get node
 
