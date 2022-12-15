@@ -6,14 +6,19 @@ An `Identifier` exists only for the material node, and to identify a single mate
 
 Some examples of identifiers include: _SMILES_, _BigSMILES_, _chemical_id_, etc.
 
+> Users are encouraged to provide unambiguous identifiers whenever possible to ensure that data is 
+appropriately to attributed to specific materials.
+
 ## Identifier Structure
 
 Identifiers are a key-value pair, with ‘key’ specifying the type of identifier and
 ‘value’ being the content
 
 ## Attributes
-| Attribute   | Type                                         | Example                                         | Description                                                                    | Required |
-|-------------|----------------------------------------------|-------------------------------------------------|--------------------------------------------------------------------------------|----------|
+| Attribute | Type | Example                        | Description                          | Required |
+|-----------|------|--------------------------------|--------------------------------------|----------|
+| key       | str  | BigSMILES                      | Identifying a polymer                | True     |
+| value     | any  | \*{[<][<]CC([>])c1ccccc1[>]}\* | A value for the specified identifier | True     |
 
 
 ## List of Material Identifier Keys
