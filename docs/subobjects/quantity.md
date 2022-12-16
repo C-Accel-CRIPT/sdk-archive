@@ -25,16 +25,13 @@ They are only used for the [Ingredients](./ingredient.md) sub-object.
 | uncertainty_type | any  | std     |  Pick [ Uncertainty type Vocabulary](https://criptapp.org/keys/uncertainty-type/) | True     |                                                                                           | True     |
 
 
-??? tip "Quantity"
-    The proper: 
+## Quantity Keys
+* [Quantity Keys](https://criptapp.org/keys/quantity-key/)
 
-    * value type (number)
-    * range ([0, 1.79e+308])
-    * SI Unit (kg)
-    * Preferred Unit (ml)
-    * Description
-    
-    can be found in the [CRIPT Quantity vocabulary](https://criptapp.org/keys/quantity-key/)
+
+!!! tip "Quantity"
+    The proper `value type`, `range`, `SI Unit`, `Preferred Unit`, `Description`
+    for each quantity type can be found in the [CRIPT Quantity vocabulary](https://criptapp.org/keys/quantity-key/)
 
 ## Navigating to quantity 
 
