@@ -20,7 +20,25 @@ Each [`Collection`](collection.md) belongs inside of a single `Project`
     _Project names Must be globally unique_, meaning no 2 projects on the entire system can have the same name
 
 
----
+## Project Object
+
+``` json
+{
+    "url": "https://criptapp.org/api/project/8fe0e506-0e8e-424e-b4e2-1687909f6ea2/",
+    "uid": "8fe0e506-0e8e-424e-b4e2-1687909f6ea2",
+    "public": false,
+    "created_at": "2022-09-13T20:14:02.729710Z",
+    "updated_at": "2022-09-13T20:14:02.729726Z",
+    "name": "TEST project",
+    "collections": "https://criptapp.org/api/project/8fe0e506-0e8e-424e-b4e2-1687909f6ea2/collections/",
+    "materials": "https://criptapp.org/api/project/8fe0e506-0e8e-424e-b4e2-1687909f6ea2/materials/",
+    "files": "https://criptapp.org/api/project/8fe0e506-0e8e-424e-b4e2-1687909f6ea2/files/",
+    "notes": "",
+    "group": "https://criptapp.org/api/group/ac0415e5-e8d2-485e-ad7d-5029b73dc3c1/"
+}
+```
+
+
 ## Methods
 
 ### Create Project
@@ -214,22 +232,3 @@ _Parameters:_
 | `offset`    | Union[int, None] | The starting position of the query    | None    |
 | `get_level` | int              | Level to recursively get nested nodes | 0       |
 | `**kwargs`  |                  | Arguments for the constructor.        | `{}`    |
-
-
-## Project Object
-
-``` json
-{
-    "url": "https://criptapp.org/api/project/8fe0e506-0e8e-424e-b4e2-1687909f6ea2/",
-    "uid": "8fe0e506-0e8e-424e-b4e2-1687909f6ea2",
-    "public": false,
-    "created_at": "2022-09-13T20:14:02.729710Z",
-    "updated_at": "2022-09-13T20:14:02.729726Z",
-    "name": "TEST project",
-    "collections": "https://criptapp.org/api/project/8fe0e506-0e8e-424e-b4e2-1687909f6ea2/collections/",
-    "materials": "https://criptapp.org/api/project/8fe0e506-0e8e-424e-b4e2-1687909f6ea2/materials/",
-    "files": "https://criptapp.org/api/project/8fe0e506-0e8e-424e-b4e2-1687909f6ea2/files/",
-    "notes": "",
-    "group": "https://criptapp.org/api/group/ac0415e5-e8d2-485e-ad7d-5029b73dc3c1/"
-}
-```

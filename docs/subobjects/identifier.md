@@ -2,7 +2,7 @@
 
 ## Definition
 
-An `Identifier` exists only for the material node, and to identify a single material.
+An `Identifier` exists only for the [material](../nodes/material.md) node, and to identify a single material.
 
 Some examples of identifiers include: _SMILES_, _BigSMILES_, _chemical_id_, etc.
 

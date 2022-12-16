@@ -25,28 +25,6 @@ data was directly extracted from, inspired by, derived from, etc. the
 | type      | str  | "derived_from"        | Pick from [CRIPT citation type](https://criptapp.org/keys/citation-type/) | True     |
 | reference | str  | "My Scholarly Article" | Reference to a book, paper, or scholarly work                             | True     |
 
-## Navigating to Citation
-
-## Create
-```python
-my_citation = cript.citation(type="extracted_by_nlp", reference="https://myreference.com")
-```
-
-## Add Citation to Node
-```python
-data.add_citation(my_citation)
-```
-
-## Save
-```python
-data.save()
-```
-
-## Remove Citation From Node
-```python
-data.remove_citation(my_citation)
-```
-
 ## Citation Node
 
 ```json hl_lines="11"
@@ -67,4 +45,27 @@ data.remove_citation(my_citation)
     "updated_at": "2022-08-11T00:40:46.416956Z",
     "group": "https://criptapp.org/api/group/3c612a84-1bf7-483a-942a-7ab56f71f83c/"
 }
+```
+
+
+## Navigating to Citation
+
+## Create
+```python
+my_citation = cript.citation(type="extracted_by_nlp", reference="https://myreference.com")
+```
+
+## Add Citation to Node
+```python
+data.add_citation(my_citation)
+```
+
+## Save
+```python
+data.save()
+```
+
+## Remove Citation From Node
+```python
+data.remove_citation(my_citation)
 ```

@@ -1,7 +1,8 @@
 # Algorithm
 
 ## Definition
-
+Algorithm consists of parameter and condition details used in the [computation](../nodes/computation.md) 
+and [computational process](../nodes/computational_process.md).
 
 
 ## Can be added to
@@ -9,8 +10,8 @@
 
 
 ## Sub-Objects
-* <a href="../../subobjects/citation" target="_blank">Citation</a>
 * <a href="../../subobjects/parameter" target="_blank">Parameter</a>
+* <a href="../../subobjects/citation" target="_blank">Citation</a>
 
 
 ## Attributes
@@ -24,14 +25,18 @@
 
 
 
-## Valid algorithm keys
+## Algorithm keys
 Please visit 
 <a href="https://criptapp.org/keys/algorithm-key/" target="_blank">CRIPT algorithm vocabulary</a>
 
 
+## algorithm Node
 
+```json
 
-## Navigating to algorithm 
+```
+
+## Navigating to algorithm
 
 ## Create
 ```python
@@ -55,13 +60,5 @@ my_computation.save()   # save the primary node
 
 ## Get
 ```python
-
-```
-
-
-
-## algorithm Node
-
-```json
 
 ```
