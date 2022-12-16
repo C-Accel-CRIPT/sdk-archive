@@ -54,7 +54,7 @@ my_process.remove_equipment(equipment)
 ```
 
 
-## Equipment Node
+## [Process Node](../nodes/process.md) with Equipment Node
 
 ```json linenums="1" hl_lines="31-39"
 {
