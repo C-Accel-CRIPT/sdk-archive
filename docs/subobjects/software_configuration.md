@@ -40,20 +40,20 @@ Software Configuration includes software and the set of algorithms to execute
 
 ## Create
 ```python
-
+my_software_configuration = 
 ```
 
-## Save
+## add to a [Node](#super-object)
 ```python
-
+my_computation.add_software_configuration(my_software_configuration)
 ```
 
-## Get
+## Remove from [Node](#super-object)
 ```python
-
+my_computation.remove_software_configuration(my_software_configuration)
 ```
 
 ## Delete
 ```python
-
+my_computation.delete()
 ```
