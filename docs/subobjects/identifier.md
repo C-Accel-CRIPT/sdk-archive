@@ -30,10 +30,10 @@ Identifiers are a key-value pair, with ‘key’ specifying the type of identifi
 ## Create Identifier
 
 ```python
-# get polystyrene from CRIPT
-polystyrene = cript.Material.get(uid="c27e320e-23f6-47d5-8348-1b842e7b9767")
+# get material from CRIPT
+my_material = cript.Material.get(uid="c27e320e-23f6-47d5-8348-1b842e7b9767")
 
-# create identifier
+# create an identifier
 identifier_bigsmiles = cript.Identifier(
     key="bigsmiles", 
     value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
@@ -42,24 +42,22 @@ identifier_bigsmiles = cript.Identifier(
 
 ## Add Identifier to Material
 ```python
-# attach the identifiers to the material
-polystyrene.add_identifier(bigsmiles)
+my_material.add_identifier(bigsmiles)   # attach the identifiers to the material
 ```
 
 ## Save Material with Identifier
 ```python
-# save the node to CRIPT database
-polystyrene.save()
+my_material.save()
 ```
 
 ## Remove Identifier
 ```python
-polystyrene.remove_identifier(bigsmiles)
+my_material.remove_identifier(bigsmiles)
 ```
 
 <br/>
 
-## Object Example
+## [Material Node](../nodes/material.md) with Identifier
 
 The identifier sub-object can be seen for the material _polystyrene_
 
