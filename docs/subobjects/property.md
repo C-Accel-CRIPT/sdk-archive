@@ -1,7 +1,25 @@
 # Property
 
 ## Definition
+Properties are qualities/traits of a [material](../nodes/material.md) or or [Process](../nodes/process.md)
 
+
+<br/>
+
+!!! example "Examples"
+    * [Material](../nodes/material.md) examples:  
+        * melting temperature
+        * molecular mass
+    * [Process](../nodes/process.md) examples:
+        * conversion
+        * rate constants
+    * [computational_process](../nodes/computational_process.md) examples: 
+        * total energy
+        * bond length
+        * hydration number
+
+> Property nodes are a key-value pair, with ‘key’ specifying the type of Property and
+‘value’ being the content.
 
 ## Can be added to
 A `Property` sub-object and can be added to the following nodes:
@@ -10,12 +28,6 @@ A `Property` sub-object and can be added to the following nodes:
 * <a href="../nodes/process" target="_blank">Process</a>
 * <a href="../nodes/computational_process" target="_blank">Computational_Process</a>
 
-Some examples of Propertys include: _SMILES_, _BigSMILES_, _chemical_id_, etc.
-
-## Property Structure
-
-Propertys are a key-value pair, with ‘key’ specifying the type of Property and
-‘value’ being the content
 
 ## List of Property Keys
 * <a href="https://criptapp.org/keys/material-property-key/" target="_blank">
@@ -38,29 +50,24 @@ Propertys are a key-value pair, with ‘key’ specifying the type of Property a
 
 ## Attributes
 
-| Attribute            | Type                                         | Example                                                 | Description                                                                  | Required |
-|----------------------|----------------------------------------------|---------------------------------------------------------|------------------------------------------------------------------------------|----------|
-| key                  | str                                          | modulus_shear                                           | type of property                                                             | **True** |
-| type                 | str                                          | min                                                     | type of value stored                                                         | **True** |
-| value                | Any                                          | 1.23                                                    | value or quantity                                                            | Cond*    |
-| unit                 | str                                          | gram                                                    | unit for value                                                               | Cond*    |
-| uncertainty          | Any                                          | 0.1                                                     | uncertainty of value                                                         | False    |
-| uncertainty_ type    | str                                          | standard_deviation                                      | type of uncertainty                                                          | False    |
-| components           | list[[Material](../nodes/material.md)]       |                                                         | material that the property relates to**                                      | False    |
-| components_ relative | list[[Material](../nodes/material.md)]       |                                                         | material that the property relative to**                                     | False    |
-| structure            | str                                          | {[][$][C:1][C:1][$],<br><br>[$][C:2][C:2]([C:2]) [$][]} | specific chemical structure associate with the property with atom mappings** | False    |
-| method               | str                                          | sec                                                     | approach or source of property data                                          | False    |
-| sample_preparation   | Process                                      |                                                         | sample preparation                                                           | False    |
-| conditions           | list[[Condition](./condition.md)]            |                                                         | conditions under which the property was measured                             | False    |
-| data                 | list[[Data](../nodes/data.md)]               |                                                         | data nodes                                                                   | False    |
-| computations         | list[[Computation](../nodes/computation.md)] |                                                         | computation method that produced property                                    | False    |
-| citations            | list[[Citation](./citation.md)]              |                                                         | reference to a book, paper, or scholarly work                                | False    |
-| notes                | str                                          |                                                         | miscellaneous information, or custom data structure (e.g.; JSON)             | False    |
-
-
-
-
-
+| Attribute            | Type                                         | Example                                                 | Description                                                                                       | Required                                  |
+|----------------------|----------------------------------------------|---------------------------------------------------------|---------------------------------------------------------------------------------------------------|-------------------------------------------|
+| key                  | str                                          | modulus_shear                                           | type of property                                                                                  | **True**                                  |
+| type                 | str                                          | min                                                     | specifies what the meaning of the value is                                                        | **True**                                  |
+| value                | Any                                          | 1.23                                                    | single point measurement                                                                          | Conditionally Required Depending on `key` |
+| unit                 | str                                          | gram                                                    | unit for value                                                                                    | Conditionally Required Depending on `key` |
+| uncertainty          | Any                                          | 0.1                                                     | uncertainty of value (must use same unit as `value`)                                              | False                                     |
+| uncertainty_ type    | str                                          | "standard_deviation"                                    | type of uncertainty                                                                               | False                                     |
+| components           | list[[Material](../nodes/material.md)]       |                                                         | material that the property relates to                                                             | False                                     |
+| components_ relative | list[[Material](../nodes/material.md)]       |                                                         | material that the property relative to                                                            | False                                     |
+| structure            | str                                          | {[][$][C:1][C:1][$],<br><br>[$][C:2][C:2]([C:2]) [$][]} | specific chemical structure associate with the property with atom mappings**                      | False                                     |
+| method               | str                                          | sec                                                     | specifies the analytical instrument                                                               | False                                     |
+| sample_preparation   | Process                                      |                                                         | sample preparation                                                                                | False                                     |
+| conditions           | list[[Condition](./condition.md)]            |                                                         | conditions under which the property was measured _(specify any relevant environmental variables)_ | False                                     |
+| data                 | list[[Data](../nodes/data.md)]               |                                                         | data node that produced the property                                                              | False                                     |
+| computations         | list[[Computation](../nodes/computation.md)] |                                                         | computation method that produced property                                                         | False                                     |
+| citations            | list[[Citation](./citation.md)]              |                                                         | provides reference to a scholarly work that the property came from                                | False                                     |
+| notes                | str                                          | "these are my notes"                                    | miscellaneous information, or custom data structure (e.g.; JSON)                                  | False                                     |
 
 
 ## Code Example
