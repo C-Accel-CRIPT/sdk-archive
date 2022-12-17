@@ -30,8 +30,9 @@ class Project(BaseNode):
         notes: Union[str, None] = None,
         public: bool = False,
         group: Union[Group, str] = None,
+        **kwargs
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.name = name
         self.collections = collections
         self.materials = materials

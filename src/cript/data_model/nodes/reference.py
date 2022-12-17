@@ -37,8 +37,9 @@ class Reference(BaseNode):
         website: Union[str, None] = None,
         notes: Union[str, None] = None,
         public: bool = False,
+        **kwargs,
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.title = title
         self.doi = doi
         self.authors = authors if authors else []

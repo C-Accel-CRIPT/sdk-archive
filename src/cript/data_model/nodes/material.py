@@ -36,8 +36,9 @@ class Material(BaseNode):
         notes: Union[str, None] = None,
         public: bool = False,
         group: Union[Group, str] = None,
+        **kwargs,
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.project = project
         self.name = name
         self.identifiers = identifiers if identifiers else []

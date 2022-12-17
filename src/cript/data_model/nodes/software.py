@@ -29,8 +29,9 @@ class Software(BaseNode):
         source: Union[str, None] = None,
         notes: Union[str, None] = None,
         public: bool = False,
+        **kwargs
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.name = name
         self.version = version
         self.source = source

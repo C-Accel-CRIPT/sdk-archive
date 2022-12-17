@@ -36,8 +36,9 @@ class Collection(BaseNode):
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         group: Union[Group, str] = None,
+        **kwargs,
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.project = project
         self.name = name
         self.experiments = experiments

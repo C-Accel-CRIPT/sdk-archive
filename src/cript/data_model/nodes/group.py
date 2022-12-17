@@ -22,8 +22,9 @@ class Group(BaseNode):
         name: str,
         users: list[Union[User, str]] = None,
         public: bool = False,
+        **kwargs,
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.name = name
         self.users = users if users else []
 
