@@ -16,6 +16,7 @@ on:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    environment: testing
     strategy:
       fail-fast: false
       matrix:
