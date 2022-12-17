@@ -1,13 +1,12 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript.data_model.nodes.file import File
 from cript.data_model.subobjects.base_subobject import BaseSubobject
-from cript.data_model.subobjects.condition import Condition
 from cript.data_model.subobjects.citation import Citation
-
+from cript.data_model.subobjects.condition import Condition
 
 logger = getLogger(__name__)
 

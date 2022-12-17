@@ -1,15 +1,14 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
-from cript.data_model.nodes.base_node import BaseNode
-from cript.data_model.nodes.group import Group
-from cript.data_model.nodes.collection import Collection
-from cript.data_model.utils import auto_assign_group
-from cript.data_model.paginator import Paginator
 from cript.cache import get_cached_api_session
-
+from cript.data_model.nodes.base_node import BaseNode
+from cript.data_model.nodes.collection import Collection
+from cript.data_model.nodes.group import Group
+from cript.data_model.paginator import Paginator
+from cript.data_model.utils import auto_assign_group
 
 logger = getLogger(__name__)
 
@@ -65,9 +64,7 @@ class Experiment(BaseNode):
     @computational_processes.setter
     def computational_processes(self, value):
         if value:
-            self._computational_processes = Paginator(
-                url=value, node_name="ComputationalProcess"
-            )
+            self._computational_processes = Paginator(url=value, node_name="ComputationalProcess")
 
     @property
     def computations(self):

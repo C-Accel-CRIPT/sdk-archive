@@ -1,11 +1,9 @@
 import json
-
-import requests
 from logging import getLogger
 
-from cript.storage_clients.exceptions import FileUploadError
-from cript.storage_clients.exceptions import FileDownloadError
+import requests
 
+from cript.storage_clients.exceptions import FileDownloadError, FileUploadError
 
 logger = getLogger(__name__)
 
@@ -28,9 +26,7 @@ class AmazonS3Client:
             "file_uid": file_uid,
             "file_checksum": node.checksum,
         }
-        response = self.session.post(
-            url=f"{self.url}/s3-signed-url/", data=json.dumps(payload)
-        )
+        response = self.session.post(url=f"{self.url}/s3-signed-url/", data=json.dumps(payload))
 
         # Upload file
         if response.status_code == 200:

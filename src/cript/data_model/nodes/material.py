@@ -1,16 +1,15 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.project import Project
+from cript.data_model.subobjects.base_subobject import BaseSubobject
 from cript.data_model.subobjects.identifier import Identifier
 from cript.data_model.subobjects.property import Property
-from cript.data_model.subobjects.base_subobject import BaseSubobject
 from cript.data_model.utils import auto_assign_group
-
 
 logger = getLogger(__name__)
 

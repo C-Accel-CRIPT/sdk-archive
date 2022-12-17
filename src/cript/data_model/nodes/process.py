@@ -1,19 +1,18 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
-from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.experiment import Experiment
+from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.material import Material
-from cript.data_model.subobjects.ingredient import Ingredient
-from cript.data_model.subobjects.equipment import Equipment
-from cript.data_model.subobjects.property import Property
-from cript.data_model.subobjects.condition import Condition
 from cript.data_model.subobjects.citation import Citation
+from cript.data_model.subobjects.condition import Condition
+from cript.data_model.subobjects.equipment import Equipment
+from cript.data_model.subobjects.ingredient import Ingredient
+from cript.data_model.subobjects.property import Property
 from cript.data_model.utils import auto_assign_group
-
 
 logger = getLogger(__name__)
 
@@ -55,9 +54,7 @@ class Process(BaseNode):
         self.type = type
         self.keywords = keywords if keywords else []
         self.description = description
-        self.prerequisite_processes = (
-            prerequisite_processes if prerequisite_processes else []
-        )
+        self.prerequisite_processes = prerequisite_processes if prerequisite_processes else []
         self.ingredients = ingredients if ingredients else []
         self.equipment = equipment if equipment else []
         self.properties = properties if properties else []

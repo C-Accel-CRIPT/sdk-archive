@@ -40,9 +40,7 @@ class Base(abc.ABC):
         :return: The cleaned dictionary.
         :rtype: dict
         """
-        return {
-            k.lstrip("_"): self.__getattribute__(k) for k in vars(self) if "__" not in k
-        }
+        return {k.lstrip("_"): self.__getattribute__(k) for k in vars(self) if "__" not in k}
 
     @abc.abstractmethod
     def _add_node(self, node, attr_name):
@@ -107,11 +105,7 @@ class Base(abc.ABC):
             elif isinstance(value, list):
                 for i in range(len(value)):
                     # Generate nodes
-                    if (
-                        isinstance(value[i], str)
-                        and api.url in value[i]
-                        and not skip_nodes
-                    ):
+                    if isinstance(value[i], str) and api.url in value[i] and not skip_nodes:
                         # Check if node already exists in memory
                         local_node = get_cached_node(value[i])
                         if local_node:
@@ -131,6 +125,4 @@ class Base(abc.ABC):
                         node_class = get_data_model_class(key)
                         subobject = node_class(**value[i])
                         value[i] = subobject
-                        subobject._generate_nested_nodes(
-                            get_level=get_level, level=level
-                        )
+                        subobject._generate_nested_nodes(get_level=get_level, level=level)

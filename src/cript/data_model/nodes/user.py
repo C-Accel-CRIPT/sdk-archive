@@ -4,7 +4,6 @@ from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
 
-
 logger = getLogger(__name__)
 
 

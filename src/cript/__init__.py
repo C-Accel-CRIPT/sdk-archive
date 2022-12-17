@@ -1,8 +1,7 @@
-import logging
 import importlib.metadata
+import logging
 
 import pint
-
 
 # Set the default logging level for the package
 logging.basicConfig(level=logging.WARNING)
@@ -22,34 +21,34 @@ __api_version__ = "0.6.0"
 pint_ureg = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
 
 
-from cript.data_model.paginator import Paginator
-from cript.data_model import (  # noqa 402
-    User,
-    Group,
-    Project,
-    Reference,
-    Citation,
-    Collection,
-    File,
-    Data,
-    Condition,
-    SoftwareConfiguration,
-    Computation,
-    Property,
-    Identifier,
-    Material,
-    Inventory,
-    Quantity,
-    Ingredient,
-    Equipment,
-    Process,
-    Experiment,
-    Software,
-    Parameter,
+from cript.data_model import (
     Algorithm,
-    ComputationalProcess,
+    Citation,
+    Collection,  # noqa 402
+    Computation,
     ComputationalForcefield,
+    ComputationalProcess,
+    Condition,
+    Data,
+    Equipment,
+    Experiment,
+    File,
+    Group,
+    Identifier,
+    Ingredient,
+    Inventory,
+    Material,
+    Parameter,
+    Process,
+    Project,
+    Property,
+    Quantity,
+    Reference,
+    Software,
+    SoftwareConfiguration,
+    User,
 )
+from cript.data_model.paginator import Paginator
 
 DATA_MODEL_CLASSES = [
     User,
@@ -81,5 +80,5 @@ DATA_MODEL_CLASSES = [
 
 DATA_MODEL_NAMES: list[str] = [node.node_name.lower() for node in DATA_MODEL_CLASSES]
 
-from cript.api.rest import API  # noqa 401 402
 from cript.api.local import APILocal
+from cript.api.rest import API  # noqa 401 402

@@ -1,22 +1,21 @@
-import os
-import shutil
-import json
-import pathlib
-import glob
-import uuid
 import datetime
-from typing import Union
+import glob
+import json
+import os
+import pathlib
+import shutil
+import uuid
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript import DATA_MODEL_NAMES
 from cript.api.base import APIBase
 from cript.api.exceptions import APIError
+from cript.api.utils import get_slug_from_url
 from cript.cache import api_session_cache
 from cript.utils import is_valid_uid
-from cript.api.utils import get_slug_from_url
-
 
 logger = getLogger(__name__)
 
@@ -93,9 +92,7 @@ def make_new_folder(folder: pathlib.Path):
         os.makedirs(folder)
 
 
-def move_copy_file(
-    old_location: Union[pathlib.Path, str], new_location: Union[pathlib.Path, str]
-):
+def move_copy_file(old_location: Union[pathlib.Path, str], new_location: Union[pathlib.Path, str]):
     """
     Copies files from one location to a new one
     """
@@ -156,9 +153,7 @@ class APILocal(APIBase):
             try:
                 node, uid = _parse_filename(file)
             except ValueError:
-                logger.warning(
-                    f"Unrecognized file found in database and will be skipped. {file}"
-                )
+                logger.warning(f"Unrecognized file found in database and will be skipped. {file}")
                 continue
 
             self.database_by_uid[uid] = file

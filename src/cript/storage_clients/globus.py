@@ -6,11 +6,7 @@ import requests
 from globus_sdk.scopes import ScopeBuilder
 
 from cript.data_model.nodes.base_node import BaseNode
-from cript.storage_clients.exceptions import (
-    FileDownloadError,
-    FileUploadError,
-    InvalidAuthCode,
-)
+from cript.storage_clients.exceptions import FileDownloadError, FileUploadError, InvalidAuthCode
 
 logger = getLogger(__name__)
 

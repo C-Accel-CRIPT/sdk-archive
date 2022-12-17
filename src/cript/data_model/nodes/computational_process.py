@@ -1,19 +1,18 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
-from cript.data_model.nodes.group import Group
-from cript.data_model.nodes.experiment import Experiment
 from cript.data_model.nodes.data import Data
-from cript.data_model.subobjects.ingredient import Ingredient
-from cript.data_model.subobjects.software_configuration import SoftwareConfiguration
-from cript.data_model.subobjects.property import Property
-from cript.data_model.subobjects.condition import Condition
+from cript.data_model.nodes.experiment import Experiment
+from cript.data_model.nodes.group import Group
 from cript.data_model.subobjects.citation import Citation
+from cript.data_model.subobjects.condition import Condition
+from cript.data_model.subobjects.ingredient import Ingredient
+from cript.data_model.subobjects.property import Property
+from cript.data_model.subobjects.software_configuration import SoftwareConfiguration
 from cript.data_model.utils import auto_assign_group
-
 
 logger = getLogger(__name__)
 
@@ -52,9 +51,7 @@ class ComputationalProcess(BaseNode):
         self.type = type
         self.input_data = input_data if input_data else []
         self.ingredients = ingredients if ingredients else []
-        self.software_configurations = (
-            software_configurations if software_configurations else []
-        )
+        self.software_configurations = software_configurations if software_configurations else []
         self.properties = properties if properties else []
         self.conditions = conditions if conditions else []
         self.output_data = output_data if output_data else []
@@ -79,15 +76,11 @@ class ComputationalProcess(BaseNode):
         self._remove_node(ingredient, "ingredients")
 
     @beartype
-    def add_software_configuration(
-        self, configuration: Union[SoftwareConfiguration, dict]
-    ):
+    def add_software_configuration(self, configuration: Union[SoftwareConfiguration, dict]):
         self._add_node(configuration, "software_configurations")
 
     @beartype
-    def remove_software_configurations(
-        self, configuration: Union[SoftwareConfiguration, int]
-    ):
+    def remove_software_configurations(self, configuration: Union[SoftwareConfiguration, int]):
         self._remove_node(configuration, "software_configurations")
 
     @beartype
