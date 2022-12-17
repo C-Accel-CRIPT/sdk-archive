@@ -42,5 +42,18 @@ jobs:
         run: pip install .
 
       - name: Run pytest
+        env:
+          IMAGE_VERSION: ${{ secrets.IMAGE_VERSION }}
+          ENVIRONMENT: ${{ secrets.ENVIRONMENT }}
+          DEBUG: ${{ secrets.DEBUG }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          GLOBUS_AUTH_CLIENT_ID: ${{ secrets.GLOBUS_AUTH_CLIENT_ID }}
+          GLOBUS_AUTH_SECRET: ${{ secrets.GLOBUS_AUTH_SECRET }}
+          GLOBUS_ACCESS_MANAGER_CLIENT_ID: ${{ secrets.GLOBUS_ACCESS_MANAGER_CLIENT_ID }}
+          GLOBUS_ACCESS_MANAGER_SECRET: ${{ secrets.GLOBUS_ACCESS_MANAGER_SECRET }}
+          GLOBUS_NATIVE_CLIENT_ID: ${{ secrets.GLOBUS_NATIVE_CLIENT_ID }}
+          GLOBUS_ENDPOINT_ID: ${{ secrets.GLOBUS_ENDPOINT_ID }}
+          STORAGE_PROVIDER: ${{ secrets.GLOBUS_ENDPOINT_ID }}
+          STORAGE_PATH: ${{ secrets.GLOBUS_ENDPOINT_ID }}
         run: |
           python -m pytest
