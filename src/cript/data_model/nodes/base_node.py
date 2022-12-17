@@ -30,7 +30,7 @@ class BaseNode(Base, abc.ABC):
         public: bool = False,
         created_at: str = None,
         updated_at: str = None,
-        can_edit: bool= False,
+        can_edit: bool = False,
     ):
         super().__init__()
         self.url = url
