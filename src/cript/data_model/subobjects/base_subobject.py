@@ -66,4 +66,6 @@ class BaseSubobject(Base, abc.ABC):
             # for BaseSubobject
             attribute.remove(node)
         else:
-            raise RemoveNodeError(f"{self.node_name} nodes do not contain {node.node_name} nodes.")
+            raise RemoveNodeError(
+                f"{self.node_name} nodes do not contain {node.node_name} nodes."
+            )

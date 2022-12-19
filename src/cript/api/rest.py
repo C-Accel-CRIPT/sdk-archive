@@ -53,7 +53,9 @@ class API(APIBase):
         try:
             response = self.session.get(f"{self.url}/session-info/")
         except Exception as e:
-            raise APIError("Connection API failed, please review your host and token") from e
+            raise APIError(
+                "Connection API failed, please review your host and token"
+            ) from e
         if response.status_code == 200:
             response_json = response.json()
             self.latest_api_version = response_json["latest_version"]

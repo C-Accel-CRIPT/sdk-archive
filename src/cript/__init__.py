@@ -21,10 +21,10 @@ __api_version__ = "0.6.0"
 pint_ureg = pint.UnitRegistry(autoconvert_offset_to_baseunit=True)
 
 
+from cript.data_model import Collection  # noqa 402
 from cript.data_model import (
     Algorithm,
     Citation,
-    Collection,  # noqa 402
     Computation,
     ComputationalForcefield,
     ComputationalProcess,

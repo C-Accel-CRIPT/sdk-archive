@@ -46,7 +46,9 @@ class Computation(BaseNode):
         self.name = name
         self.type = type
         self.input_data = input_data if input_data else []
-        self.software_configurations = software_configurations if software_configurations else []
+        self.software_configurations = (
+            software_configurations if software_configurations else []
+        )
         self.conditions = conditions if conditions else []
         self.output_data = output_data if output_data else []
         self.prerequisite_computation = prerequisite_computation
@@ -71,11 +73,15 @@ class Computation(BaseNode):
         self._remove_node(condition, "conditions")
 
     @beartype
-    def add_software_configuration(self, configuration: Union[SoftwareConfiguration, dict]):
+    def add_software_configuration(
+        self, configuration: Union[SoftwareConfiguration, dict]
+    ):
         self._add_node(configuration, "software_configurations")
 
     @beartype
-    def remove_software_configurations(self, configuration: Union[SoftwareConfiguration, int]):
+    def remove_software_configurations(
+        self, configuration: Union[SoftwareConfiguration, int]
+    ):
         self._remove_node(configuration, "software_configurations")
 
     @beartype

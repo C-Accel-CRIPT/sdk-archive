@@ -13,7 +13,9 @@ class UniqueNodeError(CRIPTError):
     def __init__(self, message):
         self.message = message
         self.existing_url = None
-        url_find_pattern = r"[(https://)|\w]*?[\w]*\.[-/\w]*\.\w*[(/{1})]?[#-\./\w]*[(/{1,})]?"
+        url_find_pattern = (
+            r"[(https://)|\w]*?[\w]*\.[-/\w]*\.\w*[(/{1})]?[#-\./\w]*[(/{1,})]?"
+        )
         all_urls = re.findall(url_find_pattern, message)
         if len(all_urls) > 0:
             if len(all_urls) > 1:
@@ -44,7 +46,9 @@ class UnsavedNodeError(CRIPTError):
         self.name = node_name
 
     def __str__(self):
-        return f"{self.name} nodes must be saved before they can be added to other nodes."
+        return (
+            f"{self.name} nodes must be saved before they can be added to other nodes."
+        )
 
 
 class AddNodeError(CRIPTError):

@@ -26,7 +26,9 @@ class AmazonS3Client:
             "file_uid": file_uid,
             "file_checksum": node.checksum,
         }
-        response = self.session.post(url=f"{self.url}/s3-signed-url/", data=json.dumps(payload))
+        response = self.session.post(
+            url=f"{self.url}/s3-signed-url/", data=json.dumps(payload)
+        )
 
         # Upload file
         if response.status_code == 200:

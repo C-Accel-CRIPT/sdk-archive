@@ -87,7 +87,9 @@ class BaseNode(Base, abc.ABC):
         Delete a node in the database and clear it locally.
         """
         if not self.url:
-            raise ValueError(f"This {self.node_name} node does not exist in the database.")
+            raise ValueError(
+                f"This {self.node_name} node does not exist in the database."
+            )
 
         api = get_cached_api_session(self.url)
         api.delete(self.url)
@@ -288,4 +290,6 @@ class BaseNode(Base, abc.ABC):
             # for BaseSubobject
             attribute.remove(node)
         else:
-            raise RemoveNodeError(f"{self.node_name} nodes do not contain {node.node_name} nodes.")
+            raise RemoveNodeError(
+                f"{self.node_name} nodes do not contain {node.node_name} nodes."
+            )

@@ -92,7 +92,9 @@ def make_new_folder(folder: pathlib.Path):
         os.makedirs(folder)
 
 
-def move_copy_file(old_location: Union[pathlib.Path, str], new_location: Union[pathlib.Path, str]):
+def move_copy_file(
+    old_location: Union[pathlib.Path, str], new_location: Union[pathlib.Path, str]
+):
     """
     Copies files from one location to a new one
     """
@@ -153,7 +155,9 @@ class APILocal(APIBase):
             try:
                 node, uid = _parse_filename(file)
             except ValueError:
-                logger.warning(f"Unrecognized file found in database and will be skipped. {file}")
+                logger.warning(
+                    f"Unrecognized file found in database and will be skipped. {file}"
+                )
                 continue
 
             self.database_by_uid[uid] = file

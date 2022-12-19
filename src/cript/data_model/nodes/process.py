@@ -54,7 +54,9 @@ class Process(BaseNode):
         self.type = type
         self.keywords = keywords if keywords else []
         self.description = description
-        self.prerequisite_processes = prerequisite_processes if prerequisite_processes else []
+        self.prerequisite_processes = (
+            prerequisite_processes if prerequisite_processes else []
+        )
         self.ingredients = ingredients if ingredients else []
         self.equipment = equipment if equipment else []
         self.properties = properties if properties else []

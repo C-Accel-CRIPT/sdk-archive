@@ -64,7 +64,9 @@ class Experiment(BaseNode):
     @computational_processes.setter
     def computational_processes(self, value):
         if value:
-            self._computational_processes = Paginator(url=value, node_name="ComputationalProcess")
+            self._computational_processes = Paginator(
+                url=value, node_name="ComputationalProcess"
+            )
 
     @property
     def computations(self):
