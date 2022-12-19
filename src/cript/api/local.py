@@ -79,7 +79,7 @@ def _format_folder(folder: Union[str, pathlib.Path]) -> pathlib.Path:
         return folder
 
     if not isinstance(folder, str):
-        raise TypeError(f"'folder' must be a string or pathlib.Path.")
+        raise TypeError(f"'folder' {folder} must be a string or pathlib.Path.")
 
     if not os.path.isabs(folder):
         folder = os.path.abspath(folder)

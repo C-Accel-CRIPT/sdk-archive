@@ -53,7 +53,8 @@ class Inventory(BaseNode):
             if obj in self.__degenerate_index_table:
                 raise ValueError("Multiple materials share this index. Try another.")
             raise ValueError(
-                f"'{obj}' not found in Inventory: {self.name}. (exact match required, case sensitive)"
+                f"'{obj}' not found in Inventory: {self.name}."
+                " (exact match required, case sensitive)"
             )
 
         raise TypeError("Invalid object for indexing.")

@@ -1,3 +1,5 @@
+# trunk-ignore-all(flake8/F401)
+
 # Order important
 from cript.data_model.nodes.collection import Collection
 from cript.data_model.nodes.computation import Computation

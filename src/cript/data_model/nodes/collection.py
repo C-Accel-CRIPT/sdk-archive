@@ -3,7 +3,6 @@ from typing import Union
 
 from beartype import beartype
 
-from cript.cache import get_cached_api_session
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.project import Project

@@ -1,3 +1,6 @@
+# trunk-ignore-all(flake8/F401)
+# trunk-ignore-all(flake8/E402)
+
 import importlib.metadata
 import logging
 

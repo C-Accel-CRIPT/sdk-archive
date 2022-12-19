@@ -97,9 +97,5 @@ class Property(BaseSubobject):
         self._remove_node(condition, "conditions")
 
     @beartype
-    def add_citation(self, citation: Union[Citation, dict]):
-        self._add_node(citation, "citations")
-
-    @beartype
     def remove_citation(self, citation: Union[Citation, int]):
         self._remove_node(citation, "citations")

@@ -3,7 +3,7 @@ from logging import getLogger
 
 import requests
 
-from cript.storage_clients.exceptions import FileDownloadError, FileUploadError
+from cript.storage_clients.exceptions import FileUploadError
 
 logger = getLogger(__name__)
 
