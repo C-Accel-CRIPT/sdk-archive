@@ -1,11 +1,9 @@
 import json
-
-import requests
 from logging import getLogger
 
-from cript.storage_clients.exceptions import FileUploadError
-from cript.storage_clients.exceptions import FileDownloadError
+import requests
 
+from cript.storage_clients.exceptions import FileUploadError
 
 logger = getLogger(__name__)
 

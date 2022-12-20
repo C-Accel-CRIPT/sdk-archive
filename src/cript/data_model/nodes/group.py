@@ -1,11 +1,10 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.user import User
-
 
 logger = getLogger(__name__)
 
@@ -22,8 +21,9 @@ class Group(BaseNode):
         name: str,
         users: list[Union[User, str]] = None,
         public: bool = False,
+        **kwargs,
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.name = name
         self.users = users if users else []
 

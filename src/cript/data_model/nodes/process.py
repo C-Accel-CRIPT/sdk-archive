@@ -1,19 +1,18 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
-from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.experiment import Experiment
+from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.material import Material
-from cript.data_model.subobjects.ingredient import Ingredient
-from cript.data_model.subobjects.equipment import Equipment
-from cript.data_model.subobjects.property import Property
-from cript.data_model.subobjects.condition import Condition
 from cript.data_model.subobjects.citation import Citation
+from cript.data_model.subobjects.condition import Condition
+from cript.data_model.subobjects.equipment import Equipment
+from cript.data_model.subobjects.ingredient import Ingredient
+from cript.data_model.subobjects.property import Property
 from cript.data_model.utils import auto_assign_group
-
 
 logger = getLogger(__name__)
 
@@ -47,8 +46,9 @@ class Process(BaseNode):
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         group: Union[Group, str] = None,
+        **kwargs,
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.experiment = experiment
         self.name = name
         self.type = type

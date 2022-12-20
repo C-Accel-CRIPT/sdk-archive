@@ -1,22 +1,21 @@
-import os
-import shutil
-import json
-import pathlib
-import glob
-import uuid
 import datetime
-from typing import Union
+import glob
+import json
+import os
+import pathlib
+import shutil
+import uuid
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript import DATA_MODEL_NAMES
 from cript.api.base import APIBase
 from cript.api.exceptions import APIError
+from cript.api.utils import get_slug_from_url
 from cript.cache import api_session_cache
 from cript.utils import is_valid_uid
-from cript.api.utils import get_slug_from_url
-
 
 logger = getLogger(__name__)
 
@@ -80,7 +79,7 @@ def _format_folder(folder: Union[str, pathlib.Path]) -> pathlib.Path:
         return folder
 
     if not isinstance(folder, str):
-        raise TypeError(f"'folder' must be a string or pathlib.Path.")
+        raise TypeError(f"'folder' {folder} must be a string or pathlib.Path.")
 
     if not os.path.isabs(folder):
         folder = os.path.abspath(folder)

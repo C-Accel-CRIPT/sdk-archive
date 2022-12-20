@@ -1,11 +1,10 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
-
 
 logger = getLogger(__name__)
 
@@ -29,8 +28,9 @@ class Software(BaseNode):
         source: Union[str, None] = None,
         notes: Union[str, None] = None,
         public: bool = False,
+        **kwargs
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.name = name
         self.version = version
         self.source = source

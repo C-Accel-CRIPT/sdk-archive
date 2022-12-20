@@ -1,12 +1,11 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
 from cript.data_model.paginator import Paginator
-from cript.cache import get_cached_api_session
 
 logger = getLogger(__name__)
 
@@ -30,8 +29,9 @@ class Project(BaseNode):
         notes: Union[str, None] = None,
         public: bool = False,
         group: Union[Group, str] = None,
+        **kwargs
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.name = name
         self.collections = collections
         self.materials = materials

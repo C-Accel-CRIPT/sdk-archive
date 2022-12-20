@@ -4,7 +4,6 @@ from urllib.parse import urlparse
 from cript.api.base import APIBase
 from cript.api.exceptions import APISessionRequiredError
 
-
 # Stores all API sessions
 api_session_cache = weakref.WeakValueDictionary()
 

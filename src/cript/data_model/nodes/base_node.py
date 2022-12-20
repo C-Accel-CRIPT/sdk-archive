@@ -30,6 +30,7 @@ class BaseNode(Base, abc.ABC):
         public: bool = False,
         created_at: str = None,
         updated_at: str = None,
+        can_edit: bool = False,
     ):
         super().__init__()
         self.url = url
@@ -37,6 +38,7 @@ class BaseNode(Base, abc.ABC):
         self.public = public
         self.created_at = created_at
         self.updated_at = updated_at
+        self.can_edit = can_edit
 
         # Add node to cache
         cache_node(self)
