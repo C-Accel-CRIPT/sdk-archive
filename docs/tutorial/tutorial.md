@@ -1,9 +1,9 @@
 # Tutorial
 
 ## Setup CRIPT
-Before proceeding please be sure to `pip install cript`
+Before proceeding, please make sure you have `cript` installed (`pip install cript`).
 
-Fore full documentation please refer to [installation docs](cript_installation.md) 
+For full installation instructions, please refer to [installation docs](cript_installation.md) 
 on how to install [CRIPT Python SDK](https://pypi.org/project/cript/) on your system.
 
 ---
