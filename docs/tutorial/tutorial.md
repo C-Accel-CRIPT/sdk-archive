@@ -1,21 +1,20 @@
 # Tutorial
 
 ## Setup CRIPT
-Before proceeding, please make sure you have `cript` installed (`pip install cript`).
+Before proceeding, please make sure you have [CRIPT Python SDK](https://pypi.org/project/cript/) installed (`pip install cript`).
 
-For full installation instructions, please refer to [installation docs](cript_installation.md) 
-on how to install [CRIPT Python SDK](https://pypi.org/project/cript/) on your system.
+For full installation instructions, please refer to the [installation docs](cript_installation.md).
 
 ---
 
-## :octicons-terminal-16: Learning CRIPT through the terminal
+## :octicons-terminal-16: Using CRIPT on the command line
 
 ### Launch python interpreter
 
-Open a terminal on your computer, I will be using Windows Powershell in this tutorial. 
-Start the python interpreter by typing python
+Open a terminal on your computer (e.g., Terminal on MacOS, Linux console on Unix-like OS, or Powershell on Windows). This tutorial is done using Windows Powershell.
+ 
+Start the python interpreter by typing `python` in the terminal:
 
-#### Example
 :fontawesome-regular-keyboard: My Input:
 ```bash
 python
@@ -31,24 +30,24 @@ Type "help", "copyright", "credits" or "license" for more information.
 ---
 
 ### Connect to CRIPT
-To connect to [CRIPT](https://criptapp.org) you must enter a `host` and an `API Token`
+To connect to [CRIPT](https://criptapp.org), you must enter a `host` and an `API Token`.
 
 #### Host
 
-Host indicates the CRIPT instance that you want to upload your data to whether that is CRIPT or a private instance. 
+The `host` indicates the CRIPT instance that you want to upload your data to, whether that is CRIPT or a private instance. 
 
 !!! note 
-    For most users host will be `"criptapp.org"`
+    For most usersl, `host` will be `criptapp.org`
 
 #### API Token
 
-The token is needed because we need to authenticate the user before saving any of their data
+The token is needed because we need to authenticate the user (i.e., make sure they are a valid CRIPT user) before saving any of their data.
 
-Your API Token that can be found in the [security settings](https://criptapp.org/security/) under the profile icon on the top right. For further explanation please refer to [how to get an API Token](acquiring_api_token.md)
+Your API Token can be found in [security settings](https://criptapp.org/security/) under the profile icon on the top right of `criptapp.org`. For further explanation, please refer to [how to get an API Token](acquiring_api_token.md)
 
-> Note: The "Token" in front of the random characters is part of the token as well 
+!!! note
+    The word `Token` in front of the random characters is part of the token as well. 
 
-#### Example
 :fontawesome-regular-keyboard: My Input:
 ```python
 import cript
