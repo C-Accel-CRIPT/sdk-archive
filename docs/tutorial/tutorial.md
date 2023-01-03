@@ -37,7 +37,7 @@ To connect to [CRIPT](https://criptapp.org), you must enter a `host` and an `API
 The `host` indicates the CRIPT instance that you want to upload your data to, whether that is CRIPT or a private instance. 
 
 !!! note 
-    For most usersl, `host` will be `criptapp.org`
+    For most users, `host` will be `criptapp.org`
 
 #### API Token
 
@@ -48,11 +48,16 @@ Your API Token can be found in [security settings](https://criptapp.org/security
 !!! note
     The word `Token` in front of the random characters is part of the token as well. 
 
+It is *highly* recommended that you store your API token in a safe location and read it into your code, rather than have it hard-coded. One way to do this is to store
+it in an environmental variable (e.g., `CRIPT_API_KEY`) and then read it in via the `os` module.
+ 
 :fontawesome-regular-keyboard: My Input:
 ```python
 import cript
+import os
+
 host = "criptapp.org"
-token = "<Your API Token>"
+token = os.environ.get("CRIPT_API_KEY")
 cript.API(host, token)
 ```
 :octicons-terminal-16: Terminal Output:
