@@ -69,11 +69,12 @@ Connected to https://criptapp.org/api
     If any user wants to connect to their own private instance of CRIPT, they can easily do that by just changing both the `Host` and `API Token` to their own `Host` and `API Token` continue everything else as normal.
 
 ---
-## What is a Node?
-* Nodes are simply just CRIPT objects.
+## What is a node?
+* A *node* is simply a CRIPT object (e.g., `Project`, `Experiment`)  in the graph-based data model. Details on how to create, modify, and save different type of nodes
+are given in the following sections.
 
-### How to know if a Node has been saved or not?
-* When a Node is saved a URL is created for it
+### How to tell if a node has been created and saved in the database?
+* When a node is saved, a URL is created for it - you can check if a particular node exists in the database by typing ``. 
 
 ---
 
