@@ -152,7 +152,7 @@ file.save()
 <!-- TODO what is "path" is that the path you want to download from within CRIPT? -->
 ``` python
 file = cript.File(project=proj, source=path)
-path = "path/to/store/downloaded/file"
+path = "downloaded.csv"
 file.download_file(path=path)
 ```
 
