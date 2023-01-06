@@ -91,7 +91,7 @@ proj.update(name="My new project name")
 2. Delete the node
 
 ``` py
-coll = cript.Collection.get(name="My collection")
+coll = cript.Collection.create(project=proj, name="My collection")
 coll.delete()
 ```
 
