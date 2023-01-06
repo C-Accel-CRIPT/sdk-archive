@@ -86,13 +86,13 @@ A [`Project`](../nodes/project.md) can be thought of as a folder that contains [
     **Project names are globally unique**, meaning no 2 projects on the entire system can have the same name
 
 ### Example
- _continuing the example from above..._
+To create a `Project` and upload it to the CRIPT database:
 
 :fontawesome-regular-keyboard: My Input:
 ```py
 Connected to https://criptapp.org/api
 
-proj = cript.Project.create(name="<Your Project Name>") # creates and saves Project to CRIPT
+proj = cript.Project.create(name="<Your Project Name>") # creates and uploads Project to CRIPT
 ```
 
 :octicons-terminal-16: Terminal Output:
@@ -105,8 +105,14 @@ proj = cript.Project.create(name="<Your Project Name>") # creates and saves Proj
 
 ```
 
-!!! Info
-    Lets print the project to get a better view
+To retrieve a `Project` that has already been uploaded:
+
+:fontawesome-regular-keyboard: My Input:
+```py
+proj = cript.Project.get(name="<Your Project Name>")
+```
+
+Let's print the project to get a better view:
 
 :fontawesome-regular-keyboard: My Input:
 ```py
