@@ -86,7 +86,7 @@ A [`Project`](../nodes/project.md) can be thought of as a folder that contains [
     **Project names are globally unique**, meaning no 2 projects on the entire system can have the same name
 
 ### Example
-To create a `Project` and upload it to the CRIPT database:
+To create a `Project`:
 
 :fontawesome-regular-keyboard: My Input:
 ```py
@@ -94,6 +94,10 @@ Connected to https://criptapp.org/api
 
 proj = cript.Project.create(name="<Your Project Name>") # creates and uploads Project to CRIPT
 ```
+
+!!! note
+    Notice the use of `create()` here, which instantiates the Python object and uploads it to the database in one go.
+
 
 :octicons-terminal-16: Terminal Output:
 
@@ -110,6 +114,16 @@ To retrieve a `Project` that has already been uploaded:
 :fontawesome-regular-keyboard: My Input:
 ```py
 proj = cript.Project.get(name="<Your Project Name>")
+```
+
+:octicons-terminal-16: Terminal Output:
+
+<small>
+    The terminal gives no output
+</small>
+
+```bash
+
 ```
 
 Let's print the project to get a better view:
@@ -140,10 +154,7 @@ print(proj)
 
 ## Create a Collection node
 
-A [Collection](../nodes/collection.md) can be thought of as a folder filled with experiments
-
-!!! note
-    Notice the use of `create()` here, which instantiates and saves the object in one go.
+A [`Collection`](../nodes/collection.md) can be thought of as a folder filled with experiments. Just like we did for a `Project` node, we use `create()` to create and upload a new `Collection`: 
 
 :fontawesome-regular-keyboard: My Input:
 ```py
@@ -170,7 +181,6 @@ expt = cript.Experiment.create(
     collection=coll,
     name="Anionic Polymerization of Styrene with SecBuLi"
 )
-expt.save()
 ```
 
 ## Get Material nodes
