@@ -14,13 +14,15 @@ Install <a href="https://pypi.org/project/cript/" target="_blank">CRIPT</a> from
 
 ## Connect to CRIPT
 
-`import cript` into your python file, fill in the host and API Token, run the python file to connect to CRIPT
+`import cript` into your python file, fill in the host and API Token, run the python file to connect to CRIPT. It is *highly* recommended that you store your API token in a safe location and read it into your code, rather than have it hard-coded. One way to do this is to store
+it in an environmental variable (e.g., `CRIPT_API_KEY`) and then read it in via the `os` module.
 
 ``` py
 import cript
+import os
 
 host = "criptapp.org"  # or any host
-token = "<Your API Token>" # eg. token = "Token 4abc478b25e30766652f76103b978349c4c4b214"
+token = os.environ.get("CRIPT_API_KEY")
 cript.API(host, token)
 ```
 
