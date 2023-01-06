@@ -194,7 +194,7 @@ inv = cript.Inventory.get(uid=uid, get_level=1)
 ```
 
 !!! note
-We are setting `get_level` to `1` so that the Material nodes are auto-generated. This parameter defaults to `0`, but can be set to any integer.
+    We are setting `get_level` to `1` so that the Material nodes are auto-generated. This parameter defaults to `0`, but can be set to any integer.
 
 Notice that the Material node objects have been auto-generated.
 
@@ -216,7 +216,6 @@ prcs = cript.Process.create(
                   "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
                   "precipitation in methanol 3 times and dried under vacuum."
 )
-prcs.save()
 ```
 
 ## Add Ingredient nodes to the Process node
@@ -368,7 +367,7 @@ Depending on the file size, there could be a delay while the checksum is generat
 Next, we'll upload the local file by saving the File node. Follow all prompts that appear.
 
 ```py
-api.save(f)
+f.save()
 ```
 
 ## Create a Data node
