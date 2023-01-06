@@ -35,11 +35,10 @@ cript.API(host, token)
 
 ``` python
 proj = cript.Project.create(name="My project")
-proj.save()
 ```
 
 ??? info
-    `.create()` instantiates and saves the object in one go
+    `create()` instantiates and saves the object in one go
 
 ---
 ## Get a Node
