@@ -117,10 +117,10 @@ results =  cript.Material.search(
     Search returns a `Paginator` object. You can paginate through the results
 
     ``` python
-    res.json()              # View the raw JSON for the query
-    res.objects()           # Generate objects for the current page
-    res.next_page()         # Flip to the next page
-    res.previous_page()     # Flip to the previous page
+    results.json()              # View the raw JSON for the query
+    results.objects()           # Generate objects for the current page
+    results.next_page()         # Flip to the next page
+    results.previous_page()     # Flip to the previous page
     ```
 
 ---
