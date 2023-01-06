@@ -370,6 +370,7 @@ Next, we'll upload the local file by saving the File node. Follow all prompts th
 f.save()
 ```
 
+You will be prompted to click a link to obtain an authorization code. Copy and paste the code obtained from this link into the terminal to save the file. 
 ## Create a Data node
 
 ```py
