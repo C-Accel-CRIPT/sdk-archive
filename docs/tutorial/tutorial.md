@@ -92,8 +92,7 @@ A [`Project`](../nodes/project.md) can be thought of as a folder that contains [
 ```py
 Connected to https://criptapp.org/api
 
-proj = cript.Project.create(name="<Your Project Name>")
-proj.save()
+proj = cript.Project.create(name="<Your Project Name>") # creates and saves Project to CRIPT
 ```
 
 :octicons-terminal-16: Terminal Output:
