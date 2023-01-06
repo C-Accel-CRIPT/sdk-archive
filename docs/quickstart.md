@@ -113,7 +113,7 @@ results =  cript.Material.search(
 )
 ```
 
-??? Info "Pagination"
+!!! Info "Pagination"
     Search returns a `Paginator` object. You can paginate through the results
 
     ``` python
