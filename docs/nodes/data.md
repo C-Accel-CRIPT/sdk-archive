@@ -2,7 +2,7 @@
 
 ## Definition
 
-A `Data` node contains the meta-data to describe raw data that is beyond a single value i.e. n-dimensional data. Each `Data` node must be linked to a single `Experiment` node.
+A `Data` node contains the meta-data to describe raw data that is beyond a single value, i.e. *n*-dimensional data. Each `Data` node must be linked to a single `Experiment` node.
 
 
 ## Sub-Objects
