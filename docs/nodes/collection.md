@@ -57,7 +57,7 @@ A `Collection` node can be thought as a folder/bucket that can hold either an
 
 _Definition:_
 
-The `.create()` method *both* creates and saves (i.e., uploads to the CRIPT database) a `Collection` node. It has 2 required arguments: `project` and `name`:
+The `.create()` method *both* creates and saves (i.e., uploads to the CRIPT database) a `Collection` node. It has 2 required arguments: `project` and `name`.
 
 `cript.Collection.create(project, name, **kwargs)`
 
