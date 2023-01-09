@@ -39,7 +39,7 @@ jobs:
           pip install -r requirements_test.txt
 
       - name: Install CRIPT Python SDK
-        run: pip install git+https://github.com/C-Accel-CRIPT/cript/tree/develop
+        run: pip install git+https://github.com/C-Accel-CRIPT/cript@develop
 
       - name: Run pytest
         env:
