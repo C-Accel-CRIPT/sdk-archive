@@ -69,11 +69,6 @@ _Parameters:_
 | `name`      | string | name of the `Collection` node                        | None    |
 | `**kwargs`  |        | Arguments for the constructor.                       | `{}`    |
 
-- **project:** *([Project](../project.md) node)*
-  `Project` to associate the `Collection` with
-- **name:** *(str)*
-  name of the `Collection` node
-
 _Returns:_
 
 - `Collection` node of type `cript.data_model.nodes.BaseNode`
