@@ -53,15 +53,21 @@ A `Collection` node can be thought as a folder/bucket that can hold either an
 
 ## Methods
 
-### Create Collection
+### Create
 
 _Definition:_
 
 The `.create()` method *both* creates and saves (i.e., uploads to the CRIPT database) a `Collection` node. It has 2 required arguments: `project` and `name`:
 
-`cript.Collection.create(project, name, update_existing=False, **kwargs)`
+`cript.Collection.create(project, name, **kwargs)`
 
 _Parameters:_
+
+| Name        | Type   | Description                                          | Default |
+|-------------|--------|------------------------------------------------------|---------|
+| `project`   | [`Project`](../project.md) node | `Project` to associate the `Collection` node with    | None    |
+| `name`      | string | name of the `Collection` node                        | None    |
+| `**kwargs`  |        | Arguments for the constructor.                       | `{}`    |
 
 - **project:** *([Project](../project.md) node)*
   `Project` to associate the `Collection` with
@@ -83,7 +89,7 @@ my_collection = cript.Collection.create(project = my_project, name="My collectio
 
 ---
 
-### Save Collection
+### Save
 
 _Definition:_
 
@@ -114,7 +120,7 @@ _Parameters:_
 
 
 ---
-### Get Collection
+### Get
 
 _Definition:_
 
@@ -164,7 +170,7 @@ _Parameters:_
 
 ---
 
-### Update Collection
+### Update
 
 _Definition:_
 
