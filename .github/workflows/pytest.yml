@@ -39,7 +39,7 @@ jobs:
           pip install -r requirements_test.txt
 
       - name: Install CRIPT Python SDK
-        run: pip install .
+        run: pip install -e .
 
       - name: Run pytest
         env:
