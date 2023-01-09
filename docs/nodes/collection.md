@@ -7,6 +7,10 @@ A `Collection` node can be thought as a folder/bucket that can hold either an
 <a href="../experiment" target="_blank">`Experiment`</a> or 
 <a href="../inventory" target="_blank">`Inventory`</a> node.
 
+## Navigating to Collection
+`Collections` can be easily found on <a href="https://criptapp.org" target="_blank">CRIPT</a> home screen in the 
+<a href="https://criptapp.org/collection/" target="_blank">Collections link</a>
+
 ## Attributes
 
 | Attribute             | Type                                                | Example                  | Description                                                                             | Required |
@@ -42,14 +46,10 @@ A `Collection` node can be thought as a folder/bucket that can hold either an
 
 ```
 
-## Navigating to Collection
-`Collections` can be easily found on <a href="https://criptapp.org" target="_blank">CRIPT</a> home screen in the 
-<a href="https://criptapp.org/collection/" target="_blank">Collections link</a>
-
 <br/>
 
 !!! warning "Collection names"
-    Collection names Must be unique within a <a href="../project" target="_blank">Project</a>
+    `Collection` names Must be unique within a <a href="../project" target="_blank">Project</a>
 
 ## Methods
 
@@ -57,9 +57,9 @@ A `Collection` node can be thought as a folder/bucket that can hold either an
 
 _Definition:_
 
-The `.create()` method can be used to create a new Collection and save it in one line.
+The `.create()` method *both* creates and saves (i.e., uploads to the CRIPT database) a `Collection` node. It has 2 required arguments: `project` and `name`:
 
-`cript.Collection.create(get_level=0, update_existing=False, **kwargs)`
+`cript.Collection.create(project, name, update_existing=False, **kwargs)`
 
 _Example:_
 
