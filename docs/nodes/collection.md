@@ -2,26 +2,29 @@
 
 ## Definition
 
-A `Collection` is nested inside of a `Project` node.
+A `Collection` is nested inside of a <a href="../experiment" target="_blank">`Project`</a> node.
 A `Collection` node can be thought as a folder/bucket that can hold either an 
-<a href="../experiment" target="_blank">Experiment</a> or 
-<a href="../inventory" target="_blank">Inventory</a> node.
+<a href="../experiment" target="_blank">`Experiment`</a> or 
+<a href="../inventory" target="_blank">`Inventory`</a> node.
 
-## Navigating to Collection
-`Collections` can be easily found on <a href="https://criptapp.org" target="_blank">CRIPT</a> home screen in the 
-<a href="https://criptapp.org/collection/" target="_blank">Collections link</a>
+## Attributes
 
-<br/>
+| Attribute             | Type                                                | Example                  | Description                                                                             | Required |
+|-----------------------|-----------------------------------------------------|--------------------------|-----------------------------------------------------------------------------------------|----------|
+| url                   | str                                                 | "https://criptapp.org/api/collection/336d0584-04f9-49fe-9c0d-78772e2f1ead/" | Unique URL for the node              | True     |
+| uid                   | str                                                 | "336d0584-04f9-49fe-9c0d-78772e2f1ead" | Unique ID for the node                                                    | True     |
+| group                 | [Group](../supporting_nodes/group.md)               |                          | Group that owns the `Collection` node                                                   | True     |
+| project                 | [Project](../project.md)                          |                          | Project associated with the `Collection` node                                           | True     |
+| name                  | str                                                 | "Navid's collection"     | Name of the `Collection`  node                                                          | True     |
+| experiments           | list[[Experiment](experiment.md)]                   | [exp_1, exp_2, exp_3]    | Experiments that relate to the `Collection` node                                        | False    |
+| inventories           | list[[Inventory](inventory.md)]                     | [inv_1, inv_2, inv_3]    | Inventories owned by the `Collection` node                                              | False    |
+| citations             | list[[Citation](../subobjects/citation.md)]         |                          | Reference to a book, paper, or scholarly work                                           | False    |
+| created_at            | datetime                                            | "2022-11-23T00:59:01.453731Z" | Date and time the `Collection` node was created (UTC time)                         | True     |
+| updated_at            | datetime                                            | "2022-11-23T00:59:01.453756Z" | Date and time the `Collection` node was last modified (UTC time)                   | True     |
+| public                | bool                                                | False                    | Boolean indicating whether the node is publicly viewable | True     |
 
-!!! warning "Collection names"
-    Collection names Must be unique within a <a href="../project" target="_blank">Project</a>
-
----
-
-## Collection Attributes
-
+## Example
 ```json
-
 {
     "url": "https://criptapp.org/api/collection/336d0584-04f9-49fe-9c0d-78772e2f1ead/",
     "uid": "336d0584-04f9-49fe-9c0d-78772e2f1ead",
@@ -39,7 +42,15 @@ A `Collection` node can be thought as a folder/bucket that can hold either an
 
 ```
 
----
+## Navigating to Collection
+`Collections` can be easily found on <a href="https://criptapp.org" target="_blank">CRIPT</a> home screen in the 
+<a href="https://criptapp.org/collection/" target="_blank">Collections link</a>
+
+<br/>
+
+!!! warning "Collection names"
+    Collection names Must be unique within a <a href="../project" target="_blank">Project</a>
+
 ## Methods
 
 ### Create Collection
