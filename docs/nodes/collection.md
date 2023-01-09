@@ -61,17 +61,25 @@ The `.create()` method *both* creates and saves (i.e., uploads to the CRIPT data
 
 `cript.Collection.create(project, name, update_existing=False, **kwargs)`
 
+_Parameters:_
+
+- **project:** *([Project](../project.md) node)*
+  `Project` to associate the `Collection` with
+- **name:** *(str)*
+  name of the `Collection` node
+
+_Returns:_
+
+- `Collection` node of type `cript.data_model.nodes.BaseNode`
+
 _Example:_
 
 Creating a `Collection` called *"My Collection"*
 
 ```python
-my_collection = cript.Collection.create(name="My collection")
+my_project = cript.Project.get(name = "My project") # retrieves an already-created project
+my_collection = cript.Collection.create(project = my_project, name="My collection")
 ```
-
-_Returns:_
-
-Created Collection node of type `cript.data_model.nodes.BaseNode`
 
 ---
 
