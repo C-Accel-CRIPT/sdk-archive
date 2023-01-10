@@ -71,7 +71,7 @@ _Parameters:_
 
 _Returns:_
 
-- `Collection` node of type `cript.data_model.nodes.BaseNode`
+`Collection` node of type `cript.data_model.nodes.BaseNode`
 
 _Example:_
 
@@ -93,28 +93,26 @@ The `.save()` method saves the `Collection` node to the CRIPT database. It can b
 
 `cript.Collection.save()`
 
+_Parameters:_
 
-_Example:_
+| Name              | Type    | Description                                                    | Default |
+|-------------------|---------|----------------------------------------------------------------|---------|
+| `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
 
-Creating a Collection node named _"My Collection"_ and saving it to CRIPT
-
-```python
-my_collection = cript.Collection.create(name="My collection")
-my_collection.save()
-```
 
 _Returns:_
 
 None
 
-_Parameters:_
+_Example:_
 
-| Name              | Type    | Description                                                    | Default |
-|-------------------|---------|----------------------------------------------------------------|---------|
-| `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
-| `update_existing` | boolean | Indicates whether to update an existing node in CRIPT database | False   |
-| `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
+Instantiating a `Collection` node named _"My Collection"_ and saving it to CRIPT
 
+```python
+my_project = cript.Project.get(name = "My project") # retrieves an already-created project
+my_collection = cript.Collection(project=my_project, name="My collection")
+my_collection.save()
+```
 
 ---
 ### Get
