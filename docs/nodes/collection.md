@@ -88,8 +88,10 @@ my_collection = cript.Collection.create(project = my_project, name="My collectio
 
 _Definition:_
 
-By saving a node it will be committed to the CRIPT database and saved there
-`cript.Collection.create()`
+The `.save()` method saves the `Collection` node to the CRIPT database. It can be used after initial instantiation of a
+`Collection` node (e.g., `cript.Collection(project, name)`) or after modifying a `Collection` node. It does not have any required arguments.
+
+`cript.Collection.save()`
 
 
 _Example:_
