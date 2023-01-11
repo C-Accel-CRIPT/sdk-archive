@@ -24,21 +24,21 @@ class Data(BaseNode):
 
     @beartype
     def __init__(
-        self,
-        experiment: Union[BaseNode, str],
-        name: str,
-        type: str,
-        files: list[Union[File, str]] = None,
-        sample_preparation: Union[BaseNode, str, None] = None,
-        computations: list[Union[BaseNode, str]] = None,
-        computational_process: Union[BaseNode, str, None] = None,
-        materials=None,
-        processes=None,
-        notes: Union[str, None] = None,
-        citations: list[Union[Citation, dict]] = None,
-        public: bool = False,
-        group: Union[Group, str] = None,
-        **kwargs,
+            self,
+            experiment: Union[BaseNode, str],
+            name: str,
+            type: str,
+            files: list[Union[File, str]] = None,
+            sample_preparation: Union[BaseNode, str, None] = None,
+            computations: list[Union[BaseNode, str]] = None,
+            computational_process: Union[BaseNode, str, None] = None,
+            materials=None,
+            processes=None,
+            notes: Union[str, None] = None,
+            citations: list[Union[Citation, dict]] = None,
+            public: bool = False,
+            group: Union[Group, str] = None,
+            **kwargs,
     ):
         super().__init__(public=public, **kwargs)
         self.experiment = experiment
@@ -53,6 +53,9 @@ class Data(BaseNode):
         self.citations = citations if citations else []
         self.notes = notes
         self.group = auto_assign_group(group, experiment)
+
+    def save(self, get_level: int = 0, update_existing: bool = False):
+        BaseNode.save(self=self,get_level=get_level, update_existing=update_existing)
 
     @beartype
     def add_file(self, file: Union[File, dict]):
