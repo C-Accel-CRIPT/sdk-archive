@@ -119,36 +119,10 @@ my_collection.save()
 
 _Definition:_
 
-Get a Collection that has already been saved into CRIPT
+The `.get()` method retrieves a `Collection` that has already been saved in the CRIPT database. At least 1 of `uid`, `url`, or `name`  is required as an argument
+to retrieve a `Collection` node. If retrieving via `name`, one should also provide a `Project uid` to the `project` parameter because `Collection` names are not unique across different `Projects`.
 
-`cript.Collection.get(get_level=0, **kwargs)`
-
-<div style="margin-bottom: 2rem"></div>
-
-_Get Collection Node via UID:_
-``` python
-my_collection = cript.Collection.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
-```
-
-_Get Collection Node via URL:_
-``` python
-my_collection = cript.Collection.get(url="https://criptapp.org/collection/015fc459-ea9f-4c37-80aa-f51d509095df/")
-```
-
-_Get Collection Node via Name:_
-
-``` python
-project = cript.Project.get(name="My project")
-collection = cript.Collection.get(name="My collection", project=project)
-```
-
-??? info "Why Project is needed"
-    When getting a Collection via name, the project must also be specified since collection is nested under project and the collection name is only unique among other collections within the project.
-
-_Returns:_
-
-CRIPT Collection node of type `cript.data_model.nodes.BaseNode`
-
+`cript.Collection.get(name, project, uid, url, **kwargs)`
 
 _Parameters:_
 
@@ -159,8 +133,35 @@ _Parameters:_
 | `project`   | string | Project name that the Collection is nested inside of | " "     |
 | `uid`       | string | UID of the specific Collection to get                | " "     |
 | `url`       | string | URL of the specific Collection to get                | " "     |
-| `get_level` | int    | Level to recursively get nested nodes                | 0       |
 | `**kwargs`  |        | Arguments for the constructor.                       | `{}`    |
+
+<div style="margin-bottom: 2rem"></div>
+
+_Examples:_
+
+Getting a `Collection` node via UID:
+``` python
+my_collection = cript.Collection.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
+```
+
+Getting a `Collection` node via URL:
+``` python
+my_collection = cript.Collection.get(url="https://criptapp.org/collection/015fc459-ea9f-4c37-80aa-f51d509095df/")
+```
+
+Getting a `Collection` Node via name:
+
+``` python
+project = cript.Project.get(name="My project")
+collection = cript.Collection.get(name="My collection", project=project.uid)
+```
+
+??? info "Why Project is needed"
+    When getting a Collection via name, the project must also be specified since collection is nested under project and the collection name is only unique among other collections within the project.
+
+_Returns:_
+
+CRIPT Collection node of type `cript.data_model.nodes.BaseNode`
 
 
 ---
