@@ -57,7 +57,7 @@ A `Collection` node can be thought as a folder/bucket that can hold either an
 
 _Definition:_
 
-The `.create()` method *both* creates and saves (i.e., uploads to the CRIPT database) a `Collection` node. It has 2 required arguments: `project` and `name`.
+Both creates and saves (i.e., uploads to the CRIPT database) a `Collection` node. It has 2 required arguments: `project` and `name`.
 
 `cript.Collection.create(project, name, **kwargs)`
 
@@ -88,7 +88,7 @@ my_collection = cript.Collection.create(project = my_project, name="My collectio
 
 _Definition:_
 
-The `.save()` method saves the `Collection` node to the CRIPT database. It can be used after initial instantiation of a
+Saves the `Collection` node to the CRIPT database. It can be used after initial instantiation of a
 `Collection` node (e.g., `cript.Collection(project, name)`) or after modifying a `Collection` node. It does not have any required arguments.
 
 `cript.Collection.save()`
@@ -119,7 +119,7 @@ my_collection.save()
 
 _Definition:_
 
-The `.get()` method retrieves a `Collection` that has already been saved in the CRIPT database. At least 1 of `uid`, `url`, or `name`  is required as an argument
+Retrieves a `Collection` that has already been saved in the CRIPT database. At least 1 of `uid`, `url`, or `name`  is required as an argument
 to retrieve a `Collection` node. If retrieving via `name`, one should also provide a `Project uid` to the `project` parameter because `Collection` names are not unique across different `Projects`.
 
 `cript.Collection.get(name, project, uid, url, **kwargs)`
@@ -135,7 +135,9 @@ _Parameters:_
 | `url`       | string | URL of the specific Collection to get                | " "     |
 | `**kwargs`  |        | Arguments for the constructor.                       | `{}`    |
 
-<div style="margin-bottom: 2rem"></div>
+_Returns:_
+
+CRIPT `Collection` node of type `cript.data_model.nodes.BaseNode`
 
 _Examples:_
 
@@ -156,12 +158,8 @@ project = cript.Project.get(name="My project")
 collection = cript.Collection.get(name="My collection", project=project.uid)
 ```
 
-??? info "Why Project is needed"
-    When getting a Collection via name, the project must also be specified since collection is nested under project and the collection name is only unique among other collections within the project.
-
-_Returns:_
-
-CRIPT Collection node of type `cript.data_model.nodes.BaseNode`
+??? note "Why `Project uid` is needed"
+    `Collection` names are only unique within a project, not across projects, so when getting a `Collection` via name, the associated `Project` node must also be specified.
 
 
 ---
@@ -170,9 +168,21 @@ CRIPT Collection node of type `cript.data_model.nodes.BaseNode`
 
 _Definition:_
 
-Update a saved Collection node with new values
+Updates a saved `Collection` node with new values
 
-`cript.Collection.update(get_level=0, **kwargs)`
+`cript.Collection.update(name, **kwargs)`
+
+_Parameters:_
+
+
+| Name              | Type    | Description                                                    | Default |
+|-------------------|---------|----------------------------------------------------------------|---------|
+| `name`      | string | New name of the `Collection`                        | " "     |
+| `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
+
+_Returns:_
+
+None
 
 _Example:_
 
@@ -180,32 +190,15 @@ _Example:_
 my_collection.update(name="My new collection name")
 ```
 
-_Returns:_
-
-None
-
-_Parameters:_
-
-
-| Name              | Type    | Description                                                    | Default |
-|-------------------|---------|----------------------------------------------------------------|---------|
-| `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
-| `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
-
 ---
 ### Refresh Collection
 
 _Definition:_
 
-Refresh a node to get the latest saved values from CRIPT
+Refreshes a node to get the latest saved values from CRIPT. It does not have any required arguments.
 
-`cript.Collection.refresh(get_level=0)`
+`cript.Collection.refresh()`
 
-_Example:_
-
-```python
-my_collection.refresh(name="My new collection name")
-```
 
 _Returns:_
 
@@ -216,9 +209,13 @@ _Parameters:_
 
 | Name              | Type    | Description                                                    | Default |
 |-------------------|---------|----------------------------------------------------------------|---------|
-| `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
 | `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
 
+_Example:_
+
+```python
+my_collection.refresh()
+```
 
 ---
 
