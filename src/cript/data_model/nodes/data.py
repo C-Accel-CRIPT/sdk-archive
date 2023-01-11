@@ -54,6 +54,9 @@ class Data(BaseNode):
         self.notes = notes
         self.group = auto_assign_group(group, experiment)
 
+    def save(self, get_level: int = 0, update_existing: bool = False):
+        BaseNode.save(self=self, get_level=get_level, update_existing=update_existing)
+
     @beartype
     def add_file(self, file: Union[File, dict]):
         self._add_node(file, "files")

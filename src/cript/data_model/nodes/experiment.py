@@ -36,6 +36,8 @@ class Experiment(BaseNode):
         group: Union[Group, str] = None,
         **kwargs,
     ):
+        # pop materials if it is passed in as extra
+        kwargs.pop("materials", None)
         super().__init__(public=public, **kwargs)
         self.collection = collection
         self.name = name
@@ -84,3 +86,6 @@ class Experiment(BaseNode):
     def data(self, value):
         if value:
             self._data = Paginator(url=value, node_name="Data")
+
+    def save(self, get_level: int = 0, update_existing: bool = False):
+        BaseNode.save(self, get_level=get_level, update_existing=update_existing)
