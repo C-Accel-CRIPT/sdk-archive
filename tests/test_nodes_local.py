@@ -21,7 +21,7 @@ def criptapp_api():
     create api for the rest of the tests to use
     """
     host = "127.0.0.1:8000"
-    token = "Token a325d6fcf7fc835c7af74c3d8a09fdc473c778dd"
+    token = ""
 
     return cript.API(host, token, tls=False)
 
