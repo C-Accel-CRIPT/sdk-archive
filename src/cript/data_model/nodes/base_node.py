@@ -181,13 +181,15 @@ class BaseNode(Base, abc.ABC):
 
         # Return the local node object if it already exists
         # Otherwise, create a new node
-        local_node = get_cached_node(obj_json["url"])
-        if local_node:
-            return local_node
-        else:
-            node = create_node(cls, obj_json)
-            node._generate_nested_nodes(get_level=get_level, level=level)
-            return node
+        if "url" in obj_json:
+            local_node = get_cached_node(obj_json["url"])
+
+            if local_node:
+                return local_node
+
+        node = create_node(cls, obj_json)
+        node._generate_nested_nodes(get_level=get_level, level=level)
+        return node
 
     @classmethod
     @beartype
