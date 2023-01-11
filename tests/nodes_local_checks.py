@@ -131,14 +131,16 @@ def test_create_quantity_nodes(criptapp_api):
     coll = cript.Collection.get(name=MY_COLLECTION)
 
     # get inventory
-    inventory = cript.Inventory.get(name=MY_INVENTORY, )
+    inventory = cript.Inventory.get(
+        name=MY_INVENTORY,
+    )
 
     # get materials from inventory
-    solution = inventory['SecBuLi solution 1.4M cHex']
-    toluene = inventory['toluene']
-    styrene = inventory['styrene']
-    butanol = inventory['1-butanol']
-    methanol = inventory['methanol']
+    solution = inventory["SecBuLi solution 1.4M cHex"]
+    toluene = inventory["toluene"]
+    styrene = inventory["styrene"]
+    butanol = inventory["1-butanol"]
+    methanol = inventory["methanol"]
 
     # create quantity nodes
     initiator_qty = cript.Quantity(key="volume", value=0.017, unit="ml")
@@ -165,11 +167,11 @@ def test_add_ingredients_to_process(criptapp_api):
     prcs = cript.Process.get(name=MY_PROCESS)
 
     # get materials from inventory
-    solution = inventory['SecBuLi solution 1.4M cHex']
-    toluene = inventory['toluene']
-    styrene = inventory['styrene']
-    butanol = inventory['1-butanol']
-    methanol = inventory['methanol']
+    solution = inventory["SecBuLi solution 1.4M cHex"]
+    toluene = inventory["toluene"]
+    styrene = inventory["styrene"]
+    butanol = inventory["1-butanol"]
+    methanol = inventory["methanol"]
 
     # create quantity nodes
     initiator_qty = cript.Quantity(key="volume", value=0.017, unit="ml")
@@ -180,29 +182,19 @@ def test_add_ingredients_to_process(criptapp_api):
 
     # create ingredient nodes
     initiator = cript.Ingredient(
-        keyword="initiator",
-        material=solution,
-        quantities=[initiator_qty]
+        keyword="initiator", material=solution, quantities=[initiator_qty]
     )
     solvent = cript.Ingredient(
-        keyword="solvent",
-        material=toluene,
-        quantities=[solvent_qty]
+        keyword="solvent", material=toluene, quantities=[solvent_qty]
     )
     monomer = cript.Ingredient(
-        keyword="monomer",
-        material=styrene,
-        quantities=[monomer_qty]
+        keyword="monomer", material=styrene, quantities=[monomer_qty]
     )
     quench = cript.Ingredient(
-        keyword="quench",
-        material=butanol,
-        quantities=[quench_qty]
+        keyword="quench", material=butanol, quantities=[quench_qty]
     )
     workup = cript.Ingredient(
-        keyword="workup",
-        material=methanol,
-        quantities=[workup_qty]
+        keyword="workup", material=methanol, quantities=[workup_qty]
     )
 
     prcs.add_ingredient(initiator)
@@ -244,7 +236,9 @@ def test_create_material_process_product(criptapp_api):
     prcs = cript.Process.get(name=MY_PROCESS)
     polystyrene = cript.Material(project=proj, name="polystyrene")
 
-    names = cript.Identifier(key="alternative_names", value=["poly(styrene)", "poly(vinylbenzene)"])
+    names = cript.Identifier(
+        key="alternative_names", value=["poly(styrene)", "poly(vinylbenzene)"]
+    )
     bigsmiles = cript.Identifier(
         key="bigsmiles", value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
     )
