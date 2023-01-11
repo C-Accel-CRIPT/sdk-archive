@@ -23,21 +23,21 @@ class Experiment(BaseNode):
 
     @beartype
     def __init__(
-            self,
-            collection: Union[Collection, str],
-            name: str,
-            processes: str = None,
-            computations: str = None,
-            computational_processes: str = None,
-            data: str = None,
-            funding: list[Union[str, None]] = None,
-            notes: Union[str, None] = None,
-            public: bool = False,
-            group: Union[Group, str] = None,
-            **kwargs,
+        self,
+        collection: Union[Collection, str],
+        name: str,
+        processes: str = None,
+        computations: str = None,
+        computational_processes: str = None,
+        data: str = None,
+        funding: list[Union[str, None]] = None,
+        notes: Union[str, None] = None,
+        public: bool = False,
+        group: Union[Group, str] = None,
+        **kwargs,
     ):
         # pop materials if it is passed in as extra
-        kwargs.pop('materials', None)
+        kwargs.pop("materials", None)
         super().__init__(public=public, **kwargs)
         self.collection = collection
         self.name = name
