@@ -261,11 +261,11 @@ _Parameters:_
 
 | Name        | Type             | Description                           | Default |
 |-------------|------------------|---------------------------------------|---------|
-| url                   | str                                                 | "https://criptapp.org/api/collection/336d0584-04f9-49fe-9c0d-78772e2f1ead/" | Unique URL for the node              | True     |
-| uid                   | str                                                 | "336d0584-04f9-49fe-9c0d-78772e2f1ead" | Unique ID for the node                                                    | True     |
-| project                 | [Project.uid](../project.md)                          |                          | Project associated with the `Collection` node                                           | True     |
-| name                  | str                                                 | "Navid's collection"     | Name of the `Collection`  node                                                          | True     |
-| experiments           | list[[Experiment.uid](experiment.md)]                   | [exp_1, exp_2, exp_3]    | Experiments that relate to the `Collection` node                                        | False    |
+| `url`                   | str                                                 | "https://criptapp.org/api/collection/336d0584-04f9-49fe-9c0d-78772e2f1ead/" | Unique URL for the node              | True     |
+| `uid`                   | str                                                 | "336d0584-04f9-49fe-9c0d-78772e2f1ead" | Unique ID for the node                                                    | True     |
+| `project`                 | [Project.uid](../project.md)                          |                          | Project associated with the `Collection` node                                           | True     |
+| `name`                  | str                                                 | "Navid's collection"     | Name of the `Collection`  node                                                          | True     |
+| `experiments`           | list[[Experiment.uid](experiment.md)]                   | [exp_1, exp_2, exp_3]    | Experiments that relate to the `Collection` node                                        | False    |
 | `limit`     | Union[int, None] | The max number of items to return     | None    |
 | `offset`    | Union[int, None] | The starting position of the query    | None    |
 | `**kwargs`  |                  | Arguments for the constructor.        | `{}`    |
