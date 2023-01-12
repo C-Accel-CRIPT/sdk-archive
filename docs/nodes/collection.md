@@ -223,15 +223,9 @@ my_collection.refresh()
 
 _Definition:_
 
-Delete a Collection node from CRIPT database
+Deletes a `Collection` node from CRIPT database. It does not have any required arguments.
 
 `cript.Collection.delete()`
-
-_Example:_
-
-```python
-my_collection.delete()
-```
 
 _Returns:_
 
@@ -242,10 +236,13 @@ _Parameters:_
 
 | Name              | Type    | Description                                                    | Default |
 |-------------------|---------|----------------------------------------------------------------|---------|
-| `get_level`       | int     | Level to recursively get nested nodes                          | 0       |
 | `**kwargs`        |         | Arguments for the constructor.                                 | `{}`    |
 
+_Example:_
 
+```python
+my_collection.delete()
+```
 
 ---
 
@@ -253,27 +250,36 @@ _Parameters:_
 
 _Definition:_
 
-Search for a Collection within CRIPT. This method returns a paginator object
+Searches for a `Collection` within CRIPT based on query arguments. Unlike the previously described
+methods, this method should not be used with a particular `Collection` instance. It requires at least 1 of the following 
+arguments: `uid`, `url`, `name`, `project`, `experiments`.
 
-`cript.Collection.search(limit=None, offset=None, get_level=0, **kwargs)`
-
-_Example:_
-
-
-```python
-
-```
-
-_Returns:_
-
-A Paginator object of type `cript.data_model.paginator.Paginator`
+`cript.Collection.search(uid, url, name, project, experiments, limit=None, offset=None, **kwargs)`
 
 _Parameters:_
 
 
 | Name        | Type             | Description                           | Default |
 |-------------|------------------|---------------------------------------|---------|
+| url                   | str                                                 | "https://criptapp.org/api/collection/336d0584-04f9-49fe-9c0d-78772e2f1ead/" | Unique URL for the node              | True     |
+| uid                   | str                                                 | "336d0584-04f9-49fe-9c0d-78772e2f1ead" | Unique ID for the node                                                    | True     |
+| project                 | [Project.uid](../project.md)                          |                          | Project associated with the `Collection` node                                           | True     |
+| name                  | str                                                 | "Navid's collection"     | Name of the `Collection`  node                                                          | True     |
+| experiments           | list[[Experiment.uid](experiment.md)]                   | [exp_1, exp_2, exp_3]    | Experiments that relate to the `Collection` node                                        | False    |
 | `limit`     | Union[int, None] | The max number of items to return     | None    |
 | `offset`    | Union[int, None] | The starting position of the query    | None    |
-| `get_level` | int              | Level to recursively get nested nodes | 0       |
 | `**kwargs`  |                  | Arguments for the constructor.        | `{}`    |
+
+_Returns:_
+
+A Paginator object of type `cript.data_model.paginator.Paginator`
+
+
+_Example:_
+
+
+```python
+results = cript.Collection.search(name = "My collection")
+results.json()
+```
+
