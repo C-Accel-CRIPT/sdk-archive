@@ -130,7 +130,7 @@ _Parameters:_
 | Name        | Type   | Description                                          | Default |
 |-------------|--------|------------------------------------------------------|---------|
 | `name`      | string | Name of the Collection to get                        | " "     |
-| `project`   | string | Project name that the Collection is nested inside of | " "     |
+| `project`   | string | Project uid that the Collection is nested inside of | " "     |
 | `uid`       | string | UID of the specific Collection to get                | " "     |
 | `url`       | string | URL of the specific Collection to get                | " "     |
 | `**kwargs`  |        | Arguments for the constructor.                       | `{}`    |
