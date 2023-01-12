@@ -306,7 +306,7 @@ prcs.add_property(yield_mass)
 First, we'll instantiate the node.
 
 ```py
-polystyrene = cript.Material(project=proj, name="polystyrene")
+polystyrene = cript.Material(project=proj.uid, name="polystyrene")
 ```
 
 Next, we'll add some Identifier nodes.
