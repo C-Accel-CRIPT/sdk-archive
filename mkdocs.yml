@@ -5,11 +5,32 @@ repo_name: C-Accel-CRIPT/cript
 
 theme:
   name: material
+  logo: assets/images/CRIPT_full_logo_colored_transparent.png
+  favicon: assets/images/favicon.ico
   palette:
-    primary: deep purple
-    accent: deep purple
-  icon:
-    repo: fontawesome/brands/github
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+# This links the CRIPT logo to the CRIPT homepage
+extra:
+  homepage: https://criptapp.org
+
+extra_css:
+  - assets/stylesheets/extra.css
 
 plugins:
   - search
@@ -18,14 +39,10 @@ plugins:
       handlers:
         python:
           paths: [src]
-          selection:
-            docstring_style: sphinx
           options:
             show_bases: false
             show_source: false
-
-options:
-  show_source: false
+            docstring_style: sphinx
 
 nav:
   - Home: index.md
@@ -67,11 +84,18 @@ markdown_extensions:
   - toc:
       baselevel: 1
       permalink: True
+  - attr_list
+  - md_in_html
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.superfences
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+

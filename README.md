@@ -40,7 +40,7 @@ For updates and release notes please visit the [CRIPT blog](https://blog.criptap
 ### Software development
 
 You are welcome to contribute code via PR to this repository.
-For the developmet, we are using [trunk.io](https://trunk.io) to achieve a consistent coding style.
+For the development, we are using [trunk.io](https://trunk.io) to achieve a consistent coding style.
 You can run `./trunk fmt` to auto-format your contributions and `./trunk check` to verify your contribution complies with our standard via trunk.
 We will run the same test automatically before we are able to merge the code.
 Please, let us know if there are any issues.
