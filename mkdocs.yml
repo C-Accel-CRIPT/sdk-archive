@@ -10,6 +10,8 @@ theme:
   icon:
     admonition:
       alert: octicons/alert-16
+  features:
+    - content.code.copy
 
   palette:
     # Palette toggle for light mode
@@ -97,10 +99,10 @@ markdown_extensions:
       permalink: True
   - attr_list
   - md_in_html
+  - admonition
   - pymdownx.superfences
   - pymdownx.tabbed:
-      alternate_style: true
-  - admonition
+      alternate_style: true  
   - pymdownx.details
   - pymdownx.highlight:
       anchor_linenums: true

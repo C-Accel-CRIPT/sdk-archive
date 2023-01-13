@@ -9,7 +9,20 @@ logger = getLogger(__name__)
 
 
 class Parameter(BaseSubobject):
-    """Object representing a an input value to an :class:`Algorithm`."""
+    """Object representing a an input parameter of an `Algorithm`.
+
+    ``` py title="Example"
+    parameter = Parameter(
+        key="duration",
+        value=10,
+        unit="ns",
+    )
+    ```
+
+    :param key: Parameter key
+    :param value: Parameter value
+    :param unit: Parameter unit
+    """
 
     node_name = "Parameter"
     alt_names = ["parameters"]
