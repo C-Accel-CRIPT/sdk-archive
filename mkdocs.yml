@@ -48,7 +48,7 @@ plugins:
           options:
             show_bases: false
             show_source: false
-            docstring_style: sphinx
+            docstring_style: google
 
 nav:
   - Home: index.md

@@ -14,6 +14,13 @@ class Algorithm(BaseSubobject):
     """Object that represents an algorithm used in
     `Computation` and `ComputationalProcess` objects.
 
+    Args:
+        key (str): Algorithm key
+        type (str): Algorithm type
+        parameters (list[Union[Parameter, dict]], optional): List of parameters linked to this algorithm
+        citations (list[Union[Citation, dict]], optional): List of citations linked to this algorithm
+
+
     ``` py title="Example"
     algorithm = Algorithm(
         key="clustering",
@@ -23,10 +30,6 @@ class Algorithm(BaseSubobject):
     )
     ```
 
-    :param key: Algorithm key
-    :param type: Algorithm type
-    :param parameters: List of parameters linked to this algorithm, defaults to None
-    :param citations: List of citations linked to this algorithm, defaults to None
     """
 
     node_name = "Algorithm"
@@ -50,7 +53,13 @@ class Algorithm(BaseSubobject):
     def add_parameter(self, parameter: Union[Parameter, dict]):
         """Add a parameter to this object.
 
-        :param parameter: The parameter to be added
+        Args:
+            parameter (Union[Parameter, dict]): The parameter to be added
+        
+
+        ``` py title="Example"
+        algorithm.add_parameter(parameter)
+        ```
         """
         self._add_node(parameter, "parameters")
 
@@ -58,22 +67,39 @@ class Algorithm(BaseSubobject):
     def remove_parameter(self, parameter: Union[Parameter, int]):
         """Remove a parameter from this object.
 
-        :param parameter: The parameter to be removed
+        Args:
+            parameter (Union[Parameter, int]): The parameter to be removed
+        
+
+        ``` py title="Example"
+        algorithm.remove_parameter(parameter)
+        ```
         """
         self._remove_node(parameter, "parameters")
 
     @beartype
     def add_citation(self, citation: Union[Citation, dict]):
-        """Adds a citation to this object.
+        """Add a citation to this object.
 
-        :param citation: The citation to be added
+        Args:
+            citation (Union[Citation, dict]): The citation to be added
+        
+
+        ``` py title="Example"
+        algorithm.add_citation(citation)
+        ```
         """
         self._add_node(citation, "citations")
 
     @beartype
     def remove_citation(self, citation: Union[Citation, int]):
-        """Removes a citation from this object.
+        """Remove a citation from this object.
 
-        :param citation: The citation to be removed
+        Args:
+            citation (Union[Citation, dict]): The citation to be removed
+        
+        ``` py title="Example"
+        algorithm.remove_citation(citation)
+        ```
         """
         self._remove_node(citation, "citations")

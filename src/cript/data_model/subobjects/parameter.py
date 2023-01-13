@@ -11,6 +11,12 @@ logger = getLogger(__name__)
 class Parameter(BaseSubobject):
     """Object representing a an input parameter of an `Algorithm`.
 
+    Args:
+        key (str): Parameter key
+        value (Union[int, float]): Parameter value
+        unit (Union[str, None], optional): Parameter unit
+
+
     ``` py title="Example"
     parameter = Parameter(
         key="duration",
@@ -18,10 +24,6 @@ class Parameter(BaseSubobject):
         unit="ns",
     )
     ```
-
-    :param key: Parameter key
-    :param value: Parameter value
-    :param unit: Parameter unit
     """
 
     node_name = "Parameter"
