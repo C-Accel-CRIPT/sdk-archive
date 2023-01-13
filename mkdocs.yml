@@ -60,7 +60,7 @@ nav:
     - Simulation: tutorials/simulation.md
     - Synthesis: tutorials/synthesis.md
   - Nodes:
-      - -- All --: nodes/all.md
+      - All: nodes/all.md
       - Collection: nodes/collection.md
       - Computation: nodes/computation.md
       - Computational Process: nodes/computational_process.md
@@ -76,7 +76,7 @@ nav:
       - Software: nodes/software.md
       - User: nodes/user.md
   - Sub-objects:
-      - -- All --: subobjects/all.md
+      - All: subobjects/all.md
       - Algorithm: subobjects/algorithm.md
       - Citation: subobjects/citation.md
       - Computational Forcefield: subobjects/computational_forcefield.md

@@ -1,86 +1,108 @@
-## Installation
+# Quick Start
 
-Prerequisites:
-> - *Python 3.9+*
-> - *Internet access*
-
-Install with pip:
-```
-pip install cript
-```
-
-## Connect to CRIPT
-
-Establish a connection with an API endpoint:
-``` py
-import cript
-
-host = "<endpoint_hostname>"  # e.g., criptapp.org
-token = "<your_api_token>"
-cript.API(host, token)
-```
-!!! note
-    Your API token can be found in the UI under Account Settings.
+!!! abstract "Objective"
+    This quick start guide will take you through some common commands of the CRIPT Python SDK. For more information please visit each node or the full tutorial.
 
 ---
 
-# Example Tasks
+## Install CRIPT
+Install <a href="https://pypi.org/project/cript/" target="_blank">CRIPT</a> from Pypi
+   ```bash
+    pip install cript
+   ```
+---
 
-## Create a node
-For example, create a Project:
-``` py
-proj = cript.Project(name="MyProject")
-proj.save()
-```
-... then a Collection:
-``` py
-coll = cript.Collection.create(project=proj, name="MyCollection")
-```
-!!! note
-    Notice the use of `create()` here, which instantiates and saves the object in one go.
+## Connect to CRIPT
 
-## Update a node
-For example, update the Project node created above:
+`import cript` into your python file, fill in the host and API Token, run the python file to connect to CRIPT. It is *highly* recommended that you store your API token in a safe location and read it into your code, rather than have it hard-coded. One way to do this is to store
+it in an environmental variable (e.g., `CRIPT_API_KEY`) and then read it in via the `os` module.
+
 ``` py
-proj.name = "OurProject"
-proj.save()
+import cript
+import os
+
+host = "criptapp.org"  # or any host
+token = os.environ.get("CRIPT_API_KEY")
+cript.API(host, token)
 ```
-... then the Collection:
+
+!!! info
+    Your API token can be found in the <a href="https://criptapp.org/security/" target="_blank">Security Settings</a> under the profile icon dropdown on the top right
+
+---
+
+## Create a Node
+
+``` python
+proj = cript.Project.create(name="My project")
+```
+
+??? info
+    `create()` instantiates and saves the object in one go
+
+---
+## Get a Node
+
+### Get Node via UID
 ```python
-coll.update(name="OurCollection")
+styrene = cript.Material.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
 ```
-!!! note
-    Notice the use of `update()` here, which updates and saves a node in one go.
 
-## Delete a node
-For example, delete the Collection node created above:
+### Get Node via URL
+```python
+styrene = cript.Material.get(url="https://criptapp.org/material/015fc459-ea9f-4c37-80aa-f51d509095df/")
+```
+
+### Get Node via Name
+```python
+proj = cript.Project.get(name="My project")
+```
+
+??? note "UID and URL are preferable"
+    Getting a node via UID and URL are preferred methods because they are unmistakable. 
+
+    When getting a node via `name` please be sure to also pass the node that it is nested under.
+
+    For example `Collection` is nested under `Project`:
+    ```python
+    project = cript.Project.get(name="My project")
+    collection = cript.Collection.get(name="My collection", project=project)
+    ```
+
+    Project does not need any other parameters because a project is the highest level node
+
+---
+
+## Update a Node
+
+1. Get the node you want to update
+2. Make the desired changes
+3. Update it
+
+```python
+proj = cript.Project.get(name="My project")
+proj.update(name="My new project name")
+```
+
+---
+
+## Delete a Node
+1. Get the node you want to delete
+2. Delete the node
+
 ``` py
+coll = cript.Collection.create(project=proj, name="My collection")
 coll.delete()
 ```
 
-## Get an existing node
-For example, get the official CRIPT Project node:
-``` py
-proj = cript.Project.get(name="CRIPT")
-```
-... then get the official styrene Material node via name:
-``` py
-styrene =  cript.Material.get(project=proj.uid, name="Styrene")
-```
-... or via UID
-``` py
-styrene =  cript.Material.get(uid="<material_uid>")
-```
-... or via URL
-```python
-styrene =  cript.Material.get(url="<material_url>")
-```
+---
 
+## Run a Search Query
 
-## Run a search query
-For example, search for Material nodes with a molar mass less than 10 g/mol:
+For example, search for Material nodes with a molar mass less than 10 g/mol
+
 ``` py
-res =  cript.Material.search(
+results =  cript.Material.search(
     properties = [
         {
             "key": "molar_mass",
@@ -91,32 +113,48 @@ res =  cript.Material.search(
 )
 ```
 
-... then paginate through the results.
-``` py
-res.json()              # View the raw JSON for the query
-res.objects()           # Generate objects for the current page
-res.next_page()         # Flip to the next page
-res.previous_page()     # Flip to the previous page
-```
+!!! Info "Pagination"
+    Search returns a `Paginator` object. You can paginate through the results
 
-## Upload a file
-First, you'll need a Project and Data node:
-``` py
-proj = cript.Project.get(uid="<project_uid>")
-data = cript.Data.get(uid="<data_uid>")
-```
-Next, create a File node that points to your local file:
-``` py
+    ``` python
+    results.json()              # View the raw JSON for the query
+    results.objects()           # Generate objects for the current page
+    results.next_page()         # Flip to the next page
+    results.previous_page()     # Flip to the previous page
+    ```
+
+---
+
+## Upload a File
+
+1. Create a <a href="../node/project" target="_blank">Project</a> node
+2. Create a <a href="../node/data" target="_blank">Data</a> node
+3. Create a <a href="../node/data" target="_blank">File</a> node 
+    1. Specify the path of the local file on your computer that you want to upload to CRIPT
+
+``` python
 path = "path/to/local/file"
-f = cript.File(project=proj, source=path)
+file = cript.File(project=proj, source=path)
 file.save()
 ```
 
-## Download a file
-For example, download the file you uploaded above.
-``` py
-path = "path/to/local/file"
-f.download_file(path=path)
+> When a node is saved it is given a URL and UID
+
+---
+
+## Download a File
+
+1. Create a Create a <a href="../node/data" target="_blank">File</a> nod 
+    1. Specify the source you want to download from
+2. Specify the path you want the file to be downloaded to on your computer
+3. Download the file from CRIPT
+
+<!-- TODO what is "path" is that the path you want to download from within CRIPT? -->
+``` python
+file = cript.File(project=proj, source=path)
+path = "downloaded.csv"
+file.download_file(path=path)
 ```
-!!! note
-    The default path for a download is your current directory.
+
+!!! info "Default Path" 
+    The default path for a download is your current directory
