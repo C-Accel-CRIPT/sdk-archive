@@ -61,7 +61,6 @@ class Reference(BaseNode):
         """
         Create or update a node in the database.
 
-        :param node: The node to be saved.
         :param get_level: Level to recursively get nested nodes.
         :param update_existing: Indicates whether to update an existing node with
                                 the same unique fields.

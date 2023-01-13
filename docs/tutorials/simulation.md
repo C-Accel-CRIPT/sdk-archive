@@ -1,6 +1,6 @@
 # Simulation example workflow
 
-> Refer to [Quickstart](./quickstart.md) for installation instructions.
+> Refer to [Quickstart](../quickstart.md) for installation instructions.
 
 ## Connect to the public API
 
