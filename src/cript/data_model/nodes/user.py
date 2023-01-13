@@ -4,7 +4,6 @@ from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
 
-
 logger = getLogger(__name__)
 
 
@@ -28,8 +27,9 @@ class User(BaseNode):
         orcid_id: str = None,
         groups=None,
         public: bool = False,
+        **kwargs
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.username = username
         self.email = email
         self.orcid_id = orcid_id

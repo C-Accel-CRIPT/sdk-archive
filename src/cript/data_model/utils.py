@@ -38,6 +38,9 @@ def create_node(node_class, obj_json):
     created_at = obj_json.pop("created_at")
     updated_at = obj_json.pop("updated_at")
 
+    # pop unused key for Python SDK, but used in web SDK
+    obj_json.pop("can_edit", None)
+
     # Create node
     node = node_class(**obj_json)
 

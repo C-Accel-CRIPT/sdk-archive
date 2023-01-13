@@ -1,18 +1,13 @@
 import copy
 from typing import Union
-from urllib.parse import urlparse
-from urllib.parse import urlunparse
-from urllib.parse import parse_qs
-from urllib.parse import urlencode
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 from beartype import beartype
 
-from cript.cache import get_cached_api_session
-from cript.cache import get_cached_node
-from cript.data_model.utils import get_data_model_class
-from cript.data_model.utils import create_node
-from cript.data_model.exceptions import InvalidPage
 from cript.api.exceptions import APIError
+from cript.cache import get_cached_api_session, get_cached_node
+from cript.data_model.exceptions import InvalidPage
+from cript.data_model.utils import create_node, get_data_model_class
 
 
 class Paginator:
@@ -35,7 +30,7 @@ class Paginator:
         payload: Union[str, None] = None,
         limit: Union[int, None] = None,
         offset: Union[int, None] = None,
-        get_level: int = 0,
+        get_level: int = 1,
     ):
         self.url = url
         self.api = get_cached_api_session(url)

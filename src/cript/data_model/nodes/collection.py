@@ -1,16 +1,14 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.project import Project
+from cript.data_model.paginator import Paginator
 from cript.data_model.subobjects.citation import Citation
 from cript.data_model.utils import auto_assign_group
-from cript.data_model.paginator import Paginator
-from cript.cache import get_cached_api_session
-
 
 logger = getLogger(__name__)
 
@@ -36,8 +34,9 @@ class Collection(BaseNode):
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         group: Union[Group, str] = None,
+        **kwargs,
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.project = project
         self.name = name
         self.experiments = experiments

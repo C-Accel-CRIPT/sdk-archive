@@ -1,14 +1,13 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
-from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.file import File
+from cript.data_model.nodes.group import Group
 from cript.data_model.subobjects.citation import Citation
 from cript.data_model.utils import auto_assign_group
-
 
 logger = getLogger(__name__)
 
@@ -39,8 +38,9 @@ class Data(BaseNode):
         citations: list[Union[Citation, dict]] = None,
         public: bool = False,
         group: Union[Group, str] = None,
+        **kwargs,
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.experiment = experiment
         self.name = name
         self.files = files if files else []
@@ -53,6 +53,9 @@ class Data(BaseNode):
         self.citations = citations if citations else []
         self.notes = notes
         self.group = auto_assign_group(group, experiment)
+
+    def save(self, get_level: int = 0, update_existing: bool = False):
+        BaseNode.save(self=self, get_level=get_level, update_existing=update_existing)
 
     @beartype
     def add_file(self, file: Union[File, dict]):

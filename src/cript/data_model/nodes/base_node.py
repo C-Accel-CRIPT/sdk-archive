@@ -3,22 +3,19 @@ import copy
 import json
 from logging import getLogger
 from typing import Union
-from urllib.parse import urlparse
 
 from beartype import beartype
 
+from cript.cache import cache_node, get_cached_api_session, get_cached_node
 from cript.data_model.base import Base
+from cript.data_model.exceptions import (
+    AddNodeError,
+    RemoveNodeError,
+    UniqueNodeError,
+    UnsavedNodeError,
+)
 from cript.data_model.paginator import Paginator
-from cript.cache import cache_node
-from cript.cache import get_cached_api_session
-from cript.cache import get_cached_node
-from cript.data_model.utils import set_node_attributes
-from cript.data_model.utils import create_node
-from cript.data_model.exceptions import UniqueNodeError
-from cript.data_model.exceptions import UnsavedNodeError
-from cript.data_model.exceptions import AddNodeError
-from cript.data_model.exceptions import RemoveNodeError
-
+from cript.data_model.utils import create_node, set_node_attributes
 
 logger = getLogger(__name__)
 
@@ -33,6 +30,7 @@ class BaseNode(Base, abc.ABC):
         public: bool = False,
         created_at: str = None,
         updated_at: str = None,
+        can_edit: bool = False,
     ):
         super().__init__()
         self.url = url
@@ -40,24 +38,26 @@ class BaseNode(Base, abc.ABC):
         self.public = public
         self.created_at = created_at
         self.updated_at = updated_at
+        self.can_edit = can_edit
 
         # Add node to cache
         cache_node(self)
 
     @beartype
-    def save(self, get_level: int = 0, update_existing: bool = False):
+    def save(self, get_level: int = 1, update_existing: bool = False):
         """
         Create or update a node in the database.
 
         :param node: The node to be saved.
         :param get_level: Level to recursively get nested nodes.
-        :param update_existing: Indicates whether to update an existing node with the same unique fields.
+        :param update_existing: Indicates whether to update an
+                                existing node with the same unique fields.
         """
         api = get_cached_api_session(self.url)
 
         if self.url:
             # Update an existing object via PUT
-            response = api.put(self.url, data=self._to_json(),valid_codes=[200,400])
+            response = api.put(self.url, data=self._to_json(), valid_codes=[200, 400])
         else:
             # Create a new object via POST
             response = api.post(
@@ -69,7 +69,7 @@ class BaseNode(Base, abc.ABC):
             # Check if a unique error was returned
             if "unique" in response:
                 unique_url = response.pop("unique")
-                if unique_url and update_existing == True:
+                if unique_url and update_existing:
                     # Update existing unique node
                     self.url = unique_url
                     self.save(get_level=get_level)
@@ -100,7 +100,7 @@ class BaseNode(Base, abc.ABC):
         logger.info("The node has been deleted from the database.")
 
     @beartype
-    def refresh(self, get_level: int = 0):
+    def refresh(self, get_level: int = 1):
         """
         Overwrite a node's attributes with the latest values from the database.
 
@@ -117,7 +117,7 @@ class BaseNode(Base, abc.ABC):
         self._generate_nested_nodes(get_level=get_level)
 
     @beartype
-    def update(self, get_level: int = 0, **kwargs):
+    def update(self, get_level: int = 1, **kwargs):
         """
         Updates and immediately saves a node.
 
@@ -134,12 +134,13 @@ class BaseNode(Base, abc.ABC):
 
     @classmethod
     @beartype
-    def create(cls, get_level: int = 0, update_existing: bool = False, **kwargs):
+    def create(cls, get_level: int = 1, update_existing: bool = False, **kwargs):
         """
         Immediately creates a node.
 
         :param get_level: Level to recursively get nested nodes.
-        :param update_existing: Indicates whether to update an existing node with the same unique fields.
+        :param update_existing: Indicates whether to update an existing node with the
+                                same unique fields.
         :param **kwargs: Arguments for the constructor.
         :return: The created node.
         :rtype: cript.data_model.nodes.BaseNode
@@ -150,7 +151,7 @@ class BaseNode(Base, abc.ABC):
 
     @classmethod
     @beartype
-    def get(cls, get_level: int = 0, **kwargs):
+    def get(cls, get_level: int = 1, **kwargs):
         """
         Get the JSON for a node and use it to generate a local node object.
 
@@ -162,7 +163,7 @@ class BaseNode(Base, abc.ABC):
         level = kwargs.pop("level", 0)
 
         if len(kwargs) == 0:
-            raise AttributeError(f"Query arguments must be provided.")
+            raise AttributeError("Query arguments must be provided.")
 
         api = get_cached_api_session()
 
@@ -180,13 +181,15 @@ class BaseNode(Base, abc.ABC):
 
         # Return the local node object if it already exists
         # Otherwise, create a new node
-        local_node = get_cached_node(obj_json["url"])
-        if local_node:
-            return local_node
-        else:
-            node = create_node(cls, obj_json)
-            node._generate_nested_nodes(get_level=get_level, level=level)
-            return node
+        if "url" in obj_json:
+            local_node = get_cached_node(obj_json["url"])
+
+            if local_node:
+                return local_node
+
+        node = create_node(cls, obj_json)
+        node._generate_nested_nodes(get_level=get_level, level=level)
+        return node
 
     @classmethod
     @beartype
@@ -194,7 +197,7 @@ class BaseNode(Base, abc.ABC):
         cls,
         limit: Union[int, None] = None,
         offset: Union[int, None] = None,
-        get_level: int = 0,
+        get_level: int = 1,
         **kwargs,
     ):
         """
@@ -208,7 +211,7 @@ class BaseNode(Base, abc.ABC):
         :rtype: cript.data_model.paginator.Paginator
         """
         if len(kwargs) == 0:
-            raise AttributeError(f"Query arguments must be provided.")
+            raise AttributeError("Query arguments must be provided.")
 
         api = get_cached_api_session()
         url = f"{api.search_url}/{cls.slug}/"

@@ -1,13 +1,13 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
+from cript.cache import get_cached_api_session
+from cript.data_model.exceptions import UniqueNodeError
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
-from cript.cache import get_cached_api_session
 from cript.data_model.utils import set_node_attributes
-from cript.data_model.exceptions import UniqueNodeError
 
 logger = getLogger(__name__)
 
@@ -37,8 +37,9 @@ class Reference(BaseNode):
         website: Union[str, None] = None,
         notes: Union[str, None] = None,
         public: bool = False,
+        **kwargs,
     ):
-        super().__init__(public=public)
+        super().__init__(public=public, **kwargs)
         self.title = title
         self.doi = doi
         self.authors = authors if authors else []
@@ -56,16 +57,16 @@ class Reference(BaseNode):
         self.group = group
 
     @beartype
-    def save(self, get_level: int = 0, update_existing: bool = False):
+    def save(self, get_level: int = 1, update_existing: bool = False):
         """
         Create or update a node in the database.
 
         :param node: The node to be saved.
         :param get_level: Level to recursively get nested nodes.
-        :param update_existing: Indicates whether to update an existing node with the same unique fields.
+        :param update_existing: Indicates whether to update an existing node with
+                                the same unique fields.
         """
         api = get_cached_api_session(self.url)
-
 
         # Create a new object via POST
         response = api.post(
@@ -77,7 +78,7 @@ class Reference(BaseNode):
         # Check if a unique error was returned
         if "unique" in response:
             unique_url = response.pop("unique")
-            if unique_url and update_existing == True:
+            if unique_url and update_existing:
                 # Update existing unique node
                 self.url = unique_url
                 self.save(get_level=get_level)

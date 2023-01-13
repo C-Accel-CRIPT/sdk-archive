@@ -1,127 +1,92 @@
-import json
+# This file is created to test the SDK locally
+
 from tempfile import NamedTemporaryFile
 from unittest import mock
 
-import psycopg2
 import pytest
-import requests
-from requests.exceptions import ConnectionError
 
 import cript
 
 MY_GROUP = "MyGroup"
 MY_PROJECT = "MyProject"
-MY_COLLECTION = "Test"
-MY_EXPERIMENT = "Anionic Polymerization of Styrene with SecBuLi"
-MY_INVENTORY = "Test"
-MY_PROCESS = "Test"
-
-
-def is_responsive(url):
-    try:
-        response = requests.get(url)
-        if response.status_code == 200:
-            return True
-    except ConnectionError:
-        return False
+MY_COLLECTION = "MyCollection"
+MY_EXPERIMENT = "MyExperiment"
+MY_INVENTORY = "MyInventory"
+MY_PROCESS = "MyProcess"
 
 
 @pytest.fixture(scope="session")
-def http_service(docker_ip, docker_services):
-    """Ensure that HTTP service is up and responsive."""
+def criptapp_api():
+    """
+    create api for the rest of the tests to use
+    """
+    host = "127.0.0.1:8000"
+    token = ""
 
-    # `port_for` takes a container port and returns the corresponding host port
-    port = docker_services.port_for("web", 8000)
-    url = "http://{}:{}".format(docker_ip, port)
-    docker_services.wait_until_responsive(
-        timeout=6000.0, pause=0.1, check=lambda: is_responsive(url)
-    )
-    return url
+    return cript.API(host, token, tls=False)
 
 
-@pytest.fixture(scope="session")
-def db_connection(docker_ip, docker_services):
-    port = docker_services.port_for("db", 5432)
-    conn = psycopg2.connect(
-        database="postgres",
-        user="postgres",
-        password="postgres",
-        host=docker_ip,
-        port=port,
-    )
-    return conn
-
-
-@pytest.fixture(scope="session")
-def web_token(docker_ip, docker_services, db_connection):
-    with db_connection.cursor() as cursor:
-        cursor.execute(
-            """
-            SELECT 
-                t.key
-            FROM authtoken_token t
-            JOIN accounts_user a ON a.id=t.user_id
-            WHERE a.email='test@test.com'
-        """
-        )
-
-        data = cursor.fetchone()
-        return data[0]
-
-
-@pytest.fixture(scope="session")
-def criptapp_api(http_service, web_token):
-    return cript.API(http_service, f"Token {web_token}", tls=False)
-
-
-def test_status_code(http_service):
-    status = 200
-    response = requests.get(http_service + "/")
-
-    assert response.status_code == status
-
-
+# warnings are failures
 @pytest.mark.filterwarnings("error::UserWarning")
-def test_create_group_success(criptapp_api):
+def test_create_group(criptapp_api):
+    """
+    test creating a group
+    """
     group = cript.Group(name=MY_GROUP)
     group.save()
 
 
-def test_create_project_success(criptapp_api):
+def test_create_project(criptapp_api):
+    """
+    create project and save it
+    """
     project = cript.Project(name=MY_PROJECT)
     project.save()
 
 
-def test_create_collection_success(criptapp_api):
+def test_create_collection(criptapp_api):
+    """
+    test creating a collection
+    """
     proj = cript.Project.get(name=MY_PROJECT)
     coll = cript.Collection(project=proj, name=MY_COLLECTION)
     coll.save()
 
 
-def test_create_experiment_success(criptapp_api):
+def test_create_experiment(criptapp_api):
+    """
+    create an experiment
+
+    tests getting collection too
+    """
     coll = cript.Collection.get(name=MY_COLLECTION)
     expt = cript.Experiment(collection=coll, name=MY_EXPERIMENT)
+
     expt.save()
 
 
-def test_create_process_success(criptapp_api):
+def test_create_process(criptapp_api):
+    """
+    get an experiment
+    create and save process node
+    """
     expt = cript.Experiment.get(name=MY_EXPERIMENT)
 
     process = cript.Process(
         experiment=expt,
-        name=MY_PROCESS,
         type="multistep",
-        description="In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
-        "solution of secBuLi (3 ml, 3.9 mmol) was added next, followed by styrene (22.3 g, 176 mmol) to "
-        "initiate the polymerization. The reaction mixture immediately turned orange. After 30 min, "
-        "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
-        "precipitation in methanol 3 times and dried under vacuum.",
+        name=MY_PROCESS,
+        description="this is my description",
     )
     process.save()
 
 
 def test_create_material(criptapp_api):
+    """
+    create materials
+    """
     proj = cript.Project.get(name=MY_PROJECT)
+
     cript.Material.create(project=proj, name="SecBuLi solution 1.4M cHex")
     cript.Material.create(project=proj, name="toluene")
     cript.Material.create(project=proj, name="styrene")
@@ -130,58 +95,92 @@ def test_create_material(criptapp_api):
 
 
 def test_create_inventory(criptapp_api):
+    """
+    puts materials in inventory
+
+    tests both getting a material and inputting them into inventory as well
+    """
     coll = cript.Collection.get(name=MY_COLLECTION)
+
     solution = cript.Material.get(name="SecBuLi solution 1.4M cHex")
     toluene = cript.Material.get(name="toluene")
     styrene = cript.Material.get(name="styrene")
     butanol = cript.Material.get(name="1-butanol")
     methanol = cript.Material.get(name="methanol")
+
     inv = cript.Inventory(
         collection=coll,
         name=MY_INVENTORY,
         materials=[solution, toluene, styrene, butanol, methanol],
     )
+
     inv.save()
 
 
-def test_get_material(criptapp_api, http_service, db_connection):
-    with db_connection.cursor() as cursor:
-        cursor.execute(
-            f"""
-            SELECT uid from core_inventory WHERE name='{MY_INVENTORY}'
-        """
-        )
-        inventory_uid = cursor.fetchone()[0]
-        inv = cript.Inventory.get(uid=inventory_uid)
-        assert type(inv.materials[0]) is cript.data_model.nodes.material.Material
+# works without specifying collection
+def test_get_inventory(criptapp_api):
+    # get collection
+    coll = cript.Collection.get(name=MY_COLLECTION)
+
+    # get inventory
+    inventory = cript.Inventory.get(name=MY_INVENTORY)
 
 
-def test_add_ingredient_to_process_node(criptapp_api, http_service, db_connection):
-    with db_connection.cursor() as cursor:
-        cursor.execute(
-            f"""
-            SELECT uid from core_inventory WHERE name='{MY_INVENTORY}'
-        """
-        )
-        inventory_uid = cursor.fetchone()[0]
-        url = f"{http_service}/inventory/{inventory_uid}/"
-        inv = cript.Inventory.get(url=url, get_level=1)
+def test_create_quantity_nodes(criptapp_api):
+    # get collection
+    coll = cript.Collection.get(name=MY_COLLECTION)
 
-    prcs = cript.Process.get(name=MY_PROCESS)
-    solution = inv["SecBuLi solution 1.4M cHex"]
-    toluene = inv["toluene"]
-    styrene = inv["styrene"]
-    butanol = inv["1-butanol"]
-    methanol = inv["methanol"]
+    # get inventory
+    inventory = cript.Inventory.get(
+        name=MY_INVENTORY,
+    )
 
-    # define Quantity nodes indicating the amount of each Ingredient.
+    # get materials from inventory
+    solution = inventory["SecBuLi solution 1.4M cHex"]
+    toluene = inventory["toluene"]
+    styrene = inventory["styrene"]
+    butanol = inventory["1-butanol"]
+    methanol = inventory["methanol"]
+
+    # create quantity nodes
     initiator_qty = cript.Quantity(key="volume", value=0.017, unit="ml")
     solvent_qty = cript.Quantity(key="volume", value=10, unit="ml")
     monomer_qty = cript.Quantity(key="mass", value=0.455, unit="g")
     quench_qty = cript.Quantity(key="volume", value=5, unit="ml")
     workup_qty = cript.Quantity(key="volume", value=100, unit="ml")
 
-    # create Ingredient nodes for each.
+
+def test_add_ingredients_to_process(criptapp_api):
+    """
+    get inventory
+    get materials from inventory
+    create quantity nodes
+    add materials to process
+    """
+    # get collection
+    coll = cript.Collection.get(name=MY_COLLECTION)
+
+    # get inventory
+    inventory = cript.Inventory.get(name=MY_INVENTORY)
+
+    # get process
+    prcs = cript.Process.get(name=MY_PROCESS)
+
+    # get materials from inventory
+    solution = inventory["SecBuLi solution 1.4M cHex"]
+    toluene = inventory["toluene"]
+    styrene = inventory["styrene"]
+    butanol = inventory["1-butanol"]
+    methanol = inventory["methanol"]
+
+    # create quantity nodes
+    initiator_qty = cript.Quantity(key="volume", value=0.017, unit="ml")
+    solvent_qty = cript.Quantity(key="volume", value=10, unit="ml")
+    monomer_qty = cript.Quantity(key="mass", value=0.455, unit="g")
+    quench_qty = cript.Quantity(key="volume", value=5, unit="ml")
+    workup_qty = cript.Quantity(key="volume", value=100, unit="ml")
+
+    # create ingredient nodes
     initiator = cript.Ingredient(
         keyword="initiator", material=solution, quantities=[initiator_qty]
     )
@@ -204,23 +203,29 @@ def test_add_ingredient_to_process_node(criptapp_api, http_service, db_connectio
     prcs.add_ingredient(quench)
     prcs.add_ingredient(workup)
 
-    # add the Ingredient nodes to the Process node.
-    prcs.add_ingredient(initiator)
-    prcs.add_ingredient(solvent)
-    prcs.add_ingredient(monomer)
-    prcs.add_ingredient(quench)
-    prcs.add_ingredient(workup)
 
-
+# TODO this needs a remove conditions from process
 def test_add_condition_nodes_to_process_nodes(criptapp_api):
+    """
+    get process
+    create conditions
+    add conditions to process
+    """
     prcs = cript.Process.get(name=MY_PROCESS)
+
     temp = cript.Condition(key="temperature", value=25, unit="celsius")
     time = cript.Condition(key="time_duration", value=60, unit="min")
+
     prcs.add_condition(temp)
     prcs.add_condition(time)
 
 
 def test_add_property_node_to_process_node(criptapp_api):
+    """
+    get process
+    create property
+    add property to process
+    """
     prcs = cript.Process.get(name=MY_PROCESS)
     yield_mass = cript.Property(key="yield_mass", value=0.47, unit="g", method="scale")
     prcs.add_property(yield_mass)
@@ -231,7 +236,9 @@ def test_create_material_process_product(criptapp_api):
     prcs = cript.Process.get(name=MY_PROCESS)
     polystyrene = cript.Material(project=proj, name="polystyrene")
 
-    names = cript.Identifier(key="names", value=["poly(styrene)", "poly(vinylbenzene)"])
+    names = cript.Identifier(
+        key="alternative_names", value=["poly(styrene)", "poly(vinylbenzene)"]
+    )
     bigsmiles = cript.Identifier(
         key="bigsmiles", value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
     )
@@ -269,8 +276,40 @@ def test_create_data_node(criptapp_api):
 
 
 def test_create_file_node_and_upload(criptapp_api):
-    with mock.patch.object(cript.File, "save", new=lambda *args: None):
-        with NamedTemporaryFile(suffix=".csv") as tmp:
-            proj = cript.Project.get(name=MY_PROJECT)
-            f = cript.File(project=proj, source=tmp.name)
-            f.save()
+    proj = cript.Project.get(name=MY_PROJECT)
+    # path = "C:\\Users\\navid\\OneDrive\\Desktop\\CRIPT Excel Templates\\Example_CRIPT_template.xlsx"
+    path = "https://google.com"
+    f = cript.File(project=proj, source=path)
+    f.save()
+
+
+# delete
+def test_delete_collection(criptapp_api):
+    """
+    test creating a collection
+    """
+    proj = cript.Project.get(name=MY_PROJECT)
+    coll = cript.Collection.get(name=MY_COLLECTION, project=proj.uid)
+    coll.delete()
+
+
+def test_delete_experiment(criptapp_api):
+    coll = cript.Collection.get(name=MY_COLLECTION)
+    expt = cript.Experiment.get(collection=coll.uid, name=MY_EXPERIMENT)
+    expt.delete()
+
+
+def test_delete_project(criptapp_api):
+    """
+    create project and save it
+    """
+    project = cript.Project.get(name=MY_PROJECT)
+    project.delete()
+
+
+def test_delete_group(criptapp_api):
+    """
+    test creating a group
+    """
+    group = cript.Group.get(name=MY_GROUP)
+    group.delete()

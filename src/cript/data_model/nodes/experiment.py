@@ -1,15 +1,13 @@
-from typing import Union
 from logging import getLogger
+from typing import Union
 
 from beartype import beartype
 
 from cript.data_model.nodes.base_node import BaseNode
-from cript.data_model.nodes.group import Group
 from cript.data_model.nodes.collection import Collection
-from cript.data_model.utils import auto_assign_group
+from cript.data_model.nodes.group import Group
 from cript.data_model.paginator import Paginator
-from cript.cache import get_cached_api_session
-
+from cript.data_model.utils import auto_assign_group
 
 logger = getLogger(__name__)
 
@@ -36,8 +34,11 @@ class Experiment(BaseNode):
         notes: Union[str, None] = None,
         public: bool = False,
         group: Union[Group, str] = None,
+        **kwargs,
     ):
-        super().__init__(public=public)
+        # pop materials if it is passed in as extra
+        kwargs.pop("materials", None)
+        super().__init__(public=public, **kwargs)
         self.collection = collection
         self.name = name
         self.funding = funding if funding else []
@@ -85,3 +86,6 @@ class Experiment(BaseNode):
     def data(self, value):
         if value:
             self._data = Paginator(url=value, node_name="Data")
+
+    def save(self, get_level: int = 0, update_existing: bool = False):
+        BaseNode.save(self, get_level=get_level, update_existing=update_existing)

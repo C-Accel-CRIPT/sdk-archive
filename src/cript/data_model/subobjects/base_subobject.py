@@ -1,11 +1,9 @@
-import copy
 import abc
+import copy
 
 from cript.data_model.base import Base
+from cript.data_model.exceptions import AddNodeError, RemoveNodeError, UnsavedNodeError
 from cript.data_model.nodes.base_node import BaseNode
-from cript.data_model.exceptions import AddNodeError
-from cript.data_model.exceptions import RemoveNodeError
-from cript.data_model.exceptions import UnsavedNodeError
 
 
 class BaseSubobject(Base, abc.ABC):

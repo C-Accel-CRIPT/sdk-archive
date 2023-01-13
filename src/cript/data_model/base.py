@@ -1,13 +1,11 @@
-import json
 import abc
+import json
 from logging import getLogger
 
-from cript.cache import get_cached_api_session
-from cript.cache import get_cached_node
+from cript.api.exceptions import APIError
+from cript.cache import get_cached_api_session, get_cached_node
 from cript.data_model.paginator import Paginator
 from cript.data_model.utils import get_data_model_class
-from cript.api.exceptions import APIError
-
 
 logger = getLogger(__name__)
 
@@ -54,7 +52,7 @@ class Base(abc.ABC):
     def _remove_node(self, node, attr):
         ...
 
-    def _generate_nested_nodes(self, get_level: int = 0, level: int = 0):
+    def _generate_nested_nodes(self, get_level: int = 1, level: int = 0):
         """
         Generate nested node objects within a given node.
 
@@ -77,7 +75,7 @@ class Base(abc.ABC):
 
             # Generate nodes
             api = get_cached_api_session()
-            if isinstance(value, str) and api.url in value and skip_nodes == False:
+            if isinstance(value, str) and api.url in value and not skip_nodes:
                 # Check if node already exists in memory
                 local_node = get_cached_node(value)
                 if local_node:
@@ -112,7 +110,7 @@ class Base(abc.ABC):
                     if (
                         isinstance(value[i], str)
                         and api.url in value[i]
-                        and skip_nodes == False
+                        and not skip_nodes
                     ):
                         # Check if node already exists in memory
                         local_node = get_cached_node(value[i])

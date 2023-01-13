@@ -1,23 +1,20 @@
-import warnings
 import json
+import warnings
+from distutils.version import StrictVersion
 from getpass import getpass
 from logging import getLogger
-from distutils.version import StrictVersion
 from urllib.parse import urlparse
 
 import requests
 from beartype import beartype
 
 from cript.api.base import APIBase
+from cript.api.exceptions import APIError
+from cript.api.utils import convert_to_api_url, get_api_url
+from cript.cache import cache_api_session
 from cript.data_model.nodes.user import User
 from cript.data_model.utils import create_node
-from cript.cache import cache_api_session
-from cript.api.utils import get_api_url
-from cript.api.utils import convert_to_api_url
-from cript.storage_clients import GlobusClient
-from cript.storage_clients import AmazonS3Client
-from cript.api.exceptions import APIError
-
+from cript.storage_clients import AmazonS3Client, GlobusClient
 
 logger = getLogger(__name__)
 
@@ -53,7 +50,12 @@ class API(APIBase):
         }
 
         # Test API authentication by fetching session info
-        response = self.session.get(f"{self.url}/session-info/")
+        try:
+            response = self.session.get(f"{self.url}/session-info/")
+        except Exception as e:
+            raise APIError(
+                "Connection API failed, please review your host and token"
+            ) from e
         if response.status_code == 200:
             response_json = response.json()
             self.latest_api_version = response_json["latest_version"]
@@ -63,7 +65,7 @@ class API(APIBase):
         elif response.status_code == 404:
             raise APIError("Please provide a valid host.")
         else:
-            raise APIError(response.content)
+            raise APIError(str(response.content))
 
         logger.info(f"Connection to {self.url} API was successful!")
 
@@ -110,7 +112,7 @@ class API(APIBase):
         return json.loads(response.content)
 
     @beartype
-    def put(self, url: str, data: str = None,valid_codes: list = [200]):
+    def put(self, url: str, data: str = None, valid_codes: list = [200]):
         """Performs an HTTP PUT request and handles errors."""
         url = convert_to_api_url(url)
         response = self.session.put(url=url, data=data)

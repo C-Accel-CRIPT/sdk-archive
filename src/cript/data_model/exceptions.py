@@ -1,3 +1,6 @@
+import re
+import warnings
+
 from cript.exceptions import CRIPTError
 
 
@@ -9,6 +12,28 @@ class UniqueNodeError(CRIPTError):
 
     def __init__(self, message):
         self.message = message
+        self.existing_url = None
+        url_find_pattern = (
+            r"[(https://)|\w]*?[\w]*\.[-/\w]*\.\w*[(/{1})]?[#-\./\w]*[(/{1,})]?"
+        )
+        all_urls = re.findall(url_find_pattern, message)
+        if len(all_urls) > 0:
+            if len(all_urls) > 1:
+                warnings.warn(
+                    "UniqueNodeError found more than one possible URL of a unique node."
+                    " Please report this bug here:"
+                    " https://github.com/C-Accel-CRIPT/cript/issues Thank you."
+                )
+            self.existing_url = all_urls[0]
+            while self.existing_url[-1] == ".":
+                self.existing_url = self.existing_url[:-1]
+
+        if self.existing_url is None:
+            warnings.warn(
+                "UniqueNodeError failed to extract unique URL of existing node."
+                " Please report this bug here:"
+                " https://github.com/C-Accel-CRIPT/cript/issues Thank you."
+            )
 
     def __str__(self):
         return self.message
