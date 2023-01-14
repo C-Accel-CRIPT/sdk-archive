@@ -16,7 +16,6 @@ class Parameter(BaseSubobject):
         value (Union[int, float]): Parameter value
         unit (Union[str, None], optional): Parameter unit
 
-
     ``` py title="Example"
     parameter = Parameter(
         key="duration",

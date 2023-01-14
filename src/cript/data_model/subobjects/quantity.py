@@ -12,6 +12,23 @@ class Quantity(BaseSubobject):
     """
     Object representing a specified amount of an `Ingredient`
     object used as input to a `Process` object.
+
+    Args:
+        key (str): Quantity key
+        value (Union[int, float]): Quantity value
+        unit (Union[str, None], optional): Quantity unit
+        uncertainty (Union[float, None], optional): Quantity uncertainty
+        uncertainty_type (Union[str, None], optional): Quantity uncertainty type
+
+    ``` py title="Example"
+    quantity = Quantity(
+        key="mass",
+        value="8.3",
+        unit="g",
+        uncertainty=0.1,
+        uncertainty_type="stdev",
+    )
+    ```
     """
 
     node_name = "Quantity"

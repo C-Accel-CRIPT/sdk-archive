@@ -12,8 +12,21 @@ logger = getLogger(__name__)
 
 
 class Equipment(BaseSubobject):
-    """
-    Object representing equipment used in a `Process`.
+    """Object representing equipment used in a `Process`.
+
+    Args:
+        key (str): Equipment key
+        description (Union[str, None], optional): Equipment description
+        conditions (list[Union[Condition, dict]], optional): `Condition` objects associated with this equipment
+        files (list[Union[File, dict]], optional): `File` objects associated with this equipment
+        citations (list[Union[Citation, dict]], optional): `Citation` objects associated with this equipment
+
+    ``` py title="Example"
+    equipment = Equipment(
+        key="burner",
+        description="general-purpose bunsen burner",
+    )
+    ```
     """
 
     node_name = "Equipment"

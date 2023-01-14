@@ -20,7 +20,6 @@ class Algorithm(BaseSubobject):
         parameters (list[Union[Parameter, dict]], optional): List of parameters linked to this algorithm
         citations (list[Union[Citation, dict]], optional): List of citations linked to this algorithm
 
-
     ``` py title="Example"
     algorithm = Algorithm(
         key="clustering",
@@ -29,7 +28,6 @@ class Algorithm(BaseSubobject):
         citations=[],
     )
     ```
-
     """
 
     node_name = "Algorithm"
@@ -56,7 +54,6 @@ class Algorithm(BaseSubobject):
         Args:
             parameter (Union[Parameter, dict]): The parameter to be added
         
-
         ``` py title="Example"
         algorithm.add_parameter(parameter)
         ```
@@ -70,7 +67,6 @@ class Algorithm(BaseSubobject):
         Args:
             parameter (Union[Parameter, int]): The parameter to be removed
         
-
         ``` py title="Example"
         algorithm.remove_parameter(parameter)
         ```
@@ -84,7 +80,6 @@ class Algorithm(BaseSubobject):
         Args:
             citation (Union[Citation, dict]): The citation to be added
         
-
         ``` py title="Example"
         algorithm.add_citation(citation)
         ```

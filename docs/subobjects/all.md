@@ -1,34 +1,34 @@
-# Subobjects
+# All Subobjects
 
-### Property
+## Property
 ::: cript.data_model.Property
 
-### Condition
+## Condition
 ::: cript.data_model.Condition
 
-### Identifier
+## Identifier
 ::: cript.data_model.Identifier
 
-### Ingredient
+## Ingredient
 ::: cript.data_model.Ingredient
 
-### Quantity
+## Quantity
 ::: cript.data_model.Quantity
 
-### Equipment
+## Equipment
 ::: cript.data_model.Equipment
 
-### ComputationalForcefield
+## ComputationalForcefield
 ::: cript.data_model.ComputationalForcefield
 
-### SoftwareConfiguration
+## SoftwareConfiguration
 ::: cript.data_model.SoftwareConfiguration
 
-### Algorithm
+## Algorithm
 ::: cript.data_model.Algorithm
 
-### Parameter
+## Parameter
 ::: cript.data_model.Parameter
 
-### Citation
+## Citation
 ::: cript.data_model.Citation

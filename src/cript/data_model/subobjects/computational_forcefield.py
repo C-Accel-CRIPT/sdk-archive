@@ -14,6 +14,23 @@ class ComputationalForcefield(BaseSubobject):
     """
     Object representing the computational forcefield of a
     virtual `Material`.
+
+    Args:
+        key (str): Computational forcefield key
+        building_block (str): Computational forcefield building block
+        coarse_grained_mapping (Union[str, None], optional): Computational forcefield coarse-grained mapping
+        implicit_solvent (Union[str, None], optional): Computational forcefield implicit solvent
+        source (Union[str, None], optional): Computational forcefield sorce
+        description (Union[str, None], optional): Computational forcefield description
+        data (Union[Data, str, None], optional): `Data` object associated with the computational forcefield
+        citations (list[Union[Citation, dict]], optional): `Citation` objects associated with the conputational forcefield
+
+    ``` py title="Example"
+    cff = ComputationalForcefield(
+        key="mmff",
+        description: "Merck Molecular Force Field",
+    )
+    ```
     """
 
     node_name = "ComputationalForcefield"

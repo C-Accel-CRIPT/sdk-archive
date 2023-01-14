@@ -13,7 +13,31 @@ logger = getLogger(__name__)
 class Condition(BaseSubobject):
     """
     Object representing a condition (e.g., temperature).
-    These are used as modifiers for `Property` and `Process` objects.
+    Conditions are used as modifiers for `Property` and `Process` objects.
+
+    Args:
+        key (str): Condition key
+        value (Union[str, int, float, list, None], optional): Condition value
+        unit (Union[str, None], optional): Condition unit
+        type (Union[str, None], optional): Condition type
+        uncertainty (Union[float, int, None], optional): Condition uncertainty
+        uncertainty_type (Union[str, None], optional): Condition uncertainty type
+        material (Union[BaseNode, str, None], optional): Material associated with this condition
+        descriptor (Union[str, None], optional): Condition descriptor
+        set_id (Union[int, None], optional): Condition set ID
+        measurement_id (Union[int, None], optional): Condition measurement ID
+        data (Union[Data, str, None], optional): `Data` object associated with this condition
+
+    ``` py title="Example"
+    condition = Condition(
+        key="flow_rate",
+        value=8.13,
+        unit="mL/min",
+        uncertainty=0.3,
+        uncertainty_type="stdev",
+        descriptor="measured on flow controller 2B"
+    )
+    ```
     """
 
     node_name = "Condition"

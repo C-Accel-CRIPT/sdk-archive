@@ -12,6 +12,17 @@ class Identifier(BaseSubobject):
     """
     Object representing an identifier of a `Material` object
     (e.g., CAS, BigSMILES).
+
+    Args:
+        key (str): Identifier key
+        value (Union[str, int, float, list]): Identifier value
+
+    ``` py title="Example"
+    identifier = Identifier(
+        key="smiles",
+        value="CCC",
+    )
+    ```
     """
 
     node_name = "Identifier"

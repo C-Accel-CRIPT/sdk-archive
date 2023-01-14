@@ -10,9 +10,21 @@ logger = getLogger(__name__)
 
 
 class Citation(BaseSubobject):
-    """
-    Object representing how a `Reference` object
+    """Object representing how a `Reference` object
     is applied in a given context.
+
+    Args:
+        reference (Union[Reference, str]): The `Reference` node which is being cited
+        type (Union[str, None], optional): The citation type
+        notes (Union[str, None], optional): Citation nodes
+
+    ``` py title="Example"
+    citation = Citation(
+        reference=reference,
+        type="reference",
+        notes="Data extracted from Table 2",
+    )
+    ```
     """
 
     node_name = "Citation"
