@@ -20,7 +20,7 @@ logger = getLogger(__name__)
 
 
 class API(APIBase):
-    """The entry point for interacting with the CRIPT REST API.
+    """The entry point for interacting with the remote CRIPT REST API.
 
     Args:
         host (str, optional): The hostname of the relevant CRIPT instance (e.g., criptapp.org)
@@ -114,7 +114,6 @@ class API(APIBase):
         ``` py title="Example"
         url = "https://criptapp.org/api/collection/30b17158-45f0-402d-a696-5de5fb172931/"
         response = api.get(url)
-        print(response)
         ```
         """
         url = convert_to_api_url(url)
@@ -144,7 +143,6 @@ class API(APIBase):
             url=url,
             data=json.dumps({"name": "My new collection", project=project}),
         )
-        print(response)
         ```
         """
         url = convert_to_api_url(url)
@@ -178,7 +176,6 @@ class API(APIBase):
             url=url,
             data=json.dumps({"name": "My edited collection"}),
         )
-        print(response)
         ```
         """
         url = convert_to_api_url(url)

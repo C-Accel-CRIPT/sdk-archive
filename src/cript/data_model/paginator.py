@@ -66,7 +66,6 @@ class Paginator:
 
         ``` py title="Example"
         json_results = paginator.json()
-        print(json_results)
         ```
         """
         if self.api is None:
@@ -108,7 +107,6 @@ class Paginator:
         
         ``` py title="Example"
         objects = paginator.objects()
-        print(objects)
         ```
         """
         if self._raw is None:
@@ -178,7 +176,6 @@ class Paginator:
         
         ```py title="Example"
         count = paginator.count()
-        print(count)
         ```
         """
         if self._raw is None:

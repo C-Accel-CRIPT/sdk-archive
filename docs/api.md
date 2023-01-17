@@ -1,5 +1,5 @@
-## Interacting with the remote CRIPT database
+# Remote CRIPT database
 ::: cript.api.rest
 
-## Interacting with a local CRIPT file system
+# Local CRIPT filesystem
 ::: cript.api.local

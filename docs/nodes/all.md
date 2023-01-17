@@ -1,41 +1,41 @@
-## Project
+# Project
 ::: cript.data_model.Project
 
-## Collection
+# Collection
 ::: cript.data_model.Collection
 
-## Experiment
+# Experiment
 ::: cript.data_model.Experiment
 
-## Inventory
+# Inventory
 ::: cript.data_model.Inventory
 
-## Data
+# Data
 ::: cript.data_model.Data
 
-## File
+# File
 ::: cript.data_model.File
 
-## Process
+# Process
 ::: cript.data_model.Process
 
-## ComputationalProcess
+# ComputationalProcess
 ::: cript.data_model.ComputationalProcess
 
-## Computation
+# Computation
 ::: cript.data_model.Computation
 
-## Material
+# Material
 ::: cript.data_model.Material
 
-## Reference
+# Reference
 ::: cript.data_model.Reference
 
-## Software
+# Software
 ::: cript.data_model.Software
 
-## User
+# User
 ::: cript.data_model.User
 
-## Group
+# Group
 ::: cript.data_model.Group

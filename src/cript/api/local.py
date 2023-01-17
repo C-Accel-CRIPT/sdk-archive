@@ -23,7 +23,19 @@ ENCODING = "UTF-8"
 
 
 def dict_remove_none(ddict: dict) -> dict:
-    """Remove 'key, value' pair form dictionary if value is None or []."""
+    """Remove 'key, value' pair from dictionary if value is None or [].
+
+    Args:
+        ddict (dict): Dictionary to clean
+
+    Returns:
+        dict: Dictionary with keys removed
+    
+    ``` py title="Example"
+    d = {"a": [], "b": 2.3  "c": None}
+    d2 = dict_remove_none(d)
+    ```
+    """
     _dict = {}
     for k, v in ddict.items():
         if v is None or v == []:
@@ -44,6 +56,14 @@ def dict_remove_none(ddict: dict) -> dict:
 
 
 def _parse_filename(filename: str) -> tuple[str, str]:
+    """Get node and UID from a filename.
+
+    Args:
+        filename (str): Filename to parse
+
+    Returns:
+        tuple[str, str]: CRIPT node type and node UID
+    """
     # parsing
     filename = pathlib.Path(filename)
     split = filename.stem.split("_")
@@ -88,15 +108,38 @@ def _format_folder(folder: Union[str, pathlib.Path]) -> pathlib.Path:
 
 
 def make_new_folder(folder: pathlib.Path):
+    """Make a new folder.
+
+    Args:
+        folder (pathlib.Path): Path for the new folder
+    
+    ``` py title="Example"
+    folder = pathlib.Path("/path/to/folder")
+    make_new_folder(folder)
+    ```
+    """
     if not os.path.isdir(folder):
         os.makedirs(folder)
 
 
 def move_copy_file(
-    old_location: Union[pathlib.Path, str], new_location: Union[pathlib.Path, str]
+    old_location: Union[pathlib.Path, str],
+    new_location: Union[pathlib.Path, str]
 ):
-    """
-    Copies files from one location to a new one
+    """Copies files from one location to a new one.
+
+    Args:
+        old_location (Union[pathlib.Path, str]): Original location of the file
+        new_location (Union[pathlib.Path, str]): New location of the file
+    
+    ``` py title="Example"
+    old_path = "/my/old/path.txt"
+    new_path = "/my/new/path.txt"
+    mode_copy_file(
+        old_location=old_path,
+        new_location=new_path,
+    )
+    ```
     """
     if not isinstance(old_location, pathlib.Path):
         old_location = pathlib.Path(old_location)
@@ -110,7 +153,13 @@ class APILocal(APIBase):
     """
     The entry point for interacting with your local filesystem.
 
-    :param folder: Path to a folder on your local filesystem.
+    Args:
+        folder (Union[str, pathlib.Path]): Path to a folder on your local filesystem
+        data_folder (Union[str, pathlib.Path], optional): Path to a folder in which to store the data
+    
+    ``` py title="Example"
+    api = API(folder="/path/to/folder")
+    ```
     """
 
     def __init__(
@@ -167,7 +216,22 @@ class APILocal(APIBase):
 
     @beartype
     def get(self, url: str):
-        """Simulates an HTTP GET request to the local filesystem."""
+        """Simulates an HTTP GET request to the local filesystem.
+
+        Args:
+            url (str): URL of the CRIPT node
+
+        Raises:
+            APIError: The specified node was not found
+
+        Returns:
+            response (dict): Response of the GET request
+        
+        ``` py title="Example"
+        url = "https://criptapp.org/api/collection/30b17158-45f0-402d-a696-5de5fb172931/"
+        response = api.get(url)
+        ```
+        """
         uid = _get_uid_from_url(url)
         if uid not in self.database_by_uid:
             raise APIError("The specified node was not found.")
@@ -177,7 +241,23 @@ class APILocal(APIBase):
 
     @beartype
     def post(self, url: str, data: str, *args, **kwargs):
-        """Simulates an HTTP POST request to the local filesystem."""
+        """Simulates an HTTP POST request to the local filesystem.
+
+        Args:
+            url (str): URL of the CRIPT node
+            data (str, optional): Data payload to POST
+
+        Returns:
+            response (dict): Response of the POST request
+    
+        ``` py title="Example"
+        url = "https://criptapp.org/api/collection/30b17158-45f0-402d-a696-5de5fb172931/"
+        response = api.post(
+            url=url,
+            data=json.dumps({"name": "My new collection", project=project}),
+        )
+        ```
+        """
         data_dict = json.loads(data)
         slug = get_slug_from_url(url)
         uid = str(uuid.uuid4())
@@ -197,7 +277,23 @@ class APILocal(APIBase):
 
     @beartype
     def put(self, url: str, data: str, *args, **kwargs):
-        """Simulates an HTTP PUT request to the local filesystem."""
+        """Simulates an HTTP PUT request to the local filesystem.
+
+        Args:
+            url (str): URL of the CRIPT node
+            data (str, optional): Data payload to POST
+    
+        Returns:
+            response (dict): Response of the PUT request
+
+        ``` py title="Example"
+        url = "https://criptapp.org/api/collection/30b17158-45f0-402d-a696-5de5fb172931/"
+        response = api.put(
+            url=url,
+            data=json.dumps({"name": "My edited collection"}),
+        )
+        ```
+        """
         data_dict = json.loads(data)
         uid = data_dict["uid"]
         slug = get_slug_from_url(url)
@@ -214,6 +310,15 @@ class APILocal(APIBase):
 
     @beartype
     def delete(self, url: str):
-        """Simulates an HTTP DELETE request to the local filesystem."""
+        """Performs an HTTP DELETE request to the local fiel system.
+
+        Args:
+            url (str): URL of the CRIPT node
+
+        ``` py title="Example"
+        url = "https://criptapp.org/api/collection/30b17158-45f0-402d-a696-5de5fb172931/"
+        api.delete(url=url)
+        ```
+        """
         uid = _get_uid_from_url(url)
         os.remove(self.database_by_uid[uid])
