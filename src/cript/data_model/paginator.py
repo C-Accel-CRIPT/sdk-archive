@@ -62,7 +62,7 @@ class Paginator:
 
         Returns:
             results (list): The list of results
-        
+
 
         ``` py title="Example"
         json_results = paginator.json()
@@ -104,7 +104,7 @@ class Paginator:
 
         Returns:
             results (list): The list of results
-        
+
         ``` py title="Example"
         objects = paginator.objects()
         ```
@@ -173,7 +173,7 @@ class Paginator:
 
         Returns:
             count (int): The number of returned results
-        
+
         ```py title="Example"
         count = paginator.count()
         ```

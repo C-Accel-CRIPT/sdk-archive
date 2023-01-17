@@ -110,7 +110,7 @@ class API(APIBase):
 
         Returns:
             response (dict): Response of the GET request
-        
+
         ``` py title="Example"
         url = "https://criptapp.org/api/collection/30b17158-45f0-402d-a696-5de5fb172931/"
         response = api.get(url)
@@ -136,7 +136,7 @@ class API(APIBase):
 
         Returns:
             response (dict): Response of the POST request
-    
+
         ``` py title="Example"
         url = "https://criptapp.org/api/collection/30b17158-45f0-402d-a696-5de5fb172931/"
         response = api.post(

@@ -30,7 +30,7 @@ def dict_remove_none(ddict: dict) -> dict:
 
     Returns:
         dict: Dictionary with keys removed
-    
+
     ``` py title="Example"
     d = {"a": [], "b": 2.3  "c": None}
     d2 = dict_remove_none(d)
@@ -112,7 +112,7 @@ def make_new_folder(folder: pathlib.Path):
 
     Args:
         folder (pathlib.Path): Path for the new folder
-    
+
     ``` py title="Example"
     folder = pathlib.Path("/path/to/folder")
     make_new_folder(folder)
@@ -123,15 +123,14 @@ def make_new_folder(folder: pathlib.Path):
 
 
 def move_copy_file(
-    old_location: Union[pathlib.Path, str],
-    new_location: Union[pathlib.Path, str]
+    old_location: Union[pathlib.Path, str], new_location: Union[pathlib.Path, str]
 ):
     """Copies files from one location to a new one.
 
     Args:
         old_location (Union[pathlib.Path, str]): Original location of the file
         new_location (Union[pathlib.Path, str]): New location of the file
-    
+
     ``` py title="Example"
     old_path = "/my/old/path.txt"
     new_path = "/my/new/path.txt"
@@ -156,7 +155,7 @@ class APILocal(APIBase):
     Args:
         folder (Union[str, pathlib.Path]): Path to a folder on your local filesystem
         data_folder (Union[str, pathlib.Path], optional): Path to a folder in which to store the data
-    
+
     ``` py title="Example"
     api = API(folder="/path/to/folder")
     ```
@@ -226,7 +225,7 @@ class APILocal(APIBase):
 
         Returns:
             response (dict): Response of the GET request
-        
+
         ``` py title="Example"
         url = "https://criptapp.org/api/collection/30b17158-45f0-402d-a696-5de5fb172931/"
         response = api.get(url)
@@ -249,7 +248,7 @@ class APILocal(APIBase):
 
         Returns:
             response (dict): Response of the POST request
-    
+
         ``` py title="Example"
         url = "https://criptapp.org/api/collection/30b17158-45f0-402d-a696-5de5fb172931/"
         response = api.post(
@@ -282,7 +281,7 @@ class APILocal(APIBase):
         Args:
             url (str): URL of the CRIPT node
             data (str, optional): Data payload to POST
-    
+
         Returns:
             response (dict): Response of the PUT request
 

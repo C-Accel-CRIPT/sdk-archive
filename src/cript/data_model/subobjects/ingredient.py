@@ -16,7 +16,7 @@ class Ingredient(BaseSubobject):
     as an input to a `Process` object.
 
     Args:
-        material (Union[Material, str]): `Material` which is used as an ingredient in the `Process` object 
+        material (Union[Material, str]): `Material` which is used as an ingredient in the `Process` object
         keyword (str): Ingredient keyword
         quantities (list[Union[Quantity, dict]], optional): Quantities of the ingredient used in the process
 
@@ -61,7 +61,7 @@ class Ingredient(BaseSubobject):
 
         Args:
             quantity (Union[Quantity, dict]): Quantity to add
-        
+
         ``` py title="Example"
         quantity = Quantity(
             key="mass",
@@ -80,7 +80,7 @@ class Ingredient(BaseSubobject):
 
         Args:
             quantity (Union[Quantity, int]): Quantity to remove
-        
+
         ``` py title="Example"
         quantity = Quantity(
             key="mass",

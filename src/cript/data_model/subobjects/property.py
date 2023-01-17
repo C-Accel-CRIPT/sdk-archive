@@ -37,7 +37,7 @@ class Property(BaseSubobject):
         computations (list[Union[Computation, str]], optional): List of `Computation` objects associated with this property
         citations (list[Union[Citation, dict]], optional): List of `Citation` objects associated with this property
         notes (Union[str, None], optional): Property nodes
-    
+
     ``` py title="Example"
     property = Property(
         key="contact_angle",

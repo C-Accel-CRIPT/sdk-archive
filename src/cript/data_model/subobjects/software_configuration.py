@@ -53,7 +53,7 @@ class SoftwareConfiguration(BaseSubobject):
 
         Args:
             algorithm (Union[Algorithm, dict]): Algorithm to add
-        
+
         ``` py title="Example"
         sc.add_algorithm(algorithm)
         ```
@@ -79,7 +79,7 @@ class SoftwareConfiguration(BaseSubobject):
 
         Args:
             citation (Union[Citation, dict]): Citation to add
-        
+
         ``` py title="Example"
         sc.add_citation(citation)
         ```
@@ -92,7 +92,7 @@ class SoftwareConfiguration(BaseSubobject):
 
         Args:
             citation (Union[Citation, dict]): Citation to remove
-        
+
         ``` py title="Example"
         sc.remove_citation(citation)
         ```

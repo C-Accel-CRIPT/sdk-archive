@@ -53,7 +53,7 @@ class Algorithm(BaseSubobject):
 
         Args:
             parameter (Union[Parameter, dict]): The parameter to be added
-        
+
         ``` py title="Example"
         algorithm.add_parameter(parameter)
         ```
@@ -66,7 +66,7 @@ class Algorithm(BaseSubobject):
 
         Args:
             parameter (Union[Parameter, int]): The parameter to be removed
-        
+
         ``` py title="Example"
         algorithm.remove_parameter(parameter)
         ```
@@ -79,7 +79,7 @@ class Algorithm(BaseSubobject):
 
         Args:
             citation (Union[Citation, dict]): The citation to be added
-        
+
         ``` py title="Example"
         algorithm.add_citation(citation)
         ```
@@ -92,7 +92,7 @@ class Algorithm(BaseSubobject):
 
         Args:
             citation (Union[Citation, dict]): The citation to be removed
-        
+
         ``` py title="Example"
         algorithm.remove_citation(citation)
         ```
