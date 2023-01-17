@@ -14,12 +14,23 @@ class Paginator:
     """
     Paginator for object lists and raw JSON.
 
-    :param url: Query URL
-    :param node_name: Name of the relevant node
-    :param payload: POST request payload
-    :param limit: The max number of items per page.
-    :param offset: The starting position of the paginator.
-    :param get_level: Level to recursively get nested nodes.
+    Args:
+        url (str): Query URL
+        node_name (str): Name of the relevant node
+        payload (Union[str, None], optional): POST request payload
+        limit (Union[int, None], optional):  The max number of items per page
+        offset (Union[int, None], optional): The starting position of the paginator.
+        get_level (int, optional): Level to recursively get nested nodes.
+
+    ``` py title="Example"
+    paginator = Paginator(
+        url="https://criptapp.org/api/collection/?format=json",
+        node_name="collection",
+        limit=10,
+        offset=0,
+        get_level=1,
+    )
+    ```
     """
 
     @beartype
@@ -43,8 +54,20 @@ class Paginator:
         self._count = None
 
     def json(self):
-        """
-        Get the raw JSON.
+        """Get the raw JSON response.
+
+        Raises:
+            AttributeError: If the API object is not defined
+            APIError: If no results are returned
+
+        Returns:
+            results (list): The list of results
+        
+
+        ``` py title="Example"
+        json_results = paginator.json()
+        print(json_results)
+        ```
         """
         if self.api is None:
             raise AttributeError("The 'api' attribute must be defined.")
@@ -78,8 +101,15 @@ class Paginator:
         return self._raw["results"]
 
     def objects(self):
-        """
-        Use the current raw JSON to generate a list of objects.
+        """Use the current raw JSON to generate a list of objects.
+
+        Returns:
+            results (list): The list of results
+        
+        ``` py title="Example"
+        objects = paginator.objects()
+        print(objects)
+        ```
         """
         if self._raw is None:
             self.json()
@@ -96,12 +126,17 @@ class Paginator:
                 obj = create_node(self.node_class, obj_json)
                 obj._generate_nested_nodes(get_level=self.get_level)
             obj_list.append(obj)
-
         return obj_list
 
     def next_page(self):
-        """
-        Flip to the next page.
+        """Flip to the next page.
+
+        Raises:
+            InvalidPage: You are already viewing the last page
+
+        ```py title="Example"
+        paginator.next_page()
+        ```
         """
         if self._raw is None:
             self.json()
@@ -115,8 +150,14 @@ class Paginator:
             raise InvalidPage("You're currently on the last page.")
 
     def previous_page(self):
-        """
-        Flip to the previous page.
+        """Flip to the previous page.
+
+        Raises:
+            InvalidPage: You are already viewing the first page
+
+        ```py title="Example"
+        paginator.previous_page()
+        ```
         """
         if self._raw is None:
             self.json()
@@ -130,8 +171,15 @@ class Paginator:
             raise InvalidPage("You're currently on the first page.")
 
     def count(self):
-        """
-        Get the total number of objects.
+        """Get the total number of objects.
+
+        Returns:
+            count (int): The number of returned results
+        
+        ```py title="Example"
+        count = paginator.count()
+        print(count)
+        ```
         """
         if self._raw is None:
             self.json()

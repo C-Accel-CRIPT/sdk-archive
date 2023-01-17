@@ -1,5 +1,3 @@
-# All Nodes
-
 ## Project
 ::: cript.data_model.Project
 

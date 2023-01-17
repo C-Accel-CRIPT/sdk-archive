@@ -1,11 +1,5 @@
-## API
-::: cript.api.rest.API
-    options:
-        members:
-            -
+## Interacting with the remote CRIPT database
+::: cript.api.rest
 
-## APILocal
-::: cript.api.local.APILocal
-    options:
-        members:
-            -
+## Interacting with a local CRIPT file system
+::: cript.api.local

@@ -1,5 +1,3 @@
-# All Subobjects
-
 ## Property
 ::: cript.data_model.Property
 

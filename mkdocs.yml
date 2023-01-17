@@ -12,6 +12,7 @@ theme:
       alert: octicons/alert-16
   features:
     - content.code.copy
+    - navigation.path
 
   palette:
     # Palette toggle for light mode
@@ -47,7 +48,7 @@ plugins:
           paths: [src]
           options:
             show_bases: false
-            show_source: false
+            show_source: true
             docstring_style: google
 
 nav:
@@ -60,7 +61,7 @@ nav:
     - Simulation: tutorials/simulation.md
     - Synthesis: tutorials/synthesis.md
   - Nodes:
-      - All: nodes/all.md
+      - All nodes: nodes/all.md
       - Collection: nodes/collection.md
       - Computation: nodes/computation.md
       - Computational Process: nodes/computational_process.md
@@ -76,7 +77,7 @@ nav:
       - Software: nodes/software.md
       - User: nodes/user.md
   - Sub-objects:
-      - All: subobjects/all.md
+      - All sub-objects: subobjects/all.md
       - Algorithm: subobjects/algorithm.md
       - Citation: subobjects/citation.md
       - Computational Forcefield: subobjects/computational_forcefield.md
@@ -95,7 +96,7 @@ nav:
 
 markdown_extensions:
   - toc:
-      baselevel: 1
+      baselevel: 2
       permalink: True
   - attr_list
   - md_in_html

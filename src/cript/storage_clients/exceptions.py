@@ -3,7 +3,7 @@ from cript.exceptions import CRIPTError
 
 class InvalidAuthCode(CRIPTError):
     """
-    Raised when an Authentication code to connect to a storage client is invalid
+    Raised when an Authentication code to connect to a storage client is invalid.
     """
 
     def __init__(self):
