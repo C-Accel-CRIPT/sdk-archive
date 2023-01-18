@@ -22,7 +22,7 @@ class Software(BaseNode):
         notes (Union[str, None], optional): Software notes
         public (bool, optional): Whether the `Software` object is publicly viewable
 
-    !!! success "Software methods"
+    !!! success "Software methods inherit from the `BaseNode`"
         Since the `Software` object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
         all the <a href="../base_node" target="_blank">`BaseNode`</a> object methods can be used to manipulate a `Software` object.
         These include `get()`, `create()`, `delete()`, `save()`, `search()`, `update()`, and `refresh()` methods.
@@ -40,6 +40,21 @@ class Software(BaseNode):
         source="Anaconda distribution",
         notes="Used for processing NMR data",
     )
+    ```
+
+    ``` json title="Example of a software object in JSON format"
+    {
+        "url": "https://criptapp.org/api/software/00b0a435-b9b6-46e1-8aea-859209f42feb/",
+        "uid": "00b0a435-b9b6-46e1-8aea-859209f42feb",
+        "group": "https://criptapp.org/api/group/48e838bc-2b8d-45e4-b0b2-135473495381/",
+        "name": "rdkit",
+        "version": "2021.9",
+        "source": "https://anaconda.org/rdkit/rdkit",
+        "notes": null,
+        "public": true,
+        "created_at": "2022-10-19T20:49:52.794672Z",
+        "updated_at": "2022-10-19T20:49:52.794695Z"
+    }
     ```
     """
 

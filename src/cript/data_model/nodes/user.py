@@ -10,7 +10,7 @@ logger = getLogger(__name__)
 class User(BaseNode):
     """The <a href="../user" target="_blank">`User`</a> object represents a single CRIPT user.
 
-    !!! warning "Modifying CRIPT users"
+    !!! warning "The CRIPT `User` object is read-only"
         CRIPT `User` objects cannot be created or modified using the Python SDK.
         The `User` object documented here is for informational purposes only.
 

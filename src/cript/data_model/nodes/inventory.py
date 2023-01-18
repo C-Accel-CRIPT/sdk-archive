@@ -30,11 +30,11 @@ class Inventory(BaseNode):
         public (bool, optional): Whether the inventory is publicly viewable
         group (Union[Group, str], optional): `Group` object that manages the inventory
 
-    !!! warning "Inventory name uniqueness"
+    !!! warning "Inventory names must be unique"
         Each <a href="../inventory" target="_blank">`Inventory`</a> name must be unique within a
         <a href="../collection" target="_blank">`Collection`</a> node.     
 
-    !!! success "Inventory methods"
+    !!! success "Inventory methods inherit from the `BaseNode`"
         Since the `Inventory` object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
         all the <a href="../base_node" target="_blank">`BaseNode`</a> object methods can be used to manipulate an `Inventory`.
         These include `get()`, `create()`, `delete()`, `save()`, `search()`, `update()`, and `refresh()` methods.

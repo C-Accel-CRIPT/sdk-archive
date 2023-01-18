@@ -28,11 +28,11 @@ class Project(BaseNode):
         group (Union[Group, str], optional): `Group` object that manages the project
 
 
-    !!! warning "Project name uniqueness"
+    !!! warning "Projects names must be unique"
         Each <a href="../project target="_blank">`Project`</a> name must be unique within a
         <a href="../group" target="_blank">`Group`</a> node.     
 
-    !!! success "Project methods"
+    !!! success "Project methods inherit from the `BaseNode`"
         Since the `Project` object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
         all the <a href="../base_node" target="_blank">`BaseNode`</a> object methods can be used to manipulate a `Project`. These include
         `get()`, `create()`, `delete()`, `save()`, `search()`, `update()`, and `refresh()` methods.

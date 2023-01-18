@@ -32,11 +32,11 @@ class Collection(BaseNode):
         public (bool, optional): Whether the collection is publicly viewable
         group (Union[Group, str], optional): `Group` object that manages the collection
     
-    !!! warning "Collection name uniqueness"
+    !!! warning "Collection names must be unique"
         Each <a href="../collection" target="_blank">`Collection`</a> name must be unique within a
         <a href="../project" target="_blank">`Project`</a> node.     
 
-    !!! success "Collection methods"
+    !!! success "Collection methods inherit from the `BaseNode`"
         Since the `Collection` object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
         all the <a href="../base_node" target="_blank">`BaseNode`</a> object methods can be used to manipulate a `Collection`. These include
         `get()`, `create()`, `delete()`, `save()`, `search()`, `update()`, and `refresh()` methods.

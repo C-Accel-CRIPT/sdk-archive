@@ -34,11 +34,11 @@ class Experiment(BaseNode):
         public (bool, optional): Whether the experiment is publicly viewable
         group (Union[Group, str], optional): `Group` object that manages the experiment
     
-    !!! warning "Experiment name uniqueness"
+    !!! warning "Experiment names must be unique"
         Each <a href="../experiment" target="_blank">`Experiment`</a> name must be unique within a
         <a href="../collection" target="_blank">`Collection`</a> node.     
 
-    !!! success "Experiment methods"
+    !!! success "Experiment methods inherit from the `BaseNode`"
         Since the `Experiment` object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
         all the <a href="../base_node" target="_blank">`BaseNode`</a> object methods can be used to manipulate an `Experiment`.
         These include `get()`, `create()`, `delete()`, `save()`, `search()`, `update()`, and `refresh()` methods.
