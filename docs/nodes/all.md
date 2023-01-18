@@ -2,7 +2,7 @@
 ::: cript.data_model.nodes.base_node.BaseNode
 
 # Collection
-::: cript.data_model.nodes.collection
+::: cript.data_model.Collection
 
 # Computation
 ::: cript.data_model.Computation

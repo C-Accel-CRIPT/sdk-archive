@@ -22,12 +22,22 @@ logger = getLogger(__name__)
 
 class BaseNode(Base, abc.ABC):
     """This is the base node that all other CRIPT nodes
-    inherit from. While a user will not instantiate this
-    node directly, its methods can be used from any of the
-    other primary CRIPT nodes (e.g. 
-    <a href="../project" target="_blank">`Project`</a>,
+    inherit from. The <a href="../base_node" target="_blank">`BaseNode`</a>
+    is not intantiated directly, but its methods can be used from any of the
+    other primary CRIPT nodes, including
     <a href="../collection" target="_blank">`Collection`</a>,
-    <a href="../experiment" target="_blank">`Experiment`</a>, etc).
+    <a href="../computation" target="_blank">`Computation`</a>,
+    <a href="../computational_process" target="_blank">`ComputationalProcess`</a>,
+    <a href="../data" target="_blank">`Data`</a>,
+    <a href="../experiment" target="_blank">`Experiment`</a>,
+    <a href="../file" target="_blank">`File`</a>,
+    <a href="../group" target="_blank">`Group`</a>,
+    <a href="../inventory" target="_blank">`Inventory`</a>,
+    <a href="../material" target="_blank">`Material`</a>,
+    <a href="../process" target="_blank">`Process`</a>,
+    <a href="../project" target="_blank">`Project`</a>,
+    <a href="../reference" target="_blank">`Reference`</a>, and
+    <a href="../software" target="_blank">`Software`</a>.
 
     Args:
         url (str, optional): URL of the node
@@ -39,7 +49,7 @@ class BaseNode(Base, abc.ABC):
 
     !!! warning "BaseNode Instantiation"
         This is the base node that other primary nodes inherit from.
-        A CRIPT user will never use the `BaseNode` directly.
+        Do not interact with the <a href="../base_node" target="_blank">`BaseNode`</a> directly.
     """
 
     slug = None
