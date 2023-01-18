@@ -32,11 +32,12 @@ class Project(BaseNode):
         Each <a href="../project target="_blank">`Project`</a> name must be unique within a
         <a href="../group" target="_blank">`Group`</a> node.     
 
-    !!! success "Project methods inherit from the `BaseNode`"
-        Since the `Project` object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
-        all the <a href="../base_node" target="_blank">`BaseNode`</a> object methods can be used to manipulate a `Project`. These include
-        `get()`, `create()`, `delete()`, `save()`, `search()`, `update()`, and `refresh()` methods.
-        See the <a href="../base_node" target="_blank">`BaseNode`</a> documentation to learn more about these methods.
+    !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
+        Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
+        all the <a href="../base_node" target="_blank">`BaseNode`</a> object methods can be used to manipulate it.
+        These include `get()`, `create()`, `delete()`, `save()`, `search()`, `update()`, and `refresh()` methods.
+        See the <a href="../base_node" target="_blank">`BaseNode`</a> documentation to learn more about these methods
+        and see examples of their use.
 
     ``` py title="Example"
     # get an existing group
