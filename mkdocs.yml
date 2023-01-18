@@ -49,7 +49,7 @@ plugins:
           paths: [src]
           options:
             show_bases: true
-            show_source: false
+            show_source: true
             docstring_style: google
 
 nav:
