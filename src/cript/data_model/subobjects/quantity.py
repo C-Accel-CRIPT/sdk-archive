@@ -9,9 +9,12 @@ logger = getLogger(__name__)
 
 
 class Quantity(BaseSubobject):
-    """
-    Object representing a specified amount of an `Ingredient`
-    object used as input to a `Process` object.
+    """The <a href="../quantity" target="_blank">`Quantity`</a>
+    object represents a specified amount of an
+    <a href="../ingredient" target="_blank">`Ingredient`</a>
+    object used in a <a href="/../nodes/process" target="_blank">`Process`</a>.
+    For example, a catalyst in a polymerization process may be used in a
+    <a href="../quantity" target="_blank">`Quantity`</a> of `100 mg`.
 
     Args:
         key (str): Quantity key

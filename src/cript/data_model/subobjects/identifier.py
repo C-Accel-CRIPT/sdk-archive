@@ -9,9 +9,10 @@ logger = getLogger(__name__)
 
 
 class Identifier(BaseSubobject):
-    """
-    Object representing an identifier of a `Material` object
-    (e.g., CAS, BigSMILES).
+    """The <a href="../identifier" target="_blank">`Identifier`</a> object
+    is used for identifying a <a href="/../nodes/material" target="_blank">`Material`</a> object.
+    For example, an <a href="../identifier" target="_blank">`Identifier`</a> can be
+    a SMILES string, BigSMILES string, or material name.
 
     Args:
         key (str): Identifier key

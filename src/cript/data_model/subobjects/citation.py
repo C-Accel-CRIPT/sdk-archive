@@ -10,8 +10,14 @@ logger = getLogger(__name__)
 
 
 class Citation(BaseSubobject):
-    """Object representing how a `Reference` object
-    is applied in a given context.
+    """A <a href="../citation" target="_blank">`Citation`</a>
+    object represents a <a href="/../nodes/reference" target="_blank">`Reference`</a> object
+    that is applied in a given context. For example, a published article may be represented by a
+    <a href="/../nodes/reference" target="_blank">`Reference`</a>, and that
+    <a href="/../nodes/reference" target="_blank">`Reference`</a>
+    may be linked to a
+    <a href="/../nodes/data" target="_blank">`Data`</a>
+    object as a <a href="../citation" target="_blank">`Citation`</a>.
 
     Args:
         reference (Union[Reference, str]): The `Reference` node which is being cited
@@ -20,7 +26,7 @@ class Citation(BaseSubobject):
 
     ``` py title="Example"
     citation = Citation(
-        reference=reference,
+        reference=my_reference,
         type="reference",
         notes="Data extracted from Table 2",
     )

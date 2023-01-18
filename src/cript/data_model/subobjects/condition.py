@@ -12,8 +12,12 @@ logger = getLogger(__name__)
 
 class Condition(BaseSubobject):
     """
-    Object representing a condition (e.g., temperature).
-    Conditions are used as modifiers for `Property` and `Process` objects.
+    The <a href="../condition" target="_blank">`Condition`</a>
+    object represents a physical or virtual condition (e.g. temperature, pressure,
+    or humidity). A <a href="../condition" target="_blank">`Condition`</a> object
+    may be used as a modifier for
+    <a href="../property" target="_blank">`Property`</a> or 
+    <a href="/../nodes/process" target="_blank">`Process`</a> objects.
 
     Args:
         key (str): Condition key

@@ -6,13 +6,16 @@ from beartype import beartype
 from cript.data_model.subobjects.base_subobject import BaseSubobject
 from cript.data_model.subobjects.citation import Citation
 from cript.data_model.subobjects.parameter import Parameter
+from cript.data_model.nodes.computation import Computation
 
 logger = getLogger(__name__)
 
 
 class Algorithm(BaseSubobject):
-    """Object that represents an algorithm. An algorithm is used in
-    `Computation` and `ComputationalProcess` objects.
+    """The <a href="../algorithm" target="_blank">`Algorithm`</a>
+    object represents an algorithm that can be used as part of a
+    <a href="/../nodes/computation" target="_blank">`Computation`</a> object. For example,
+    the computation might consist of a clustering algorithm or sorting a algorithm.
 
     Args:
         key (str): Algorithm key
@@ -49,7 +52,7 @@ class Algorithm(BaseSubobject):
 
     @beartype
     def add_parameter(self, parameter: Union[Parameter, dict]):
-        """Add a parameter to this object.
+        """Add a <a href="../parameter" target="_blank">`Parameter`</a> to the algorithm.
 
         Args:
             parameter (Union[Parameter, dict]): The parameter to be added
@@ -62,7 +65,7 @@ class Algorithm(BaseSubobject):
 
     @beartype
     def remove_parameter(self, parameter: Union[Parameter, int]):
-        """Remove a parameter from this object.
+        """Remove a <a href="../parameter" target="_blank">`Parameter`</a> from the algorithm.
 
         Args:
             parameter (Union[Parameter, int]): The parameter to be removed
@@ -75,7 +78,7 @@ class Algorithm(BaseSubobject):
 
     @beartype
     def add_citation(self, citation: Union[Citation, dict]):
-        """Add a citation to this object.
+        """Add a <a href="../citation" target="_blank">`Citation`</a> to the algorithm.
 
         Args:
             citation (Union[Citation, dict]): The citation to be added
@@ -88,7 +91,7 @@ class Algorithm(BaseSubobject):
 
     @beartype
     def remove_citation(self, citation: Union[Citation, int]):
-        """Remove a citation from this object.
+        """Remove a <a href="../citation" target="_blank">`Citation`</a> from the algorithm.
 
         Args:
             citation (Union[Citation, dict]): The citation to be removed

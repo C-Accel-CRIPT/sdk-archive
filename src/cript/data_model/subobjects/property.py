@@ -14,9 +14,12 @@ logger = getLogger(__name__)
 
 
 class Property(BaseSubobject):
-    """
-    Object representing an observed or measured attribute
-    of a `Material` or `Process` object.
+    """The <a href="../property" target="_blank">`Property`</a> object represents
+    an observed or measured attribute of a
+    <a href="/../nodes/material" target="_blank">`Material`</a> object
+    or a <a href="/../nodes/process" target="_blank">`Process`</a> object.
+    For example, the contact angle of a polymer solution is a
+    <a href="../property" target="_blank">`Property`</a> of the solution.
 
     Args:
         key (str): Property key
@@ -98,7 +101,7 @@ class Property(BaseSubobject):
 
     @beartype
     def add_components(self, component: Union[BaseNode, dict]):
-        """Add a component to this property.
+        """Add a component to the property.
 
         Args:
             component (Union[BaseNode, dict]): Component to add
@@ -111,7 +114,7 @@ class Property(BaseSubobject):
 
     @beartype
     def remove_components(self, component: Union[BaseNode, int]):
-        """Remove a component from this proeprty.
+        """Remove a component from the proeprty.
 
         Args:
             component (Union[BaseNode, int]): Component to remove
@@ -124,7 +127,7 @@ class Property(BaseSubobject):
 
     @beartype
     def add_components_relative(self, component: Union[BaseNode, dict]):
-        """Add a relative component to this property.
+        """Add a relative component to the property.
 
         Args:
             component (Union[BaseNode, dict]): Relative component to add
@@ -137,7 +140,7 @@ class Property(BaseSubobject):
 
     @beartype
     def remove_components_relative(self, component: Union[BaseNode, int]):
-        """Remove a relative component from this property.
+        """Remove a relative component from the property.
 
         Args:
             component (Union[BaseNode, int]): Relative component to remove
@@ -150,7 +153,7 @@ class Property(BaseSubobject):
 
     @beartype
     def add_computation(self, computation: Union[Computation, dict]):
-        """Add a `Computation` object to this property.
+        """Add a <a href="/../nodes/computation" target="_blank">`Computation`</a> object to the property.
 
         Args:
             computation (Union[Computation, dict]): Computation to add
@@ -163,7 +166,7 @@ class Property(BaseSubobject):
 
     @beartype
     def remove_computation(self, computation: Union[Condition, int]):
-        """Remove a computation from this property.
+        """Remove a <a href="/../nodes/computation" target="_blank">`Computation`</a> object from the property.
 
         Args:
             computation (Union[Computation, int]): Computation to remove
@@ -176,7 +179,7 @@ class Property(BaseSubobject):
 
     @beartype
     def add_citation(self, citation: Union[Citation, dict]):
-        """Add a `Citation` object to this property.
+        """Add a <a href="../citation" target="_blank">`Citation`</a> object to the property.
 
         Args:
             citation (Union[Citation, dict]): `Citation` to add
@@ -189,7 +192,7 @@ class Property(BaseSubobject):
 
     @beartype
     def remove_citation(self, citation: Union[Citation, int]):
-        """Remove a `Citation` object from this property.
+        """Remove a <a href="../citation" target="_blank">`Citation`</a> object from the property.
 
         Args:
             citation (Union[Citation, int]): `Citation` to remove
@@ -202,7 +205,7 @@ class Property(BaseSubobject):
 
     @beartype
     def add_condition(self, condition: Union[Condition, int]):
-        """Add a `Condition` object to this property.
+        """Add a <a href="../condition" target="_blank">`Condition`</a> object to the property.
 
         Args:
             condition (Union[Condition, int]): `Condition` to add
@@ -215,7 +218,7 @@ class Property(BaseSubobject):
 
     @beartype
     def remove_condition(self, condition: Union[Condition, int]):
-        """Remove a `Condition` object from this property.
+        """Remove a <a href="../condition" target="_blank">`Condition`</a> object from the property.
 
         Args:
             condition (Union[Condition, int]): `Condition` to remove.

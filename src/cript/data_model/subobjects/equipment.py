@@ -12,7 +12,9 @@ logger = getLogger(__name__)
 
 
 class Equipment(BaseSubobject):
-    """Object representing equipment used in a `Process`.
+    """The <a href="../equiupment" target="_blank">`Equipment`</a> object
+    represents a piece of laboratory equipment. It can be used in a
+    <a href="/../nodes/process" target="_blank">`Process`</a>.
 
     Args:
         key (str): Equipment key

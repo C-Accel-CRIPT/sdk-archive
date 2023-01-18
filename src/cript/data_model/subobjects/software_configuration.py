@@ -12,9 +12,12 @@ logger = getLogger(__name__)
 
 
 class SoftwareConfiguration(BaseSubobject):
-    """
-    Object representing the `Software` and set of `Algorithm` objects
-    used to execute a `Computation` or `ComputationalProcess`.
+    """The <a href="../software_configuration" target="_blank">`SoftwareConfiguration`</a>
+    object represents the
+    <a href="/../nodes/software" target="_blank">`Software`</a> and set of
+    <a href="../algorithm" target="_blank">`Algorithm`</a> objects
+    used to execute a <a href="/../nodes/computation" target="_blank">`Computation`</a> or a
+    <a href="/../nodes/computational_process" target="_blank">`ComputationalProcess`</a>.
 
     Args:
         software (Union[Software, str]): Software name
@@ -49,7 +52,7 @@ class SoftwareConfiguration(BaseSubobject):
 
     @beartype
     def add_algorithm(self, algorithm: Union[Algorithm, dict]):
-        """Add an algorithm to this object.
+        """Add an <a href="../algorithm" target="_blank">`Algorithm`</a> to the software configuration.
 
         Args:
             algorithm (Union[Algorithm, dict]): Algorithm to add
@@ -62,7 +65,7 @@ class SoftwareConfiguration(BaseSubobject):
 
     @beartype
     def remove_algorithm(self, algorithm: Union[Algorithm, int]):
-        """Remove an algorithm from this software configuration
+        """Remove an <a href="../algorithm" target="_blank">`Algorithm`</a> from the software configuration.
 
         Args:
             algorithm (Union[Algorithm, int]): Algorithm to remove
@@ -75,7 +78,7 @@ class SoftwareConfiguration(BaseSubobject):
 
     @beartype
     def add_citation(self, citation: Union[Citation, dict]):
-        """Add a citation to this object.
+        """Add a <a href="../citation" target="_blank">`Citation`</a> to the software configiuration.
 
         Args:
             citation (Union[Citation, dict]): Citation to add
@@ -88,7 +91,7 @@ class SoftwareConfiguration(BaseSubobject):
 
     @beartype
     def remove_citation(self, citation: Union[Citation, int]):
-        """Remove a citation from this object.
+        """Remove a <a href="../citation" target="_blank">`Citation`</a> from this software configuration.
 
         Args:
             citation (Union[Citation, dict]): Citation to remove

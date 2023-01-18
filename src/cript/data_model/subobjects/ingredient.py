@@ -11,9 +11,11 @@ logger = getLogger(__name__)
 
 
 class Ingredient(BaseSubobject):
-    """
-    Object representing a `Material` object being used
-    as an input to a `Process` object.
+    """An <a href="../ingredient" target="_blank">`Ingredient`</a> object
+    represents a quantity of material which is used as an input to a
+    <a href="/../nodes/process" target="_blank">`Process`</a>. For example,
+    the catalyst material in a polymerization process is an
+    <a href="../ingredient" target="_blank">`Ingredient`</a>.
 
     Args:
         material (Union[Material, str]): `Material` which is used as an ingredient in the `Process` object
@@ -57,7 +59,7 @@ class Ingredient(BaseSubobject):
 
     @beartype
     def add_quantity(self, quantity: Union[Quantity, dict]):
-        """Add a quantity to the ingredient.
+        """Add a <a href="../quantity" target="_blank">`Quantity`</a> to the ingredient.
 
         Args:
             quantity (Union[Quantity, dict]): Quantity to add
@@ -76,7 +78,7 @@ class Ingredient(BaseSubobject):
 
     @beartype
     def remove_quantity(self, quantity: Union[Quantity, int]):
-        """Remove a quantity from the ingredient.
+        """Remove a <a href="../quantity" target="_blank">`Quantity`</a> from the ingredient.
 
         Args:
             quantity (Union[Quantity, int]): Quantity to remove
