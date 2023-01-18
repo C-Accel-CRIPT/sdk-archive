@@ -1,4 +1,6 @@
 ::: cript.data_model.nodes.collection
+
+<!---
 ==============================
 
 # Non-docstrings
@@ -286,3 +288,4 @@ results = cript.Collection.search(name = "My collection")
 results.json()
 ```
 
+--->
