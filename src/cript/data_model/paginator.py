@@ -25,7 +25,7 @@ class Paginator:
     ``` py title="Example"
     paginator = Paginator(
         url="https://criptapp.org/api/collection/?format=json",
-        node_name="collection",
+        node_name="Collection",
         limit=10,
         offset=0,
         get_level=1,

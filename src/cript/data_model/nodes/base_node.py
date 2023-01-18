@@ -21,6 +21,27 @@ logger = getLogger(__name__)
 
 
 class BaseNode(Base, abc.ABC):
+    """This is the base node that all other CRIPT nodes
+    inherit from. While a user will not instantiate this
+    node directly, its methods can be used from any of the
+    other primary CRIPT nodes (e.g. 
+    <a href="../project" target="_blank">`Project`</a>,
+    <a href="../collection" target="_blank">`Collection`</a>,
+    <a href="../experiment" target="_blank">`Experiment`</a>, etc).
+
+    Args:
+        url (str, optional): URL of the node
+        uid (str, optional): UID of the node
+        public (bool, optional): Whether the node is publicly viewable
+        created_at (str, optional): Time at which the node was created
+        updated_at (str, optional): Time at which the node was last updated
+        can_edit (bool, optional): Whether the current user has permission to edit the node
+
+    !!! warning "BaseNode Instantiation"
+        This is the base node that other primary nodes inherit from.
+        A CRIPT user will never use the `BaseNode` directly.
+    """
+
     slug = None
 
     def __init__(
@@ -45,13 +66,21 @@ class BaseNode(Base, abc.ABC):
 
     @beartype
     def save(self, get_level: int = 1, update_existing: bool = False):
-        """
-        Create or update a node in the database.
+        """Create or update a node in the database.
 
-        :param get_level: Level to recursively get nested nodes.
-        :param update_existing: Indicates whether to update an
-                                existing node with the same unique fields.
+        Args:
+            get_level (int, optional): Level to recursively get nested nodes
+            update_existing (bool, optional): Whether to update an existing node with the same unique fields
+
+        Raises:
+            UniqueNodeError: Arises when the node cannot be created because it is not unique
+
+        ``` py title="Example"
+        my_node = Project(name="My new project")
+        my_node.save()
+        ```
         """
+
         api = get_cached_api_session(self.url)
 
         if self.url:
@@ -82,14 +111,20 @@ class BaseNode(Base, abc.ABC):
 
     @beartype
     def delete(self):
-        """
-        Delete a node in the database and clear it locally.
+        """Delete a node in the database and clear it locally."
+
+        Raises:
+            ValueError: The node does not exist in the database
+        
+        ``` py title="Example"
+        my_project = Project.get(name="My project")
+        my_project.delete()
+        ```
         """
         if not self.url:
             raise ValueError(
                 f"This {self.node_name} node does not exist in the database."
             )
-
         api = get_cached_api_session(self.url)
         api.delete(self.url)
         self.url = None
@@ -100,16 +135,24 @@ class BaseNode(Base, abc.ABC):
 
     @beartype
     def refresh(self, get_level: int = 1):
-        """
-        Overwrite a node's attributes with the latest values from the database.
+        """Overwrite a node's attributes with the latest values from the database.
 
-        :param get_level: Level to recursively get nested nodes.
+        Args:
+            get_level (int, optional): Level to recursively get nested nodes.
+
+        Raises:
+            ValueError: The node hasn't been saved to the database yet (it has no URL)
+        
+        ``` py title="Example"
+        my_project = Project.get(name="My project")
+        my_project.name = "New name"
+        my_project.refresh()
+        ```
         """
         if self.url is None:
             raise ValueError(
                 "Before you can refresh a node, you must either save it or define its URL."
             )
-
         api = get_cached_api_session(self.url)
         response = api.get(self.url)
         set_node_attributes(self, response)
@@ -117,11 +160,19 @@ class BaseNode(Base, abc.ABC):
 
     @beartype
     def update(self, get_level: int = 1, **kwargs):
-        """
-        Updates and immediately saves a node.
+        """Updates and saves changes to a node.
 
-        :param get_level: Level to recursively get nested nodes.
-        :param **kwargs: Arguments to update the node.
+        Args:
+            get_level (int, optional): Level to recursively get nested nodes
+            **kwargs (dict): Node attributes
+
+        Raises:
+            ValueError: The node hasn't been saved to the database yet (it has no URL)
+        
+        ``` py title="Example"
+        proj = Porject.get(name="My project")
+        proj.update(name="My project with new name")
+        ```
         """
         if self.url is None:
             raise ValueError(
@@ -134,30 +185,45 @@ class BaseNode(Base, abc.ABC):
     @classmethod
     @beartype
     def create(cls, get_level: int = 1, update_existing: bool = False, **kwargs):
-        """
-        Immediately creates a node.
+        """Creates a node and saves it to the CRIPT database.
 
-        :param get_level: Level to recursively get nested nodes.
-        :param update_existing: Indicates whether to update an existing node with the
-                                same unique fields.
-        :param **kwargs: Arguments for the constructor.
-        :return: The created node.
-        :rtype: cript.data_model.nodes.BaseNode
+        Args:
+            get_level (int, optional): Level to recursively get nested nodes
+            update_existing (bool, optional): Whether to update an existing node with the same unique fields
+            **kwargs (dict): Node attributes
+
+        Returns:
+            node (cript.data_model.nodes.BaseNode): _description_
+
+        ``` py title="Example"
+        my_proj = Project.create(name="My project")
+        ```
         """
         node = cls(**kwargs)
         node.save(get_level=get_level, update_existing=update_existing)
         return node
 
+
     @classmethod
     @beartype
     def get(cls, get_level: int = 1, **kwargs):
-        """
-        Get the JSON for a node and use it to generate a local node object.
+        """Get the JSON for a node and use it to generate a local node object.
 
-        :param get_level: Level to recursively get nested nodes.
-        :param **kwargs: Query parameters.
-        :return: The generated node object.
-        :rtype: cript.data_model.nodes.BaseNode
+        Args:
+            get_level (int, optional): Level to recursively get nested nodes
+            **kwargs (dict): Query parameters
+
+        Raises:
+            AttributeError: No query arguments were provided
+            ValueError: No matches were found, or more than one match was found
+
+        Returns:
+            result (dict): The matching node object
+        
+        ``` py title="Example"
+        # get a collection by name
+        Collection.get(name="My collection")
+        ```
         """
         level = kwargs.pop("level", 0)
 
@@ -199,15 +265,24 @@ class BaseNode(Base, abc.ABC):
         get_level: int = 1,
         **kwargs,
     ):
-        """
-        Send a query to the API and display the results.
+        """Send a query to the API and display the results.
 
-        :param limit: The max number of items to return.
-        :param offset: The starting position of the query.
-        :param get_level: Level to recursively get nested nodes.
-        :param **kwargs: Query parameters.
-        :return: A `Paginator` object.
-        :rtype: cript.data_model.paginator.Paginator
+        Args:
+            limit (Union[int, None], optional):  The maximum number of results to return
+            offset (Union[int, None], optional): The starting position of the query
+            get_level (int, optional): Level to recursively get nested nodes
+            **kwargs (dict): Query parameters
+
+        Raises:
+            AttributeError: No query arguments were provided
+
+        Returns:
+            results (cript.data_model.paginator.Paginator): The paginated results
+
+        ``` py title="Example"
+        # searches for collections inside "My project"
+        results = Collection.search(project="My project")
+        ```
         """
         if len(kwargs) == 0:
             raise AttributeError("Query arguments must be provided.")

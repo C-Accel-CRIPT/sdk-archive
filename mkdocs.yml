@@ -13,6 +13,7 @@ theme:
   features:
     - content.code.copy
     - navigation.path
+    - nagivation.tracking
 
   palette:
     # Palette toggle for light mode
@@ -47,8 +48,8 @@ plugins:
         python:
           paths: [src]
           options:
-            show_bases: false
-            show_source: true
+            show_bases: true
+            show_source: false
             docstring_style: google
 
 nav:
@@ -62,6 +63,7 @@ nav:
     - Synthesis: tutorials/synthesis.md
   - Nodes:
       - All nodes: nodes/all.md
+      - BaseNode: nodes/base_node.md
       - Collection: nodes/collection.md
       - Computation: nodes/computation.md
       - Computational Process: nodes/computational_process.md

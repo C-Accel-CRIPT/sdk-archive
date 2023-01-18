@@ -1,4 +1,7 @@
-# Collection
+::: cript.data_model.nodes.collection
+==============================
+
+# Non-docstrings
 
 ## Definition
 

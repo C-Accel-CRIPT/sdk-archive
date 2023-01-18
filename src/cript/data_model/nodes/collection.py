@@ -14,9 +14,36 @@ logger = getLogger(__name__)
 
 
 class Collection(BaseNode):
-    """
-    Object representing a logical grouping of `Experiment` and
-    `Inventory` objects.
+    """Object representing a logical grouping of
+    <a href="../experiment" target="_blank">`Experiment`</a> and
+    <a href="../inventory" target="_blank">`Inventory`</a>
+    objects. Each collection is nested inside of a 
+    <a href="../project" target="_blank">`Project`</a>
+    node.
+
+    Args:
+        project (Union[Project, str]): The collection's parent `Project`
+        name (str): Collection name
+        experiments (str, optional): URL for list of experiments inside this collection
+        inventories (str, optional): URL for list of inventories inside this collection
+        notes (Union[str, None], optional): Collection notes
+        citations (list[Union[Citation, dict]], optional): List of citations associated with this collection
+        public (bool, optional): Whether this collection is publicly viewable
+        group (Union[Group, str], optional): `Group` object which manages this collection
+    
+    !!! warning "Collection names"
+        Each `Collection` name must be unique within a `Project` node
+
+    ```py title="Example"
+    # get an existing project
+    my_project = cript.Project.get(name="My project")
+    # create the collection
+    collection = Collection(
+        project=my_project,
+        name="My new collection",
+        notes="
+    )
+    ```
     """
 
     node_name = "Collection"
@@ -36,6 +63,39 @@ class Collection(BaseNode):
         group: Union[Group, str] = None,
         **kwargs,
     ):
+        """Object representing a logical grouping of
+        <a href="../experiment" target="_blank">`Experiment`</a> and
+        <a href="../inventory" target="_blank">`Inventory`</a>
+        objects. Each collection is nested inside of a 
+        <a href="../project" target="_blank">`Project`</a>
+        node.
+
+        <a href="../base_node" target="_blank">basenode</a>
+
+        Args:
+            project (Union[Project, str]): The collection's parent `Project`
+            name (str): Collection name
+            experiments (str, optional): URL for list of experiments inside this collection
+            inventories (str, optional): URL for list of inventories inside this collection
+            notes (Union[str, None], optional): Collection notes
+            citations (list[Union[Citation, dict]], optional): List of citations associated with this collection
+            public (bool, optional): Whether this collection is publicly viewable
+            group (Union[Group, str], optional): `Group` object which manages this collection
+        
+        !!! warning "Collection names"
+            Each `Collection` name must be unique within a `Project` node
+
+        ```py title="Example"
+        # get an existing project
+        my_project = cript.Project.get(name="My project")
+        # create the collection
+        collection = Collection(
+            project=my_project,
+            name="My new collection",
+            notes="
+        )
+        ```
+        """
         super().__init__(public=public, **kwargs)
         self.project = project
         self.name = name

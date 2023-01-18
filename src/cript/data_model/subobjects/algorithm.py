@@ -11,7 +11,7 @@ logger = getLogger(__name__)
 
 
 class Algorithm(BaseSubobject):
-    """Object that represents an algorithm used in
+    """Object that represents an algorithm. An algorithm is used in
     `Computation` and `ComputationalProcess` objects.
 
     Args:
