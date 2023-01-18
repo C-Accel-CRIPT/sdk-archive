@@ -146,9 +146,7 @@ class Reference(BaseNode):
         Raises:
             UniqueNodeError: This reference already exists and cannot be edited.
         
-            
         ``` py title="Example"
-    
         # get an existing group
         my_group = Group.get(name="My group")
 
