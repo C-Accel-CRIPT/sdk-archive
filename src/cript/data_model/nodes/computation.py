@@ -46,7 +46,8 @@ class Computation(BaseNode):
         and see examples of their use.
 
     !!! note "Allowed `Computation` types"
-        The allowed `Computation` types are listed in the [CRIPT controlled vocabulary](https://criptapp.org/keys/computation-type/).
+        The allowed `Computation` types are listed in the
+        <a href="https://criptapp.org/keys/computation-type/" target="_blank">CRIPT controlled vocabulary</a>
         
     ``` py title="Example"
     # get an existing experiment
@@ -197,7 +198,7 @@ class Computation(BaseNode):
         """Remove an output <a href="../data" target="_blank">`Data`</a> object from this `Computation`.
 
         Args:
-            data (Union[Data, int]): `Data` object to remove.
+            data (Union[Data, int]): `Data` object to remove
         
         ``` py title="Example"
         computation.remove_output_data(data)
