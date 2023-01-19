@@ -1,5 +1,5 @@
 # 1. Setup CRIPT
-Before proceeding, please make sure you have <a href="https://pypi.org/project/cript/" target="_blank">CRIPT Python SDK</a> installed (`pip install cript`). For full installation instructions, please refer to the <a href="installation.md" target="_blank">Installation docs</a>.
+Before proceeding, please make sure you have <a href="https://pypi.org/project/cript/" target="_blank">CRIPT Python SDK</a> installed (`pip install cript`). For full installation instructions, please refer to the <a href="../installation" target="_blank">Installation docs</a>.
 
 ---
 
