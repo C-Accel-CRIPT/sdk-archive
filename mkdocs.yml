@@ -59,8 +59,9 @@ nav:
     - Full Tutorial: tutorials/full_tutorial.md
     - Installation: tutorials/installation.md
     - Getting an API Token: tutorials/api_token.md
-    - Simulation: tutorials/simulation.md
-    - Synthesis: tutorials/synthesis.md
+    - Workflows:
+        - Simulation: tutorials/simulation.md
+        - Synthesis: tutorials/synthesis.md
   - Nodes:
       - All nodes: nodes/all.md
       - BaseNode: nodes/base_node.md

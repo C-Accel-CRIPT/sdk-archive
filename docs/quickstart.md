@@ -34,11 +34,18 @@ cript.API(host, token)
 ## Create a Node
 
 ``` python
-proj = cript.Project.create(name="My project")
+proj = cript.Project.create(name="My project") # creates a Project and saves it to CRIPT
 ```
 
-??? info
-    `create()` instantiates and saves the object in one go
+!!! info
+    `create()` instantiates (i.e., creates a Python object) and saves (i.e., uploads to CRIPT) the object in one go
+
+Alternatively, you can instantiate the node and then save it:
+
+``` python
+proj = cript.Project(name="My project") # instantiates Project object
+proj.save() # saves the Project to CRIPT 
+```
 
 ---
 ## Get a Node
@@ -55,43 +62,35 @@ styrene = cript.Material.get(url="https://criptapp.org/material/015fc459-ea9f-4c
 
 ### Get Node via Name
 ```python
-proj = cript.Project.get(name="My project")
+styrene = cript.Material.get(name="polystyrene_1")
 ```
 
-??? note "UID and URL are preferable"
-    Getting a node via UID and URL are preferred methods because they are unmistakable. 
+!!! note "UID and URL are preferable"
+    Getting a node via UID and URL are preferred methods because they are unique across the entire CRIPT database. 
 
-    When getting a node via `name` please be sure to also pass the node that it is nested under.
+    When getting nested nodes via `name`, you must pass the node it belongs to (i.e., is nested under).
 
     For example `Collection` is nested under `Project`:
     ```python
-    project = cript.Project.get(name="My project")
-    collection = cript.Collection.get(name="My collection", project=project)
+    proj = cript.Project.get(name="My project")
+    coll = cript.Collection.get(name="My collection", project=proj.uid)
     ```
 
-    Project does not need any other parameters because a project is the highest level node
+    Project does not need any other parameters because a project is the highest level node.
 
 ---
 
 ## Update a Node
 
-1. Get the node you want to update
-2. Make the desired changes
-3. Update it
-
 ```python
-proj = cript.Project.get(name="My project")
 proj.update(name="My new project name")
 ```
 
 ---
 
 ## Delete a Node
-1. Get the node you want to delete
-2. Delete the node
 
 ``` py
-coll = cript.Collection.create(project=proj, name="My collection")
 coll.delete()
 ```
 
@@ -99,7 +98,7 @@ coll.delete()
 
 ## Run a Search Query
 
-For example, search for Material nodes with a molar mass less than 10 g/mol
+For example, to search for `Material` nodes with a molar mass less than 10 g/mol:
 
 ``` py
 results =  cript.Material.search(
@@ -119,42 +118,28 @@ results =  cript.Material.search(
     ``` python
     results.json()              # View the raw JSON for the query
     results.objects()           # Generate objects for the current page
-    results.next_page()         # Flip to the next page
-    results.previous_page()     # Flip to the previous page
+    results.next_page()         # Flip to the next page (if exists)
+    results.previous_page()     # Flip to the previous page (if exists)
     ```
 
 ---
 
 ## Upload a File
 
-1. Create a <a href="../node/project" target="_blank">Project</a> node
-2. Create a <a href="../node/data" target="_blank">Data</a> node
-3. Create a <a href="../node/data" target="_blank">File</a> node 
-    1. Specify the path of the local file on your computer that you want to upload to CRIPT
-
 ``` python
-path = "path/to/local/file"
-file = cript.File(project=proj, source=path)
+path = "path/to/local/file" # path to local file
+file = cript.File(project=proj, source=path) 
 file.save()
 ```
-
-> When a node is saved it is given a URL and UID
 
 ---
 
 ## Download a File
 
-1. Create a Create a <a href="../node/data" target="_blank">File</a> nod 
-    1. Specify the source you want to download from
-2. Specify the path you want the file to be downloaded to on your computer
-3. Download the file from CRIPT
-
-<!-- TODO what is "path" is that the path you want to download from within CRIPT? -->
 ``` python
-file = cript.File(project=proj, source=path)
-path = "downloaded.csv"
+path = "downloaded.csv" #local file path you want to save to
 file.download_file(path=path)
 ```
 
-!!! info "Default Path" 
+!!! info 
     The default path for a download is your current directory
