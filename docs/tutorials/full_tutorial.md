@@ -14,7 +14,7 @@ An API token is required to authenticate each user (i.e., make sure they are a v
 It is *highly* recommended that you store your API token in a safe location and read it into your code, rather than have it hard-coded. One way to do this is to store
 it in an environmental variable (e.g., `CRIPT_API_KEY`) and then read it in via the `os` module:
  
-```python
+``` python
 import cript
 import os
 
@@ -24,7 +24,7 @@ cript.API(host, token)
 ```
 
 You should see the following output:
-```bash
+``` bash
 Connected to https://criptapp.org/api
 ```
 
@@ -82,13 +82,11 @@ This should print something similar to the following:
 
 ---
 
-# Get an existing node
-
 # Create a Collection node
 
 A [`Collection`](../nodes/collection.md) can be thought of as a folder filled with experiments. Just like we did for a `Project` node, we use `create()` to create and upload a new `Collection`: 
 
-```python
+``` python
 coll = cript.Collection.create(project=proj, name="<Your Collection Name>")
 ```
 
@@ -96,7 +94,7 @@ coll = cript.Collection.create(project=proj, name="<Your Collection Name>")
 
 # Create an Experiment node
 
-```python
+``` python
 expt = cript.Experiment.create(
     collection=coll,
     name="Anionic Polymerization of Styrene with SecBuLi"
@@ -108,7 +106,7 @@ expt = cript.Experiment.create(
 For this tutorial, we will get an existing Inventory node from the database.  
 This contains all of the Material nodes we will be using.
 
-```python
+``` python
 uid = "134f2658-6245-42d8-a47e-6424aa3472b4"
 inv = cript.Inventory.get(uid=uid, get_level=1)
 ```
@@ -116,17 +114,17 @@ inv = cript.Inventory.get(uid=uid, get_level=1)
 !!! note
     We are setting `get_level` to `1` so that the Material nodes are auto-generated. This parameter defaults to `0`, but can be set to any integer.
 
-```python
+``` python
 print( type(inv.materials[0]) )
 ```
 
 Something similar to the following should be printed:
-```bash
+``` bash
 <class 'cript.data_model.nodes.material.Material'>
 ```
 # Create a Process node
 
-```python
+``` python
 prcs = cript.Process.create(
     experiment=expt,
     name="Anionic of Styrene",
@@ -143,7 +141,7 @@ prcs = cript.Process.create(
 
 First, let's grab the Material nodes we need from the Inventory node.
 
-```python
+``` python
 solution = inv['SecBuLi solution 1.4M cHex']
 toluene = inv['toluene']
 styrene = inv['styrene']
@@ -153,7 +151,7 @@ methanol = inv['methanol']
 
 Next, we'll define Quantity nodes indicating the amount of each Ingredient.
 
-```python
+``` python
 initiator_qty = cript.Quantity(key="volume", value=0.017, unit="ml")
 solvent_qty = cript.Quantity(key="volume", value=10, unit="ml")
 monomer_qty = cript.Quantity(key="mass", value=0.455, unit="g")
@@ -163,7 +161,7 @@ workup_qty = cript.Quantity(key="volume", value=100, unit="ml")
 
 Next, we'll create Ingredient nodes for each.
 
-```python
+``` python
 initiator = cript.Ingredient(
     keyword="initiator",
     material=solution,
@@ -193,7 +191,7 @@ workup = cript.Ingredient(
 
 Last, we'll add the Ingredient nodes to the Process node.
 
-```python
+``` python
 prcs.add_ingredient(initiator)
 prcs.add_ingredient(solvent)
 prcs.add_ingredient(monomer)
@@ -203,7 +201,7 @@ prcs.add_ingredient(workup)
 
 # Add Condition nodes to the Process node
 
-```python
+``` python
 temp = cript.Condition(key="temperature", value=25, unit="celsius")
 time = cript.Condition(key="time_duration", value=60, unit="min")
 prcs.add_condition(temp)
@@ -212,7 +210,7 @@ prcs.add_condition(time)
 
 # Add a Property node to the Process node
 
-```python
+``` python
 yield_mass = cript.Property(
     key="yield_mass",
     value=0.47,
@@ -226,13 +224,13 @@ prcs.add_property(yield_mass)
 
 First, we'll instantiate the node.
 
-```python
+``` python
 polystyrene = cript.Material(project=proj.uid, name="polystyrene")
 ```
 
 Next, we'll add some Identifier nodes.
 
-```python
+``` python
 names = cript.Identifier(
     key="names",
     value=["poly(styrene)", "poly(vinylbenzene)"]
@@ -250,7 +248,7 @@ polystyrene.add_identifier(bigsmiles)
 
 Next, we'll add some Property nodes.
 
-```python
+``` python
 phase = cript.Property(key="phase", value="solid")
 color = cript.Property(key="color", value="white")
 
@@ -260,14 +258,14 @@ polystyrene.add_property(color)
 
 Now we can save the Material and add it to the Process node as a product.
 
-```python
+``` python
 polystyrene.save()
 prcs.add_product(polystyrene)
 ```
 
 Last, we can save the Process node.
 
-```python
+``` python
 prcs.save()
 ```
 
@@ -275,7 +273,7 @@ prcs.save()
 
 First, we'll instantiate a File node and associate with the Data node created above.
 
-```python
+``` python
 path = "path/to/local/file"
 f = cript.File(project=proj, source=path)
 ```
@@ -287,14 +285,15 @@ Depending on the file size, there could be a delay while the checksum is generat
 
 Next, we'll upload the local file by saving the File node. Follow all prompts that appear.
 
-```python
+``` python
 f.save()
 ```
 
-You will be prompted to click a link to obtain an authorization code. Copy and paste the code obtained from this link into the terminal to save the file. 
+You will be prompted to click a link to obtain an authorization code. Copy and paste the code obtained from this link into the terminal to save the file.
+
 # Create a Data node
 
-```python
+``` python
 sec = cript.Data(
     experiment=expt,
     name="Crude SEC of polystyrene",
@@ -304,7 +303,7 @@ sec = cript.Data(
 
 .. then add the uploaded File to it:
 
-```python
+``` python
 sec.add_file(f)
 sec.save()
 ```
@@ -313,19 +312,19 @@ sec.save()
 
 First, we'll create one more Property node for polystyrene.
 
-```python
+``` python
 mw_n = cript.Property(key="mw_n", value=5200, unit="g/mol")
 ```
 
 Next, we'll add the Data node to the new Property node.
 
-```python
+``` python
 mw_n.data = sec
 ```
 
 Last, we'll add the new Property node to polystyrene then save it.
 
-```python
+``` python
 polystyrene.add_property(mw_n)
 polystyrene.save()
 ```

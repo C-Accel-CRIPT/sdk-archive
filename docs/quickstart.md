@@ -1,5 +1,3 @@
-# Quick Start
-
 !!! abstract "Objective"
     This quick start guide will take you through some common commands of the CRIPT Python SDK. For more information please visit each node or the full tutorial.
 

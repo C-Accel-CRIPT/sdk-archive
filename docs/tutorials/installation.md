@@ -1,39 +1,40 @@
-# How to Install CRIPT
-
 !!! abstract
-    This page will give you a through guide on how to set up [CRIPT Python SDK](https://pypi.org/project/cript/) on your system.
+    This page will give you a through guide on how to set up the
+    <a href="https://pypi.org/project/cript/" target="_blank">CRIPT Python SDK</a>
+    on your system.
 
+1.  Install <a href="https://www.python.org/downloads/" target="_blank">Python 3.9+</a>
 
-## Steps
-1.  Install [Python 3.9+](https://www.python.org/downloads/)
 2.  Create a virtual environment
 
-    > It is best practice to create a dedicated [python virtual environment](https://docs.python.org/3/library/venv.html) for each python project
+    > It is best practice to create a dedicated
+    <a href="https://docs.python.org/3/library/venv.html" target="_blank">python virtual environment</a> for each python project
 
     === ":fontawesome-brands-windows: **_Windows:_**"
-        ```bash 
+        ``` powershell
         python -m venv .\venv
         ```
 
     === ":fontawesome-brands-apple: **_Mac_** & :fontawesome-brands-linux: **_Linux:_**"
-        ```bash 
+        ``` bash 
         python3 -m venv ./venv
         ```
 
 3.  Activate your virtual environment
 
     === ":fontawesome-brands-windows: **_Windows:_**"
-        ```bash 
+        ``` powershell 
         .\venv\Scripts\activate
         ```
 
     === ":fontawesome-brands-apple: **_Mac_** & :fontawesome-brands-linux: **_Linux:_**"
-        ```bash 
+        ``` bash 
         source venv/bin/activate
         ```
 
-4.  Install [CRIPT from Python Package Index (PyPI)](https://pypi.org/project/cript/)
-    ```bash
+4.  Install <a href="https://pypi.org/project/cript/" target="_blank">CRIPT from Python Package Index (PyPI)</a>
+    ``` bash
      pip install cript
     ```
+
 5.  Create your CRIPT Script!
