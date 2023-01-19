@@ -94,7 +94,7 @@ class SoftwareConfiguration(BaseSubobject):
         """Remove a <a href="../citation" target="_blank">`Citation`</a> from this software configuration.
 
         Args:
-            citation (Union[Citation, dict]): Citation to remove
+            citation (Union[Citation, int]): Citation to remove
 
         ``` py title="Example"
         sc.remove_citation(citation)

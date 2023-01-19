@@ -154,7 +154,7 @@ class Inventory(BaseNode):
         """Remove a <a href="../material" target="_blank">`Material`</a> object from the inventory.
 
         Args:
-            material (Union[Material, dict]): `Material` object to remove
+            material (Union[Material, int]): `Material` object to remove
 
         ``` py title="Example"
         inventory.remove_material(material)

@@ -146,7 +146,7 @@ class Collection(BaseNode):
         """Remove a <a href="/../subobjects/citation" target="_blank">`Citation`</a> from the collection.
 
         Args:
-            citation (Union[Citation, dict]): Citation to remove
+            citation (Union[Citation, int]): Citation to remove
         
         ``` py title="Example"
         my_collection.remove_citation(citation)

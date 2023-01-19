@@ -94,7 +94,7 @@ class Algorithm(BaseSubobject):
         """Remove a <a href="../citation" target="_blank">`Citation`</a> from the algorithm.
 
         Args:
-            citation (Union[Citation, dict]): The citation to be removed
+            citation (Union[Citation, int]): The citation to be removed
 
         ``` py title="Example"
         algorithm.remove_citation(citation)

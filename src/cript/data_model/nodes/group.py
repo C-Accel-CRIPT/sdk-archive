@@ -91,7 +91,7 @@ class Group(BaseNode):
         """Remove a <a href="../user" target="_blank">`User`</a> from the group.
 
         Args:
-            user (Union[User, dict]): `User` object to remove
+            user (Union[User, int]): `User` object to remove
         
         ``` py title="Example"
         eric = User.get(name="Eric M")

@@ -114,7 +114,7 @@ class Property(BaseSubobject):
 
     @beartype
     def remove_components(self, component: Union[BaseNode, int]):
-        """Remove a component from the proeprty.
+        """Remove a component from the property.
 
         Args:
             component (Union[BaseNode, int]): Component to remove
