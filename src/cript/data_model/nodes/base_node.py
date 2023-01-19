@@ -180,7 +180,7 @@ class BaseNode(Base, abc.ABC):
             ValueError: The node hasn't been saved to the database yet (it has no URL)
         
         ``` py title="Example"
-        proj = Porject.get(name="My project")
+        proj = Project.get(name="My project")
         proj.update(name="My project with new name")
         ```
         """
