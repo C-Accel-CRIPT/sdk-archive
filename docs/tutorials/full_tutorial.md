@@ -1,9 +1,9 @@
-# Setup CRIPT
-Before proceeding, please make sure you have [CRIPT Python SDK](https://pypi.org/project/cript/) installed (`pip install cript`). For full installation instructions, please refer to the [installation docs](installation.md).
+# 1. Setup CRIPT
+Before proceeding, please make sure you have <a href="https://pypi.org/project/cript/" target="_blank">CRIPT Python SDK</a> installed (`pip install cript`). For full installation instructions, please refer to the <a href="installation.md" target="_blank">Installation docs</a>.
 
 ---
 
-# Connect to CRIPT
+# 2. Connect to CRIPT
 To connect to [CRIPT](https://criptapp.org), you must enter a `host` and an `API Token`. For most users, `host` will be `criptapp.org`
 
 ## API Token
