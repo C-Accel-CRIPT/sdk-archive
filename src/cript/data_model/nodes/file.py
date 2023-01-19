@@ -5,6 +5,7 @@ from typing import Union
 from beartype import beartype
 
 from cript.cache import get_cached_api_session
+from cript.api.rest import API
 from cript.data_model.exceptions import FileSizeLimitError, UniqueNodeError
 from cript.data_model.nodes.base_node import BaseNode
 from cript.data_model.nodes.group import Group
@@ -17,7 +18,45 @@ logger = getLogger(__name__)
 
 
 class File(BaseNode):
-    """Object representing a single raw data file."""
+    """The <a href="../file" target="_blank">`File`</a> object represents a
+    single computer file. The <a href="../file" target="_blank">`File`</a> object
+    is always nested inside a <a href="../project" target="_blank">`Project`</a> object, and
+    may exist inside a <a href="../data" target="_blank">`Data`</a> object as well.
+
+    Args:
+        project (Union[Project, str]): Parent `Project` object
+        source (str): Source of the file
+        type (str, optional): File type
+        name (str, optional): File name
+        checksum (Union[str, None], optional): File checksum for verifying integrity
+        unique_name (Union[str, None], optional): Unique file name generated from `File` object UID
+        extension (Union[str, None], optional): File extension
+        public (bool, optional): Whether the file is publicly viewable
+        group (Union[Group, str], optional): `Group` object which manages the file
+
+    !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
+        Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
+        all the <a href="../base_node" target="_blank">`BaseNode`</a> object methods can be used to manipulate it.
+        These include `get()`, `create()`, `delete()`, `save()`, `search()`, `update()`, and `refresh()` methods.
+        See the <a href="../base_node" target="_blank">`BaseNode`</a> documentation to learn more about these methods
+        and see examples of their use.
+
+    !!! note "Allowed `File` types"
+        The allowed `File` types are listed in the
+        <a href="https://criptapp.org/keys/file-type/" target="_blank">CRIPT controlled vocabulary</a>
+        
+    ``` py title="Example"
+    # get an existing project
+    my_project = Project.get(name="My project")
+
+    # create a new file in the existing project
+    f = File.create(
+        project=my_project
+        name="my_calibration_data.txt",
+        type="calibration",
+    )
+    ```
+    """
 
     node_name = "File"
     slug = "file"
@@ -75,6 +114,15 @@ class File(BaseNode):
 
     @beartype
     def save(self, get_level: int = 1, update_existing: bool = False):
+        """Save the file node and upload it to the file storage provider.
+
+        Args:
+            get_level (int, optional): Level to recursively get nested nodes
+            update_existing (bool, optional): Whether to update an existing node with the same unique fields
+
+        Raises:
+            UniqueNodeError: The file has already been created
+        """
         api = get_cached_api_session(self.url)
 
         if api.host == "localhost":
@@ -115,9 +163,7 @@ class File(BaseNode):
         self.refresh(get_level=get_level)
 
     def _upload_file(self, api, url, uid):
-        """
-        Upload a file to the defined storage provider.
-        """
+        # Upload a file to the defined storage provider.
         # Check if file is too big
         max_file_size = api.storage_info["max_file_size"]
         file_size = os.path.getsize(self.source)
@@ -135,11 +181,16 @@ class File(BaseNode):
                 api.storage_client.multipart_file_upload(uid, self)
 
     @beartype
-    def download_file(self, path: str = None, api=None):
-        """
-        Download a file from the defined storage provider.
+    def download_file(self, api, path: str = None):
+        """Download the file from the file storage provider.
 
-        :param path: Path where the file should go.
+        Args:
+            api (API): Instantiated CRIPT API object
+            path (str, optional): Path where file should be downloaded to
+        
+        ``` py title="Example"
+        f.download(api=api)
+        ```
         """
         api = get_cached_api_session(self.url)
 
@@ -149,4 +200,4 @@ class File(BaseNode):
         if isinstance(api.storage_client, GlobusClient):
             api.storage_client.https_download(self, path)
         elif isinstance(api.storage_client, AmazonS3Client):
-            pass  # Coming soon
+            print("AWS file storage is not implemented yet")
