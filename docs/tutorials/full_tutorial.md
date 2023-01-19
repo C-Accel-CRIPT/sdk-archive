@@ -6,8 +6,6 @@ Before proceeding, please make sure you have <a href="https://pypi.org/project/c
 # 2. Connect to CRIPT
 To connect to [CRIPT](https://criptapp.org), you must enter a `host` and an `API Token`. For most users, `host` will be `criptapp.org`
 
-## API Token
-
 An API token is required to authenticate each user (i.e., make sure they are a valid CRIPT user) before saving any of their data. Your API Token can be found in [security settings](https://criptapp.org/security/) under the profile icon on the top right of `criptapp.org`. For further explanation, please refer to [how to get an API Token](api_token.md)
 
 !!! note
@@ -43,34 +41,26 @@ Connected to https://criptapp.org/api
     ```
 
 ---
-# What is a node?
-* A *node* is simply a CRIPT object (e.g., `Project`, `Experiment`)  in the graph-based data model. Details on how to create, modify, and save different type of nodes
-are given in the following sections.
 
----
+# 3. Create a node
 
-# Create a [Project](../nodes/project.md) node
+??? "What is a node?"
+    A *node* is simply a CRIPT object (e.g., `Project`, `Experiment`)  in the graph-based data model. 
 
-A [`Project`](../nodes/project.md) can be thought of as a folder that contains [`Collections`](../nodes/collection.md). Each [`Collection`](../nodes/collection.md) must belong to a single [`Project`](../nodes/project.md) node.
-
-!!! warning "Project Name"
-    **Project names are globally unique**, meaning no two projects in the entire CRIPT database can have the same name.
-
-To create a `Project`:
+All data uploaded to CRIPT must be associated with a <a href="../../nodes/project" target="_blank">`Project`</a> node. A <a href="../../nodes/project" target="_blank">`Project`</a> can be thought of as a folder that contains <a href="../../nodes/collection" target="_blank">`Collections`</a>. To create a <a href="../../nodes/project" target="_blank">`Project`</a> and upload it to CRIPT :
 
 ```python
-Connected to https://criptapp.org/api
-
-proj = cript.Project.create(name="<Your Project Name>") # creates and uploads Project to CRIPT
+my_proj = cript.Project.create(name="My first project") # creates and uploads Project to CRIPT
 ```
 
-!!! note
-    Notice the use of `create()` here, which both *instantiates* the Python object and *uploads* it to the database in one go.
+??? "Notes"
+    * `Project` names are globally unique, meaning no two `Projects` in the entire CRIPT database can have the same name.
+    * Notice the use of `create()` here, which both *instantiates* the Python object and *uploads* it to the database in one go.
 
 Let's print the project to get a better view:
 
 ```python
-print(proj)
+print(my_proj)
 ```
 
 This should print something similar to the following:
@@ -91,6 +81,8 @@ This should print something similar to the following:
 ```
 
 ---
+
+# Get an existing node
 
 # Create a Collection node
 
