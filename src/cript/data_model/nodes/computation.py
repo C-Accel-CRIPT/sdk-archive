@@ -18,10 +18,10 @@ class Computation(BaseNode):
     """The <a href="../computation" target="_blank">`Computation`</a> object represents a
     single computation that is used for calculating a value, transforming some data,
     or creating a data set. Each <a href="../Computation" target="_blank">`Computation`</a> is
-    nested inside a single <a href="../experiment" target="_blank">`Experiment`</a>.
+    nested inside an <a href="../experiment" target="_blank">`Experiment`</a> object.
 
     Args:
-        experiment (Union[BaseNode, str]): The computation's parent `Experiment`
+        experiment (Union[BaseNode, str]): The parent `Experiment`
         name (str): Computation name
         type (str): Computation type
         input_data (list[Union[Data, str]], optional): List of `Data` objects used as inputs to the computation
@@ -60,6 +60,29 @@ class Computation(BaseNode):
         type="analysis",
     )
     ```
+
+    ``` json title="Example of a computation in JSON format"
+    {
+        "url": "https://criptapp.org/api/material/c27e320e-23f6-47d5-8348-1b842e7b9767/",
+        "uid": "c27e320e-23f6-47d5-8348-1b842e7b9767",
+        "group": "https://criptapp.org/api/group/30bad7ab-ed35-4659-a56f-9fc384d996f4/",
+        "experiment": "https://criptapp.org/api/experiment/ab890408-4da1-4311-aa7e-6a4f7897619f/",
+        "name": "k-means clustering",
+        "type": "analysis",
+        "input_data": [],
+        "software_configurations": [],
+        "conditions": [],
+        "output_data": [],
+        "prerequisite_computation": null,
+        "citations": [],
+        "notes": "performed using sci-kit learn python package",
+        "public": true,
+        "created_at": "2022-09-08T17:36:08.154333Z",
+        "updated_at": "2022-10-06T14:17:21.817950Z"
+    }
+    ```
+
+
     """
 
     node_name = "Computation"
