@@ -23,7 +23,7 @@ logger = getLogger(__name__)
 class BaseNode(Base, abc.ABC):
     """This is the base node that all other CRIPT nodes
     inherit from. The <a href="../base_node" target="_blank">`BaseNode`</a>
-    is not intantiated directly, but its methods can be used from any of the
+    is not called in the SDK directly, but its methods can be used from any of the
     other primary CRIPT nodes, including
     <a href="../collection" target="_blank">`Collection`</a>,
     <a href="../computation" target="_blank">`Computation`</a>,
@@ -49,7 +49,10 @@ class BaseNode(Base, abc.ABC):
 
     !!! warning "BaseNode Instantiation"
         This is the base node that other primary nodes inherit from.
-        Do not interact with the <a href="../base_node" target="_blank">`BaseNode`</a> directly.
+        Do not interact directly with the <a href="../base_node" target="_blank">`BaseNode`</a>.
+        Instead, call its methods from other primary nodes. For example, instead of using
+        `BaeNode().create()`, use the create method on a project,
+        like this: `Project.create(name="My project")`.
     """
 
     slug = None
@@ -86,7 +89,10 @@ class BaseNode(Base, abc.ABC):
             UniqueNodeError: Arises when the node cannot be created because it is not unique
 
         ``` py title="Example"
-        my_node = Project(name="My new project")
+        my_node = Project(
+            name="My new project",
+            notes="Project created using the Python SDK",
+        )
         my_node.save()
         ```
         """
@@ -157,6 +163,7 @@ class BaseNode(Base, abc.ABC):
         my_project = Project.get(name="My project")
         my_project.name = "New name"
         my_project.refresh()
+
         ```
         """
         if self.url is None:
@@ -180,8 +187,17 @@ class BaseNode(Base, abc.ABC):
             ValueError: The node hasn't been saved to the database yet (it has no URL)
         
         ``` py title="Example"
+        # update project name
         proj = Project.get(name="My project")
         proj.update(name="My project with new name")
+
+        # update project notes
+        proj.update(notes="new notes")
+
+        # update inventory to change its materials
+        inventory = Inventory.get(name="My inventory")
+        new_material_list = [material1, material2, material3]
+        inventory.update(materials=new_material_list)
         ```
         """
         if self.url is None:
@@ -206,7 +222,25 @@ class BaseNode(Base, abc.ABC):
             node (cript.data_model.nodes.BaseNode): _description_
 
         ``` py title="Example"
-        my_proj = Project.create(name="My project")
+        # create a project
+        my_project = Project.create(
+            name="My project",
+            notes="Project created from the Python SDK",
+        )
+
+        # create a collection
+        my_collection = Collection.create(
+            name="My collection",
+            project=my_project,
+            notes="A new collection created from the Python SDK",
+        )
+
+        # create an experiment
+        my_experiment = Experiment.create(
+            name="My experiment",
+            collection=my_collection,
+            notes="A new experiment created from the Python SDK",
+        )
         ```
         """
         node = cls(**kwargs)
@@ -232,7 +266,14 @@ class BaseNode(Base, abc.ABC):
         
         ``` py title="Example"
         # get a collection by name
-        Collection.get(name="My collection")
+        collection = Collection.get(name="My collection")
+
+        # get a project by UID
+        project = Project.get(uid="fa12b444-4931-427d-8f6e-475604e8404c")
+
+        # get a material by URL
+        url = "https://criptapp.org/material/015fc459-ea9f-4c37-80aa-f51d509095df/"
+        material = styrene = cript.Material.get(url=url)
         ```
         """
         level = kwargs.pop("level", 0)
@@ -289,9 +330,23 @@ class BaseNode(Base, abc.ABC):
         Returns:
             results (cript.data_model.paginator.Paginator): The paginated results
 
-        ``` py title="Example"
+        ``` py title="Examples"
+        # search for inventory with the name "My Inventory"
+        results Inventory.search(name="My Inventory")
+
         # searches for collections inside "My project"
         results = Collection.search(project="My project")
+
+        # search for materials with molar mass < 10 g/mol
+        results =  cript.Material.search(
+            properties = [
+                {
+                    "key": "molar_mass",
+                    "value__lt": 10,
+                    "unit": "g/mol"
+                }
+            ]
+        )
         ```
         """
         if len(kwargs) == 0:
