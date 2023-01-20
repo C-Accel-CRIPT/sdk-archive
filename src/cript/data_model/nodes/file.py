@@ -44,7 +44,7 @@ class File(BaseNode):
     !!! note "Allowed `File` types"
         The allowed `File` types are listed in the
         <a href="https://criptapp.org/keys/file-type/" target="_blank">CRIPT controlled vocabulary</a>
-        
+
     ``` py title="Example"
     # get an existing project
     my_project = Project.get(name="My project")
@@ -187,7 +187,7 @@ class File(BaseNode):
         Args:
             api (API): Instantiated CRIPT API object
             path (str, optional): Path where file should be downloaded to
-        
+
         ``` py title="Example"
         f.download(api=api)
         ```

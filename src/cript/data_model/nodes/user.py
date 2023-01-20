@@ -20,7 +20,7 @@ class User(BaseNode):
         orcid_id (str, optional): ORCID ID of the user
         groups (_type_, optional): `Group` objects that the user is a member of
         public (bool, optional): Whether the user is publicly viewable
-     
+
     ``` json title="Example of a user in JSON format"
     {
         "url": "https://criptapp.org/api/user/8de042c7-ba6e-4e4e-9f6e-0fdeb73e4595/",

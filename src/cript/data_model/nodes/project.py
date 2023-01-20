@@ -14,7 +14,7 @@ class Project(BaseNode):
     """The <a href="../project" target="_blank">`Project`</a> object represents
     a logical grouping of <a href="../collection" target="_blank">`Collection`</a>,
     <a href="../material target="_blank">`Material`</a>, and
-    <a href="../file" target="_blank">`File`</a> objects. A 
+    <a href="../file" target="_blank">`File`</a> objects. A
     <a href="../project" target="_blank">`Project`</a> is the highest-level
     organizational node in the CRIPT data model.
 
@@ -30,7 +30,7 @@ class Project(BaseNode):
 
     !!! warning "Projects names must be unique"
         Each <a href="../project target="_blank">`Project`</a> name must be unique within a
-        <a href="../group" target="_blank">`Group`</a> node.     
+        <a href="../group" target="_blank">`Group`</a> node.
 
     !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
         Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,

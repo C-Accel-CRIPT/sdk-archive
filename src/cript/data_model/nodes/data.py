@@ -42,7 +42,7 @@ class Data(BaseNode):
 
     !!! warning "Data names must be unique"
         Each <a href="../data" target="_blank">`Data`</a> name must be unique within a given
-        <a href="../experiment" target="_blank">`Experiment`</a> node.     
+        <a href="../experiment" target="_blank">`Experiment`</a> node.
 
     !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
         Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
@@ -54,7 +54,7 @@ class Data(BaseNode):
     !!! note "Allowed `Data` types"
         The allowed `Data` types are listed in the
         <a href="https://criptapp.org/keys/data-type/" target="_blank">CRIPT controlled vocabulary</a>
-        
+
     ``` py title="Example"
     # get an existing experiment
     my_experiment = Experiment.get(name="My experiment")
@@ -138,7 +138,7 @@ class Data(BaseNode):
 
         Args:
             file (Union[File, dict]): `File` object to add
-        
+
         ``` py title="Example"
         my_data.add_file(my_file)
         ```
@@ -151,7 +151,7 @@ class Data(BaseNode):
 
         Args:
             file (Union[File, int]): `File` object to remove
-        
+
         ``` py title="Example"
         my_data.remove_file(my_file)
         ```
@@ -164,7 +164,7 @@ class Data(BaseNode):
 
         Args:
             computation (Union[Computation, dict]): `Computation` object to add
-        
+
         ``` py title="Example"
         my_data.add_computation(my_computation)
         ```
@@ -177,7 +177,7 @@ class Data(BaseNode):
 
         Args:
             computation (Union[Computation, dict]): `Computation` object to remove
-        
+
         ``` py title="Example"
         my_data.remove_computation(my_computation)
         ```
@@ -190,7 +190,7 @@ class Data(BaseNode):
 
         Args:
             citation (Union[Citation, dict]): `Citation` to add
-        
+
         ``` py title="Example"
         data.add_citation(citation)
         ```
@@ -203,7 +203,7 @@ class Data(BaseNode):
 
         Args:
             citation (Union[Citation, int]): `Citation` to remove
-        
+
         ``` py title="Example"
         data.remove_citation(citation)
         ```

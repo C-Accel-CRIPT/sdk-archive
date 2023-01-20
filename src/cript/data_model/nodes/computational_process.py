@@ -39,7 +39,7 @@ class ComputationalProcess(BaseNode):
 
     !!! warning "ComputationalProcess names must be unique"
         Each <a href="../computational_process" target="_blank">`CopmutationalProcess`</a> name must be unique within an
-        <a href="../experiment" target="_blank">`Experiment`</a> node.     
+        <a href="../experiment" target="_blank">`Experiment`</a> node.
 
     !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
         Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
@@ -51,7 +51,7 @@ class ComputationalProcess(BaseNode):
     !!! note "Allowed `ComputationalProcess` types"
         The allowed `ComputationalProcess` types are listed in the
         <a href="https://criptapp.org/keys/computational-process-type/" target="_blank">CRIPT controlled vocabulary</a>.
-        
+
     ``` py title="Example"
     # get an existing experiment
     my_exp = Experiment.get(name="My experiment")
@@ -109,7 +109,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             data (Union[Data, dict]): `Data` object to add
-        
+
         ``` py title="Example"
         cp.add_input_data(data)
         ```
@@ -122,7 +122,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             data (Union[Data, int]): `Data` object to remove
-        
+
         ``` py title="Example"
         cp.remove_input_data(data)
         ```
@@ -135,7 +135,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             ingredient (Union[Ingredient, dict]): `Ingredient` to add
-        
+
         ``` py title="Example"
         cp.add_ingredient(ingredient)
         ```
@@ -148,7 +148,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             ingredient (Union[Ingredient, int]): `Ingredient` to remove
-        
+
         ``` py title="Example"
         cp.remove_ingredient(ingredient)
         ```
@@ -163,7 +163,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             configuration (Union[SoftwareConfiguration, dict]): `SoftwareConfiguration` to add
-        
+
         ``` py title="Example"
         cp.add_software_configuration(configuration)
         ```
@@ -178,7 +178,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             configuration (Union[SoftwareConfiguration, int]): `SoftwareConfiguration` to remove
-        
+
         ``` py title="Example"
         cp.remove_software_configuration(configuration)
         ```
@@ -191,7 +191,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             property (Union[Property, dict]): `Property` to add
-        
+
         ``` py title="Example"
         cp.add_property(property)
         ```
@@ -204,7 +204,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             property (Union[Property, int]): `Property` to remove
-        
+
         ``` py title="Example"
         cp.remove_property(property)
         ```
@@ -217,7 +217,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             condition (Union[Condition, dict]): `Condition` to add
-        
+
         ``` py title="Example"
         cp.add_condition(condition)
         ```
@@ -230,7 +230,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             condition (Union[Condition, int]): `Condition` to remove
-        
+
         ``` py title="Example"
         cp.remove_condition(condition)
         ```
@@ -243,7 +243,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             data (Union[Data, dict]): `Data` object to add
-        
+
         ``` py title="Example"
         cp.add_output_data(data)
         ```
@@ -256,7 +256,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             data (Union[Data, int]): `Data` object to remove
-        
+
         ``` py title="Example"
         cp.remove_output_data(data)
         ```
@@ -269,7 +269,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             citation (Union[Citation, dict]): `Citation` to add
-        
+
         ``` py title="Example"
         cp.add_citation(citation)
         ```
@@ -282,7 +282,7 @@ class ComputationalProcess(BaseNode):
 
         Args:
             citation (Union[Citation, int]): `Citation` to remove
-        
+
         ``` py title="Example"
         cp.remove_citation(citation)
         ```

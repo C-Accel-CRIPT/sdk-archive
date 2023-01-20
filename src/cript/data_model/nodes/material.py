@@ -33,7 +33,7 @@ class Material(BaseNode):
 
     !!! warning "Material names must be unique"
         Each <a href="../material" target="_blank">`Material`</a> name must be unique within a given
-        <a href="../project" target="_blank">`Project`</a> node.     
+        <a href="../project" target="_blank">`Project`</a> node.
 
     !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
         Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
@@ -45,7 +45,7 @@ class Material(BaseNode):
     !!! note "Allowed `Material` keywords"
         The allowed `Material` keywords are listed in the
         <a href="https://criptapp.org/keys/material-keyword/" target="_blank">CRIPT controlled vocabulary</a>
-        
+
     ``` py title="Example"
     # get an existing project
     my_project = Project.get(name="My project")
@@ -237,7 +237,7 @@ class Material(BaseNode):
 
         Args:
             identifier (Union[Identifier, dict]): `Identifier` to add
-        
+
         ``` py title="Example"
         material.add_identifier(identifier)
         ```
@@ -250,7 +250,7 @@ class Material(BaseNode):
 
         Args:
             identifier (Union[Identifier, int]): `Identifier` to remove
-        
+
         ``` py title="Example"
         material.remove_identifier(identifier)
         ```
@@ -281,7 +281,7 @@ class Material(BaseNode):
 
         Args:
             property (Union[Identifier, dict]): `Property` to add
-        
+
         ``` py title="Example"
         material.add_property(property)
         ```
@@ -294,7 +294,7 @@ class Material(BaseNode):
 
         Args:
             property (Union[Identifier, int]): `Property` to remove
-        
+
         ``` py title="Example"
         material.remove_property(property)
         ```

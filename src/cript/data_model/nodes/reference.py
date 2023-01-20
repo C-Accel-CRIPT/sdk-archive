@@ -38,7 +38,7 @@ class Reference(BaseNode):
     !!! warning "Saving references is permanent"
         Once created, a <a href="../reference" target="_blank">`Reference`</a> object becomes locked
         and cannot be edited or deleted. This allows others to link to it using a
-        <a href="/../subobjects/citation" target="_blank">`Citation`</a> object. 
+        <a href="/../subobjects/citation" target="_blank">`Citation`</a> object.
 
     !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
         Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
@@ -145,7 +145,7 @@ class Reference(BaseNode):
 
         Raises:
             UniqueNodeError: This reference already exists and cannot be edited.
-        
+
         ``` py title="Example"
         # get an existing group
         my_group = Group.get(name="My group")

@@ -19,7 +19,7 @@ class Collection(BaseNode):
     represents a logical grouping of
     <a href="../experiment" target="_blank">`Experiment`</a> and
     <a href="../inventory" target="_blank">`Inventory`</a>
-    objects. Each collection is nested inside of a 
+    objects. Each collection is nested inside of a
     <a href="../project" target="_blank">`Project`</a>.
 
     Args:
@@ -31,10 +31,10 @@ class Collection(BaseNode):
         citations (list[Union[Citation, dict]], optional): List of citations associated with the collection
         public (bool, optional): Whether the collection is publicly viewable
         group (Union[Group, str], optional): `Group` object that manages the collection
-    
+
     !!! warning "Collection names must be unique"
         Each <a href="../collection" target="_blank">`Collection`</a> name must be unique within a
-        <a href="../project" target="_blank">`Project`</a> node.     
+        <a href="../project" target="_blank">`Project`</a> node.
 
     !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
         Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
@@ -84,6 +84,7 @@ class Collection(BaseNode):
 
     ```
     """
+
     node_name = "Collection"
     slug = "collection"
     alt_names = ["collections"]
@@ -134,7 +135,7 @@ class Collection(BaseNode):
 
         Args:
             citation (Union[Citation, dict]): Citation to add
-        
+
         ``` py title="Example"
         my_collection.add_citation(citation)
         ```
@@ -147,7 +148,7 @@ class Collection(BaseNode):
 
         Args:
             citation (Union[Citation, int]): Citation to remove
-        
+
         ``` py title="Example"
         my_collection.remove_citation(citation)
         ```

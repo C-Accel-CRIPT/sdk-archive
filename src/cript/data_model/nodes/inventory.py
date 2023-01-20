@@ -16,7 +16,7 @@ class Inventory(BaseNode):
     """The <a href="../inventory" target="_blank">`Inventory`</a> object
     represents a logical grouping of
     <a href="../material" target="_blank">`Material`</a> objects.
-    
+
     For example, the set of chemicals
     available in a specific laboratory, or set of polymers studied in a published article,
     may make up an inventory. Each <a href="../inventory" target="_blank">`Inventory`</a> is nested inside of a
@@ -32,7 +32,7 @@ class Inventory(BaseNode):
 
     !!! warning "Inventory names must be unique"
         Each <a href="../inventory" target="_blank">`Inventory`</a> name must be unique within a
-        <a href="../collection" target="_blank">`Collection`</a> node.     
+        <a href="../collection" target="_blank">`Collection`</a> node.
 
     !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
         Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
@@ -142,7 +142,7 @@ class Inventory(BaseNode):
 
         Args:
             material (Union[Material, dict]): `Material` object to add
-        
+
         ``` py title="Example"
         inventory.add_material(material)
         ```

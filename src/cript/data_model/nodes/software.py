@@ -28,7 +28,7 @@ class Software(BaseNode):
         These include `get()`, `create()`, `delete()`, `save()`, `search()`, `update()`, and `refresh()` methods.
         See the <a href="../base_node" target="_blank">`BaseNode`</a> documentation to learn more about these methods
         and see examples of their use.
-    
+
     ``` py title="Example"
     # get an existing group
     my_group = Group.get(name="My group")

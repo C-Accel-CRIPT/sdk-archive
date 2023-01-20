@@ -21,7 +21,7 @@ class Group(BaseNode):
         name (str): Group name
         users (list[Union[User, str]], optional): List of users who are members of the group
         public (bool, optional): Whether the group is publicly viewable
-    
+
     !!! warning "Group names must be unique"
         Each <a href="../group" target="_blank">`Group`</a> name must be unique across all of CRIPT.
 
@@ -77,7 +77,7 @@ class Group(BaseNode):
 
         Args:
             user (Union[User, dict]): `User` object to add
-        
+
         ``` py title="Example"
         eric = User.get(name="Eric M")
 
@@ -92,7 +92,7 @@ class Group(BaseNode):
 
         Args:
             user (Union[User, int]): `User` object to remove
-        
+
         ``` py title="Example"
         eric = User.get(name="Eric M")
 

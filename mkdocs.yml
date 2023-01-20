@@ -104,19 +104,19 @@ markdown_extensions:
   - attr_list
   - md_in_html
   - admonition
-  - pymdownx.superfences
-  - pymdownx.tabbed:
-      alternate_style: true  
   - pymdownx.details
-  - pymdownx.highlight:
-      anchor_linenums: true
+  - pymdownx.superfences
   - pymdownx.inlinehilite
   - pymdownx.snippets
-  - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
   - pymdownx.critic
   - pymdownx.caret
   - pymdownx.keys
   - pymdownx.mark
   - pymdownx.tilde
+  - pymdownx.tabbed:
+      alternate_style: true  
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg

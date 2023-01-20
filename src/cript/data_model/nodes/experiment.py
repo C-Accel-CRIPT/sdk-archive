@@ -33,10 +33,10 @@ class Experiment(BaseNode):
         notes (Union[str, None], optional): Experiment notes
         public (bool, optional): Whether the experiment is publicly viewable
         group (Union[Group, str], optional): `Group` object that manages the experiment
-    
+
     !!! warning "Experiment names must be unique"
         Each <a href="../experiment" target="_blank">`Experiment`</a> name must be unique within a
-        <a href="../collection" target="_blank">`Collection`</a> node.     
+        <a href="../collection" target="_blank">`Collection`</a> node.
 
     !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
         Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,

@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 
 class ComputationalForcefield(BaseSubobject):
     """The <a href="../computational_forcefield" target="_blank">`ComputationalForcefield`</a>
-    object represents a computational forcefield in a material simulation. The 
+    object represents a computational forcefield in a material simulation. The
     <a href="../computational_forcefield" target="_blank">`ComputationalForcefield`</a>
     object can be linked to a virtual <a href="/../nodes/material" target="_blank">`Material`</a> object.
 

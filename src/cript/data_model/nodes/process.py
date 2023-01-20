@@ -46,7 +46,7 @@ class Process(BaseNode):
 
     !!! warning "Process names must be unique"
         Each <a href="../process" target="_blank">`Process`</a> name must be unique within a given
-        <a href="../experiment" target="_blank">`Experiment`</a> node.     
+        <a href="../experiment" target="_blank">`Experiment`</a> node.
 
     !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
         Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
@@ -58,11 +58,11 @@ class Process(BaseNode):
     !!! note "Allowed `Process` keywords"
         The allowed `Process` keywords are listed in the
         <a href="https://criptapp.org/keys/process-keyword/" target="_blank">CRIPT controlled vocabulary</a>
-        
+
     !!! note "Allowed `Process` types"
         The allowed `Process` types are listed in the
         <a href="https://criptapp.org/keys/process-type/" target="_blank">CRIPT controlled vocabulary</a>
-        
+
     ``` py title="Example"
     # get an existing experiment
     my_experiment = Project.get(name="My experiment")
@@ -195,7 +195,7 @@ class Process(BaseNode):
 
         Args:
             piece (Union[Equipment, dict]): `Equipment` object to add
-        
+
         ``` py title="Example"
         process.add_equipment(equipment)
         ```
@@ -208,7 +208,7 @@ class Process(BaseNode):
 
         Args:
             piece (Union[Equipment, int]): `Equipment` object to remove
-        
+
         ``` py title="Example"
         process.remove_equipment(equipment)
         ```
@@ -221,7 +221,7 @@ class Process(BaseNode):
 
         Args:
             process (Union[Process, dict]): `Process` object to add
-        
+
         ``` py title="Example"
         process.add_prerequisite_process(process)
         ```
@@ -234,7 +234,7 @@ class Process(BaseNode):
 
         Args:
             process (Union[Process, int]): `Process` object to remove
-        
+
         ``` py title="Example"
         process.remove_prerequisite_process(process)
         ```
@@ -247,7 +247,7 @@ class Process(BaseNode):
 
         Args:
             ingredient (Union[Ingredient, dict]): `Ingredient` object to add
-        
+
         ``` py title="Example"
         process.add_ingredient(ingredient)
         ```
@@ -260,7 +260,7 @@ class Process(BaseNode):
 
         Args:
             ingredient (Union[Ingredient, int]): `Ingredient` object to remove
-        
+
         ``` py title="Example"
         process.remove_ingredient(ingredient)
         ```
@@ -273,7 +273,7 @@ class Process(BaseNode):
 
         Args:
             material (Union[Material, dict]): `Material` object to add as a product
-        
+
         ``` py title="Example"
         process.add_product(product)
         ```
@@ -286,7 +286,7 @@ class Process(BaseNode):
 
         Args:
             material (Union[Material, int]): `Material` object to remove as a product
-        
+
         ``` py title="Example"
         process.remove_product(product)
         ```
@@ -299,7 +299,7 @@ class Process(BaseNode):
 
         Args:
             material (Union[Material, dict]): `Material` object to add as waste
-        
+
         ``` py title="Example"
         process.add_waste(waste)
         ```
@@ -312,7 +312,7 @@ class Process(BaseNode):
 
         Args:
             material (Union[Material, int]): `Material` object to remove as waste
-        
+
         ``` py title="Example"
         process.remove_waste(waste)
         ```
@@ -325,7 +325,7 @@ class Process(BaseNode):
 
         Args:
             condition (Union[Condition, dict]): `Condition` object to add
-        
+
         ``` py title="Example"
         process.add_condition(condition)
         ```
@@ -338,7 +338,7 @@ class Process(BaseNode):
 
         Args:
             condition (Union[Condition, int]): `Condition` object to remove
-        
+
         ``` py title="Example"
         process.remove_condition(condition)
         ```
@@ -351,7 +351,7 @@ class Process(BaseNode):
 
         Args:
             property (Union[Property, dict]): `Property` object to add
-        
+
         ``` py title="Example"
         process.add_property(property)
         ```
@@ -364,7 +364,7 @@ class Process(BaseNode):
 
         Args:
             property (Union[Property, int]): `Property` object to remove
-        
+
         ``` py title="Example"
         process.remove_property(property)
         ```
@@ -377,7 +377,7 @@ class Process(BaseNode):
 
         Args:
             citation (Union[Citation, dict]): `Citation` object to add
-        
+
         ``` py title="Example"
         process.add_citation(citation)
         ```
@@ -390,7 +390,7 @@ class Process(BaseNode):
 
         Args:
             citation (Union[Citation, int]): `Citation` object to remove
-        
+
         ``` py title="Example"
         process.remove_citation(citation)
         ```

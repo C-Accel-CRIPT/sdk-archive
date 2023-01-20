@@ -9,7 +9,7 @@ logger = getLogger(__name__)
 
 
 class Parameter(BaseSubobject):
-    """The <a href="../parameter" target="_blank">`Parameter`</a> object 
+    """The <a href="../parameter" target="_blank">`Parameter`</a> object
     represents an input parameter to an <a href="../algorithm" target="_blank">`Algorithm`</a>.
     For example, the `k` variable in a `k-means` clustering algorithm is a parameter.
 

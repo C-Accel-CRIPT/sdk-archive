@@ -16,7 +16,7 @@ class Condition(BaseSubobject):
     object represents a physical or virtual condition (e.g. temperature, pressure,
     or humidity). A <a href="../condition" target="_blank">`Condition`</a> object
     may be used as a modifier for
-    <a href="../property" target="_blank">`Property`</a> or 
+    <a href="../property" target="_blank">`Property`</a> or
     <a href="/../nodes/process" target="_blank">`Process`</a> objects.
 
     Args:

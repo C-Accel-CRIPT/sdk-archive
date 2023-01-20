@@ -21,7 +21,7 @@ logger = getLogger(__name__)
 
 
 class BaseNode(Base, abc.ABC):
-    """This is the base node that all other CRIPT nodes
+    """This is the base node that all other CRIPT primary nodes
     inherit from. The <a href="../base_node" target="_blank">`BaseNode`</a>
     is not called in the SDK directly, but its methods can be used from any of the
     other primary CRIPT nodes, including
@@ -48,10 +48,9 @@ class BaseNode(Base, abc.ABC):
         can_edit (bool, optional): Whether the current user has permission to edit the node
 
     !!! warning "BaseNode Instantiation"
-        This is the base node that other primary nodes inherit from.
         Do not interact directly with the <a href="../base_node" target="_blank">`BaseNode`</a>.
         Instead, call its methods from other primary nodes. For example, instead of using
-        `BaeNode().create()`, use the create method on a project,
+        `BaseNode().create()`, use the create method on a project,
         like this: `Project.create(name="My project")`.
     """
 
@@ -131,7 +130,7 @@ class BaseNode(Base, abc.ABC):
 
         Raises:
             ValueError: The node does not exist in the database
-        
+
         ``` py title="Example"
         my_project = Project.get(name="My project")
         my_project.delete()
@@ -158,7 +157,7 @@ class BaseNode(Base, abc.ABC):
 
         Raises:
             ValueError: The node hasn't been saved to the database yet (it has no URL)
-        
+
         ``` py title="Example"
         my_project = Project.get(name="My project")
         my_project.name = "New name"
@@ -185,7 +184,7 @@ class BaseNode(Base, abc.ABC):
 
         Raises:
             ValueError: The node hasn't been saved to the database yet (it has no URL)
-        
+
         ``` py title="Example"
         # update project name
         proj = Project.get(name="My project")
@@ -247,7 +246,6 @@ class BaseNode(Base, abc.ABC):
         node.save(get_level=get_level, update_existing=update_existing)
         return node
 
-
     @classmethod
     @beartype
     def get(cls, get_level: int = 1, **kwargs):
@@ -263,7 +261,7 @@ class BaseNode(Base, abc.ABC):
 
         Returns:
             result (dict): The matching node object
-        
+
         ``` py title="Example"
         # get a collection by name
         collection = Collection.get(name="My collection")

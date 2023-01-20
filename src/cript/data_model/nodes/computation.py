@@ -36,7 +36,7 @@ class Computation(BaseNode):
 
     !!! warning "Computation names must be unique"
         Each <a href="../computation" target="_blank">`Copmutation`</a> name must be unique within an
-        <a href="../experiment" target="_blank">`Experiment`</a> node.     
+        <a href="../experiment" target="_blank">`Experiment`</a> node.
 
     !!! success "Use <a href='../base_node' target='_blank'>`BaseNode`</a> methods to manipulate this object"
         Since this object inherits from the <a href="../base_node" target="_blank">`BaseNode`</a> object,
@@ -48,7 +48,7 @@ class Computation(BaseNode):
     !!! note "Allowed `Computation` types"
         The allowed `Computation` types are listed in the
         <a href="https://criptapp.org/keys/computation-type/" target="_blank">CRIPT controlled vocabulary</a>
-        
+
     ``` py title="Example"
     # get an existing experiment
     my_exp = Experiment.get(name="My experiment")
@@ -127,7 +127,7 @@ class Computation(BaseNode):
 
         Args:
             data (Union[Data, dict]): `Data` object to add
-        
+
         ``` py title="Example"
         computation.add_input_data(data)
         ```
@@ -140,7 +140,7 @@ class Computation(BaseNode):
 
         Args:
             data (Union[Data, int]): `Data` object to remove
-        
+
         ``` py title="Example"
         computation.remove_input_data(data)
         ```
@@ -153,7 +153,7 @@ class Computation(BaseNode):
 
         Args:
             condition (Union[Condition, dict]): `Condition` to add
-        
+
         ``` py title="Example"
         computation.add_condition(condition)
         ```
@@ -166,7 +166,7 @@ class Computation(BaseNode):
 
         Args:
             condition (Union[Condition, int]): `Condition` to remove
-        
+
         ``` py title="Example"
         computation.remove_condition(condition)
         ```
@@ -181,7 +181,7 @@ class Computation(BaseNode):
 
         Args:
             configuration (Union[SoftwareConfiguration, dict]): `SoftwareConfiguration` to add
-        
+
         ``` py title="Example"
         computation.add_software_configuration(configuration)
         ```
@@ -196,7 +196,7 @@ class Computation(BaseNode):
 
         Args:
             configuration (Union[SoftwareConfiguration, int]): `SoftwareConfiguration` to remove
-        
+
         ``` py title="Example"
         computation.remove_software_configuration(configuration)
         ```
@@ -209,7 +209,7 @@ class Computation(BaseNode):
 
         Args:
             data (Union[Data, dict]): `Data` object to add
-        
+
         ``` py title="Example"
         computation.add_output_data(data)
         ```
@@ -222,7 +222,7 @@ class Computation(BaseNode):
 
         Args:
             data (Union[Data, int]): `Data` object to remove
-        
+
         ``` py title="Example"
         computation.remove_output_data(data)
         ```
@@ -235,7 +235,7 @@ class Computation(BaseNode):
 
         Args:
             citation (Union[Citation, dict]): `Citation` to add
-        
+
         ``` py title="Example"
         computation.add_citation(citation)
         ```
@@ -248,7 +248,7 @@ class Computation(BaseNode):
 
         Args:
             citation (Union[Citation, int]): `Citation` to remove
-        
+
         ``` py title="Example"
         computation.remove_citation(citation)
         ```
