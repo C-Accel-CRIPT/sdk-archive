@@ -88,11 +88,13 @@ class BaseNode(Base, abc.ABC):
             UniqueNodeError: Arises when the node cannot be created because it is not unique
 
         ``` py title="Example"
-        my_node = Project(
+        import cript
+
+        my_project = cript.Project(
             name="My new project",
             notes="Project created using the Python SDK",
         )
-        my_node.save()
+        my_project.save()
         ```
         """
 
@@ -161,8 +163,9 @@ class BaseNode(Base, abc.ABC):
             ValueError: The node hasn't been saved to the database yet (it has no URL)
 
         ``` py title="Example"
-        my_project = Project.get(name="My project")
-        my_project.name = "New name"
+        import cript
+
+        my_project = cript.Project.get(name="My project")
         my_project.refresh()
 
         ```
