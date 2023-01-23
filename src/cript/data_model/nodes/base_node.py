@@ -132,7 +132,9 @@ class BaseNode(Base, abc.ABC):
             ValueError: The node does not exist in the database
 
         ``` py title="Example"
-        my_project = Project.get(name="My project")
+        import cript
+
+        my_project = cript.Project.get(name="My project")
         my_project.delete()
         ```
         """
@@ -265,15 +267,17 @@ class BaseNode(Base, abc.ABC):
             result (dict): The matching node object
 
         ``` py title="Example"
-        # get a collection by name
-        collection = Collection.get(name="My collection")
+        import cript
 
         # get a project by UID
-        project = Project.get(uid="fa12b444-4931-427d-8f6e-475604e8404c")
+        my_project = cript.Project.get(uid="fa12b444-4931-427d-8f6e-475604e8404c")
+
+        # get a collection by name and Project UID
+        my_collection = cript.Collection.get(name="My collection", project=my_project.uid)
 
         # get a material by URL
         url = "https://criptapp.org/material/015fc459-ea9f-4c37-80aa-f51d509095df/"
-        material = styrene = cript.Material.get(url=url)
+        styrene = cript.Material.get(url=url)
         ```
         """
         level = kwargs.pop("level", 0)
