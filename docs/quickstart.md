@@ -29,43 +29,59 @@ cript.API(host, token, tls=True)
 
 ## Create a Node
 
-Use the `.create()` method to create a CRIPT node.
+The CRIPT data model is graph-like, which means that we can think of each CRIPT object as a node which is linked to other nodes. All primary nodes inherit from the <a href="../nodes/bas_node/" target="_blank">BaseNode</a> class, which provides basic methods such as `create`, `update`, `get`, `search`, and `delete`. Use the `create()` method to create a new CRIPT node.
 
 ``` python
-# create a project and saves it to CRIPT
+# create a new project and save it to CRIPT
 proj = cript.Project.create(name="My project") 
+
+# create a new material and save it to CRIPT
+styrene = cript.Project.create(
+    project=proj,  # the project which should manage this material
+    name="polystyrene_1",  # the material name
+) 
 ```
 
 !!! info
     `create()` instantiates (i.e., creates a Python object) and saves (i.e., uploads to CRIPT) the object in one go
 
-Alternatively, you can instantiate the node and then save it:
+Alternatively, you can instantiate the node as a Python class instance, and then save it to the CRIPT database afterwards:
 
 ``` python
-proj = cript.Project(name="My project") # instantiates Project object
-proj.save() # saves the Project to CRIPT 
+# instantiate the Project object
+proj = cript.Project(name="My project") 
+# save the Project to CRIPT 
+proj.save() 
 ```
 
 ---
-## Get a Node
+## Get an existing Node
 
-### Get Node via UID
+When a node is saved to the CRIPT database, it gets a unique identifier (UID), and a URL, which points to its UID. The node name, UID, or URL can all be used to get a reference to the node using the `get()` method.
+
+### Get Node using its UID
+
 ```python
+# get a material by its UID
 styrene = cript.Material.get(uid="015fc459-ea9f-4c37-80aa-f51d509095df")
 ```
 
-### Get Node via URL
+### Get Node using its URL
 ```python
+# get a material by its URL
 styrene = cript.Material.get(url="https://criptapp.org/material/015fc459-ea9f-4c37-80aa-f51d509095df/")
 ```
 
-### Get Node via Name
+### Get Node using its Name
 ```python
-styrene = cript.Material.get(name="polystyrene_1")
+styrene = cript.Material.get(
+    project=proj,  # specify which project the material is in
+    name="polystyrene_1",  # specify the material name to get
+)
 ```
 
 !!! note "UID and URL are preferable"
-    Getting a node via UID and URL are preferred methods because they are unique across the entire CRIPT database. 
+    Getting a node via UID and URL are preferred over getting a node by its name because UID and URL attributes are unique across the entire CRIPT database. 
 
     When getting nested nodes via `name`, you must pass the node it belongs to (i.e., is nested under).
 
@@ -81,7 +97,10 @@ styrene = cript.Material.get(name="polystyrene_1")
 
 ## Update a Node
 
+The `update()` method can be used to change the value of a specific attribute of an existing node.
+
 ```python
+# change the name of an existing project
 proj.update(name="My new project name")
 ```
 
@@ -89,18 +108,21 @@ proj.update(name="My new project name")
 
 ## Delete a Node
 
+The `delete()` method 
+
 ``` py
-coll.delete()
+# delete an existing project
+proj.delete()
 ```
 
 ---
 
 ## Run a Search Query
 
-For example, to search for `Material` nodes with a molar mass less than 10 g/mol:
+Existing nodes can be searched by their attributes. In contrast to the `get()` method, the `search()` method returns a `Paginator` object which may contain any number of results. For example, to search for all `Material` nodes with a molar mass less than 10 g/mol:
 
 ``` py
-results =  cript.Material.search(
+results = cript.Material.search(
     properties = [
         {
             "key": "molar_mass",
@@ -112,13 +134,13 @@ results =  cript.Material.search(
 ```
 
 !!! Info "Pagination"
-    Search returns a `Paginator` object. You can paginate through the results
+    Search returns a `Paginator` object, which allows you to paginate through the results using a special set of paginator methods:
 
     ``` python
-    results.json()              # View the raw JSON for the query
+    results.json()              # View the raw JSON results
     results.objects()           # Generate objects for the current page
-    results.next_page()         # Flip to the next page (if exists)
-    results.previous_page()     # Flip to the previous page (if exists)
+    results.next_page()         # Flip to the next page of results (if it exists)
+    results.previous_page()     # Flip to the previous page of results (if it exists)
     ```
 
 ---
