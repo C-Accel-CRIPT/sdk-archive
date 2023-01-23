@@ -1,9 +1,9 @@
-This quick start tutorial will guide you through some common commands of the CRIPT Python SDK. For more information please visit the [full tutorial](../tutorials/full_tutorial/) page or read reference the documentation for individual [CRIPT nodes](../nodes/all/).
+This quick start tutorial will guide you through some common commands of the CRIPT Python SDK. For more information please visit the [full tutorial](../tutorials/full_tutorial/) or reference the documentation for individual [CRIPT nodes](../nodes/all/).
 
 ---
 
 ## Install CRIPT
-Install <a href="https://pypi.org/project/cript/" target="_blank">CRIPT</a> from Pypi
+As described by the [Installation tutorial](../tutorials/installation/), it is recommended to install the <a href="https://pypi.org/project/cript/" target="_blank">CRIPT package</a> inside a Python virtual environment.
    ```bash
     pip install cript
    ```
@@ -11,27 +11,29 @@ Install <a href="https://pypi.org/project/cript/" target="_blank">CRIPT</a> from
 
 ## Connect to CRIPT
 
-`import cript` into your python file, fill in the host and API Token, run the python file to connect to CRIPT. It is *highly* recommended that you store your API token in a safe location and read it into your code, rather than have it hard-coded. One way to do this is to store
-it in an environmental variable (e.g., `CRIPT_API_KEY`) and then read it in via the `os` module.
+Create a new Python script. At the top of the script, import the `cript` package and populate the host and API Token. Your API token can be found on the <a href="https://criptapp.org/security/" target="_blank">CRIPT security settings page</a>. It is *highly* recommended that you store your API token as an environment variable, as explained in the [API token tutorial](../tutorials/api_token/). Here, we assume that your API key is stored as an environment variable called `CRIPT_API_KEY`, so it can be read using the built-in Python `os` module.
 
 ``` py
 import cript
 import os
 
-host = "criptapp.org"  # or any host
+host = "https://criptapp.org/"  # or any host
 token = os.environ.get("CRIPT_API_KEY")
-cript.API(host, token)
+cript.API(host, token, tls=True)
 ```
 
-!!! info
-    Your API token can be found in the <a href="https://criptapp.org/security/" target="_blank">Security Settings</a> under the profile icon dropdown on the top right
+!!! warning
+    Use the `tls` parameter to specify whether to use TLS encryption (`https`) for the API connection. This paramet defaults to `True`. In some cases, such as when running the CRIPT server locally, you may want to disable https and instead run the server on `http`. In this case, set `tls=False`.
 
 ---
 
 ## Create a Node
 
+Use the `.create()` method to create a CRIPT node.
+
 ``` python
-proj = cript.Project.create(name="My project") # creates a Project and saves it to CRIPT
+# create a project and saves it to CRIPT
+proj = cript.Project.create(name="My project") 
 ```
 
 !!! info
