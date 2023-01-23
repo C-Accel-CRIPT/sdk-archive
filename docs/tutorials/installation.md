@@ -1,7 +1,4 @@
-!!! abstract
-    This page will give you a through guide on how to set up the
-    <a href="https://pypi.org/project/cript/" target="_blank">CRIPT Python SDK</a>
-    on your system.
+This page explains how to set up the <a href="https://pypi.org/project/cript/" target="_blank">CRIPT Python SDK</a> on your system.
 
 1.  Make sure <a href="https://www.python.org/downloads/" target="_blank">Python 3.9+</a> is installed.
 
