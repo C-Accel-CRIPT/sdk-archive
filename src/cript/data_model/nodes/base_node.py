@@ -221,21 +221,23 @@ class BaseNode(Base, abc.ABC):
             node (cript.data_model.nodes.BaseNode): _description_
 
         ``` py title="Example"
+        import cript
+
         # create a project
-        my_project = Project.create(
+        my_project = cript.Project.create(
             name="My project",
             notes="Project created from the Python SDK",
         )
 
         # create a collection
-        my_collection = Collection.create(
+        my_collection = cript.Collection.create(
             name="My collection",
             project=my_project,
             notes="A new collection created from the Python SDK",
         )
 
         # create an experiment
-        my_experiment = Experiment.create(
+        my_experiment = cript.Experiment.create(
             name="My experiment",
             collection=my_collection,
             notes="A new experiment created from the Python SDK",
