@@ -191,17 +191,19 @@ class BaseNode(Base, abc.ABC):
             ValueError: The node hasn't been saved to the database yet (it has no URL)
 
         ``` py title="Example"
+        import cript
+
         # update project name
-        proj = Project.get(name="My project")
-        proj.update(name="My project with new name")
+        my_project = cript.Project.get(name="My project")
+        my_project.update(name="My project with new name")
 
         # update project notes
-        proj.update(notes="new notes")
+        my_project.update(notes="new notes")
 
         # update inventory to change its materials
-        inventory = Inventory.get(name="My inventory")
+        my_inventory = Inventory.create(name="My inventory")
         new_material_list = [material1, material2, material3]
-        inventory.update(materials=new_material_list)
+        my_inventory.update(materials=new_material_list) #NOTE: this doesn't work right now
         ```
         """
         if self.url is None:
@@ -338,11 +340,12 @@ class BaseNode(Base, abc.ABC):
             results (cript.data_model.paginator.Paginator): The paginated results
 
         ``` py title="Examples"
-        # search for inventory with the name "My Inventory"
-        results Inventory.search(name="My Inventory")
+        import cript
+
+        my_project = cript.Project.get(name = "My project")
 
         # searches for collections inside "My project"
-        results = Collection.search(project="My project")
+        results = cript.Collection.search(project=my_project.uid)
 
         # search for materials with molar mass < 10 g/mol
         results =  cript.Material.search(
