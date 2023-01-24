@@ -80,12 +80,12 @@ styrene = cript.Material.get(
 )
 ```
 
-!!! note "UID and URL are preferable"
-    Getting a node via UID and URL are preferred over getting a node by its name because UID and URL attributes are unique across the entire CRIPT database. 
+!!! note "Getting objects by their UID or URL"
+    Getting a node using its UID or URL is preferred over getting a node by its name, because UID and URL attributes are unique across the entire CRIPT database. 
 
-    When getting nested nodes via `name`, you must pass the node it belongs to (i.e., is nested under).
+    When getting nested nodes via `name`, you must also pass the node it belongs to (i.e., is nested under).
 
-    For example `Collection` is nested under `Project`:
+    For example, `Collection` is nested under `Project`:
     ```python
     proj = cript.Project.get(name="My project")
     coll = cript.Collection.get(name="My collection", project=proj.uid)
@@ -108,7 +108,7 @@ proj.update(name="My new project name")
 
 ## Delete a Node
 
-The `delete()` method 
+The `delete()` method removes an object from the CRIPT database and from memory. In some cases, deleting an object may fail when the object is linked to other nodes. In these cases, the `delete()` method produces an appropriate error message.
 
 ``` py
 # delete an existing project
@@ -134,7 +134,7 @@ results = cript.Material.search(
 ```
 
 !!! Info "Pagination"
-    Search returns a `Paginator` object, which allows you to paginate through the results using a special set of paginator methods:
+    The `search()` method returns a `Paginator` object, which allows you to paginate through the results using a special set of paginator methods:
 
     ``` python
     results.json()              # View the raw JSON results
@@ -147,20 +147,24 @@ results = cript.Material.search(
 
 ## Upload a File
 
+You may upload a filde to the CRIPT database and link it to a specific project, `Data` node object, or material.
 ``` python
-path = "path/to/local/file" # path to local file
-file = cript.File(project=proj, source=path) 
-file.save()
+# set path to local file
+path = "path/to/local/file.txt" 
+# create the file node
+file = cript.File.create(project=proj, source=path)
 ```
 
 ---
 
 ## Download a File
+Once a file is uploaded to CRIPT, it can also be downloaded again.
 
 ``` python
-path = "downloaded.csv" #local file path you want to save to
+# local file path you want to download the file to
+path = "downloaded.txt" 
 file.download_file(path=path)
 ```
 
 !!! info 
-    The default path for a download is your current directory
+    The default path for a download is your current directory.
