@@ -275,11 +275,17 @@ def test_create_data_node(criptapp_api):
     polystyrene.save()
 
 
-def test_create_file_node_and_upload(criptapp_api):
+def test_upload_local_file(criptapp_api):
     proj = cript.Project.get(name=MY_PROJECT)
-    # path = "C:\\Users\\navid\\OneDrive\\Desktop\\CRIPT Excel Templates\\Example_CRIPT_template.xlsx"
+    path = ".....\\CRIPT Excel Templates\\Example_CRIPT_template.xlsx"
+    f = cript.File(project=proj, source=path, name="I am FILE")
+    f.save()
+
+
+def test_upload_link_file(criptapp_api):
+    proj = cript.Project.get(name=MY_PROJECT)
     path = "https://google.com"
-    f = cript.File(project=proj, source=path)
+    f = cript.File(project=proj, source=path, name="I am FILE")
     f.save()
 
 
