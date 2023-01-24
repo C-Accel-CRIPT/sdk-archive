@@ -259,56 +259,91 @@ prcs.add_property(yield_mass)
 
 # Create a Material node (process product)
 
-First, we'll instantiate the node.
+Along with input [`Ingredients`](../subobjects/ingredient.md), our `Process` may also produce product materials.
+
+First, let's create the [`Material`](../nodes/material.md) that will serve as our product. We give the material a `name` attribute and add it to our `Project` using the project's `uid` attribute.
 
 ``` python
-polystyrene = cript.Material(project=proj.uid, name="polystyrene")
+polystyrene = cript.Material(
+    project=proj.uid,
+    name="polystyrene",
+)
 ```
 
-Next, we'll add some Identifier nodes.
+Note that we haven't used the `Material.create()` method here, which means that our `Material` node is not yet saved to the CRIPT database. We've merely created an instance of a `Material` object using `cript.Material()`. We will add some more attributes to this `Material` object before we save it.
+
+Let's add some [`Identifier`](../subobjects/identifier.md) nodes to the material to make it easier to identify and search.
 
 ``` python
+# create a name identifier
 names = cript.Identifier(
     key="names",
     value=["poly(styrene)", "poly(vinylbenzene)"]
 )
+# create a BigSMILES identifier
 bigsmiles = cript.Identifier(
     key="bigsmiles",
     value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
 )
-chem_repeat = cript.Identifier(key="chem_repeat", value="C8H8")
+# create a chemical repeat unit identifier
+chem_repeat = cript.Identifier(
+    key="chem_repeat",
+    value="C8H8",
+)
 
+# add the identifiers to the material
 polystyrene.add_identifier(names)
 polystyrene.add_identifier(chem_repeat)
 polystyrene.add_identifier(bigsmiles)
 ```
 
-Next, we'll add some Property nodes.
+!!! note "Identifier keys"
+    The allowed `Identifier` keys are listed in the <a href="https://criptapp.org/keys/material-identifier-key/" target="_blank">material identifier keys</a> in the CRIPT controlled vocabulary.
+
+Next, we'll add some [`Property`](../subobjects/property.md) nodes to the `Material`, which represent its physical or virtual (in the case of a simulated material) properties.
 
 ``` python
-phase = cript.Property(key="phase", value="solid")
-color = cript.Property(key="color", value="white")
+# create a phase property
+phase = cript.Property(
+    key="phase",
+    value="solid",
+)
+# create a color property
+color = cript.Property(
+    key="color",
+    value="white",
+)
 
+# add the properties to the material
 polystyrene.add_property(phase)
 polystyrene.add_property(color)
 ```
 
-Now we can save the Material and add it to the Process node as a product.
+!!! note "Material property keys"
+    The allowed material `Proeprty` keys are listed in the <a href="https://criptapp.org/keys/material-property-key/" target="_blank">material property keys</a> in the CRIPT controlled vocabulary.
+
+Finally we can save the `Material` node, add it as a product to the `Process` node, and then save the changes to the `Process` node.
 
 ``` python
+# save the material
 polystyrene.save()
+# add the material as a product of the process
 prcs.add_product(polystyrene)
-```
 
-Last, we can save the Process node.
-
-``` python
+# save the resulting process
 prcs.save()
 ```
 
+*Congratulations!** You've just created a process that represents the polymerization reaction of Polystyrene, starting with a set of input ingredients in various quantities, and ending with a new polymer with specific identifiers and physical properties.
+
+
+
+
 # Create a File node and upload a file
 
-First, we'll instantiate a File node and associate with the Data node created above.
+We may want to upload files to CRIPT which contain materials characterization data, simulation data, instrument settings, or other information. While CRIPT can store the actual file object, we can also create a CRIPT `File` node which represents the file and can be linked to other CRIPT nodes.
+
+First, let's instantiate a File node (note that we're not saving it yet) and associate with the Data node created above.
 
 ``` python
 path = "path/to/local/file"
