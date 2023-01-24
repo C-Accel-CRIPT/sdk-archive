@@ -334,7 +334,7 @@ prcs.add_product(polystyrene)
 prcs.save()
 ```
 
-*Congratulations!** You've just created a process that represents the polymerization reaction of Polystyrene, starting with a set of input ingredients in various quantities, and ending with a new polymer with specific identifiers and physical properties.
+**Congratulations!** You've just created a process that represents the polymerization reaction of Polystyrene, starting with a set of input ingredients in various quantities, and ending with a new polymer with specific identifiers and physical properties.
 
 # Create a Data node
 
