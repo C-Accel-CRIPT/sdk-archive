@@ -320,7 +320,7 @@ polystyrene.add_property(color)
 ```
 
 !!! note "Material property keys"
-    The allowed material `Proeprty` keys are listed in the <a href="https://criptapp.org/keys/material-property-key/" target="_blank">material property keys</a> in the CRIPT controlled vocabulary.
+    The allowed material `Property` keys are listed in the <a href="https://criptapp.org/keys/material-property-key/" target="_blank">material property keys</a> in the CRIPT controlled vocabulary.
 
 Finally we can save the `Material` node, add it as a product to the `Process` node, and then save the changes to the `Process` node.
 
@@ -336,24 +336,68 @@ prcs.save()
 
 *Congratulations!** You've just created a process that represents the polymerization reaction of Polystyrene, starting with a set of input ingredients in various quantities, and ending with a new polymer with specific identifiers and physical properties.
 
+# Create a Data node
 
-
-
-# Create a File node and upload a file
-
-We may want to upload files to CRIPT which contain materials characterization data, simulation data, instrument settings, or other information. While CRIPT can store the actual file object, we can also create a CRIPT `File` node which represents the file and can be linked to other CRIPT nodes.
-
-First, let's instantiate a File node (note that we're not saving it yet) and associate with the Data node created above.
+We may want to associate some files with our polymerization reaction. For this we will create a CRIPT [`Data`](../nodes/data.md) node, which helps us store files in an organized way. Note that we are attaching the `Data` node to our previous experiment, but not saving it yet.
 
 ``` python
+sec_data = cript.Data(
+    experiment=expt,
+    name="Crude SEC of polystyrene",
+    type="sec_trace",
+)
+```
+
+!!! note "Data types"
+    The allowed `Data` types are listed in the <a href="https://criptapp.org/keys/data-type/" target="_blank">data types</a> in the CRIPT controlled vocabulary.
+
+
+# Associate a Data node with a Property node
+
+Now lets associate our [`Data`](../nodes/data.md) with a specific material property. To do this, we'll create one more [`Property`](../subobjects/property.md) node for polystyrene.
+
+``` python
+mw_n = cript.Property(
+    key="mw_n",
+    value=5200,
+    unit="g/mol",
+)
+```
+
+Next, we'll add the `Data` node to the new Property node.
+
+``` python
+mw_n.data = sec_data
+```
+
+Last, we'll add the new Property node to polystyrene and save it.
+
+``` python
+polystyrene.add_property(mw_n)
+polystyrene.save()
+```
+
+# Create a File node
+
+Now that we have a `Data` node object, we can add files to it. We may want to upload files to CRIPT which contain materials characterization data, simulation data, instrument settings, or other information. While CRIPT can store the actual file object, we can also create a CRIPT `File` node which represents the file and can be linked to our other CRIPT node objects.
+
+First, let's instantiate a [`File`](../nodes/file.md) node (note that we're not saving it yet) and associate it with the [`Data`](../nodes/data.md) node that we created above.
+
+``` python
+# specify the local path of the file
 path = "path/to/local/file"
-f = cript.File(project=proj, source=path)
+# instantiate a new the file node
+f = cript.File(
+    project=proj,
+    source=path,
+)
 ```
 
 !!! note
-The `source` field should point to a file on your local filesystem.
+    The `source` field should point to a file on your local filesystem.
+
 !!! info
-Depending on the file size, there could be a delay while the checksum is generated.
+    Depending on the file size, there could be a delay while the checksum is generated.
 
 Next, we'll upload the local file by saving the File node. Follow all prompts that appear.
 
@@ -361,44 +405,12 @@ Next, we'll upload the local file by saving the File node. Follow all prompts th
 f.save()
 ```
 
-You will be prompted to click a link to obtain an authorization code. Copy and paste the code obtained from this link into the terminal to save the file.
+You will be prompted to click a link to obtain an authorization code for uploading this file to the CRIPT file sotage client. Copy and paste the code obtained from this link into the terminal to save the file.
 
-# Create a Data node
-
+Once the `File` node is saved, we add the newly uploaded file to our `Data` node and save it.
 ``` python
-sec = cript.Data(
-    experiment=expt,
-    name="Crude SEC of polystyrene",
-    type="sec_trace",
-)
-```
-
-.. then add the uploaded File to it:
-
-``` python
-sec.add_file(f)
-sec.save()
-```
-
-# Associate a Data node with a Property node
-
-First, we'll create one more Property node for polystyrene.
-
-``` python
-mw_n = cript.Property(key="mw_n", value=5200, unit="g/mol")
-```
-
-Next, we'll add the Data node to the new Property node.
-
-``` python
-mw_n.data = sec
-```
-
-Last, we'll add the new Property node to polystyrene then save it.
-
-``` python
-polystyrene.add_property(mw_n)
-polystyrene.save()
+sec_data.add_file(f)
+sec_data.save()
 ```
 
 # Conclusion
