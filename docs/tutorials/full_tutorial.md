@@ -1,18 +1,16 @@
-# 1. Setup CRIPT
-Before proceeding, please make sure you have <a href="https://pypi.org/project/cript/" target="_blank">CRIPT Python SDK</a> installed (`pip install cript`). For full installation instructions, please refer to the <a href="../installation" target="_blank">Installation docs</a>.
+# Install CRIPT
+Before proceeding, please make sure you have the <a href="https://pypi.org/project/cript/" target="_blank">CRIPT Python SDK</a> installed (`pip install cript`). For full installation instructions, please refer to the <a href="../installation" target="_blank">Installation docs</a>.
 
----
+# Connect to CRIPT
+To connect to [CRIPT](https://criptapp.org), you must enter a `host` and an `API Token`. For most users, `host` will be `criptapp.org`.
 
-# 2. Connect to CRIPT
-To connect to [CRIPT](https://criptapp.org), you must enter a `host` and an `API Token`. For most users, `host` will be `criptapp.org`
-
-An API token is required to authenticate each user (i.e., make sure they are a valid CRIPT user) before saving any of their data. Your API Token can be found in [security settings](https://criptapp.org/security/) under the profile icon on the top right of `criptapp.org`. For further explanation, please refer to [how to get an API Token](api_token.md)
+An API token tells CRIPT who you are and ensures that you have permission to view and upload certain types of data. Your API Token can be found in the CRIPT application <a href="https://criptapp.org/security/" target="_blank">security settings</a>. For additional details, please refer to [how to get an API Token](api_token.md)
 
 !!! note
-    The word `Token` in front of the random characters is part of the token as well. 
+    The word `Token` in front of the random token characters is part of the token as well. Always copy the entire token text.
 
 It is *highly* recommended that you store your API token in a safe location and read it into your code, rather than have it hard-coded. One way to do this is to store
-it in an environmental variable (e.g., `CRIPT_API_KEY`) and then read it in via the `os` module:
+it in an environmental variable (e.g., `CRIPT_API_KEY`) and then read it in via the `os` module. See [API Token documentation](api_token.md) to learn more:
  
 ``` python
 import cript
@@ -29,7 +27,7 @@ Connected to https://criptapp.org/api
 ```
 
 ??? "Private Instance of CRIPT"
-    If any user wants to connect to their own private instance of CRIPT, they can easily do that by just changing the `host` to their local host address (e.g., `http://127.0.0.1:8000/`) and setting `tls=False`:
+    If you're connecting to your own private instance of CRIPT, just set the `host` to your local host address (e.g., `http://127.0.0.1:8000/`), and set `tls=False`:
 
     ```python 
     import cript
@@ -40,22 +38,25 @@ Connected to https://criptapp.org/api
     cript.API(host, token, tls=False)
     ```
 
----
+!!! info
+    Use the `tls` parameter to specify whether to use TLS encryption (`https`) for the API connection. This parameter is set to `True` by default. In some cases, such as when running the CRIPT server locally, you may want to disable https and instead run the server on `http` by setting `tls=False`.
 
-# 3. Create a node
+
+# Create a (CRIPT object) node
 
 ??? "What is a node?"
-    A *node* is simply a CRIPT object (e.g., `Project`, `Experiment`)  in the graph-based data model. 
+    A *node* is simply a CRIPT object (e.g., `Project`, `Experiment`, `Material`) in the graph-based CRIPT data model. 
 
-All data uploaded to CRIPT must be associated with a <a href="../../nodes/project" target="_blank">`Project`</a> node. A <a href="../../nodes/project" target="_blank">`Project`</a> can be thought of as a folder that contains <a href="../../nodes/collection" target="_blank">`Collections`</a>. To create a <a href="../../nodes/project" target="_blank">`Project`</a> and upload it to CRIPT :
+All data uploaded to CRIPT must be associated with a <a href="../../nodes/project" target="_blank">`Project`</a> node. A <a href="../../nodes/project" target="_blank">`Project`</a> can be thought of as a folder that contains <a href="../../nodes/collection" target="_blank">`Collections`</a> and <a href="../../nodes/material" target="_blank">`Materials`</a>. To create a <a href="../../nodes/project" target="_blank">`Project`</a> and upload it to CRIPT, use the `<node>.create()` method, where `<node>` can be any of the <a href="../../nodes/all" target="_blank">primary CRIPT node types</a>:
 
 ```python
-my_proj = cript.Project.create(name="My first project") # creates and uploads Project to CRIPT
+ # create a new project in the CRIPT database
+my_proj = cript.Project.create(name="My first project")
 ```
 
-??? "Notes"
+!!! info "Notes"
     * `Project` names are globally unique, meaning no two `Projects` in the entire CRIPT database can have the same name.
-    * Notice the use of `create()` here, which both *instantiates* the Python object and *uploads* it to the database in one go.
+    * Notice the use of `create()` here, which both *instantiates* the Python object and *uploads* it to the database in one command.
 
 Let's print the project to get a better view:
 
@@ -71,7 +72,7 @@ This should print something similar to the following:
     "public": false,
     "created_at": "2022-11-23T00:47:40.011485Z",
     "updated_at": "2022-11-23T00:47:40.011507Z",
-    "name": "Navid's Project SDK",
+    "name": "My first project",
     "notes": null,
     "group": "https://criptapp.org/api/group/68ed4c57-d1ca-4708-89b2-cb1c1609ace2/",
     "collections": "https://criptapp.org/api/project/910445b2-88ca-43ac-88cf-f6424e85b1ba/collections/",
@@ -80,19 +81,22 @@ This should print something similar to the following:
 }
 ```
 
----
+**Congratulations!** You've successfully created your frst project on CRIPT. 
 
 # Create a Collection node
 
-A [`Collection`](../nodes/collection.md) can be thought of as a folder filled with experiments. Just like we did for a `Project` node, we use `create()` to create and upload a new `Collection`: 
+A [`Collection`](../nodes/collection.md) can be thought of as a folder filled with experiments. Just like we did for a [`Project`](../nodes/project.md) node, we use the `create()` method to create a new [`Collection`](../nodes/collection.md). This time, we're also specifying the project that we just created. This will create the new collection **inside** our project. 
 
 ``` python
-coll = cript.Collection.create(project=proj, name="<Your Collection Name>")
+coll = cript.Collection.create(
+    project=proj,
+    name="My new collection",
+)
 ```
 
----
-
 # Create an Experiment node
+
+The CRIPT [`Experiment`](../nodes/experiment.md) node holds [`Process`](../nodes/process.md) and [`Data`](../nodes/data.md) nodes. Now that we have a project and a collection, let's add an [`Experiment`](../nodes/experiment.md) inside our collection.
 
 ``` python
 expt = cript.Experiment.create(
@@ -103,26 +107,36 @@ expt = cript.Experiment.create(
 
 # Get Material nodes
 
-For this tutorial, we will get an existing Inventory node from the database.  
-This contains all of the Material nodes we will be using.
+[`Material`](../nodes/material.md) and [`Inventory`](../nodes/inventory.md) nodes can be created in the same way that [`Project`](../nodes/project.md), [`Collection`](../nodes/collection.md), and [`Experiment`](../nodes/experiment.md) nodes were created.
+
+For this tutorial, instead of creating new [`Material`](../nodes/material.md) and [`Inventory`](../nodes/inventory.md) nodes, we will get references to existing nodes using the `<node>.get()` method. The inventory we will get contains all of the [`Material`](../nodes/material.md) nodes we will be using.
 
 ``` python
+# UID of the inventory node we wish to get
 uid = "134f2658-6245-42d8-a47e-6424aa3472b4"
+# get the inventory by its UID
 inv = cript.Inventory.get(uid=uid, get_level=1)
 ```
 
 !!! note
-    We are setting `get_level` to `1` so that the Material nodes are auto-generated. This parameter defaults to `0`, but can be set to any integer.
+    We are setting `get_level` to `1` so that all the inventory's children material nodes are collected as well. This parameter defaults to `0`, but can be set to any integer.
+
+To see what our command returned, use:
 
 ``` python
-print( type(inv.materials[0]) )
+print(type(inv.materials[0]))
 ```
 
 Something similar to the following should be printed:
 ``` bash
 <class 'cript.data_model.nodes.material.Material'>
 ```
+
+We've shown that we can get an existing [`Inventory`](../nodes/inventory.md) node using the `get()` method, and that the inventory object has an attribute called `materials`. By printing the first instance of the `materials` attribute, we can see that a [`Material`](../nodes/material.md) object is returned.
+
 # Create a Process node
+
+Now let's create a [`Process`](../nodes/process.md) node using the same `create()` method we used before. Here we are creating the `Process` inside the experiment called `expt` that was previously created. We're also giving the `Process` a name, a `type`, and a `description`.
 
 ``` python
 prcs = cript.Process.create(
@@ -137,9 +151,14 @@ prcs = cript.Process.create(
 )
 ```
 
-# Add Ingredient nodes to the Process node
+!!! note "Process types"
+    The allowed `Process` types are listed in the <a href="https://criptapp.org/keys/process-type/" target="_blank">process type keywords</a> in the CRIPT controlled vocabulary.
 
-First, let's grab the Material nodes we need from the Inventory node.
+# Add Ingredients to a Process
+
+From a chemistry standpoint, most experimental processeses, regardless of whether they are carried out in the lab or simulated using computer code, consist of input ingredients that are transformed in some way. Let's add ingredients to the [`Process`](../nodes/process.md) that we just created.
+
+First, get references to the [`Material`](../nodes/material.md) nodes that were contained within the [`Inventory`](../nodes/inventory.md) node:
 
 ``` python
 solution = inv['SecBuLi solution 1.4M cHex']
@@ -149,7 +168,7 @@ butanol = inv['1-butanol']
 methanol = inv['methanol']
 ```
 
-Next, we'll define Quantity nodes indicating the amount of each Ingredient.
+Next, define [`Quantity`](../subobjects/quantity.md) nodes indicating the amount of each [`Ingredient`](../subobjects/ingredient.md) that we will use in the [`Process`](../nodes/process.md).
 
 ``` python
 initiator_qty = cript.Quantity(key="volume", value=0.017, unit="ml")
@@ -159,7 +178,7 @@ quench_qty = cript.Quantity(key="volume", value=5, unit="ml")
 workup_qty = cript.Quantity(key="volume", value=100, unit="ml")
 ```
 
-Next, we'll create Ingredient nodes for each.
+Now we can create an [`Ingredient`](../subobjects/ingredient.md) node for each ingredient using the `material` and `quantities` attributes.
 
 ``` python
 initiator = cript.Ingredient(
@@ -189,7 +208,10 @@ workup = cript.Ingredient(
 )
 ```
 
-Last, we'll add the Ingredient nodes to the Process node.
+!!! note "Ingredient keywords"
+    The allowed `Ingredient` keywords are listed in the <a href="https://criptapp.org/keys/ingredient-keyword/" target="_blank">ingredient keywords</a> in the CRIPT controlled vocabulary.
+
+Finally, we can add the [`Ingredient`](../subobjects/ingredient.md) nodes to the [`Process`](../nodes/process.md) node.
 
 ``` python
 prcs.add_ingredient(initiator)
@@ -199,7 +221,9 @@ prcs.add_ingredient(quench)
 prcs.add_ingredient(workup)
 ```
 
-# Add Condition nodes to the Process node
+# Add Conditions to the Process
+
+Its possible that our [`Process`](../nodes/process.md) was carried out under specific physical conditions. We can codify this by adding [`Condition`](../subobjects/condition.md) nodes to the process.
 
 ``` python
 temp = cript.Condition(key="temperature", value=25, unit="celsius")
@@ -208,7 +232,13 @@ prcs.add_condition(temp)
 prcs.add_condition(time)
 ```
 
-# Add a Property node to the Process node
+!!! note "Condition keys"
+    The allowed `Condition` keys are listed in the <a href="https://criptapp.org/keys/condition-key/" target="_blank">condition keys</a> in the CRIPT controlled vocabulary.
+
+
+# Add a Property to a Process
+
+We may also want to associate our process with certain properties. We can do this by adding [`Property`](../subobjects/property.md) nodes to the process.
 
 ``` python
 yield_mass = cript.Property(
@@ -219,6 +249,13 @@ yield_mass = cript.Property(
 )
 prcs.add_property(yield_mass)
 ```
+
+!!! note "Process property keys"
+    The allowed process `Property` keys are listed in the <a href="https://criptapp.org/keys/process-property-key/" target="_blank">process property keys</a> in the CRIPT controlled vocabulary.
+
+!!! note "Property methods"
+    The allowed `Property` methods are listed in the <a href="https://criptapp.org/keys/property-method/" target="_blank">property methods</a> in the CRIPT controlled vocabulary.
+
 
 # Create a Material node (process product)
 

@@ -19,11 +19,8 @@ import os
 
 host = "https://criptapp.org/"  # or any host
 token = os.environ.get("CRIPT_API_KEY")
-cript.API(host, token, tls=True)
+cript.API(host, token)
 ```
-
-!!! info
-    Use the `tls` parameter to specify whether to use TLS encryption (`https`) for the API connection. This paramet defaults to `True`. In some cases, such as when running the CRIPT server locally, you may want to disable https and instead run the server on `http`. In this case, set `tls=False`.
 
 ---
 
