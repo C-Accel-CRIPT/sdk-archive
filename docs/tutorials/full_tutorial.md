@@ -10,7 +10,7 @@ An API token tells CRIPT who you are and ensures that you have permission to vie
     The word `Token` in front of the random token characters is part of the token as well. Always copy the entire token text.
 
 It is *highly* recommended that you store your API token in a safe location and read it into your code, rather than have it hard-coded. One way to do this is to store
-it in an environmental variable (e.g., `CRIPT_API_KEY`) and then read it in via the `os` module. See [API Token documentation](api_token.md) to learn more:
+it in an environment variable (e.g., `CRIPT_API_KEY`) and then read it in via the `os` module. See [API Token documentation](api_token.md) to learn more:
  
 ``` python
 import cript

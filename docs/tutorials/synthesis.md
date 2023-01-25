@@ -1,70 +1,90 @@
-# Example workflow for a synthesis project
+This tutorial guides you through an example material synthesis workflow using the CRIPT Python SDK.
 
-> Refer to [Quickstart](../quickstart.md) for installation instructions.
+Before you start, make sure the `cript` python package is installed. Refer to the [Installation guide](installation.md) or [Quickstart](../quickstart.md) for installation instructions.
 
-## Connect to the public API
 
-```py
+# Connect to CRIPT
+To connect to [CRIPT](https://criptapp.org), you must enter a `host` and an `API Token`. For most users, `host` will be `criptapp.org`. Here we assume that your API key is stored in an environment variable called `CRIPT_API_KEY`.
+ 
+``` python
 import cript
+import os
 
 host = "criptapp.org"
-token = "<your_api_token>"
+token = os.environ.get("CRIPT_API_KEY")
 cript.API(host, token)
 ```
 
-!!! note
-Your API token can be found in the UI under [Account Settings](https://criptapp.org/settings/).
+# Create a Project
 
-### Create a Project node
+All data uploaded to CRIPT must be associated with a <a href="../../nodes/project" target="_blank">`Project`</a> node. A <a href="../../nodes/project" target="_blank">`Project`</a> can be thought of as a folder that contains <a href="../../nodes/collection" target="_blank">`Collections`</a> and <a href="../../nodes/material" target="_blank">`Materials`</a>. To create a <a href="../../nodes/project" target="_blank">`Project`</a> and upload it to CRIPT, use the `<node>.create()` method, where `<node>` can be any of the <a href="../../nodes/all" target="_blank">primary CRIPT node types</a>:
 
-```py
-proj = cript.Project(name="<your_project_name>")
-proj.save()
+```python
+ # create a new project in the CRIPT database
+my_proj = cript.Project.create(name="My first project")
 ```
 
-!!! note
-Project names are globally unique.
+!!! info "Notes"
+    * `Project` names are globally unique, meaning no two `Projects` in the entire CRIPT database can have the same name.
+    * Notice the use of `create()` here, which both *instantiates* the Python object and *uploads* it to the database in one command.
 
-### Create a Collection node
+# Create a Collection node
 
-```py
-coll = cript.Collection.create(project=proj, name="Synthesis Tutorial")
+A [`Collection`](../nodes/collection.md) can be thought of as a folder filled with experiments. Just like we did for a [`Project`](../nodes/project.md) node, we use the `create()` method to create a new [`Collection`](../nodes/collection.md). This time, we're also specifying the project that we just created. This will create the new collection **inside** our project. 
+
+``` python
+coll = cript.Collection.create(
+    project=proj,
+    name="My new collection",
+)
 ```
 
-!!! note
-Notice the use of `create()` here, which instantiates and saves the object in one go.
+# Create an Experiment node
 
-### Create an Experiment node
+The CRIPT [`Experiment`](../nodes/experiment.md) node holds [`Process`](../nodes/process.md) and [`Data`](../nodes/data.md) nodes. Now that we have a project and a collection, let's add an [`Experiment`](../nodes/experiment.md) inside our collection.
 
-```py
-expt = cript.Experiment(
+``` python
+expt = cript.Experiment.create(
     collection=coll,
     name="Anionic Polymerization of Styrene with SecBuLi"
 )
-expt.save()
 ```
 
-### Get Material nodes
+# Get Material nodes
 
-For this tutorial, we will get an existing Inventory node from the database.  
-This contains all of the Material nodes we will be using.
+[`Material`](../nodes/material.md) and [`Inventory`](../nodes/inventory.md) nodes can be created in the same way that [`Project`](../nodes/project.md), [`Collection`](../nodes/collection.md), and [`Experiment`](../nodes/experiment.md) nodes were created.
 
-```py
+For this tutorial, instead of creating new [`Material`](../nodes/material.md) and [`Inventory`](../nodes/inventory.md) nodes, we will get references to existing nodes using the `<node>.get()` method. The inventory we will get contains all of the [`Material`](../nodes/material.md) nodes we will be using.
+
+``` python
+# UID of the inventory node we wish to get
 uid = "134f2658-6245-42d8-a47e-6424aa3472b4"
-inv = cript.Inventory.get(uid=uid)
+# get the inventory by its UID
+inv = cript.Inventory.get(uid=uid, get_level=1)
 ```
 
-Notice that the Material node objects have been auto-generated.
+!!! note
+    We are setting `get_level` to `1` so that all the inventory's children material nodes are collected as well. This parameter defaults to `0`, but can be set to any integer.
 
-```py
-type(inv.materials[0])
-# <class 'cript.data_model.nodes.material.Material'>
+To see what our command returned, use:
+
+``` python
+print(type(inv.materials[0]))
 ```
 
-### Create a Process node
+Something similar to the following should be printed:
+``` bash
+<class 'cript.data_model.nodes.material.Material'>
+```
 
-```py
-prcs = cript.Process(
+We've shown that we can get an existing [`Inventory`](../nodes/inventory.md) node using the `get()` method, and that the inventory object has an attribute called `materials`. By printing the first instance of the `materials` attribute, we can see that a [`Material`](../nodes/material.md) object is returned.
+
+# Create a Process node
+
+Now let's create a [`Process`](../nodes/process.md) node using the same `create()` method we used before. Here we are creating the `Process` inside the experiment called `expt` that was previously created. We're also giving the `Process` a name, a `type`, and a `description`.
+
+``` python
+prcs = cript.Process.create(
     experiment=expt,
     name="Anionic of Styrene",
     type = "multistep",
@@ -74,14 +94,18 @@ prcs = cript.Process(
                   "the reaction was quenched with the addition of 3 ml of methanol. The polymer was isolated by "
                   "precipitation in methanol 3 times and dried under vacuum."
 )
-prcs.save()
 ```
 
-### Add Ingredient nodes to the Process node
+!!! note "Process types"
+    The allowed `Process` types are listed in the <a href="https://criptapp.org/keys/process-type/" target="_blank">process type keywords</a> in the CRIPT controlled vocabulary.
 
-First, let's grab the Material nodes we need from the Inventory node.
+# Add Ingredients to a Process
 
-```py
+From a chemistry standpoint, most experimental processeses, regardless of whether they are carried out in the lab or simulated using computer code, consist of input ingredients that are transformed in some way. Let's add ingredients to the [`Process`](../nodes/process.md) that we just created.
+
+First, get references to the [`Material`](../nodes/material.md) nodes that were contained within the [`Inventory`](../nodes/inventory.md) node:
+
+``` python
 solution = inv['SecBuLi solution 1.4M cHex']
 toluene = inv['toluene']
 styrene = inv['styrene']
@@ -89,9 +113,9 @@ butanol = inv['1-butanol']
 methanol = inv['methanol']
 ```
 
-Next, we'll define Quantity nodes indicating the amount of each Ingredient.
+Next, define [`Quantity`](../subobjects/quantity.md) nodes indicating the amount of each [`Ingredient`](../subobjects/ingredient.md) that we will use in the [`Process`](../nodes/process.md).
 
-```py
+``` python
 initiator_qty = cript.Quantity(key="volume", value=0.017, unit="ml")
 solvent_qty = cript.Quantity(key="volume", value=10, unit="ml")
 monomer_qty = cript.Quantity(key="mass", value=0.455, unit="g")
@@ -99,9 +123,9 @@ quench_qty = cript.Quantity(key="volume", value=5, unit="ml")
 workup_qty = cript.Quantity(key="volume", value=100, unit="ml")
 ```
 
-Next, we'll create Ingredient nodes for each.
+Now we can create an [`Ingredient`](../subobjects/ingredient.md) node for each ingredient using the `material` and `quantities` attributes.
 
-```py
+``` python
 initiator = cript.Ingredient(
     keyword="initiator",
     material=solution,
@@ -129,9 +153,12 @@ workup = cript.Ingredient(
 )
 ```
 
-Last, we'll add the Ingredient nodes to the Process node.
+!!! note "Ingredient keywords"
+    The allowed `Ingredient` keywords are listed in the <a href="https://criptapp.org/keys/ingredient-keyword/" target="_blank">ingredient keywords</a> in the CRIPT controlled vocabulary.
 
-```py
+Finally, we can add the [`Ingredient`](../subobjects/ingredient.md) nodes to the [`Process`](../nodes/process.md) node.
+
+``` python
 prcs.add_ingredient(initiator)
 prcs.add_ingredient(solvent)
 prcs.add_ingredient(monomer)
@@ -139,18 +166,26 @@ prcs.add_ingredient(quench)
 prcs.add_ingredient(workup)
 ```
 
-### Add Condition nodes to the Process node
+# Add Conditions to the Process
 
-```py
+Its possible that our [`Process`](../nodes/process.md) was carried out under specific physical conditions. We can codify this by adding [`Condition`](../subobjects/condition.md) nodes to the process.
+
+``` python
 temp = cript.Condition(key="temperature", value=25, unit="celsius")
 time = cript.Condition(key="time_duration", value=60, unit="min")
 prcs.add_condition(temp)
 prcs.add_condition(time)
 ```
 
-### Add a Property node to the Process node
+!!! note "Condition keys"
+    The allowed `Condition` keys are listed in the <a href="https://criptapp.org/keys/condition-key/" target="_blank">condition keys</a> in the CRIPT controlled vocabulary.
 
-```py
+
+# Add a Property to a Process
+
+We may also want to associate our process with certain properties. We can do this by adding [`Property`](../subobjects/property.md) nodes to the process.
+
+``` python
 yield_mass = cript.Property(
     key="yield_mass",
     value=0.47,
@@ -160,114 +195,170 @@ yield_mass = cript.Property(
 prcs.add_property(yield_mass)
 ```
 
-### Create a Material node (process product)
+!!! note "Process property keys"
+    The allowed process `Property` keys are listed in the <a href="https://criptapp.org/keys/process-property-key/" target="_blank">process property keys</a> in the CRIPT controlled vocabulary.
 
-First, we'll instantiate the node.
+!!! note "Property methods"
+    The allowed `Property` methods are listed in the <a href="https://criptapp.org/keys/property-method/" target="_blank">property methods</a> in the CRIPT controlled vocabulary.
 
-```py
-polystyrene = cript.Material(project=proj, name="polystyrene")
+
+# Create a Material node (process product)
+
+Along with input [`Ingredients`](../subobjects/ingredient.md), our `Process` may also produce product materials.
+
+First, let's create the [`Material`](../nodes/material.md) that will serve as our product. We give the material a `name` attribute and add it to our `Project` using the project's `uid` attribute.
+
+``` python
+polystyrene = cript.Material(
+    project=proj.uid,
+    name="polystyrene",
+)
 ```
 
-Next, we'll add some Identifier nodes.
+Note that we haven't used the `Material.create()` method here, which means that our `Material` node is not yet saved to the CRIPT database. We've merely created an instance of a `Material` object using `cript.Material()`. We will add some more attributes to this `Material` object before we save it.
 
-```py
+Let's add some [`Identifier`](../subobjects/identifier.md) nodes to the material to make it easier to identify and search.
+
+``` python
+# create a name identifier
 names = cript.Identifier(
     key="names",
     value=["poly(styrene)", "poly(vinylbenzene)"]
 )
+# create a BigSMILES identifier
 bigsmiles = cript.Identifier(
     key="bigsmiles",
     value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
 )
-chem_repeat = cript.Identifier(key="chem_repeat", value="C8H8")
+# create a chemical repeat unit identifier
+chem_repeat = cript.Identifier(
+    key="chem_repeat",
+    value="C8H8",
+)
 
+# add the identifiers to the material
 polystyrene.add_identifier(names)
 polystyrene.add_identifier(chem_repeat)
 polystyrene.add_identifier(bigsmiles)
 ```
 
-Next, we'll add some Property nodes.
+!!! note "Identifier keys"
+    The allowed `Identifier` keys are listed in the <a href="https://criptapp.org/keys/material-identifier-key/" target="_blank">material identifier keys</a> in the CRIPT controlled vocabulary.
 
-```py
-phase = cript.Property(key="phase", value="solid")
-color = cript.Property(key="color", value="white")
+Next, we'll add some [`Property`](../subobjects/property.md) nodes to the `Material`, which represent its physical or virtual (in the case of a simulated material) properties.
 
+``` python
+# create a phase property
+phase = cript.Property(
+    key="phase",
+    value="solid",
+)
+# create a color property
+color = cript.Property(
+    key="color",
+    value="white",
+)
+
+# add the properties to the material
 polystyrene.add_property(phase)
 polystyrene.add_property(color)
 ```
 
-Now we can save the Material and add it to the Process node as a product.
+!!! note "Material property keys"
+    The allowed material `Property` keys are listed in the <a href="https://criptapp.org/keys/material-property-key/" target="_blank">material property keys</a> in the CRIPT controlled vocabulary.
 
-```py
+Finally we can save the `Material` node, add it as a product to the `Process` node, and then save the changes to the `Process` node.
+
+``` python
+# save the material
 polystyrene.save()
+# add the material as a product of the process
 prcs.add_product(polystyrene)
-```
 
-Last, we can save the Process node.
-
-```py
+# save the resulting process
 prcs.save()
 ```
 
-### Create a File node and upload a file
+**Congratulations!** You've just created a process that represents the polymerization reaction of Polystyrene, starting with a set of input ingredients in various quantities, and ending with a new polymer with specific identifiers and physical properties.
 
-First, we'll instantiate a File node and associate it with the Data node created above.
+# Create a Data node
 
-```py
-path = "path/to/local/file"
-f = cript.File(project=proj, source=path)
-```
+We may want to associate some files with our polymerization reaction. For this we will create a CRIPT [`Data`](../nodes/data.md) node, which helps us store files in an organized way. Note that we are attaching the `Data` node to our previous experiment, but not saving it yet.
 
-!!! note
-The `source` field should point to a file on your local filesystem.
-!!! info
-Depending on the file size, there could be a delay while the checksum is generated.
-
-Next, we'll upload the local file by saving the File node. Follow all prompts that appear.
-
-```py
-api.save(f)
-```
-
-### Create a Data node
-
-```py
-sec = cript.Data(
+``` python
+sec_data = cript.Data(
     experiment=expt,
     name="Crude SEC of polystyrene",
     type="sec_trace",
 )
 ```
 
-.. then add the uploaded File to it:
+!!! note "Data types"
+    The allowed `Data` types are listed in the <a href="https://criptapp.org/keys/data-type/" target="_blank">data types</a> in the CRIPT controlled vocabulary.
 
-```python
-sec.add_file(f)
-sec.save()
+
+# Associate a Data node with a Property node
+
+Now lets associate our [`Data`](../nodes/data.md) with a specific material property. To do this, we'll create one more [`Property`](../subobjects/property.md) node for polystyrene.
+
+``` python
+mw_n = cript.Property(
+    key="mw_n",
+    value=5200,
+    unit="g/mol",
+)
 ```
 
-### Associate a Data node with a Property node
+Next, we'll add the `Data` node to the new Property node.
 
-First, we'll create one more Property node for polystyrene.
-
-```py
-mw_n = cript.Property(key="mw_n", value=5200, unit="g/mol")
+``` python
+mw_n.data = sec_data
 ```
 
-Next, we'll add the Data node to the new Property node.
+Last, we'll add the new Property node to polystyrene and save it.
 
-```py
-mw_n.data = sec
-```
-
-Last, we'll add the new Property node to polystyrene and then save it.
-
-```py
+``` python
 polystyrene.add_property(mw_n)
 polystyrene.save()
 ```
 
-### Conclusion
+# Create a File node
+
+Now that we have a `Data` node object, we can add files to it. We may want to upload files to CRIPT which contain materials characterization data, simulation data, instrument settings, or other information. While CRIPT can store the actual file object, we can also create a CRIPT `File` node which represents the file and can be linked to our other CRIPT node objects.
+
+First, let's instantiate a [`File`](../nodes/file.md) node (note that we're not saving it yet) and associate it with the [`Data`](../nodes/data.md) node that we created above.
+
+``` python
+# specify the local path of the file
+path = "path/to/local/file"
+# instantiate a new the file node
+f = cript.File(
+    project=proj,
+    source=path,
+)
+```
+
+!!! note
+    The `source` field should point to a file on your local filesystem.
+
+!!! info
+    Depending on the file size, there could be a delay while the checksum is generated.
+
+Next, we'll upload the local file by saving the File node. Follow all prompts that appear.
+
+``` python
+f.save()
+```
+
+You will be prompted to click a link to obtain an authorization code for uploading this file to the CRIPT file sotage client. Copy and paste the code obtained from this link into the terminal to save the file.
+
+Once the `File` node is saved, we add the newly uploaded file to our `Data` node and save it.
+``` python
+sec_data.add_file(f)
+sec_data.save()
+```
+
+# Conclusion
 
 You made it! We hope this tutorial has been helpful.
 

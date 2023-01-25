@@ -56,12 +56,11 @@ nav:
   - Home: index.md
   - Quick Start: quickstart.md  
   - Tutorials:
-    - Full Tutorial: tutorials/full_tutorial.md
+    - Full Tutorial: tutorials/full_tutorial.md  
     - Installation: tutorials/installation.md
     - Getting an API Token: tutorials/api_token.md
-    - Workflows:
-        - Simulation: tutorials/simulation.md
-        - Synthesis: tutorials/synthesis.md
+    - Synthesis workflow: tutorials/synthesis.md    
+    - Simulation workflow: tutorials/simulation.md
   - Nodes:
       - All nodes: nodes/all.md
       - BaseNode: nodes/base_node.md
