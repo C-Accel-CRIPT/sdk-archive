@@ -274,3 +274,10 @@ def test_create_file_node_and_upload(criptapp_api):
             proj = cript.Project.get(name=MY_PROJECT)
             f = cript.File(project=proj, source=tmp.name)
             f.save()
+
+
+def test_upload_link_file(criptapp_api):
+    proj = cript.Project.get(name=MY_PROJECT)
+    path = "https://google.com"
+    f = cript.File(project=proj, source=path, name="Link File Node")
+    f.save()
