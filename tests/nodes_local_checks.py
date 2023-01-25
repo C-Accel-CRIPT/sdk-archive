@@ -204,7 +204,6 @@ def test_add_ingredients_to_process(criptapp_api):
     prcs.add_ingredient(workup)
 
 
-# TODO this needs a remove conditions from process
 def test_add_condition_nodes_to_process_nodes(criptapp_api):
     """
     get process
@@ -278,14 +277,14 @@ def test_create_data_node(criptapp_api):
 def test_upload_local_file(criptapp_api):
     proj = cript.Project.get(name=MY_PROJECT)
     path = ".....\\CRIPT Excel Templates\\Example_CRIPT_template.xlsx"
-    f = cript.File(project=proj, source=path, name="I am FILE")
+    f = cript.File(project=proj, source=path, name="An actual FILE upload")
     f.save()
 
 
 def test_upload_link_file(criptapp_api):
     proj = cript.Project.get(name=MY_PROJECT)
     path = "https://google.com"
-    f = cript.File(project=proj, source=path, name="I am FILE")
+    f = cript.File(project=proj, source=path, name="Link File Upload")
     f.save()
 
 
