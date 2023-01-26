@@ -50,8 +50,8 @@ class BaseNode(Base, abc.ABC):
     !!! warning "BaseNode Instantiation"
         Do not interact directly with the <a href="../base_node" target="_blank">`BaseNode`</a>.
         Instead, call its methods from other primary nodes. For example, instead of using
-        `BaseNode().create()`, use the create method on a project,
-        like this: `Project.create(name="My project")`.
+        `cript.BaseNode.create()`, use the create method on a project,
+        like this: `cript.Project.create(name="My project")`.
     """
 
     slug = None
