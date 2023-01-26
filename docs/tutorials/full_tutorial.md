@@ -1,16 +1,16 @@
-# Install CRIPT
+# 1. Install CRIPT
 Before proceeding, please make sure you have the <a href="https://pypi.org/project/cript/" target="_blank">CRIPT Python SDK</a> installed (`pip install cript`). For full installation instructions, please refer to the <a href="../installation" target="_blank">Installation docs</a>.
 
-# Connect to CRIPT
-To connect to [CRIPT](https://criptapp.org), you must enter a `host` and an `API Token`. For most users, `host` will be `criptapp.org`.
+# 2. Connect to CRIPT
+To connect to <a href="https://criptapp.org" target="_blank">CRIPT</a>, you must enter a `host` and an `API Token`. For most users, `host` will be `criptapp.org`.
 
-An API token tells CRIPT who you are and ensures that you have permission to view and upload certain types of data. Your API Token can be found in the CRIPT application <a href="https://criptapp.org/security/" target="_blank">security settings</a>. For additional details, please refer to [how to get an API Token](api_token.md)
+An API token tells CRIPT who you are and ensures that you have permission to view and upload certain types of data. Your API Token can be found in the CRIPT application <a href="https://criptapp.org/security/" target="_blank">security settings</a>. For additional details, please refer to <a href="../api_token" target="_blank">Getting an API Token</a>.
 
 !!! note
     The word `Token` in front of the random token characters is part of the token as well. Always copy the entire token text.
 
 It is *highly* recommended that you store your API token in a safe location and read it into your code, rather than have it hard-coded. One way to do this is to store
-it in an environment variable (e.g., `CRIPT_API_KEY`) and then read it in via the `os` module. See [API Token documentation](api_token.md) to learn more:
+it in an environment variable (e.g., `CRIPT_API_KEY`) and then read it in via the `os` module. See <a href="../api_token" target="_blank">Getting an API Token</a> to learn more:
  
 ``` python
 import cript
@@ -38,25 +38,21 @@ Connected to https://criptapp.org/api
     cript.API(host, token, tls=False)
     ```
 
-!!! info
-    Use the `tls` parameter to specify whether to use TLS encryption (`https`) for the API connection. This parameter is set to `True` by default. In some cases, such as when running the CRIPT server locally, you may want to disable https and instead run the server on `http` by setting `tls=False`.
-
-
-# Create a (CRIPT object) node
+# 3. Create a <a href="../../nodes/project" target="_blank">`Project`</a> node
 
 ??? "What is a node?"
     A *node* is simply a CRIPT object (e.g., `Project`, `Experiment`, `Material`) in the graph-based CRIPT data model. 
 
-All data uploaded to CRIPT must be associated with a <a href="../../nodes/project" target="_blank">`Project`</a> node. A <a href="../../nodes/project" target="_blank">`Project`</a> can be thought of as a folder that contains <a href="../../nodes/collection" target="_blank">`Collections`</a> and <a href="../../nodes/material" target="_blank">`Materials`</a>. To create a <a href="../../nodes/project" target="_blank">`Project`</a> and upload it to CRIPT, use the `<node>.create()` method, where `<node>` can be any of the <a href="../../nodes/all" target="_blank">primary CRIPT node types</a>:
+All data uploaded to CRIPT must be associated with a <a href="../../nodes/project" target="_blank">`Project`</a> node. A <a href="../../nodes/project" target="_blank">`Project`</a> can be thought of as a folder that contains <a href="../../nodes/collection" target="_blank">`Collections`</a> and <a href="../../nodes/material" target="_blank">`Materials`</a>. To create a <a href="../../nodes/project" target="_blank">`Project`</a> and upload it to CRIPT, use the <a href="../../nodes/base_node/#cript.data_model.nodes.base_node.BaseNode.create" target="_blank">`cript.<node>.create()`</a> method, where `<node>` can be any of the <a href="../../nodes/all" target="_blank">primary CRIPT node types</a>:
 
 ```python
- # create a new project in the CRIPT database
+# create a new project in the CRIPT database
 my_proj = cript.Project.create(name="My first project")
 ```
 
 !!! info "Notes"
-    * `Project` names are globally unique, meaning no two `Projects` in the entire CRIPT database can have the same name.
-    * Notice the use of `create()` here, which both *instantiates* the Python object and *uploads* it to the database in one command.
+    * <a href="../../nodes/project" target="_blank">`Project`</a> names are globally unique, meaning no two <a href="../../nodes/project" target="_blank">`Projects`</a> in the entire CRIPT database can have the same name.
+    * The <a href="../../nodes/base_node/#cript.data_model.nodes.base_node.BaseNode.create" target="_blank">`cript.<node>.create()`</a> method both *instantiates* the Python object and *uploads* it to the database in one command.
 
 Let's print the project to get a better view:
 
@@ -81,50 +77,50 @@ This should print something similar to the following:
 }
 ```
 
-**Congratulations!** You've successfully created your frst project on CRIPT. 
+**Congratulations!** You've successfully created your first project on CRIPT. 
 
-# Create a Collection node
+# 4. Create a <a href="../../nodes/collection" target="_blank">`Collection`</a> node
 
-A [`Collection`](../nodes/collection.md) can be thought of as a folder filled with experiments. Just like we did for a [`Project`](../nodes/project.md) node, we use the `create()` method to create a new [`Collection`](../nodes/collection.md). This time, we're also specifying the project that we just created. This will create the new collection **inside** our project. 
+A <a href="../../nodes/collection" target="_blank">`Collection`</a> can be thought of as a folder filled with <a href="../../nodes/experiment" target="_blank">`Experiments`</a>. Just like we did for a <a href="../../nodes/project" target="_blank">`Project`</a> node, we use the <a href="../../nodes/base_node/#cript.data_model.nodes.base_node.BaseNode.create" target="_blank">`cript.<node>.create()`</a> method to create a new <a href="../../nodes/collection" target="_blank">`Collection`</a>. However, we also have to specify the <a href="../../nodes/project" target="_blank">`Project`</a> that this <a href="../../nodes/collection" target="_blank">`Collection`</a> will belong to. Let's use the project we just created: 
 
 ``` python
-coll = cript.Collection.create(
-    project=proj,
+my_coll = cript.Collection.create(
+    project=my_proj,
     name="My new collection",
 )
 ```
 
-# Create an Experiment node
+# 5. Create an <a href="../../nodes/experiment" target="_blank">`Experiment`</a> node
 
-The CRIPT [`Experiment`](../nodes/experiment.md) node holds [`Process`](../nodes/process.md) and [`Data`](../nodes/data.md) nodes. Now that we have a project and a collection, let's add an [`Experiment`](../nodes/experiment.md) inside our collection.
+An <a href="../../nodes/experiment" target="_blank">`Experiment`</a> node can hold <a href="../../nodes/process" target="_blank">`Process`</a> and <a href="../../nodes/data" target="_blank">`Data`</a> nodes. Similar to how a <a href="../../nodes/collection" target="_blank">`Collection`</a> must belong to a certain <a href="../../nodes/project" target="_blank">`Project`</a>, an <a href="../../nodes/experiment" target="_blank">`Experiment`</a> must belong to a <a href="../../nodes/collection" target="_blank">`Collection`</a>:
 
 ``` python
-expt = cript.Experiment.create(
-    collection=coll,
+my_expt = cript.Experiment.create(
+    collection=my_coll,
     name="Anionic Polymerization of Styrene with SecBuLi"
 )
 ```
 
-# Get Material nodes
+# 6. Get <a href="../../nodes/material" target="_blank">`Material`</a> nodes
 
-[`Material`](../nodes/material.md) and [`Inventory`](../nodes/inventory.md) nodes can be created in the same way that [`Project`](../nodes/project.md), [`Collection`](../nodes/collection.md), and [`Experiment`](../nodes/experiment.md) nodes were created.
+<a href="../../nodes/material" target="_blank">`Material`</a> and <a href="../../nodes/inventory" target="_blank">`Inventory`</a> nodes can be created in the same way that <a href="../../nodes/project" target="_blank">`Project`</a>, <a href="../../nodes/collection" target="_blank">`Collection`</a>, and <a href="../../nodes/Experiment" target="_blank">`Experiment`</a>  nodes were created.
 
-For this tutorial, instead of creating new [`Material`](../nodes/material.md) and [`Inventory`](../nodes/inventory.md) nodes, we will get references to existing nodes using the `<node>.get()` method. The inventory we will get contains all of the [`Material`](../nodes/material.md) nodes we will be using.
+For this tutorial, instead of creating new <a href="../../nodes/material" target="_blank">`Material`</a> and <a href="../../nodes/inventory" target="_blank">`Inventory`</a> nodes, we will get references to existing nodes using the <a href="../../nodes/base_node/#cript.data_model.nodes.base_node.BaseNode.get" target="_blank">`cript.<node>.get()`</a> method. The <a href="../../nodes/inventory" target="_blank">`Inventory`</a> we will get contains all of the <a href="../../nodes/material" target="_blank">`Material`</a> nodes we will be using.
 
 ``` python
 # UID of the inventory node we wish to get
-uid = "134f2658-6245-42d8-a47e-6424aa3472b4"
+inv_uid = "134f2658-6245-42d8-a47e-6424aa3472b4"
 # get the inventory by its UID
-inv = cript.Inventory.get(uid=uid, get_level=1)
+my_inv = cript.Inventory.get(uid=inv_uid, get_level=1)
 ```
 
 !!! note
-    We are setting `get_level` to `1` so that all the inventory's children material nodes are collected as well. This parameter defaults to `0`, but can be set to any integer.
+    We are setting `get_level` to `1` so that all the <a href="../../nodes/inventory" target="_blank">`Inventory's`</a> children <a href="../../nodes/material" target="_blank">`Material`</a> nodes are collected as well. This parameter defaults to `0`, but can be set to any integer.
 
-To see what our command returned, use:
+To see what this command returned, use:
 
 ``` python
-print(type(inv.materials[0]))
+print(type(my_inv.materials[0]))
 ```
 
 Something similar to the following should be printed:
@@ -132,15 +128,15 @@ Something similar to the following should be printed:
 <class 'cript.data_model.nodes.material.Material'>
 ```
 
-We've shown that we can get an existing [`Inventory`](../nodes/inventory.md) node using the `get()` method, and that the inventory object has an attribute called `materials`. By printing the first instance of the `materials` attribute, we can see that a [`Material`](../nodes/material.md) object is returned.
+We see that the <a href="../../nodes/inventory" target="_blank">`Inventory`</a> object has an attribute called `materials`. By printing the first element of the `materials` list, we can see that a <a href="../../nodes/material" target="_blank">`Material`</a> node is returned.
 
-# Create a Process node
+# 7. Create a <a href="../../nodes/process" target="_blank">`Process`</a> node
 
-Now let's create a [`Process`](../nodes/process.md) node using the same `create()` method we used before. Here we are creating the `Process` inside the experiment called `expt` that was previously created. We're also giving the `Process` a name, a `type`, and a `description`.
+Now let's create a <a href="../../nodes/process" target="_blank">`Process`</a> node using the same <a href="../../nodes/base_node/#cript.data_model.nodes.base_node.BaseNode.create" target="_blank">`cript.<node>.create()`</a> method we used before. For a <a href="../../nodes/process" target="_blank">`Process`</a>, we must specify the <a href="../../nodes/experiment" target="_blank">`Experiment`</a> it belongs to:
 
 ``` python
-prcs = cript.Process.create(
-    experiment=expt,
+my_prcs = cript.Process.create(
+    experiment=my_expt,
     name="Anionic of Styrene",
     type = "multistep",
     description = "In an argon filled glovebox, a round bottom flask was filled with 216 ml of dried toluene. The "
@@ -152,23 +148,23 @@ prcs = cript.Process.create(
 ```
 
 !!! note "Process types"
-    The allowed `Process` types are listed in the <a href="https://criptapp.org/keys/process-type/" target="_blank">process type keywords</a> in the CRIPT controlled vocabulary.
+    The allowed <a href="../../nodes/process" target="_blank">`Process`</a> types are listed in the <a href="https://criptapp.org/keys/process-type/" target="_blank">process type keywords</a> in the CRIPT controlled vocabulary.
 
-# Add Ingredients to a Process
+# 8. Add <a href="../../subobjects/ingredient" target="_blank">`Ingredients`</a> to a <a href="../../nodes/process" target="_blank">`Process`</a>
 
-From a chemistry standpoint, most experimental processeses, regardless of whether they are carried out in the lab or simulated using computer code, consist of input ingredients that are transformed in some way. Let's add ingredients to the [`Process`](../nodes/process.md) that we just created.
+From a chemistry standpoint, most experimental processeses, regardless of whether they are carried out in the lab or simulated using computer code, consist of input ingredients that are transformed in some way. Let's add <a href="../../subobjects/ingredient" target="_blank">`Ingredients`</a> to the <a href="../../nodes/process" target="_blank">`Process`</a> that we just created.
 
-First, get references to the [`Material`](../nodes/material.md) nodes that were contained within the [`Inventory`](../nodes/inventory.md) node:
+First, get references to the <a href="../../nodes/material" target="_blank">`Material`</a> nodes that were contained within the <a href="../../nodes/inventory" target="_blank">`Inventory`</a> node:
 
 ``` python
-solution = inv['SecBuLi solution 1.4M cHex']
-toluene = inv['toluene']
-styrene = inv['styrene']
-butanol = inv['1-butanol']
-methanol = inv['methanol']
+solution = my_inv['SecBuLi solution 1.4M cHex']
+toluene = my_inv['toluene']
+styrene = my_inv['styrene']
+butanol = my_inv['1-butanol']
+methanol = my_inv['methanol']
 ```
 
-Next, define [`Quantity`](../subobjects/quantity.md) nodes indicating the amount of each [`Ingredient`](../subobjects/ingredient.md) that we will use in the [`Process`](../nodes/process.md).
+Next, define <a href="../../subobjects/quantity" target="_blank">`Quantity`</a> nodes indicating the amount of each <a href="../../subobjects/ingredient" target="_blank">`Ingredient`</a> that we will use in the <a href="../../nodes/process" target="_blank">`Process`</a>.
 
 ``` python
 initiator_qty = cript.Quantity(key="volume", value=0.017, unit="ml")
@@ -178,7 +174,7 @@ quench_qty = cript.Quantity(key="volume", value=5, unit="ml")
 workup_qty = cript.Quantity(key="volume", value=100, unit="ml")
 ```
 
-Now we can create an [`Ingredient`](../subobjects/ingredient.md) node for each ingredient using the `material` and `quantities` attributes.
+Now we can create an <a href="../../subobjects/ingredient" target="_blank">`Ingredients`</a> node for each ingredient using the `material` and `quantities` attributes.
 
 ``` python
 initiator = cript.Ingredient(
@@ -209,36 +205,36 @@ workup = cript.Ingredient(
 ```
 
 !!! note "Ingredient keywords"
-    The allowed `Ingredient` keywords are listed in the <a href="https://criptapp.org/keys/ingredient-keyword/" target="_blank">ingredient keywords</a> in the CRIPT controlled vocabulary.
+    The allowed <a href="../../subobjects/ingredient" target="_blank">`Ingredient`</a> keywords are listed in the <a href="https://criptapp.org/keys/ingredient-keyword/" target="_blank">ingredient keywords</a> in the CRIPT controlled vocabulary.
 
-Finally, we can add the [`Ingredient`](../subobjects/ingredient.md) nodes to the [`Process`](../nodes/process.md) node.
+Finally, we can add the <a href="../../subobjects/ingredient" target="_blank">`Ingredients`</a> nodes to the <a href="../../nodes/process" target="_blank">`Process`</a> node.
 
 ``` python
-prcs.add_ingredient(initiator)
-prcs.add_ingredient(solvent)
-prcs.add_ingredient(monomer)
-prcs.add_ingredient(quench)
-prcs.add_ingredient(workup)
+my_prcs.add_ingredient(initiator)
+my_prcs.add_ingredient(solvent)
+my_prcs.add_ingredient(monomer)
+my_prcs.add_ingredient(quench)
+my_prcs.add_ingredient(workup)
 ```
 
-# Add Conditions to the Process
+# 9. Add <a href="../../subobjects/condition" target="_blank">`Conditions`</a> to the <a href="../../nodes/process" target="_blank">`Process`</a>
 
-Its possible that our [`Process`](../nodes/process.md) was carried out under specific physical conditions. We can codify this by adding [`Condition`](../subobjects/condition.md) nodes to the process.
+It's possible that our <a href="../../nodes/process" target="_blank">`Process`</a> was carried out under specific physical conditions. We can codify this by adding <a href="../../subobjects/condition" target="_blank">`Condition`</a> nodes to the process.
 
 ``` python
-temp = cript.Condition(key="temperature", value=25, unit="celsius")
-time = cript.Condition(key="time_duration", value=60, unit="min")
-prcs.add_condition(temp)
-prcs.add_condition(time)
+my_temp = cript.Condition(key="temperature", value=25, unit="celsius")
+my_time = cript.Condition(key="time_duration", value=60, unit="min")
+my_prcs.add_condition(my_temp)
+my_prcs.add_condition(my_time)
 ```
 
 !!! note "Condition keys"
-    The allowed `Condition` keys are listed in the <a href="https://criptapp.org/keys/condition-key/" target="_blank">condition keys</a> in the CRIPT controlled vocabulary.
+    The allowed <a href="../../subobjects/condition" target="_blank">`Condition`</a> keys are listed in the <a href="https://criptapp.org/keys/condition-key/" target="_blank">condition keys</a> in the CRIPT controlled vocabulary.
 
 
-# Add a Property to a Process
+# 10. Add a <a href="../../subobjects/property" target="_blank">`Property`</a> to a <a href="../../nodes/process" target="_blank">`Process`</a>
 
-We may also want to associate our process with certain properties. We can do this by adding [`Property`](../subobjects/property.md) nodes to the process.
+We may also want to associate our process with certain properties. We can do this by adding <a href="../../subobjects/property" target="_blank">`Property`</a> nodes to the process.
 
 ``` python
 yield_mass = cript.Property(
@@ -247,149 +243,149 @@ yield_mass = cript.Property(
     unit="g",
     method="scale"
 )
-prcs.add_property(yield_mass)
+my_prcs.add_property(yield_mass)
 ```
 
 !!! note "Process property keys"
-    The allowed process `Property` keys are listed in the <a href="https://criptapp.org/keys/process-property-key/" target="_blank">process property keys</a> in the CRIPT controlled vocabulary.
+    The allowed process  <a href="../../subobjects/property" target="_blank">`Property`</a> keys are listed in the <a href="https://criptapp.org/keys/process-property-key/" target="_blank">process property keys</a> in the CRIPT controlled vocabulary.
 
 !!! note "Property methods"
-    The allowed `Property` methods are listed in the <a href="https://criptapp.org/keys/property-method/" target="_blank">property methods</a> in the CRIPT controlled vocabulary.
+    The allowed <a href="../../subobjects/property" target="_blank">`Property`</a> methods are listed in the <a href="https://criptapp.org/keys/property-method/" target="_blank">property methods</a> in the CRIPT controlled vocabulary.
 
 
-# Create a Material node (process product)
+# 11. Create a <a href="../../nodes/material" target="_blank">`Material`</a> node as a <a href="../../nodes/process" target="_blank">`Process`</a> product
 
-Along with input [`Ingredients`](../subobjects/ingredient.md), our `Process` may also produce product materials.
+Along with input <a href="../../subobjects/ingredient" target="_blank">`Ingredients`</a>, our <a href="../../nodes/process" target="_blank">`Process`</a> may also produce product <a href="../../nodes/material" target="_blank">`Materials`</a>.
 
-First, let's create the [`Material`](../nodes/material.md) that will serve as our product. We give the material a `name` attribute and add it to our `Project` using the project's `uid` attribute.
+First, let's create the <a href="../../nodes/material" target="_blank">`Material`</a> that will serve as our product. We give the material a `name` attribute and add it to our <a href="../../nodes/project" target="_blank">`Project`</a> using the project's `uid` attribute.
 
 ``` python
 polystyrene = cript.Material(
-    project=proj.uid,
+    project=my_proj.uid,
     name="polystyrene",
 )
 ```
 
-Note that we haven't used the `Material.create()` method here, which means that our `Material` node is not yet saved to the CRIPT database. We've merely created an instance of a `Material` object using `cript.Material()`. We will add some more attributes to this `Material` object before we save it.
+Note that we haven't used the `cript.Material.create()` method here, which means that our <a href="../../nodes/material" target="_blank">`Material`</a> node is not yet saved to the CRIPT database. By using `cript.Material()`, we've only created an instance of a Python object. We will add some more attributes to this <a href="../../nodes/material" target="_blank">`Material`</a> object before we save it.
 
-Let's add some [`Identifier`](../subobjects/identifier.md) nodes to the material to make it easier to identify and search.
+Let's add some <a href="../../subobjects/identifier" target="_blank">`Identifier`</a> nodes to the <a href="../../nodes/material" target="_blank">`Material`</a> to make it easier to identify and search.
 
 ``` python
 # create a name identifier
-names = cript.Identifier(
+my_names = cript.Identifier(
     key="names",
     value=["poly(styrene)", "poly(vinylbenzene)"]
 )
 # create a BigSMILES identifier
-bigsmiles = cript.Identifier(
+my_bigsmiles = cript.Identifier(
     key="bigsmiles",
     value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC"
 )
 # create a chemical repeat unit identifier
-chem_repeat = cript.Identifier(
+my_chem_repeat = cript.Identifier(
     key="chem_repeat",
     value="C8H8",
 )
 
 # add the identifiers to the material
-polystyrene.add_identifier(names)
-polystyrene.add_identifier(chem_repeat)
-polystyrene.add_identifier(bigsmiles)
+polystyrene.add_identifier(my_names)
+polystyrene.add_identifier(my_chem_repeat)
+polystyrene.add_identifier(my_bigsmiles)
 ```
 
 !!! note "Identifier keys"
-    The allowed `Identifier` keys are listed in the <a href="https://criptapp.org/keys/material-identifier-key/" target="_blank">material identifier keys</a> in the CRIPT controlled vocabulary.
+    The allowed <a href="../../subobjects/identifier" target="_blank">`Identifier`</a> keys are listed in the <a href="https://criptapp.org/keys/material-identifier-key/" target="_blank">material identifier keys</a> in the CRIPT controlled vocabulary.
 
-Next, we'll add some [`Property`](../subobjects/property.md) nodes to the `Material`, which represent its physical or virtual (in the case of a simulated material) properties.
+Next, we'll add some <a href="../../subobjects/property" target="_blank">`Property`</a> nodes to the <a href="../../nodes/material" target="_blank">`Material`</a>, which represent its physical or virtual (in the case of a simulated material) properties.
 
 ``` python
 # create a phase property
-phase = cript.Property(
+my_phase = cript.Property(
     key="phase",
     value="solid",
 )
 # create a color property
-color = cript.Property(
+my_color = cript.Property(
     key="color",
     value="white",
 )
 
 # add the properties to the material
-polystyrene.add_property(phase)
-polystyrene.add_property(color)
+polystyrene.add_property(my_phase)
+polystyrene.add_property(my_color)
 ```
 
 !!! note "Material property keys"
-    The allowed material `Property` keys are listed in the <a href="https://criptapp.org/keys/material-property-key/" target="_blank">material property keys</a> in the CRIPT controlled vocabulary.
+    The allowed material <a href="../../subobjects/property" target="_blank">`Property`</a> keys are listed in the <a href="https://criptapp.org/keys/material-property-key/" target="_blank">material property keys</a> in the CRIPT controlled vocabulary.
 
-Finally we can save the `Material` node, add it as a product to the `Process` node, and then save the changes to the `Process` node.
+Finally we can save the <a href="../../nodes/material" target="_blank">`Material`</a> node, add it as a product to the <a href="../../nodes/process" target="_blank">`Process`</a> node, and then save the changes to the <a href="../../nodes/process" target="_blank">`Process`</a> node.
 
 ``` python
 # save the material
 polystyrene.save()
 # add the material as a product of the process
-prcs.add_product(polystyrene)
+my_prcs.add_product(polystyrene)
 
 # save the resulting process
-prcs.save()
+my_prcs.save()
 ```
 
-**Congratulations!** You've just created a process that represents the polymerization reaction of Polystyrene, starting with a set of input ingredients in various quantities, and ending with a new polymer with specific identifiers and physical properties.
+**Congratulations!** You've just created a <a href="../../nodes/process" target="_blank">`Process`</a> that represents the polymerization reaction of Polystyrene, starting with a set of input <a href="../../subobjects/ingredient" target="_blank">`Ingredients`</a> in various <a href="../../subobjects/quantity" target="_blank">`Quantities`</a>, and ending with a new polymer with specific <a href="../../subobjects/identifier" target="_blank">`Identifiers`</a> and physical <a href="../../subobjects/property" target="_blank">`Properties`</a>.
 
-# Create a Data node
+# 12. Create a <a href="../../nodes/data" target="_blank">`Data`</a> node
 
-We may want to associate some files with our polymerization reaction. For this we will create a CRIPT [`Data`](../nodes/data.md) node, which helps us store files in an organized way. Note that we are attaching the `Data` node to our previous experiment, but not saving it yet.
+We may want to associate some files with our polymerization reaction. For this, we will create a CRIPT <a href="../../nodes/data" target="_blank">`Data`</a> node, which helps us store files in an organized way. Note that we are attaching the <a href="../../nodes/data" target="_blank">`Data`</a> node to our previous <a href="../../nodes/experiment" target="_blank">`Experiment`</a>, but not saving it yet.
 
 ``` python
-sec_data = cript.Data(
-    experiment=expt,
+my_sec_data = cript.Data(
+    experiment=my_expt,
     name="Crude SEC of polystyrene",
     type="sec_trace",
 )
 ```
 
 !!! note "Data types"
-    The allowed `Data` types are listed in the <a href="https://criptapp.org/keys/data-type/" target="_blank">data types</a> in the CRIPT controlled vocabulary.
+    The allowed <a href="../../nodes/data" target="_blank">`Data`</a> types are listed in the <a href="https://criptapp.org/keys/data-type/" target="_blank">data types</a> in the CRIPT controlled vocabulary.
 
 
-# Associate a Data node with a Property node
+# 13. Associate a <a href="../../nodes/data" target="_blank">`Data`</a> node with a <a href="../../subobjects/property" target="_blank">`Property`</a> node
 
-Now lets associate our [`Data`](../nodes/data.md) with a specific material property. To do this, we'll create one more [`Property`](../subobjects/property.md) node for polystyrene.
+Now lets associate our <a href="../../nodes/data" target="_blank">`Data`</a> with a specific <a href="../../nodes/material" target="_blank">`Material`</a> property. To do this, we'll create one more <a href="../../subobjects/property" target="_blank">`Property`</a> node for polystyrene.
 
 ``` python
-mw_n = cript.Property(
+poly_mw = cript.Property(
     key="mw_n",
     value=5200,
     unit="g/mol",
 )
 ```
 
-Next, we'll add the `Data` node to the new Property node.
+Next, we'll add the <a href="../../nodes/data" target="_blank">`Data`</a> node to the new <a href="../../subobjects/property" target="_blank">`Property`</a> node.
 
 ``` python
-mw_n.data = sec_data
+poly_mw.data = my_sec_data
 ```
 
-Last, we'll add the new Property node to polystyrene and save it.
+Last, we'll add the new <a href="../../subobjects/property" target="_blank">`Property`</a> node to polystyrene and save it.
 
 ``` python
-polystyrene.add_property(mw_n)
+polystyrene.add_property(poly_mw)
 polystyrene.save()
 ```
 
-# Create a File node
+# 14. Create a <a href="../../nodes/file" target="_blank">`File`</a> node
 
-Now that we have a `Data` node object, we can add files to it. We may want to upload files to CRIPT which contain materials characterization data, simulation data, instrument settings, or other information. While CRIPT can store the actual file object, we can also create a CRIPT `File` node which represents the file and can be linked to our other CRIPT node objects.
+Now that we have a <a href="../../nodes/data" target="_blank">`Data`</a> node object, we can add files to it. We may want to upload files to CRIPT which contain materials characterization data, simulation data, instrument settings, or other information. While CRIPT can store the actual file object, we can also create a CRIPT <a href="../../nodes/file" target="_blank">`File`</a> node which represents the file and can be linked to our other CRIPT node objects.
 
-First, let's instantiate a [`File`](../nodes/file.md) node (note that we're not saving it yet) and associate it with the [`Data`](../nodes/data.md) node that we created above.
+First, let's instantiate a <a href="../../nodes/file" target="_blank">`File`</a> node (note that we're not saving it yet) and associate it with the <a href="../../nodes/data" target="_blank">`Data`</a> node that we created above.
 
 ``` python
 # specify the local path of the file
-path = "path/to/local/file"
+my_path = "~/quickstart.csv" # path to local file
 # instantiate a new the file node
-f = cript.File(
-    project=proj,
-    source=path,
+my_file = cript.File(
+    project=my_proj,
+    source=my_path,
 )
 ```
 
@@ -399,18 +395,19 @@ f = cript.File(
 !!! info
     Depending on the file size, there could be a delay while the checksum is generated.
 
-Next, we'll upload the local file by saving the File node. Follow all prompts that appear.
+Next, we'll upload the local file by saving the <a href="../../nodes/file" target="_blank">`File`</a> node. Follow all prompts that appear.
 
 ``` python
-f.save()
+my_file.save()
 ```
 
-You will be prompted to click a link to obtain an authorization code for uploading this file to the CRIPT file sotage client. Copy and paste the code obtained from this link into the terminal to save the file.
+You will be prompted to click a link to obtain an authorization code for uploading this file to the CRIPT file storage client. Copy and paste the code obtained from this link into the terminal to save the file.
 
-Once the `File` node is saved, we add the newly uploaded file to our `Data` node and save it.
+Once the <a href="../../nodes/file" target="_blank">`File`</a> node is saved, we add the newly uploaded file to our <a href="../../nodes/data" target="_blank">`Data`</a> node and save it.
+
 ``` python
-sec_data.add_file(f)
-sec_data.save()
+my_sec_data.add_file(my_file)
+my_sec_data.save()
 ```
 
 # Conclusion
