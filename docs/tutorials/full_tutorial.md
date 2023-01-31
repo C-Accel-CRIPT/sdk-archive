@@ -261,7 +261,7 @@ First, let's create the <a href="../../nodes/material" target="_blank">`Material
 
 ``` python
 polystyrene = cript.Material(
-    project=my_proj.uid,
+    project=my_proj,
     name="polystyrene",
 )
 ```
