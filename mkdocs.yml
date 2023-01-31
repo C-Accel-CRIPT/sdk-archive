@@ -14,6 +14,7 @@ theme:
     - content.code.copy
     - navigation.path
     - nagivation.tracking
+    - navigation.footer
 
   palette:
     # Palette toggle for light mode
@@ -36,6 +37,11 @@ theme:
 # This links the CRIPT logo to the CRIPT homepage
 extra:
   homepage: https://criptapp.org
+#  social:
+#    - icon: fontawesome/brands/twitter
+#      link: https://twitter.com/squidfunk
+#      name: squidfunk on Twitter  
+copyright: © 2023 MIT | All Rights Reserved
 
 extra_css:
   - assets/stylesheets/extra.css
@@ -95,6 +101,7 @@ nav:
   - Paginator: paginator.md
   - Exceptions: exceptions.md
   - FAQs: faqs.md
+  - More Resources: more_resources.md
 
 markdown_extensions:
   - toc:
