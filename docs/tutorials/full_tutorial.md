@@ -337,7 +337,7 @@ my_prcs.save()
 We may want to associate some files with our polymerization reaction. For this, we will create a CRIPT <a href="../../nodes/data" target="_blank">`Data`</a> node, which helps us store files in an organized way. Note that we are attaching the <a href="../../nodes/data" target="_blank">`Data`</a> node to our previous <a href="../../nodes/experiment" target="_blank">`Experiment`</a>, but not saving it yet.
 
 ``` python
-my_sec_data = cript.Data(
+my_sec_data = cript.Data.create(
     experiment=my_expt,
     name="Crude SEC of polystyrene",
     type="sec_trace",
