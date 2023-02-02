@@ -38,10 +38,10 @@ def create_node(node_class, obj_json):
     created_at = obj_json.pop("created_at")
     updated_at = obj_json.pop("updated_at")
 
-    #pop these keys out from api returned JSON for compatibility with Python SDK
+    # Pop these keys out from api returned JSON for compatibility with Python SDK
     if node_class.node_name == "File":
-        obj_json.pop("data_dictionary",None)
-        obj_json.pop("data",None)
+        obj_json.pop("data_dictionary", None)
+        obj_json.pop("data", None)
 
     # pop unused key for Python SDK, but used in web SDK
     obj_json.pop("can_edit", None)
