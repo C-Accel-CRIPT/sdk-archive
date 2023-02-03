@@ -36,7 +36,7 @@ cript.API(host, token)
 
 The CRIPT data model is graph-like, which means we can think of each CRIPT object as a node which is linked to other nodes. 
 
-All primary nodes inherit from the <a href="../nodes/bas_node/" target="_blank">BaseNode</a> class, which provides basic methods such as `create`, `update`, `get`, `search`, and `delete`.
+All primary nodes inherit from the <a href="../nodes/bas_node/" target="_blank">BaseNode</a> class, which provides basic methods such as `create`, `save`, `get`, `search`, and `delete`.
 
 ``` python
 # Instantiate a new project node and save it to CRIPT
