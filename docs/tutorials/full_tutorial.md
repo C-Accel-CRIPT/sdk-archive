@@ -396,8 +396,6 @@ polystyrene.save()
 
 Now that we have a <a href="../../nodes/data" target="_blank">`Data`</a> node object, we can add files to it. We may want to upload files to CRIPT which contain materials characterization data, simulation data, instrument settings, or other information. While CRIPT can store the actual file object, we can also create a CRIPT <a href="../../nodes/file" target="_blank">`File`</a> node which represents the file and can be linked to our other CRIPT node objects.
 
-First, let's instantiate a <a href="../../nodes/file" target="_blank">`File`</a> node (note that we're not saving it yet) and associate it with the <a href="../../nodes/data" target="_blank">`Data`</a> node that we created above.
-
 ``` python
 # specify path to file
 my_path = "path/to/my/file" # path to file
