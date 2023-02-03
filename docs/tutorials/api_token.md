@@ -24,7 +24,7 @@ API Token: Token 4abc478b25e30766652f76103b978349c4c4b214
 ## Storing your API token
 To keep your API token safe, you should generally avoid using directly it
 in Python scripts. Instead, store it as an environment variable.
-<a href="https://gargankush.medium.com/storing-api-keys-as-environmental-variable-for-windows-linux-and-mac-and-accessing-it-through-974ba7c5109f" target="_blank">Check out this guide</a> to learn how to store your API token as an environment variable. The <a href="../full_tutorial/#connect-to-cript" target="_blank">full CRIPT tutorial</a> provides an example of how your API Token can be imported from an environment variable and used in a Python script
+<a href="https://gargankush.medium.com/storing-api-keys-as-environmental-variable-for-windows-linux-and-mac-and-accessing-it-through-974ba7c5109f" target="_blank">For more information, see this guide</a> to learn how to store your API token as an environment variable. The <a href="../full_tutorial/#connect-to-cript" target="_blank">full CRIPT tutorial</a> provides an example of how your API Token can be imported from an environment variable and used in a Python script
 for interacting with CRIPT.
 
 ---
