@@ -410,7 +410,7 @@ my_file = cript.File(   # instantiate a new the file node
     The `source` field should point to a file on your local filesystem.
 
 ??? info
-    Depending on the file size, there could be a delay while the checksum is generated.
+    Depending on the file size, there could be a delay while file is being uploaded to CRIPT.
 
 Next, we'll upload the local file by saving the <a href="../../nodes/file" target="_blank">`File`</a> node. Follow all prompts that appear.
 
