@@ -367,7 +367,7 @@ my_sec_data = cript.Data(
 
 # Associate a <a href="../../nodes/data" target="_blank">`Data`</a> node with a <a href="../../subobjects/property" target="_blank">`Property`</a> node
 
-Now lets associate our <a href="../../nodes/data" target="_blank">`Data`</a> with a specific <a href="../../nodes/material" target="_blank">`Material`</a> property. To do this, we'll create one more <a href="../../subobjects/property" target="_blank">`Property`</a> node for polystyrene.
+Now lets associate our <a href="../../nodes/data" target="_blank">`Data`</a> with a specific <a href="../../nodes/material" target="_blank">`Material`</a> property, molecular weight. To do this, we'll create one more <a href="../../subobjects/property" target="_blank">`Property`</a> node for polystyrene.
 
 ``` python
 poly_mw = cript.Property(
