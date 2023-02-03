@@ -80,10 +80,12 @@ filled with <a href="../../nodes/experiment" target="_blank">`Experiments`</a>.
 A `Collection` can be created in the same way as `Project`, however, since every `Collection` must lives inside of a `Project`, the `Project` that this new `Collection` belongs to must be specified during instantiation.
 
 ``` python
-my_collection = cript.Collection.create(
+my_collection = cript.Collection(
     project=my_project,
     name="My new collection",
 )
+
+my_collection.save()
 ```
 
 ---
