@@ -30,7 +30,4 @@ This page explains how to set up the <a href="https://pypi.org/project/cript/" t
     ``` bash
      pip install cript
     ```
-You may also install other Python packages into this environment that might be useful for organizing your data, such as <a href="https://pandas.pydata.org/" target="_blank">Pandas</a> or <a href="https://numpy.org/" target="_blank">Numpy</a>.
-
-
-Now you're ready to use the CRIPT Python SDK! Check out the <a href="../full_tutorial">full tutorial</a> for some examples.
+> You may also install other Python packages into this environment that might be useful for organizing your data, such as <a href="https://pandas.pydata.org/" target="_blank">Pandas</a> or <a href="https://numpy.org/" target="_blank">Numpy</a>.

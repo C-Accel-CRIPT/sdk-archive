@@ -62,9 +62,9 @@ nav:
   - Home: index.md
   - Quick Start: quickstart.md  
   - Tutorials:
-    - Full Tutorial: tutorials/full_tutorial.md  
     - Installation: tutorials/installation.md
     - Getting an API Token: tutorials/api_token.md
+    - Full Tutorial: tutorials/full_tutorial.md  
     - Synthesis workflow: tutorials/synthesis.md    
     - Simulation workflow: tutorials/simulation.md
   - Nodes:
