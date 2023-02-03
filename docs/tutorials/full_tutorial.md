@@ -267,7 +267,7 @@ After the process is complete it may produce a product, this is referred to as a
 # add the newly created material to my project
 my_polystyrene = cript.Material(
     name="my polystyrene",
-    project=my_project.uid,
+    project=my_project
 )
 ```
 
