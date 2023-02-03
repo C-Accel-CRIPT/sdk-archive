@@ -14,10 +14,10 @@ To get your API token, visit the <a href="https://criptapp.org/security/" target
 **Example**
 
 ```yaml
-API Token: Token 4abc478b25e30766652f76103b978349c4c4b214
+Token 4abc478b25e30766652f76103b978349c4c4b214
 ```
 
-> Note: The text of some API tokens begins with the word "Token" is part of your API token.
+> Note: The word "Token" is part of your API token.
 
 ---
 
