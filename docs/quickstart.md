@@ -1,4 +1,5 @@
-This quick start tutorial will guide you through some common commands of the CRIPT Python SDK. For more information please visit the [full tutorial](../tutorials/full_tutorial/) or reference the documentation for individual [CRIPT nodes](../nodes/all/).
+This quick start tutorial will guide you through some common commands of the CRIPT Python SDK. For more information please visit the
+<a href="../tutorials/full_tutorial" target="_blank">full tutorial</a> or reference the documentation for individual <a href="../nodes/all" target="_blank">CRIPT nodes</a>.
 
 ---
 
@@ -8,9 +9,9 @@ pip install cript
 ```
 
 
-> It is recommended to install the <a href="https://pypi.org/project/cript/" target="_blank">CRIPT package</a> inside a [Python virtual environment](https://docs.python.org/3/library/venv.html). 
+> It is recommended to install the <a href="https://pypi.org/project/cript/" target="_blank">CRIPT package</a> inside a <a href="https://docs.python.org/3/library/venv.html" target="_blank">Python virtual environment</a>.
 
-For more please refer to [CRIPT installation guide](https://docs.python.org/3/library/venv.html).
+For more please refer to <a href="../tutorials/installation" target="_blank">CRIPT installation guide</a>.
 
 ---
 
@@ -19,7 +20,7 @@ For more please refer to [CRIPT installation guide](https://docs.python.org/3/li
 Your API token can be found on the <a href="https://criptapp.org/security/" target="_blank">CRIPT security settings page</a>. 
 
 !!! warning "Security Warning"
-    It is **highly** recommended that you store your API token as an environment variable, as explained in the [API token tutorial](../tutorials/api_token/).
+    It is **highly** recommended that you store your API token as an environment variable, as explained in the <a href="../tutorials/api_token" target="_blank">API token tutorial</a>.
 
 ``` py
 import cript
@@ -36,7 +37,7 @@ cript.API(host, token)
 
 The CRIPT data model is graph-like, which means we can think of each CRIPT object as a node which is linked to other nodes. 
 
-All primary nodes inherit from the <a href="../nodes/bas_node/" target="_blank">BaseNode</a> class, which provides basic methods such as `create`, `save`, `get`, `search`, and `delete`.
+All primary nodes inherit from the <a href="../nodes/base_node/" target="_blank">BaseNode</a> class, which provides basic methods such as `create`, `save`, `get`, `search`, and `delete`.
 
 ``` python
 # Instantiate a new project node and save it to CRIPT
