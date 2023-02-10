@@ -60,7 +60,7 @@ my_material.save()
 
     ``` python
     # create a project node and save it in one line
-    proj = cript.Project.create(name="My project") 
+    my_project = cript.Project.create(name="My project") 
     ```
 
 ---
@@ -98,8 +98,8 @@ my_material = cript.Material.get(
 
     For example, `Collection` is nested under `Project`:
     ```python
-    proj = cript.Project.get(name="My project")
-    coll = cript.Collection.get(name="My collection", project=proj.uid)
+    my_project = cript.Project.get(name="My project")
+    my_collection = cript.Collection.get(name="My collection", project=proj.uid)
     ```
 
     Project does not need any other parameters because a project is the highest level node.
@@ -123,7 +123,7 @@ The `delete()` method removes an object from the CRIPT database and from memory.
 
 ``` py
 # delete an existing project
-proj.delete()
+my_project.delete()
 ```
 
 ---
@@ -133,7 +133,7 @@ proj.delete()
 Existing nodes can be searched by their attributes. In contrast to the `get()` method, the `search()` method returns a `Paginator` object which may contain any number of results. For example, to search for all `Material` nodes with a molar mass less than 10 g/mol:
 
 ``` py
-results = cript.Material.search(
+my_results = cript.Material.search(
     properties = [
         {
             "key": "molar_mass",
@@ -148,10 +148,10 @@ results = cript.Material.search(
     The `search()` method returns a `Paginator` object, which allows you to paginate through the results using a special set of paginator methods:
 
     ``` python
-    results.json()              # View the raw JSON results
-    results.objects()           # Generate objects for the current page
-    results.next_page()         # Flip to the next page of results (if it exists)
-    results.previous_page()     # Flip to the previous page of results (if it exists)
+    my_results.json()              # View the raw JSON my_results
+    my_results.objects()           # Generate objects for the current page
+    my_results.next_page()         # Flip to the next page of my_results (if it exists)
+    my_results.previous_page()     # Flip to the previous page of my_results (if it exists)
     ```
 
 ---
@@ -160,9 +160,9 @@ results = cript.Material.search(
 
 You may upload a file to the CRIPT database and link it to a specific project, `Data` node object, or material.
 ``` python
-path = "path/to/local/file.txt" # set path to local file
-file = cript.File(project=proj, source=path) # create the file node
-file.save() # save file to CRIPT
+my_path = "path/to/local/file.txt" # set path to local file
+my_file = cript.File(project=my_project, source=my_path) # create the file node
+my_file.save() # save file to CRIPT
 ```
 
 ---
@@ -172,8 +172,8 @@ Once a file is uploaded to CRIPT, it can also be downloaded again.
 
 ``` python
 # local file path you want to download the file to
-path = "downloaded.txt" 
-file.download_file(path=path)
+my_path = "downloaded.txt" 
+my_file.download_file(path=my_path)
 ```
 
 !!! info 
