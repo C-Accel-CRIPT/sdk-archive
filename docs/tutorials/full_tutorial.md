@@ -1,7 +1,8 @@
 This tutorial covers a sample workflow for adding experimental data to <a href="https://criptapp.org" target="_blank">CRIPT</a>, which includes creating `Project`, `Collection`, `Experiment`, `Process`, `Material`, `File`, and `Data` nodes, as well as how to add `Ingredients` and `Conditions` to a `Process` node. Steps should be done sequentially, as some steps rely on the completion of previous steps.
 
 ??? "What is a node?"
-
+    A *node* is simply a CRIPT object (e.g., `Project`, `Experiment`)  in the graph-based data model. Details on how to create, modify, and save different type of nodes
+    are given in the following sections.
 
 # Install CRIPT
 
