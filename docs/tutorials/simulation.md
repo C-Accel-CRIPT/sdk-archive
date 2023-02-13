@@ -1,39 +1,41 @@
-This tutorial guides you through an example simulation workflow using the CRIPT Python SDK.
-
-This tutorial assumes that you've already installed the `cript` python package and tried the [Quickstart](../quickstart.md) or [Full tutorial](full_tutorial.md) and have some understanding of the CRIPT data model.
+This tutorial guides you through an example simulation workflow using the CRIPT Python SDK. This tutorial assumes that you've already installed the `cript` python package and tried the <a href="../../quickstart" target="_blank">Quickstart</a> or <a href="../full_tutorial" target="_blank">Full tutorial</a> and have some understanding of the CRIPT data model.
 
 # Connect to CRIPT
 
-```py
+``` python
 import cript
+import os
 
 host = "criptapp.org"
-token = "<your_api_token>"
+token = os.environ.get("CRIPT_API_KEY")
 cript.API(host, token)
 ```
 
 # Create a Project node
 
 ```py
-proj = cript.Project.create(name="My simulation project")
+my_project = cript.Project(name="My simulation project")
+my_project.save()
 ```
 
 # Create a Collection node
 
 ```py
-coll = cript.Collection.create(
-    project=proj,
+my_collection = cript.Collection(
+    project=my_project,
     name="Simulation Tutorial",
 )
+my_collection.save()
 ```
 
 # Create an Experiment node
 
 ```py
-expt = cript.Experiment.create(
-    collection=coll,
+my_experiment = cript.Experiment(
+    collection=my_collection,
     name="Bulk simulation of polystyrene"
 )
+my_experiment.save()
 ```
 
 # Get the relevant Software nodes
@@ -72,12 +74,12 @@ We can also attach <a href="../../subobjects/algorithm" target="_blank">`Algorit
 
 ```py
 # create some software configuration nodes
-python_config = cript.SoftwareConfiguration(software=python)
-rdkit_config = cript.SoftwareConfiguration(software=rdkit)
-stage_config = cript.SoftwareConfiguration(software=stage)
+my_python_config = cript.SoftwareConfiguration(software=python)
+my_rdkit_config = cript.SoftwareConfiguration(software=rdkit)
+my_stage_config = cript.SoftwareConfiguration(software=stage)
 
 # create a software configuration node with a child Algorithm node
-openmm_config = cript.SoftwareConfiguration(
+my_openmm_config = cript.SoftwareConfiguration(
     software = openmm,
     algorithms = [
         cript.Algorithm(
@@ -89,7 +91,7 @@ openmm_config = cript.SoftwareConfiguration(
 
 # create a software configuration node, with a child Algorithm node,
 # which contains additional parameters
-packmol_config = cript.SoftwareConfiguration(
+my_packmol_config = cript.SoftwareConfiguration(
     software = packmol,
     algorithms = [
         cript.Algorithm(
@@ -105,11 +107,9 @@ packmol_config = cript.SoftwareConfiguration(
 )
 ```
 
-!!! note "Algorithm keys"
-    The allowed `Algorithm` keys are listed under <a href="https://criptapp.org/keys/algorithm-key/" target="_blank">algorithm keys</a> in the CRIPT controlled vocabulary.
-
-!!! note "Parameter keys"
-    The allowed `Parameter` keys are listed under <a href="https://criptapp.org/keys/parameter-key/" target="_blank">parameter keys</a> in the CRIPT controlled vocabulary.
+!!! note "Allowed"
+    - The allowed <a href="../../subobjects/algorithm" target="_blank">`Algorithm`</a> keys are listed under <a href="https://criptapp.org/keys/algorithm-key/" target="_blank">algorithm keys</a> in the CRIPT controlled vocabulary.
+    - The allowed <a href="../../subobjects/parameter" target="_blank">`Parameter`</a> keys are listed under <a href="https://criptapp.org/keys/parameter-key/" target="_blank">parameter keys</a> in the CRIPT controlled vocabulary.
 
 
 # Create Computations
@@ -119,221 +119,228 @@ Now that we've created some <a href="../../subobjects/software_configuration" ta
 In some cases, we may also want to add <a href="../../subobjects/condition" target="_blank">`Condition`</a> nodes to our computation, to specify the conditions at which the computation was carried out. An example of this is shown below.
 
 ```py
-# create a Computation node
-init = cript.Computation.create(
-    experiment = expt,
+# create a Computation node for initialization
+my_initialization = cript.Computation(
+    experiment = my_experiment,
     name = "Initial snapshot and force-field generation",
     type = "initialization",
     software_configurations = [
-        python_config,
-        rdkit_config,
-        stage_config,
-        packmol_config,
-        openmm_config,
+        my_python_config,
+        my_rdkit_config,
+        my_stage_config,
+        my_packmol_config,
+        my_openmm_config,
     ]
 )
+my_initialization.save()
 
-# create a computation node with Condition nodes
-equi = cript.Computation.create(
-    experiment = expt,
+# create a Computation node for equilibration
+my_equilibration = cript.Computation(
+    experiment = my_experiment,
     name = "Equilibrate data prior to measurement",
     type = "MD",
-    software_configurations = [python_config, openmm_config],
+    software_configurations = [my_python_config, my_openmm_config],
     conditions = [
         cript.Condition(key="time_duration", value=100.0, unit="ns"),
         cript.Condition(key="temperature", value=450.0, unit="K"),
         cript.Condition(key="pressure", value=1.0, unit="bar"),
         cript.Condition(key="number", value=31),
     ],
-    prerequisite_computation = init,
+    prerequisite_computation = my_initialization,
 )
+my_equilibration.save()
 
-bulk = cript.Computation.create(
-    experiment = expt,
+# create a Computation node for a bulk simulation
+my_bulk = cript.Computation(
+    experiment = my_experiment,
     name = "Bulk simulation for measurement",
     type = "MD",
-    software_configurations = [python_config, openmm_config],
+    software_configurations = [my_python_config, my_openmm_config],
     conditions = [
         cript.Condition(key="time_duration", value=50.0, unit="ns"),
         cript.Condition(key="temperature", value=450.0, unit="K"),
         cript.Condition(key="pressure", value=1.0, unit="bar"),
         cript.Condition(key="number", value=31),
     ],
-    prerequisite_computation = equi,
+    prerequisite_computation = my_equilibration,
 )
+my_bulk.save()
 
-ana = cript.Computation.create(
-        experiment = expt,
+# create a Computation node for analysis
+my_analysis = cript.Computation(
+        experiment = my_experiment,
         name = "Density analysis",
         type = "analysis",
-        software_configurations = [python_config],
-        prerequisite_computation = bulk,
+        software_configurations = [my_python_config],
+        prerequisite_computation = my_bulk,
 )
+my_analysis.save()
 ```
 
 !!! note "Computation types"
-    The allowed `Computation` types are listed under <a href="https://criptapp.org/keys/computation-type/" target="_blank">computation types</a> in the CRIPT controlled vocabulary.
+    The allowed <a href="../../nodes/computation" target="_blank">`Computation`</a> types are listed under <a href="https://criptapp.org/keys/computation-type/" target="_blank">computation types</a> in the CRIPT controlled vocabulary.
 
 !!! note "Condition keys"
-    The allowed `Condition` keys are listed under <a href="https://criptapp.org/keys/condition-key/" target="_blank">condition keys</a> in the CRIPT controlled vocabulary.
+    The allowed <a href="../../subobjects/condition" target="_blank">`Condition`</a> keys are listed under <a href="https://criptapp.org/keys/condition-key/" target="_blank">condition keys</a> in the CRIPT controlled vocabulary.
 
 
-# Create and Upload Files
+# Create and Upload <a href="../../nodes/file" target="_blank">`File`</a> nodes
 
-New we'd like to upload files associated with our simulation. First, we'll instantiate our File nodes under a specific project.
+New we'd like to upload files associated with our simulation. First, we'll instantiate our <a href="../../nodes/file" target="_blank">`File`</a> nodes under a specific project.
 
 ```py
-packing_file = cript.File(project=proj, source="path/to/local/file")
-forcefield_file = cript.File(project=proj, source="path/to/local/file")
-snap_file = cript.File(project=proj, source="path/to/local/file")
-final_file = cript.File(project=proj, source="path/to/local/file")
+my_packing_file = cript.File(project=my_project, source="path/to/local/packing_file")
+my_forcefield_file = cript.File(project=my_project, source="path/to/local/forcefield_file")
+my_snap_file = cript.File(project=my_project, source="path/to/local/snap_file")
+my_final_file = cript.File(project=my_project, source="path/to/local/final_file")
+
+my_packing_file.save()
+my_forcefield_file.save()
+my_snap_file.save()
+my_final_file.save()
 ```
 
 !!! note
-The `source` field should point to any file on your local filesystem.
+    The `source` field should point to a file on your local filesystem.
 
 !!! info
-Depending on the file size, there could be a delay while the checksum is generated.
+    - You will be prompted to click a link to obtain an authorization code for uploading this file to the CRIPT file storage client. Copy and paste the code obtained from this link into the terminal to save the file.
+    - Depending on the file size, there could be a delay while file is being uploaded to CRIPT.
 
-Next, we'll upload the local files by saving the File nodes. Follow all prompts that appear in the terminal.
-
-```py
-packing_file.save()
-forcefield_file.save()
-snap_file.save()
-final_file.save()
-```
-
-# Create Data
+# Create a <a href="../../nodes/data" target="_blank">`Data`</a> node
 
 Next, we'll create a <a href="../../nodes/data" target="_blank">`Data`</a> node which helps organize our <a href="../../nodes/file" target="_blank">`File`</a> nodes and links back to our <a href="../../nodes/computation" target="_blank">`Computation`</a> objects.
 
 ```py
-packing_data = cript.Data.create(
-    experiment = expt,
+my_packing_data = cript.Data(
+    experiment = my_experiment,
     name = "Loosely packed chains",
     type = "computation_config",
-    files = [packing_file],
-    computations = [init],
+    files = [my_packing_file],
+    computations = [my_initialization],
     notes = "PDB file without topology describing an initial system.",
 )
+my_packing_data.save()
 
-forcefield_data = cript.Data.create(
-    experiment = expt,
+my_forcefield_data = cript.Data(
+    experiment = my_experiment,
     name = "OpenMM forcefield",
     type = "computation_forcefield",
-    files = [forcefield_file],
-    computations = [init],
+    files = [my_forcefield_file],
+    computations = [my_initialization],
     notes = "Full forcefield definition and topology.",
 )
+my_forcefield_data.save()
 
-equi_snap = cript.Data.create(
-    experiment = expt,
+my_equi_snap = cript.Data(
+    experiment = my_experiment,
     name = "Equilibrated simulation snapshot",
     type = "computation_config",
-    files = [snap_file],
-    computations = [equi],
+    files = [my_snap_file],
+    computations = [my_equilibration],
 )
+my_equi_snap.save()
 
-final_data = cript.Data.create(
-    experiment = expt,
+my_final_data = cript.Data(
+    experiment = my_experiment,
     name = "Logged volume during simulation",
     type = "+raw_data",
-    files = [final_file],
-    computations = [bulk],
+    files = [my_final_file],
+    computations = [my_bulk],
 )
+my_final_data.save()
 ```
 
 !!! note "Data types"
-    The allowed `Data` types are listed under the <a href="https://criptapp.org/keys/data-type/" target="_blank">data types</a> in the CRIPT controlled vocabulary.
+    The allowed <a href="../../nodes/data" target="_blank">`Data`</a> types are listed under the <a href="https://criptapp.org/keys/data-type/" target="_blank">data types</a> in the CRIPT controlled vocabulary.
 
 
 Next, we'll link these <a href="../../nodes/data" target="_blank">`Data`</a> nodes to the appropriate <a href="../../nodes/computation" target="_blank">`Computation`</a> nodes.
 
 ```py
-init.update(output_data=[packing_data, forcefield_data])
-equi.update(
-    input_data=[packing_data, forcefield_data],
-    output_data=[equi_snap]
+my_initialization.update(output_data=[my_packing_data, my_forcefield_data])
+my_equilibration.update(
+    input_data=[my_packing_data, my_forcefield_data],
+    output_data=[my_equi_snap]
 )
-ana.update(input_data=[final_data])
-bulk.update(output_data=[final_data])
+my_analysis.update(input_data=[my_final_data])
+my_bulk.update(output_data=[my_final_data])
 ```
 
 !!! note
     Notice the use of `update()` here, which updates and saves the object in one go.
 
-# Create a virtual Material
+# Create a <a href="../../nodes/material" target="_blank">`Material`</a> node
 
 Finally, we'll create a virtual material and link it to the <a href="../../nodes/computation" target="_blank">`Computation`</a> nodes that we've built.
 
 ```py
-polystyrene = cript.Material(
-    project=proj,
+my_polystyrene = cript.Material(
+    project=my_project,
     name="virtual polystyrene",
 )
+
+my_polystyrene.save()
 ```
 
-Next, let's add some [`Identifier`](../subobjects/identifier.md) nodes to the material to make it easier to identify and search.
+Next, let's add some <a href="../../subobjects/identifier" target="_blank">`Identifier`</a> nodes to the <a href="../../nodes/material" target="_blank">`Material`</a> to make it easier to identify and search.
 
 ```py
-names = cript.Identifier(
+my_names = cript.Identifier(
     key="names",
     value=["poly(styrene)", "poly(vinylbenzene)"],
 )
 
-bigsmiles = cript.Identifier(
+my_bigsmiles = cript.Identifier(
     key="bigsmiles",
     value="[H]{[>][<]C(C[>])c1ccccc1[<]}C(C)CC",
 )
 
-chem_repeat = cript.Identifier(
+my_chem_repeat = cript.Identifier(
     key="chem_repeat",
     value="C8H8",
 )
 
-polystyrene.add_identifier(names)
-polystyrene.add_identifier(chem_repeat)
-polystyrene.add_identifier(bigsmiles)
+my_polystyrene.add_identifier(my_names)
+my_polystyrene.add_identifier(my_chem_repeat)
+my_polystyrene.add_identifier(my_bigsmiles)
+
+my_polystyrene.save()
 ```
 
 !!! note "Identifier keys"
-    The allowed `Identifier` keys are listed in the <a href="https://criptapp.org/keys/material-identifier-key/" target="_blank">material identifier keys</a> in the CRIPT controlled vocabulary.
+    The allowed <a href="../../subobjects/identifier" target="_blank">`Identifier`</a> keys are listed in the <a href="https://criptapp.org/keys/material-identifier-key/" target="_blank">material identifier keys</a> in the CRIPT controlled vocabulary.
 
-Let's also add some [`Property`](../subobjects/property.md) nodes to the `Material`, which represent its physical or virtual (in the case of a simulated material) properties.
+Let's also add some <a href="../../subobjects/property" target="_blank">`Property`</a> nodes to the <a href="../../nodes/material" target="_blank">`Material`</a>, which represent its physical or virtual (in the case of a simulated material) properties.
 
 ```py
-phase = cript.Property(key="phase", value="solid")
-color = cript.Property(key="color", value="white")
+my_phase = cript.Property(key="phase", value="solid")
+my_color = cript.Property(key="color", value="white")
 
-polystyrene.add_property(phase)
-polystyrene.add_property(color)
+my_polystyrene.add_property(my_phase)
+my_polystyrene.add_property(my_color)
+
+my_polystyrene.save()
 ```
 
 !!! note "Material property keys"
-    The allowed material `Property` keys are listed in the <a href="https://criptapp.org/keys/material-property-key/" target="_blank">material property keys</a> in the CRIPT controlled vocabulary.
+    The allowed material <a href="../../subobjects/property" target="_blank">`Property`</a> keys are listed in the <a href="https://criptapp.org/keys/material-property-key/" target="_blank">material property keys</a> in the CRIPT controlled vocabulary.
 
 
-Finally, we'll create a [`ComputationalForcefield`](../subobjects/computational_forcefield.md) node and link it to the Material.
+Finally, we'll create a <a href="../../subobjects/computational_forcefield" target="_blank">`ComputationalForcefield`</a> node and link it to the <a href="../../nodes/material" target="_blank">`Material`</a>.
 
 ```py
-forcefield = cript.ComputationalForcefield(
+my_forcefield = cript.ComputationalForcefield(
     key="opls_aa",
     building_block="atom",
     source="Custom determination via STAGE",
-    data=forcefield_data,
+    data=my_forcefield_data,
 )
 
-polystyrene.computational_forcefield = forcefield
-polystyrene.save()
+my_polystyrene.computational_forcefield = my_forcefield
+my_polystyrene.save()
 ```
 
 !!! note "Computational forcefield keys"
-    The allowed `ComputationalForcefield` keys are listed under the <a href="https://criptapp.org/keys/computational-forcefield-key/" target="_blank">computational forcefield keys</a> in the CRIPT controlled vocabulary.
+    The allowed <a href="../../subobjects/computational_forcefield" target="_blank">`ComputationalForcefield`</a> keys are listed under the <a href="https://criptapp.org/keys/computational-forcefield-key/" target="_blank">computational forcefield keys</a> in the CRIPT controlled vocabulary.
 
-
-# Conclusion
-
-You made it! We hope this tutorial has been helpful.
-
-Please let us know how you think it could be improved.
