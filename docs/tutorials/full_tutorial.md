@@ -1,5 +1,7 @@
-!!! abstract "Summary"
-    This tutorial goes over creating a `Project`, `Collection`, `Experiment` and adding the process product to CRIPT 
+This tutorial covers a sample workflow for adding experimental data to <a href="https://criptapp.org" target="_blank">CRIPT</a>, which includes creating `Project`, `Collection`, `Experiment`, `Process`, `Material`, `File`, and `Data` nodes, as well as how to add `Ingredients` and `Conditions` to a `Process` node. Steps should be done sequentially, as some steps rely on the completion of previous steps.
+
+??? "What is a node?"
+
 
 # Install CRIPT
 
@@ -219,6 +221,8 @@ my_process.add_ingredient(solvent)
 my_process.add_ingredient(monomer)
 my_process.add_ingredient(quench)
 my_process.add_ingredient(workup)
+
+my_process.save()
 ```
 
 ---
@@ -232,6 +236,8 @@ my_temperature = cript.Condition(key="temperature", value=25, unit="celsius")
 my_time = cript.Condition(key="time_duration", value=60, unit="min")
 my_process.add_condition(my_temperature)
 my_process.add_condition(my_time)
+
+my_process.save()
 ```
 
 !!! note "Condition keys"
@@ -251,6 +257,8 @@ yield_mass = cript.Property(
     method="scale"
 )
 my_process.add_property(yield_mass)
+
+my_process.save()
 ```
 
 !!! note "Allowed Keys"
@@ -271,9 +279,9 @@ my_polystyrene = cript.Material(
     name="my polystyrene",
     project=my_project
 )
-```
 
-> Note: The material has only been created and not yet saved anywhere
+my_polystyrene.save()
+```
 
 Let's add some <a href="../../subobjects/identifier" target="_blank">`Identifier`</a> nodes to the <a href="../../nodes/material" target="_blank">`Material`</a> to make it easier to identify and search.
 
@@ -297,9 +305,11 @@ my_chem_repeat = cript.Identifier(
 )
 
 # add the identifiers to the material
-polystyrene.add_identifier(my_names)
-polystyrene.add_identifier(my_chem_repeat)
-polystyrene.add_identifier(my_bigsmiles)
+my_polystyrene.add_identifier(my_names)
+my_polystyrene.add_identifier(my_chem_repeat)
+my_polystyrene.add_identifier(my_bigsmiles)
+
+my_polystyrene.save()
 ```
 
 !!! note "Identifier keys"
@@ -357,6 +367,8 @@ my_sec_data = cript.Data(
     name="Crude SEC of polystyrene",
     type="sec_trace",
 )
+
+my_sec_data.save()
 ```
 
 !!! note "Data types"
@@ -370,7 +382,7 @@ my_sec_data = cript.Data(
 Now lets associate our <a href="../../nodes/data" target="_blank">`Data`</a> with a specific <a href="../../nodes/material" target="_blank">`Material`</a> property, molecular weight. To do this, we'll create one more <a href="../../subobjects/property" target="_blank">`Property`</a> node for polystyrene.
 
 ``` python
-poly_mw = cript.Property(
+my_poly_mw = cript.Property(
     key="mw_n",
     value=5200,
     unit="g/mol",
@@ -380,14 +392,14 @@ poly_mw = cript.Property(
 Next, we'll add the <a href="../../nodes/data" target="_blank">`Data`</a> node to the new <a href="../../subobjects/property" target="_blank">`Property`</a> node.
 
 ``` python
-poly_mw.data = my_sec_data
+my_poly_mw.data = my_sec_data
 ```
 
 Last, we'll add the new <a href="../../subobjects/property" target="_blank">`Property`</a> node to polystyrene and save it.
 
 ``` python
-polystyrene.add_property(poly_mw)
-polystyrene.save()
+my_polystyrene.add_property(my_poly_mw)
+my_polystyrene.save()
 ```
 
 ---
@@ -404,21 +416,16 @@ my_file = cript.File(   # instantiate a new the file node
     project=my_project, # associate it with a project
     source=my_path,     # say where the file is located
 )
+
+my_file.save()
 ```
 
 !!! note
     The `source` field should point to a file on your local filesystem.
 
-??? info
-    Depending on the file size, there could be a delay while file is being uploaded to CRIPT.
-
-Next, we'll upload the local file by saving the <a href="../../nodes/file" target="_blank">`File`</a> node. Follow all prompts that appear.
-
-``` python
-my_file.save()
-```
 !!! info
-    You will be prompted to click a link to obtain an authorization code for uploading this file to the CRIPT file storage client. Copy and paste the code obtained from this link into the terminal to save the file.
+    - You will be prompted to click a link to obtain an authorization code for uploading this file to the CRIPT file storage client. Copy and paste the code obtained from this link into the terminal to save the file.
+    - Depending on the file size, there could be a delay while file is being uploaded to CRIPT.
 
 Once the <a href="../../nodes/file" target="_blank">`File`</a> node is saved, we add the newly uploaded file to our <a href="../../nodes/data" target="_blank">`Data`</a> node and save it.
 
