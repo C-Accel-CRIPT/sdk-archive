@@ -80,7 +80,7 @@ A <a href="../../nodes/collection" target="_blank">`Collection`</a> can be thoug
 filled with <a href="../../nodes/experiment" target="_blank">`Experiments`</a>. 
 
 
-A `Collection` can be created in the same way as `Project`, however, since every `Collection` must lives inside of a `Project`, the `Project` that this new `Collection` belongs to must be specified during instantiation.
+A <a href="../../nodes/collection" target="_blank">`Collection`</a> can be created in the same way as <a href="../../nodes/project" target="_blank">`Project`</a>, however, since every <a href="../../nodes/collection" target="_blank">`Collection`</a> must lives inside of a <a href="../../nodes/project" target="_blank">`Project`</a>, the <a href="../../nodes/project" target="_blank">`Project`</a> that this new <a href="../../nodes/collection" target="_blank">`Collection`</a> belongs to must be specified during instantiation.
 
 ``` python
 my_collection = cript.Collection(
@@ -115,7 +115,7 @@ my_experiment.save()
 
 # Get <a href="../../nodes/material" target="_blank">`Material`</a> nodes
 
-<a href="../../nodes/material" target="_blank">`Material`</a> and <a href="../../nodes/inventory" target="_blank">`Inventory`</a> nodes can be created in the same way that <a href="../../nodes/project" target="_blank">`Project`</a>, <a href="../../nodes/collection" target="_blank">`Collection`</a>, and <a href="../../nodes/Experiment" target="_blank">`Experiment`</a>  nodes were created.
+<a href="../../nodes/material" target="_blank">`Material`</a> and <a href="../../nodes/inventory" target="_blank">`Inventory`</a> nodes can be created in the same way that <a href="../../nodes/project" target="_blank">`Project`</a>, <a href="../../nodes/collection" target="_blank">`Collection`</a>, and <a href="../../nodes/experiment" target="_blank">`Experiment`</a>  nodes were created.
 
 For this tutorial, instead of creating new <a href="../../nodes/material" target="_blank">`Material`</a> and <a href="../../nodes/inventory" target="_blank">`Inventory`</a> nodes, we will get references to existing nodes using the <a href="../../nodes/base_node/#cript.data_model.nodes.base_node.BaseNode.get" target="_blank">`cript.<node>.get()`</a> method. The <a href="../../nodes/inventory" target="_blank">`Inventory`</a> we will get contains all of the <a href="../../nodes/material" target="_blank">`Material`</a> nodes we will be using.
 
