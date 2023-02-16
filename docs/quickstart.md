@@ -86,8 +86,9 @@ my_material = cript.Material.get(url="https://criptapp.org/material/015fc459-ea9
 
 ### Get Node using its Name
 ```python
+# get a material by its name
 my_material = cript.Material.get(
-    project=my_project,  # specify which project the material is in
+    project=my_project.uid,  # specify which project the material is in
     name="my new material",  # specify the material name to get
 )
 ```
