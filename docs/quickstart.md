@@ -162,7 +162,12 @@ my_results = cript.Material.search(
 
 You may upload a file to the CRIPT database and link it to a specific project, `Data` node object, or material.
 ``` python
-my_path = "path/to/local/file.txt" # set path to local file
+# first, need to recreate the project we deleted
+my_project = cript.Project(name="My project")
+my_project.save()
+
+# for a file named quickstart.csv in current working directory
+my_path = "quickstart.csv" # set path to existing local file
 my_file = cript.File(project=my_project, source=my_path) # create the file node
 my_file.save() # save file to CRIPT
 ```
