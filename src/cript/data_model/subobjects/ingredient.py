@@ -23,8 +23,8 @@ class Ingredient(BaseSubobject):
     def __init__(
         self,
         material: Union[Material, str],
-        keyword: str,
-        quantities: list[Union[Quantity, dict]] = None,
+        quantities: list[Union[Quantity, dict]],
+        keyword: str = None,
     ):
         super().__init__()
         self.material = material
