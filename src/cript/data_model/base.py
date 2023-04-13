@@ -68,14 +68,17 @@ class Base(abc.ABC):
             skip_nodes = True
 
         node_dict = self.__dict__
-        fields_to_skip = {
-            "url",
-            "_Inventory__index_table",
-            "_Inventory__degenerate_index_table",
-        }
+
         for key, value in node_dict.items():
             # Skip empty values and other fields that should be skipped
-            if not value or key in fields_to_skip:
+            if not value or key == "url":
+                continue
+
+            elif key == "_Inventory__index_table":
+                node_dict[key] = {}
+                continue
+            elif key == "_Inventory__degenerate_index_table":
+                node_dict[key] = set()
                 continue
 
             # Generate nodes
