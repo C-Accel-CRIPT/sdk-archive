@@ -274,3 +274,43 @@ def test_create_file_node_and_upload(criptapp_api):
             proj = cript.Project.get(name=MY_PROJECT)
             f = cript.File(project=proj, source=tmp.name)
             f.save()
+
+
+def test_inventory_index_table(criptapp_api):
+    """
+    test for bug that was persistent across v0.6.2 and 0.6.3
+    """
+    project = cript.Project(name='tmp')
+    project.save()
+
+    collection = cript.Collection(project=project, name='tmp')
+    collection.save()
+
+    inventory = cript.Inventory(collection=collection, name='tmp')
+    inventory.save()
+
+    tmp_mat1 = cript.Material(project=project, name='tmp_mat1')
+    tmp_mat1.save()
+
+    inventory.add_material(tmp_mat1)
+    inventory.save()
+
+    x = inventory['tmp_mat1']
+
+    print(x)
+
+    tmp_mat2 = cript.Material(project=project, name='tmp_mat2')
+    tmp_mat2.save()
+
+    inventory.add_material(tmp_mat2)
+    inventory.save()
+
+    x = inventory['tmp_mat1']
+    print(x)
+
+
+    y = inventory['tmp_mat2']
+    x = inventory['tmp_mat1']
+
+    print(x)
+    print(inventory.materials)
